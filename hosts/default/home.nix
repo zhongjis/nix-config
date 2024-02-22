@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   # Home Manager needs a bit of information about you and the paths it should
@@ -77,7 +77,7 @@
       live_config_reload = true;
 
       shell = {
-	program = "/bin/zsh";
+	program = "${lib.getExe pkgs.zsh}";
         args = ["-l" "-c" "tmux attach || tmux new-session -d -s home"];
       };
       cursor.style.blinking = "Always";
