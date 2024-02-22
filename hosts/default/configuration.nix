@@ -129,6 +129,7 @@
     # userName = "zshen";
     # userEmail = "zhongjie.x.shen@gmail.com";
   };
+
   programs.zsh = {
     enable = true;
     ohMyZsh = {

@@ -70,6 +70,35 @@
     # EDITOR = "emacs";
   };
 
+  # alacritty
+  programs.alacritty = {
+    enable = true;
+    settings = {
+      live_config_reload = true;
+
+      shell.args = ["-l" "-c" "tmux attach || tmux new-session -d -s home"];
+      cursor.style.blinking = "Always";
+      font.size = 20;
+      window = {
+        decorations = "buttonless";
+        dynamic_padding = false;
+        opacity = 0.95;
+        padding = {
+          x = 18;
+          y = 18;
+        };
+      };
+      env.TERM = "xterm-256color";
+    };
+  };
+
+  # git
+  programs.git = {
+    enable = true;
+    userName = "zshen";
+    userEmail = "zhongjie.x.shen@gmail.com";
+  };
+
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 }
