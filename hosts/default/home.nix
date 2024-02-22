@@ -76,11 +76,14 @@
     settings = {
       live_config_reload = true;
 
-      shell.args = ["-l" "-c" "tmux attach || tmux new-session -d -s home"];
+      shell = {
+	program = "/bin/zsh";
+        args = ["-l" "-c" "tmux attach || tmux new-session -d -s home"];
+      };
       cursor.style.blinking = "Always";
-      font.size = 20;
+      font.size = 15;
       window = {
-        decorations = "buttonless";
+        decorations = "none";
         dynamic_padding = false;
         opacity = 0.95;
         padding = {
