@@ -1,6 +1,11 @@
 { config, pkgs, lib, ... }:
 
 {
+
+  imports = [
+    ../../modules/home-manager/alacritty.nix
+  ];
+
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "zshen";
@@ -68,31 +73,6 @@
   #
   home.sessionVariables = {
     # EDITOR = "emacs";
-  };
-
-  # alacritty
-  programs.alacritty = {
-    enable = true;
-    settings = {
-      live_config_reload = true;
-
-      shell = {
-	program = "${lib.getExe pkgs.zsh}";
-        args = ["-l" "-c" "tmux attach || tmux new-session -d -s home"];
-      };
-      cursor.style.blinking = "Always";
-      font.size = 15;
-      window = {
-        decorations = "none";
-        dynamic_padding = false;
-        opacity = 0.95;
-        padding = {
-          x = 18;
-          y = 18;
-        };
-      };
-      env.TERM = "xterm-256color";
-    };
   };
 
   # git
