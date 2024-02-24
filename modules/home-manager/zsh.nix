@@ -7,7 +7,7 @@
     enableCompletion = true;
     oh-my-zsh = {
       enable = true;
-      plugins = [ "git" "terraform" ];
+      plugins = [ "git" "terraform" "vi-mode"];
       theme = "robbyrussell";
     };
   };

@@ -108,6 +108,13 @@
     mplus-outline-fonts.githubRelease
     dina-font
     proggyfonts
+    (nerdfonts.override { 
+        fonts = [ 
+         "FiraCode" 
+         "DroidSansMono" 
+         "Agave"
+        ]; 
+    })
   ];
 
   # hyprland related settings
