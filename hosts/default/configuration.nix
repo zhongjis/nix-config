@@ -27,7 +27,6 @@
 
   nixpkgs.config.allowUnfree = true;
 
-
   networking.hostName = "nixos"; # Define your hostname.
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -112,34 +111,17 @@
     };
   };
 
-  programs.neovim = {
-    enable = true;
-    viAlias = true;
-    vimAlias = true;
-  };
-
   # hyprland related settings
   programs.hyprland.enable = true;
   programs.waybar.enable = true;
   xdg.portal.enable = true;
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
 
-  programs.zsh = {
-    enable = true;
-    ohMyZsh = {
-      enable = true;
-      plugins = [ "git" "terraform" ];
-      theme = "robbyrussell";
-    };
-  };
-
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     wget
     wofi
-    alacritty
-    tmux
     awscli
     terraform
     firefox
