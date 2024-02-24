@@ -3,5 +3,5 @@
 {
   programs.tmux = {
     enable = true;
-  }
-{
+  };
+}

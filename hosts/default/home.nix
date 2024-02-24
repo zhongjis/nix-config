@@ -3,9 +3,9 @@
 {
 
   imports = [
+    ../../modules/home-manager/zsh.nix
     ../../modules/home-manager/alacritty.nix
     ../../modules/home-manager/git.nix
-    ../../modules/home-manager/zsh.nix
     ../../modules/home-manager/neovim.nix
     ../../modules/home-manager/tmux.nix
   ];

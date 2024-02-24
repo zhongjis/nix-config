@@ -26,6 +26,12 @@
   };
 
   nixpkgs.config.allowUnfree = true;
+  home-manager = {
+    extraSpecialArgs = { inherit inputs; };
+    users = {
+      zshen = import ./home.nix;
+    };
+  };
 
   networking.hostName = "nixos"; # Define your hostname.
   # Pick only one of the below networking options.
@@ -104,18 +110,13 @@
     proggyfonts
   ];
 
-  home-manager = {
-    extraSpecialArgs = { inherit inputs; };
-    users = {
-      zshen = import ./home.nix;
-    };
-  };
-
   # hyprland related settings
   programs.hyprland.enable = true;
   programs.waybar.enable = true;
   xdg.portal.enable = true;
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+
+  programs.zsh.enable = true;
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
