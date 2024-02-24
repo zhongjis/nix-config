@@ -7,6 +7,7 @@
     ../../modules/home-manager/git.nix
     ../../modules/home-manager/zsh.nix
     ../../modules/home-manager/neovim.nix
+    ../../modules/home-manager/tmux.nix
   ];
 
   # Home Manager needs a bit of information about you and the paths it should
