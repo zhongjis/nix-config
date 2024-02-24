@@ -124,12 +124,6 @@
   xdg.portal.enable = true;
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
 
-  programs.git = {
-    enable = true;
-    # userName = "zshen";
-    # userEmail = "zhongjie.x.shen@gmail.com";
-  };
-
   programs.zsh = {
     enable = true;
     ohMyZsh = {

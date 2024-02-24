@@ -4,6 +4,7 @@
 
   imports = [
     ../../modules/home-manager/alacritty.nix
+    ../../modules/home-manager/git.nix
   ];
 
   # Home Manager needs a bit of information about you and the paths it should
@@ -73,13 +74,6 @@
   #
   home.sessionVariables = {
     # EDITOR = "emacs";
-  };
-
-  # git
-  programs.git = {
-    enable = true;
-    userName = "zshen";
-    userEmail = "zhongjie.x.shen@gmail.com";
   };
 
   # Let Home Manager install and manage itself.
