@@ -10,5 +10,7 @@
   home.packages = with pkgs; [
     lazygit
     ripgrep
+    node_21
+    unzip
   ];
 }
