@@ -11,4 +11,8 @@
       theme = "robbyrussell";
     };
   };
+
+  home.packages = with pkgs; [
+    fzf
+  ];
 }

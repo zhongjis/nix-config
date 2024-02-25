@@ -6,4 +6,8 @@
     viAlias = true;
     vimAlias = true;
   };
+
+  home.packages = with pkgs; [
+    lazygit
+  ];
 }
