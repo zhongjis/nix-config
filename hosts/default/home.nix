@@ -8,6 +8,7 @@
     ../../modules/home-manager/git.nix
     ../../modules/home-manager/neovim.nix
     ../../modules/home-manager/tmux.nix
+    ../../modules/home-manager/tmux-sessionizer.nix
   ];
 
   # Home Manager needs a bit of information about you and the paths it should
