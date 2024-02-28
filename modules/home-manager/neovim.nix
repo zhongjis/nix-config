@@ -12,5 +12,6 @@
     ripgrep
     nodejs_21
     unzip
+    cargo
   ];
 }
