@@ -26,6 +26,10 @@
   };
 
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.permittedInsecurePackages = [
+    "electron-25.9.0"
+  ];
+
   home-manager = {
     extraSpecialArgs = { inherit inputs; };
     users = {
@@ -132,7 +136,6 @@
     wofi
     awscli
     terraform
-    firefox
     brightnessctl
     obsidian
   ];
