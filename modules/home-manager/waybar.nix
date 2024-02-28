@@ -6,11 +6,11 @@
     # TODO: add this for the latest waybar
     # package = ""
     settings = {
-
     };
   };
 
   home.packages = with pkgs; [
     rofi
+    killall
   ];
 }
