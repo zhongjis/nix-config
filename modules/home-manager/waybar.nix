@@ -3,8 +3,7 @@
 {
   programs.waybar = {
     enable = true;
-    # TODO: add this for the latest waybar
-    # package = ""
+    package = null;
     settings = {
     };
   };
