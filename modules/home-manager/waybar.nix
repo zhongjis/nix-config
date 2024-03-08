@@ -8,19 +8,26 @@
         mainBar = {
             layer = "top";
             position = "top";
-            height = 30;
+            height = 32;
             spacing = 4;
-            modules-left = [];
-            modules-center = ["hyprland/window"];
+            modules-left = [ 
+                "wlr/taskbar" 
+                "hyprland/window"
+            ];
+            modules-center = [
+              "hyprland/workspaces"
+            ];
             modules-right = [
                 "idle_inhibitor"
                 "pulseaudio"
-                "network"
+                "bluetooth"
                 "cpu"
                 "memory"
+                "disk"
                 "temperature"
-                "backlight"
-                "keyboard-state"
+                # "backlight"
+                # "keyboard-state"
+                "network"
                 "battery"
                 "clock"
             ];
