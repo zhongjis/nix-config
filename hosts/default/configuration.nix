@@ -95,7 +95,7 @@
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.zshen = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "inputs" ]; # Enable ‘sudo’ for the user.
+    extraGroups = [ "wheel" "input" ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
     ];
     shell = pkgs.zsh;
