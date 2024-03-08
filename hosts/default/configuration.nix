@@ -95,7 +95,7 @@
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.zshen = {
     isNormalUser = true;
-    extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
+    extraGroups = [ "wheel" "inputs" ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
     ];
     shell = pkgs.zsh;
@@ -123,7 +123,6 @@
 
   # hyprland related settings
   programs.hyprland.enable = true;
-  programs.waybar.enable = true;
   xdg.portal.enable = true;
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
 
@@ -133,6 +132,7 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     wget
+    waybar
     wofi
     awscli
     terraform
