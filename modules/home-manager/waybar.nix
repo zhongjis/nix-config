@@ -3,7 +3,6 @@
 {
   programs.waybar = {
     enable = true;
-    # package = "";
     settings = {
         mainBar = {
             layer = "top";
@@ -25,21 +24,48 @@
                 "memory"
                 "disk"
                 "temperature"
-                # "backlight"
-                # "keyboard-state"
                 "network"
                 "battery"
                 "clock"
             ];
 
-            "keyboard-state" = {
-                numlock = true;
-                capslock = true;
-                format = "{name} {icon}";
-                format-icons= {
-                    locked= "";
-                    unlocked= "";
+            "hyprland/workspaces" = {
+                on-click = "activate";
+                active-only = false;
+                all-outputs = true;
+                format = "{}";
+                format-icons = {
+                    urgent = "";
+                    active = "";
+                    default = "";
                 };
+                persistent-workspaces = {
+                    "*" = 5;
+                };
+            };
+
+            "wlr/taskbar" = {
+                format = "{icon}";
+                icon-size = 18;
+                tooltip-format = "{title}";
+                on-click = "activate";
+                on-click-middle = "close";
+                ignore-list = [];
+                app_ids-mapping = {};
+                rewirte = {
+                    "Firefox Web Browser" = "Firefox";
+                };
+            };
+
+            "hyprland/window" = {
+                rewrite = {
+                    "(.*) - Brave" = "$1";
+                    "(.*) - Chromium" = "$1";
+                    "(.*) - Brave Search" = "$1";
+                    "(.*) - Outlook" = "$1";
+                    "(.*) Microsoft Teams" = "$1";
+                };
+                separate-outputs = true;
             };
 
             "idle_inhibitor" = {
@@ -96,19 +122,22 @@
                 format-icons= ["" "" "" "" ""];
             };
 
-            "network"= {
-                # interface = "wlp2*"; # (Optional) To force the use of this interface
-                format-wifi = "{essid} ({signalStrength}%) ";
-                format-ethernet = "{ipaddr}/{cidr} ";
-                tooltip-format = "{ifname} via {gwaddr} ";
-                format-linked = "{ifname} (No IP) ";
-                format-disconnected = "Disconnected ⚠";
-                format-alt = "{ifname}: {ipaddr}/{cidr}";
+            "network" = {
+                format = "{ifname}";
+                format-wifi = "   {signalStrength}%";
+                format-ethernet = "  {ifname}";
+                format-disconnected = "Disconnected";
+                tooltip-format = " {ifname} via {gwaddri}";
+                tooltip-format-wifi = "  {ifname} @ {essid}\nIP: {ipaddr}\nStrength: {signalStrength}%\nFreq: {frequency}MHz\nUp: {bandwidthUpBits} Down: {bandwidthDownBits}";
+                tooltip-format-ethernet = " {ifname}\nIP: {ipaddr}\n up: {bandwidthUpBits} down: {bandwidthDownBits}";
+                tooltip-format-disconnected = "Disconnected";
+                max-length = 50;
+                # on-click = "~/dotfiles/.settings/networkmanager.sh";
             };
 
-            "pulseaudio"= {
-                # scroll-step = 1; # %; can be a float
-                format = "{volume}% {icon} {format_source}";
+            "pulseaudio" = {
+                scroll-step = 1;
+                format = "{icon} {volume}%";
                 format-bluetooth = "{volume}% {icon} {format_source}";
                 format-bluetooth-muted = " {icon} {format_source}";
                 format-muted = " {format_source}";
@@ -121,10 +150,20 @@
                     phone = "";
                     portable = "";
                     car = "";
-                    default = ["" "" ""];
+                    default = ["" " " " "];
                 };
-                on-click = "pavucontrol";
+                "on-click" = "pavucontrol";
             };
+
+            "bluetooth" = {
+                format = " {status}";
+                format-disabled = "";
+                format-off = "";
+                interval = 30;
+                on-click = "blueman-manager";
+                format-no-controller = "";
+            };
+
         };
     };
   };
