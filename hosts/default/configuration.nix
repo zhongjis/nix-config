@@ -77,7 +77,6 @@
   # Enable sound.
   sound.enable = true;
   security.rtkit.enable = true;
-  # hardware.pulseaudio.enable = true;
   # Enable pipewire for screen sharing sound
   services.pipewire = {
     enable = true;
