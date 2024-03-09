@@ -5,7 +5,7 @@
     mainBarConfig = {
         layer = "top";
         position = "top";
-        height = 32;
+        # height = 32;
         spacing = 4;
         modules-left = [ 
             "wlr/taskbar" 
@@ -75,9 +75,9 @@
         };
 
         "clock"= {
-            # "timezone"= "America/New_York";
-            tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
-            format-alt = "{:%Y-%m-%d}";
+            interval = 60;
+            format = "{:%H:%M}";
+            max-length = 25;
         };
 
         "cpu"= {
