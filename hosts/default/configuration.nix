@@ -25,6 +25,8 @@
     };
   };
 
+  nix.settings.experimental-features = [ "nix-command" "flakes"];
+
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.permittedInsecurePackages = [
     "electron-25.9.0"
@@ -124,9 +126,9 @@
   programs.hyprland.enable = true;
   xdg.portal.enable = true;
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
-  environment.sessionVariables = {
-    NIXOS_OZONE_WL = "1";
-  };
+  # environment.sessionVariables = {
+  #   NIXOS_OZONE_WL = "1";
+  # };
 
   programs.zsh.enable = true;
 
