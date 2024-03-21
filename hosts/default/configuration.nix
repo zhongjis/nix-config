@@ -118,6 +118,7 @@
          "FiraCode" 
          "DroidSansMono" 
          "Agave"
+         "JetBrainsMono"
         ]; 
     })
   ];
