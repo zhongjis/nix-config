@@ -27,12 +27,15 @@
 
   nix.settings.experimental-features = [ "nix-command" "flakes"];
 
-  nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.permittedInsecurePackages = [
-    "electron-25.9.0"
-  ];
+  nixpkgs.config = {
+    allowUnfree = true;
+    permittedInsecurePackages = [
+        "electron-25.9.0"
+    ];
+  };
 
   home-manager = {
+    useGlobalPkgs = true;
     extraSpecialArgs = { inherit inputs; };
     users = {
       zshen = import ./home.nix;
@@ -137,14 +140,6 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     wget
-    waybar
-    wofi
-    awscli
-    terraform
-    brightnessctl
-    obsidian
-    firefox
-    font-manager
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
