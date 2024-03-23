@@ -19,11 +19,16 @@
             "bluetooth"
             "cpu"
             "memory"
+            "disk"
             "temperature"
             "network"
             "battery"
             "clock"
         ];
+
+        "disk" = {
+            format = "[DISK:{percentage_used}%]";
+        };
 
         "hyprland/workspaces" = {
             format = "[{id}]";
