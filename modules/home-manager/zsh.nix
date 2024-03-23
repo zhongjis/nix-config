@@ -4,7 +4,6 @@
   programs.zsh = {
     enable = true;
     enableCompletion = true;
-    # enableAutoSuggestions = true;
     dotDir = ".config/zsh";
     autosuggestion = {
         enable = true;
