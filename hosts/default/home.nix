@@ -8,7 +8,6 @@
     ../../modules/home-manager/git.nix
     ../../modules/home-manager/neovim.nix
     ../../modules/home-manager/tmux.nix
-    ../../modules/home-manager/tmux-sessionizer.nix
     ../../modules/home-manager/waybar.nix
   ];
 
