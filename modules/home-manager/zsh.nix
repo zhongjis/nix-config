@@ -6,10 +6,10 @@
     enableCompletion = true;
     # enableAutoSuggestions = true;
     dotDir = ".config/zsh";
-    # autosuggestions = {
-    #     enable = true;
-    #     highlight = true;
-    # };
+    autosuggestion = {
+        enable = true;
+        highlight = "fg=#ff00ff,bg=cyan,bold,underline";
+    };
     oh-my-zsh = {
       enable = true;
       plugins = [ "git" "terraform" "vi-mode"];
