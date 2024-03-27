@@ -209,5 +209,4 @@ bind = $mainMod, O, exec, obsidian
 bind = $mainMod, RETURN, fullscreen, 1 # toggle fullscreen
     '';
   };
-
 }
