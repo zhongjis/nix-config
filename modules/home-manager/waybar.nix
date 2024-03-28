@@ -222,7 +222,6 @@ in {
   };
 
   home.packages = with pkgs; [
-    rofi
     (pkgs.writeScriptBin "restart-waybar" ''
     #!/usr/bin/env bash
     pkill waybar
