@@ -206,6 +206,7 @@ bind =, xf86audiolowervolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
 # Custom bindings
 bind = $mainMod, F, exec, firefox
 bind = $mainMod, O, exec, obsidian
+bind = $mainMod, X, exec, restart-waybar
 bind = $mainMod, RETURN, fullscreen, 1 # toggle fullscreen
     '';
   };

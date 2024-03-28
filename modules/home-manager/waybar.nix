@@ -40,8 +40,7 @@
 
         "clock"= {
             tooltip-format = "<big>[{:%Y %B}]</big>\n<tt><small>{calendar}</small></tt>";
-            format = "[{:%H:%M}]";
-            format-alt = "[{:%Y-%m-%d}]";
+            format = "[{:%H:%M %Y-%m-%d}]";
         };
 
         "cpu"= {
@@ -102,113 +101,108 @@
     };
 
     css = ''
-@define-color accent #383838;
-@define-color text #f8f8f8;
-@define-color invText #f8f8f8;
-/* text when background is accent */
-@define-color bg #181818;
+      * {
+        font-family: "JetBrainsMono Nerd Font";
+        font-size: 12pt;
+        font-weight: bold;
+        border-radius: 0px;
+        transition-property: background-color;
+        transition-duration: 0.5s;
+      }
 
+      @keyframes blink_red {
+        to {
+            background-color: rgb(242, 143, 173);
+                color: rgb(26, 24, 38);
+            }
+      }
+      .warning, .critical, .urgent {
+        animation-name: blink_red;
+        animation-duration: 1s;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+        animation-direction: alternate;
+      }
 
-/* @import "./wal.css";
-@define-color accent @color5;
-@define-color bg @background;
-@define-color text @foreground; */
+      window#waybar {
+        background-color: transparent;
+      }
+      window > box {
+        margin-left: 5px;
+        margin-right: 5px;
+        margin-top: 5px;
+        background-color: #3b4252;
+      }
 
-/*
-*
-* Base16 Default Dark
-* Author: Chris Kempson (http://chriskempson.com)
-*
-*/
+      #workspaces {
+        padding-left: 0px;
+        padding-right: 4px;
+      }
+      #workspaces button {
+        padding-top: 5px;
+        padding-bottom: 5px;
+        padding-left: 6px;
+        padding-right: 6px;
+        color:#D8DEE9;
+      }
+      #workspaces button.active {
+        background-color: rgb(181, 232, 224);
+        color: rgb(26, 24, 38);
+      }
+      #workspaces button.urgent {
+        color: rgb(26, 24, 38);
+      }
+      #workspaces button:hover {
+        background-color: #B38DAC;
+        color: rgb(26, 24, 38);
+      }
 
-@define-color base00 #181818;
-@define-color base01 #282828;
-@define-color base02 #383838;
-@define-color base03 #585858;
-@define-color base04 #b8b8b8;
-@define-color base05 #d8d8d8;
-@define-color base06 #e8e8e8;
-@define-color base07 #f8f8f8;
-@define-color base08 #ab4642;
-@define-color base09 #dc9656;
-@define-color base0A #f7ca88;
-@define-color base0B #a1b56c;
-@define-color base0C #86c1b9;
-@define-color base0D #7cafc2;
-@define-color base0E #ba8baf;
-@define-color base0F #a16946;
+      tooltip {
+        /* background: rgb(250, 244, 252); */
+        background: #3b4253;
+      }
+      tooltip label {
+        color: #E4E8EF;
+      }
 
-@define-color accent @base01;
-@define-color text @base07;
-@define-color invText @base07;
-@define-color bg @base00;
+      #memory {
+        color: #8EBBBA;
+      }
 
-* {
-  font-family: "JetBrainsMono Nerd Font";
-  font-size: 16;
-  border-radius: 2px;
-  /* :[ */
-  min-height: 0px;
-}
+      #cpu {
+        color: #B38DAC;
+      }
 
-.modules-left {
-  background-color: @bg;
-  padding: 0px 0px 0px 0px;
-}
+      #clock {
+        color: #E4E8EF;
+      }
 
-.modules-center {
-  background-color: @bg;
-  padding: 0px 0px 0px 0px;
-}
+      #temperature {
+        color: #80A0C0;
+      }
 
-.modules-right {
-  background-color: @bg;
-  padding: 0px 0px 0px 0px;
-}
+      #pulseaudio {
+        color: #E9C98A;
+      }
 
-window#waybar {
-  background-color: @bg;
-  color: @text;
-  opacity: 1;
-}
+      #disk {
+        color: #f58442;
+      }
 
-#workspaces {
-  background-color: transparent;
-}
+      #network {
+        color: #99CC99;
+      }
 
-#workspaces button {
-  padding: 0 5px;
-	color: @text;
-}
+      #network.disconnected {
+      color: #CCCCCC;
+      }
 
-#workspaces button.active {
-  background-color: @accent;
-  color: @invText;
-  /* color: @background; */
-}
-
-#taskbar,
-#window,
-#workspaces,
-#pulseaudio,
-#bluetooth,
-#cpu,
-#memory,
-#temperature,
-#network,
-#battery,
-#clock
-{
-  background-color: transparent;
-  color: @text;
-  margin: 0px;
-}
-
-#window {
-  color: @invText;
-  /* background-color: @accent; */
-  padding-left: 4px;
-}
+      #battery.charging, #battery.full, #battery.discharging {
+        color: #CF876F;
+      }
+      #battery.critical:not(.charging) {
+        color: #D6DCE7;
+      }
     '';
 in {
   programs.waybar = {
@@ -222,5 +216,11 @@ in {
 
   home.packages = with pkgs; [
     rofi
+    (pkgs.writeScriptBin "restart-waybar" ''
+    #!/bin/sh
+    pkill waybar
+    sleep 2
+    waybar & disown
+  '')
   ];
 }
