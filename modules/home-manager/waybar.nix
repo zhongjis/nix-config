@@ -228,7 +228,7 @@ in {
 
     pkill waybar
     sleep 10
-    waybar &
+    waybar&
   '')
   ];
 }
