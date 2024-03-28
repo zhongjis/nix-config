@@ -133,6 +133,13 @@
         margin-top: 5px;
         background-color: #3b4252;
       }
+      /* make window module transparent when no windows present */
+      window#waybar.empty #window {
+        background-color: transparent;
+      }
+      #window {
+        color: #ffffff
+      }
 
       #workspaces {
         padding-left: 0px;
@@ -174,7 +181,7 @@
       }
 
       #clock {
-        color: #E4E8EF;
+        color: #f54295;
       }
 
       #temperature {
@@ -218,9 +225,10 @@ in {
     rofi
     (pkgs.writeScriptBin "restart-waybar" ''
     #!/bin/sh
+
     pkill waybar
-    sleep 2
-    waybar & disown
+    sleep 10
+    waybar &
   '')
   ];
 }
