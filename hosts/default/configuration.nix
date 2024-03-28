@@ -135,6 +135,10 @@
   # };
 
   programs.zsh.enable = true;
+    
+  # better power consumption
+  services.thermald.enable = true;
+  services.tlp.enable = true;
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
