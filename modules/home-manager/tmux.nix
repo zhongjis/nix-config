@@ -30,7 +30,7 @@
 
   home.packages = with pkgs; [
     (pkgs.writeScriptBin "tmux-sessionizer" ''
-    #!/bin/sh
+    #!/usr/bin/env bash
     # Your script's content here.
     if [[ $# -eq 1 ]]; then
     	selected=$1
