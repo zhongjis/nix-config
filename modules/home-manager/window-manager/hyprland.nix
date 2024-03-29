@@ -204,6 +204,7 @@
     # Volume control
     bind =, xf86audioraisevolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+ 
     bind =, xf86audiolowervolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+    bind =, xf86audiomute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
     
     # Custom bindings
     bind = $mainMod, F, exec, firefox

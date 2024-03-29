@@ -86,7 +86,7 @@
 
         "pulseaudio" = {
             format = "[VOL:{volume}%]";
-            format-muted = "[VOL: -]";
+            format-muted = "[VOL:MUTE]";
             on-click = "pavucontrol";
         };
 
