@@ -38,6 +38,8 @@
     exec-once = waybar
     exec-once = dunst
     exec-once = lxqt-policykit-agent
+    exec-once = wl-paste --type text --watch cliphist store #Stores only text data
+    exec-once = wl-paste --type image --watch cliphist store #Stores only image data
     
     # Source a file (multi-file configs)
     # source = ~/.config/hypr/myColors.conf
@@ -222,6 +224,9 @@
     bind = $mainMod, O, exec, obsidian
     bind = $mainMod, X, exec, restart-waybar
     bind = $mainMod, RETURN, fullscreen, 1 # toggle fullscreen
+
+    # rofi cliphist
+    bind = $mainMod, $mainMod, exec, cliphist list | rofi -dmenu | cliphist decode | wl-copy
     '';
   };
 }
