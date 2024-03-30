@@ -4,6 +4,7 @@
 {
   home.packages = with pkgs; [
     dunst
+    lxqt.lxqt-policykit
   ];
 
   xdg.portal.enable = true;
@@ -36,6 +37,7 @@
     # exec-once = waybar & hyprpaper & firefox
     exec-once = waybar
     exec-once = dunst
+    exec-once = lxqt-policykit-agent
     
     # Source a file (multi-file configs)
     # source = ~/.config/hypr/myColors.conf

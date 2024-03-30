@@ -5,6 +5,7 @@
     enable = true;
     package = pkgs.rofi-wayland;
     terminal = "${pkgs.alacritty}/bin/alacritty";
+    theme = "gruvbox-dark-hard";
   };
 
   home.packages = with pkgs; [
@@ -16,7 +17,7 @@
         pkill rofi 
     else
         # Rofi not running, launch it
-        rofi -show drun 
+        rofi -show combi -modes combi -combi-modes "window,drun,run"
         sleep 0.2           # Small delay to let Rofi open
         hyprctl dispatch focuswindow active
     fi
