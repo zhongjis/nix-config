@@ -5,6 +5,8 @@
   home.packages = with pkgs; [
     dunst
     lxqt.lxqt-policykit
+    wl-clipboard
+    cliphist
   ];
 
   xdg.portal.enable = true;
@@ -226,7 +228,7 @@
     bind = $mainMod, RETURN, fullscreen, 1 # toggle fullscreen
 
     # rofi cliphist
-    bind = $mainMod, $mainMod, exec, cliphist list | rofi -dmenu | cliphist decode | wl-copy
+    bind = $mainMod, ALT_L, exec, cliphist list | rofi -dmenu | cliphist decode | wl-copy
     '';
   };
 }
