@@ -43,7 +43,7 @@
     # Set programs that you use
     $terminal = alacritty
     $fileManager = dolphin
-    $menu = rofi -show drun
+    $menu = rofi-toggle
     
     # Some default env vars.
     env = XCURSOR_SIZE,24
