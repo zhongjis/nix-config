@@ -7,7 +7,7 @@
     ../../modules/home-manager/alacritty.nix
     ../../modules/home-manager/git.nix
     ../../modules/home-manager/neovim.nix
-    ../../modules/home-manager/tmux.nix
+    ../../modules/home-manager/tmux
     ../../modules/home-manager/window-manager
   ];
 

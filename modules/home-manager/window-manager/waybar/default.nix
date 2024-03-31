@@ -244,9 +244,7 @@ in {
 
   home.packages = with pkgs; [
     (pkgs.writeScriptBin "restart-waybar" ''
-    #!/usr/bin/env bash
-    pkill waybar
-    waybar &
+    ${builtins.readFile ./restart-waybar.sh}
   '')
   ];
 }
