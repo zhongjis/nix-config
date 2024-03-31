@@ -91,6 +91,10 @@
         "battery"= {
             format = "[BAT:{capacity}%]";
             format-charging = "[BAT:{capacity}%+]";
+            stats = {
+              warning = 20;
+              critical = 10;
+            };
         };
 
         "network" = {
