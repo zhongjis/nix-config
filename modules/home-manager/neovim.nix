@@ -6,13 +6,13 @@
     viAlias = true;
     vimAlias = true;
     vimdiffAlias = true;
-  };
 
-  home.packages = with pkgs; [
-    lazygit
-    ripgrep
-    nodejs_21
-    unzip
-    cargo
-  ];
+    extraPackages = with pkgs; [
+        lazygit
+        ripgrep
+        nodejs_21
+        unzip
+        cargo
+    ];
+  };
 }
