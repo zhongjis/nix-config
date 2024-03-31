@@ -1,4 +1,3 @@
-
 { pkgs, ... }:
 
 {
@@ -17,7 +16,7 @@
     enable = true;
     xwayland.enable = true;
     extraConfig = ''
-    ${builtins.readFile ./hyprland.conf}
+      ${builtins.readFile ./hyprland.conf}
     '';
   };
 }
