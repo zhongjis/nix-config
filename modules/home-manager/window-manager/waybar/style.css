@@ -1,0 +1,110 @@
+* {
+  font-family: "JetBrainsMono Nerd Font";
+  font-size: 12pt;
+  font-weight: bold;
+  border-radius: 0px;
+  transition-property: background-color;
+  transition-duration: 0.5s;
+}
+
+@keyframes blink_red {
+  to {
+      background-color: rgb(242, 143, 173);
+          color: rgb(26, 24, 38);
+      }
+}
+.warning, .critical, .urgent {
+  animation-name: blink_red;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+window#waybar {
+  background-color: transparent;
+}
+window > box {
+  margin-left: 5px;
+  margin-right: 5px;
+  margin-top: 5px;
+  background-color: #3b4252;
+}
+/* make window module transparent when no windows present */
+window#waybar.empty #window {
+  background-color: transparent;
+}
+
+#window {
+  color: #ffffff
+}
+
+#workspaces {
+  padding-left: 0px;
+  padding-right: 4px;
+}
+#workspaces button {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 6px;
+  padding-right: 6px;
+  color:#D8DEE9;
+}
+#workspaces button.active {
+  background-color: rgb(181, 232, 224);
+  color: rgb(26, 24, 38);
+}
+#workspaces button.urgent {
+  color: rgb(26, 24, 38);
+}
+#workspaces button:hover {
+  background-color: #B38DAC;
+  color: rgb(26, 24, 38);
+}
+
+tooltip {
+  /* background: rgb(250, 244, 252); */
+  background: #3b4253;
+}
+tooltip label {
+  color: #E4E8EF;
+}
+
+#memory {
+  color: #8EBBBA;
+}
+
+#cpu {
+  color: #B38DAC;
+}
+
+#clock {
+  color: #f54295;
+}
+
+#temperature {
+  color: #80A0C0;
+}
+
+#pulseaudio {
+  color: #E9C98A;
+}
+
+#disk {
+  color: #f58442;
+}
+
+#network {
+  color: #99CC99;
+}
+
+#network.disconnected {
+color: #CCCCCC;
+}
+
+#battery.charging, #battery.full, #battery.discharging {
+  color: #CF876F;
+}
+#battery.critical:not(.charging) {
+  color: #D6DCE7;
+}
