@@ -6,7 +6,7 @@
     ../../modules/home-manager/zsh.nix
     ../../modules/home-manager/alacritty.nix
     ../../modules/home-manager/git.nix
-    ../../modules/home-manager/neovim.nix
+    ../../modules/home-manager/nvim
     ../../modules/home-manager/tmux
     ../../modules/home-manager/window-manager
   ];
