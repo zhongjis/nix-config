@@ -32,6 +32,12 @@
     ];
 
     extraLuaConfig = ''
+      ${builtins.readFile ./config/options.lua}
+
+      ${builtins.readFile ./config/keymaps.lua}
+
+      ${builtins.readFile ./config/autocmds.lua}
+
       ${builtins.readFile ./kickstart.lua}
     '';
   };
