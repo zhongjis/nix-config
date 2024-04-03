@@ -9,18 +9,7 @@
     ../../modules/home-manager/nvim
     ../../modules/home-manager/tmux
     ../../modules/home-manager/window-manager
-    inputs.xremap-flake.homeManagerModules.default
   ];
-
-  services.xremap = {
-    withWlroots = true;
-    yamlConfig = ''
-      modmap:
-        - name: main remaps
-          remap:
-            CapsLock: esc
-    '';
-  };
 
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
