@@ -13,7 +13,7 @@
   ];
 
   services.xremap = {
-    withHypr = true;
+    withWlroots = true;
     yamlConfig = ''
       modmap:
         - name: main remaps
