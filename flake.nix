@@ -11,6 +11,7 @@
     };
 
     hyprland.url = "github:hyprwm/Hyprland";
+    xremap-flake.url = "github:xremap/nix-flake";
   };
 
   outputs = { self, nixpkgs, nixos-hardware, ... }@inputs:

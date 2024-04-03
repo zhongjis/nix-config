@@ -11,6 +11,13 @@
       inputs.home-manager.nixosModules.default
     ];
 
+  # xremap
+  hardware.uinput.enable = true;
+  users.groups = {
+    uinput.members = ["zshen"];
+    input.members = ["zshen"];
+  };
+
   # Use the systemd-boot EFI boot loader.
   boot.loader = {
     systemd-boot.enable = false;
