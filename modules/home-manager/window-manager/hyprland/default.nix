@@ -4,6 +4,9 @@
   home.packages = with pkgs; [
     dunst
     lxqt.lxqt-policykit
+
+    pavucontrol
+
     wl-clipboard
     cliphist
   ];
