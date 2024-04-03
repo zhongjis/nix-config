@@ -5,7 +5,8 @@
     dunst
     lxqt.lxqt-policykit
 
-    pavucontrol
+    brightnessctl # brightness control
+    pavucontrol # volume control GUI
 
     wl-clipboard
     cliphist
