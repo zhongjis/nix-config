@@ -10,16 +10,19 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix-darwin.url = "github:LnL7/nix-darwin"; 
+    nix-darwin.inputs.nixpkgs.follows = "nixpkgs"; 
+
     hyprland.url = "github:hyprwm/Hyprland";
     xremap-flake.url = "github:xremap/nix-flake";
   };
 
-  outputs = { self, nixpkgs, nixos-hardware, ... }@inputs:
+  outputs = { self, nixpkgs, nix-darwin, nixos-hardware, ... }@inputs:
     let
-      system = "x86_64-linux";
-      pkgs = import nixpkgs {
-        inherit system;
-      };
+      supportedSystems = [ "x86_64-linux" "aarch64-darwin" ];
+      forEachSupportedSystem = f: nixpkgs.lib.genAttrs supportedSystems (system: f {
+        pkgs = import nixpkgs { inherit system; };
+      });
     in
     {
       nixosConfigurations = {
@@ -28,8 +31,17 @@
           modules = [ 
             ./hosts/default/configuration.nix
             inputs.home-manager.nixosModules.default
-	    nixos-hardware.nixosModules.lenovo-thinkpad-t480
+	        nixos-hardware.nixosModules.lenovo-thinkpad-t480
           ];
+        };
+      };
+
+      darwinConfigurations = {
+        "Zhongjies-MacBook-Pro-2" = nix-darwin.lib.darwinSystem { 
+          modules = [
+            ./hosts/work-mac/configuration.nix 
+            inputs.home-manager.nixosModules.default
+          ]; 
         };
       };
     };
