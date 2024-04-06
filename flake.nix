@@ -19,8 +19,8 @@
 
   outputs = { self, nixpkgs, nix-darwin, nixos-hardware, ... }@inputs:
     let
-      supportedSystems = [ "x86_64-linux" "aarch64-darwin" ];
-      forEachSupportedSystem = f: nixpkgs.lib.genAttrs supportedSystems (system: f {
+        systems = [ "x86_64-linux" "aarch64-darwin" ];
+        forEachSupportedSystem = f: nixpkgs.lib.genAttrs systems (system: f {
         pkgs = import nixpkgs { inherit system; };
       });
     in
@@ -37,10 +37,9 @@
       };
 
       darwinConfigurations = {
-        "Zhongjies-MacBook-Pro-2" = nix-darwin.lib.darwinSystem { 
+        mac-work = nix-darwin.lib.darwinSystem { 
           modules = [
-            ./hosts/work-mac/configuration.nix 
-            inputs.home-manager.nixosModules.default
+            ./hosts/work-mac/configuration.nix
           ]; 
         };
       };
