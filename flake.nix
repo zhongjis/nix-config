@@ -43,6 +43,7 @@
           specialArgs = { inherit inputs; };
           modules = [
             ./hosts/work-mac/configuration.nix
+            inputs.home-manager.darwinModules.home-manager
           ]; 
         };
       };

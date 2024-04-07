@@ -3,7 +3,16 @@
 {
   imports = 
     [ 
+      inputs.home-manager.darwinModules.default
     ];
+
+  home-manager = {
+    useGlobalPkgs = true;
+    extraSpecialArgs = { inherit inputs; };
+    users = {
+      zshen = import ./home.nix;
+    };
+  };
 
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
