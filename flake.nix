@@ -10,8 +10,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nix-darwin.url = "github:LnL7/nix-darwin"; 
-    nix-darwin.inputs.nixpkgs.follows = "nixpkgs"; 
+    nix-darwin = {
+      url = "github:LnL7/nix-darwin"; 
+      inputs.nixpkgs.follows = "nixpkgs"; 
+    };
 
     hyprland.url = "github:hyprwm/Hyprland";
     xremap-flake.url = "github:xremap/nix-flake";
