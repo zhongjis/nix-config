@@ -18,7 +18,7 @@
         size = 13;
       };
       window = {
-        decorations = "none";
+        decorations = "buttonless";
         dynamic_padding = false;
         opacity = 0.95;
         padding = {
