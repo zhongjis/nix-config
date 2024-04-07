@@ -7,14 +7,14 @@
     # ../../modules/home-manager/alacritty.nix
     # ../../modules/home-manager/git.nix
     # ../../modules/home-manager/nvim
-    # ../../modules/home-manager/tmux
+    ../../modules/home-manager/tmux
     # ../../modules/home-manager/window-manager
   ];
 
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "zshen";
-  home.homeDirectory = "/home/zshen";
+  home.homeDirectory = lib.mkForce "/Users/zshen";
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release

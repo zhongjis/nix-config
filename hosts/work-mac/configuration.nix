@@ -1,10 +1,15 @@
-{ inputs, ... }:
+{ inputs, pkgs, ... }:
 
 {
   imports = 
     [ 
       inputs.home-manager.darwinModules.default
     ];
+
+  users.users.zshen = {
+    packages = with pkgs; [];
+    shell = pkgs.zsh;
+  };
 
   home-manager = {
     useGlobalPkgs = true;
