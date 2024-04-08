@@ -26,7 +26,6 @@
           y = 18;
         };
       };
-      env.TERM = "xterm-256color";
     };
   };
 }
