@@ -4,6 +4,8 @@
   imports = 
     [ 
       inputs.home-manager.darwinModules.default
+      ../../modules/nix-darwin/skhd
+      ../../modules/nix-darwin/yabai
     ];
 
   users.users.zshen = {

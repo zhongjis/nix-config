@@ -3,7 +3,7 @@
 {
   services.skhd = {
     enable = true;
-    skhdconfig = ''
+    skhdConfig = ''
       ${builtins.readFile ./skhdrc}
       ${builtins.readFile ./yabai-setting}
     '';
