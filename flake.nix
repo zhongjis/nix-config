@@ -29,6 +29,7 @@
     {
       nixosConfigurations = {
         default = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
           specialArgs = { inherit inputs; };
           modules = [ 
             ./hosts/default/configuration.nix
@@ -40,6 +41,7 @@
 
       darwinConfigurations = {
         mac-work = nix-darwin.lib.darwinSystem {
+          system = "aarch64-darwin";
           specialArgs = { inherit inputs; };
           modules = [
             ./hosts/work-mac/configuration.nix
