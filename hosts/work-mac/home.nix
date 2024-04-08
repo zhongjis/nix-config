@@ -1,12 +1,11 @@
 { config, pkgs, lib, inputs, ... }:
 
 {
-
   imports = [
     # ../../modules/home-manager/zsh.nix
     ../../modules/home-manager/alacritty
     # ../../modules/home-manager/git.nix
-    # ../../modules/home-manager/nvim
+    ../../modules/home-manager/nvim
     ../../modules/home-manager/tmux
   ];
 
