@@ -11,8 +11,26 @@
     };
     oh-my-zsh = {
       enable = true;
-      plugins = [ "git" "terraform" "vi-mode"];
-      theme = "robbyrussell";
+      plugins = [ 
+        "git"
+        "terraform"
+        "vi-mode"
+        # "autojump"
+        # "zsh-syntax-highlighting"
+        # "zsh-autosuggestions"
+        "sublime" 
+        "sublime-merge"
+        "mvn"
+        "kubectl"
+      ];
+      theme = "refined";
+    };
+    history = {
+      expireDuplicatesFirst = true;
+      extended = true;
+      save = 10000;
+      size = 10000;
+      share = true;
     };
     shellAliases = {
         ls = "eza --long --header --git";
