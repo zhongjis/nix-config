@@ -9,6 +9,7 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       inputs.home-manager.nixosModules.default
+      ../common.nix
     ];
 
   # xremap
@@ -101,34 +102,11 @@
     shell = pkgs.zsh;
   };
 
-  fonts.packages = with pkgs; [
-    noto-fonts
-    noto-fonts-cjk
-    noto-fonts-emoji
-    font-awesome
-    liberation_ttf
-    fira-code
-    fira-code-symbols
-    mplus-outline-fonts.githubRelease
-    dina-font
-    proggyfonts
-    (nerdfonts.override { 
-        fonts = [ 
-         "FiraCode" 
-         "DroidSansMono" 
-         "Agave"
-         "JetBrainsMono"
-        ]; 
-    })
-  ];
-
   # hyprland related settings
   # environment.sessionVariables = {
   #   NIXOS_OZONE_WL = "1";
   # };
-
-  programs.zsh.enable = true;
-    
+ 
   # better power consumption
   services.thermald.enable = true;
   services.tlp.enable = true;

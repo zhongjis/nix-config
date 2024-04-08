@@ -7,7 +7,7 @@
       live_config_reload = true;
 
       shell = {
-	    program = "${lib.getExe pkgs.zsh}";
+        program = "${lib.getExe pkgs.zsh}";
         args = ["-l" "-c" "tmux attach || tmux new-session -d -s home"];
       };
       cursor.style.blinking = "Always";
