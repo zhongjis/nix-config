@@ -9,6 +9,7 @@
         enable = true;
         highlight = "fg=#ff00ff,bg=cyan,bold,underline";
     };
+    syntaxHighlighting.enable = true;
     oh-my-zsh = {
       enable = true;
       plugins = [ 
@@ -16,8 +17,6 @@
         "terraform"
         "vi-mode"
         # "autojump"
-        # "zsh-syntax-highlighting"
-        # "zsh-autosuggestions"
         "sublime" 
         "sublime-merge"
         "mvn"

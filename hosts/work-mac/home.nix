@@ -2,7 +2,7 @@
 
 {
   imports = [
-    # ../../modules/home-manager/zsh.nix
+    ../../modules/home-manager/zsh.nix
     ../../modules/home-manager/alacritty
     # ../../modules/home-manager/git.nix
     ../../modules/home-manager/nvim

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Properly assign the output to hotkey_window_id. Use command substitution $() and quotes.
 hotkey_window_id=$(yabai -m query --windows | jq -r 'map(select(.app == "Alacritty" and ."is-floating" == true)) | .[0].id')
