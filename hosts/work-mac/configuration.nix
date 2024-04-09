@@ -43,6 +43,29 @@
     })
   ];
 
+  homebrew = {
+    enable = true;
+    casks = [
+      "alfred"
+      "bartender"
+      "bitwarden"
+      "caffeine"
+      "charles"
+      "cheatsheet"
+      "devdocs"
+      "devtoys"
+      "docker"
+      "dropbox"
+      "flux"
+      "github"
+      "spotify"
+      "mongodb-compass"
+      "microsoft-openjdk11"
+      "itsycal"
+      "intellij-idea"
+    ];
+  };
+
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
   environment.systemPackages = [];
