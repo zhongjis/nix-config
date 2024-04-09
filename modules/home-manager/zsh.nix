@@ -9,10 +9,27 @@
         enable = true;
         highlight = "fg=#ff00ff,bg=cyan,bold,underline";
     };
+    syntaxHighlighting.enable = true;
     oh-my-zsh = {
       enable = true;
-      plugins = [ "git" "terraform" "vi-mode"];
-      theme = "robbyrussell";
+      plugins = [ 
+        "git"
+        "terraform"
+        "vi-mode"
+        # "autojump"
+        "sublime" 
+        "sublime-merge"
+        "mvn"
+        "kubectl"
+      ];
+      theme = "refined";
+    };
+    history = {
+      expireDuplicatesFirst = true;
+      extended = true;
+      save = 10000;
+      size = 10000;
+      share = true;
     };
     shellAliases = {
         ls = "eza --long --header --git";

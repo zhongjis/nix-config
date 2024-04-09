@@ -2,13 +2,14 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{ config, lib, pkgs, inputs, ... }:
+{ pkgs, inputs, ... }:
 
 {
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       inputs.home-manager.nixosModules.default
+      ../common.nix
     ];
 
   # xremap
@@ -127,8 +128,6 @@
   #   NIXOS_OZONE_WL = "1";
   # };
 
-  programs.zsh.enable = true;
-    
   # better power consumption
   services.thermald.enable = true;
   services.tlp.enable = true;

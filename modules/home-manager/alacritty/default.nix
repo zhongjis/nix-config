@@ -7,7 +7,7 @@
       live_config_reload = true;
 
       shell = {
-	    program = "${lib.getExe pkgs.zsh}";
+        program = "${lib.getExe pkgs.zsh}";
         args = ["-l" "-c" "tmux attach || tmux new-session -d -s home"];
       };
       cursor.style.blinking = "Always";
@@ -18,7 +18,7 @@
         size = 13;
       };
       window = {
-        decorations = "none";
+        decorations = "buttonless";
         dynamic_padding = false;
         opacity = 0.95;
         padding = {
@@ -26,7 +26,6 @@
           y = 18;
         };
       };
-      env.TERM = "xterm-256color";
     };
   };
 }
