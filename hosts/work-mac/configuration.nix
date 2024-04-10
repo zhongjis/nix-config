@@ -69,7 +69,6 @@
   nixpkgs = {
     overlays = [ 
       inputs.nixpkgs-terraform.overlays.default
-      inputs.neovim-nightly-overlay.overlay
     ];
     config = {
       allowUnfree = true;
@@ -78,8 +77,10 @@
 
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
-  environment.systemPackages = [
-    pkgs.terraform-versions."1.5.2"
+  environment.systemPackages = with pkgs; [
+    terraform-versions."1.5.2"
+    kubectl
+    kubelogin
   ];
 
   # Auto upgrade nix package and the daemon service.
