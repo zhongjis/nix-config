@@ -34,7 +34,7 @@
           modules = [ 
             ./hosts/default/configuration.nix
             inputs.home-manager.nixosModules.default
-	        nixos-hardware.nixosModules.lenovo-thinkpad-t480
+            nixos-hardware.nixosModules.lenovo-thinkpad-t480
           ];
         };
       };
