@@ -1,15 +1,5 @@
 { inputs, pkgs, ... }:
-let
-     pkgs = import (builtins.fetchGit {
-         # Descriptive name to make the store path easier to identify
-         name = "terraform-1-5-2";
-         url = "https://github.com/NixOS/nixpkgs/";
-         ref = "refs/heads/nixpkgs-unstable";
-         rev = "5a8650469a9f8a1958ff9373bd27fb8e54c4365d";
-     }) {};
 
-     myPkg = pkgs.terraform;
-in
 {
   imports = 
     [ 
@@ -66,7 +56,6 @@ in
       "devdocs"
       "devtoys"
       "docker"
-      "dropbox"
       "flux"
       "github"
       "spotify"
@@ -77,14 +66,20 @@ in
     ];
   };
 
-  nixpkgs.config = {
-    allowUnfree = true;
+  nixpkgs = {
+    overlays = [ 
+      inputs.nixpkgs-terraform.overlays.default
+      inputs.neovim-nightly-overlay.overlay
+    ];
+    config = {
+      allowUnfree = true;
+    };
   };
 
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
   environment.systemPackages = [
-    myPkg.terraform
+    pkgs.terraform-versions."1.5.2"
   ];
 
   # Auto upgrade nix package and the daemon service.
