@@ -12,9 +12,8 @@
       };
       cursor.style.blinking = "Always";
       font = {
-        normal = {
-          family = "Firacode Nerd Font";
-        };
+        normal.family = "Firacode Nerd Font";
+        bold.style = "Bold";
         size = 13;
       };
       window = {
