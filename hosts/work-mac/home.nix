@@ -6,6 +6,7 @@
     # ../../modules/home-manager/git.nix
     ../../modules/home-manager/nvim
     ../../modules/home-manager/tmux
+    ../../modules/home-manager/k9s.nix
   ];
 
   # Home Manager needs a bit of information about you and the paths it should
