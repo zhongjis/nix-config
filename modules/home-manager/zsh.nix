@@ -29,7 +29,6 @@
       extended = true;
       save = 10000;
       size = 10000;
-      share = true;
     };
     shellAliases = {
         ls = "eza --long --header --git";
