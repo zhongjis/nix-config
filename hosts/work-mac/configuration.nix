@@ -69,6 +69,7 @@
   nixpkgs = {
     overlays = [ 
       inputs.nixpkgs-terraform.overlays.default
+      inputs.neovim-nightly-overlay.overlay
     ];
     config = {
       allowUnfree = true;
