@@ -23,16 +23,7 @@
   };
 
   fonts.fonts = with pkgs; [
-    noto-fonts
-    noto-fonts-cjk
-    noto-fonts-emoji
     font-awesome
-    liberation_ttf
-    fira-code
-    fira-code-symbols
-    mplus-outline-fonts.githubRelease
-    dina-font
-    proggyfonts
     (nerdfonts.override { 
         fonts = [ 
          "FiraCode" 
@@ -46,23 +37,25 @@
   homebrew = {
     enable = true;
     casks = [
-      "alacritty"
+      # productivity
       "alfred"
       "bartender"
       "bitwarden"
       "caffeine"
-      "charles"
-      "cheatsheet"
-      "devdocs"
-      "devtoys"
-      "docker"
       "flux"
       "github"
       "spotify"
-      "mongodb-compass"
-      "microsoft-openjdk11"
       "itsycal"
+      "box-drive"
+
+      # dev tools
+      "alacritty"
+      "charles"
+      "microsoft-openjdk11"
+      "devtoys"
+      "docker"
       "intellij-idea"
+      "mongodb-compass"
     ];
   };
 
