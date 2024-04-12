@@ -11,10 +11,10 @@ name:
 }:
 
 let
-  hostOSConfiguration = ../hosts/${name}/configuration.nix;
+  hostConfiguration = ../hosts/${name}/configuration.nix;
 
   systemFunc = if darwin then inputs.nix-darwin.lib.darwinSystem else nixpkgs.lib.nixosSystem;
-  home-manager = if darwin then inputs.home-manager.darwinModules.home-manager else inputs.home-manager.nixosModules.default;
+  home-manager-module = if darwin then inputs.home-manager.darwinModules.home-manager else inputs.home-manager.nixosModules.default;
 in 
 systemFunc {
   system = system;
@@ -28,8 +28,7 @@ systemFunc {
       };
     }
 
-    hostOSConfiguration 
-
-    home-manager
+    hostConfiguration 
+    home-manager-module
   ];
 }
