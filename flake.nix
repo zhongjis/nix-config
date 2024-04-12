@@ -26,6 +26,7 @@
     let
       overlays = [
         inputs.neovim-nightly-overlay.overlay
+        inputs.nixpkgs-terraform.overlays.default
       ];
       mkSystem = import ./lib/mksystem.nix {
         inherit overlays nixpkgs inputs;
@@ -43,17 +44,6 @@
           ];
         };
       };
-
-      # darwinConfigurations = {
-      #   mac-work = nix-darwin.lib.darwinSystem {
-      #     system = "aarch64-darwin";
-      #     specialArgs = { inherit inputs; };
-      #     modules = [
-      #       ./hosts/work-mac/configuration.nix
-      #       inputs.home-manager.darwinModules.home-manager
-      #     ]; 
-      #   };
-      # };
 
       darwinConfigurations.mac-work = 
         mkSystem "mac-work" {

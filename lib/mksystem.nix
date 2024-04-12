@@ -11,44 +11,25 @@ name:
 }:
 
 let
-  # The config files for this system.
-  # hardwareConfig = ../hosts/${name}/hardware.nix;
-  userOSConfig = ../hosts/${name}/configuration.nix;
-  userHMConfig = ../hosts/${name}/home.nix;
+  hostOSConfiguration = ../hosts/${name}/configuration.nix;
 
-  # NixOS vs nix-darwin functionst
   systemFunc = if darwin then inputs.nix-darwin.lib.darwinSystem else nixpkgs.lib.nixosSystem;
-  home-manager = if darwin then inputs.home-manager.darwinModules else inputs.home-manager.nixosModules;
-in systemFunc rec {
-  inherit system;
+  home-manager = if darwin then inputs.home-manager.darwinModules.home-manager else inputs.home-manager.nixosModules.default;
+in 
+systemFunc {
+  system = system;
+  specialArgs = { inherit inputs; };
 
   modules = [
-    # Apply our overlays. Overlays are keyed by system type so we have
-    # to go through and apply our system type. We do this first so
-    # the overlays are available globally.
-    { nixpkgs.overlays = overlays; }
-
-    # hardwareConfig
-
-    userOSConfig
-
-    home-manager.home-manager {
-      home-manager.useGlobalPkgs = true;
-      home-manager.useUserPackages = true;
-      home-manager.users.${user} = import userHMConfig {
-        inputs = inputs;
+    { 
+      nixpkgs = {
+        overlays = overlays; 
+        config.allowUnfree = true;
       };
     }
 
-    # We expose some extra arguments so that our modules can parameterize
-    # better based on these values.
-    {
-      config._module.args = {
-        currentSystem = system;
-        currentSystemName = name;
-        currentSystemUser = user;
-        inputs = inputs;
-      };
-    }
+    hostOSConfiguration 
+
+    home-manager
   ];
 }
