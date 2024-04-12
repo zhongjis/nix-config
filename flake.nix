@@ -24,11 +24,12 @@
 
   outputs = { self, nixpkgs, nix-darwin, nixos-hardware, ... }@inputs:
     let
-      systems = [ "x86_64-linux" "aarch64-darwin" ];
-      forEachSupportedSystem = f: nixpkgs.lib.genAttrs systems (system: f {
-        pkgs = import nixpkgs { inherit system; };
-      });
-
+      overlays = [
+        inputs.neovim-nightly-overlay.overlay
+      ];
+      mkSystem = import ./lib/mksystem.nix {
+        inherit overlays nixpkgs inputs;
+      };
     in
     {
       nixosConfigurations = {
@@ -43,15 +44,22 @@
         };
       };
 
-      darwinConfigurations = {
-        mac-work = nix-darwin.lib.darwinSystem {
-          system = "aarch64-darwin";
-          specialArgs = { inherit inputs; };
-          modules = [
-            ./hosts/work-mac/configuration.nix
-            inputs.home-manager.darwinModules.home-manager
-          ]; 
+      # darwinConfigurations = {
+      #   mac-work = nix-darwin.lib.darwinSystem {
+      #     system = "aarch64-darwin";
+      #     specialArgs = { inherit inputs; };
+      #     modules = [
+      #       ./hosts/work-mac/configuration.nix
+      #       inputs.home-manager.darwinModules.home-manager
+      #     ]; 
+      #   };
+      # };
+
+      darwinConfigurations.mac-work = 
+        mkSystem "mac-work" {
+          system  = "aarch64-darwin";
+          user    = "zshen";
+          darwin  = true;
         };
-      };
     };
 }
