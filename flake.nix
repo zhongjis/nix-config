@@ -33,15 +33,15 @@
       };
     in
     {
-      nixosConfigurations.personal-thinkpad-t480 =
-        mkSystem "personal-thinkpad-t480" {
+      nixosConfigurations.thinkpad-t480 =
+        mkSystem "thinkpad-t480" {
           system   = "x86_64-linux";
           user     = "zshen";
           hardware = "lenovo-thinkpad-t480";
         };
 
-      darwinConfigurations.work-mac = 
-        mkSystem "work-mac" {
+      darwinConfigurations.mac-m1-max = 
+        mkSystem "mac-m1-max" {
           system  = "aarch64-darwin";
           user    = "zshen";
           darwin  = true;
