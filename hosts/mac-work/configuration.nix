@@ -14,8 +14,6 @@
     shell = pkgs.zsh;
   };
 
-  home-manager.users.${currentSystemUser} = import ./home.nix;
-
   fonts.fonts = with pkgs; [
     font-awesome
     (nerdfonts.override { 

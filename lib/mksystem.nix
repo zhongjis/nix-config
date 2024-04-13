@@ -45,6 +45,15 @@ systemFunc {
     hardwareModule
 
     {
+      home-manager = {
+        useGlobalPkgs = true;
+        useUserPackages = false;
+        extraSpecialArgs = { inherit inputs; };
+        users.${user} = import ../hosts/${name}/home.nix;
+      };
+    }
+
+    {
       config._module.args = {
         currentSystem = system;
         currentSystemName = name;

@@ -33,8 +33,8 @@
       };
     in
     {
-      nixosConfigurations.default =
-        mkSystem "default" {
+      nixosConfigurations.personal-thinkpad-t480 =
+        mkSystem "personal-thinkpad-t480" {
           system   = "x86_64-linux";
           user     = "zshen";
           hardware = "lenovo-thinkpad-t480";
