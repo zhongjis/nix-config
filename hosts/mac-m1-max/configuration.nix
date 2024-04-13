@@ -4,9 +4,8 @@
   imports = 
     [ 
       inputs.home-manager.darwinModules.default
-      ../../modules/nix-darwin/skhd
-      ../../modules/nix-darwin/yabai
       ../common.nix
+      ../../modules/nix-darwin
     ];
 
   users.users.${currentSystemUser} = {

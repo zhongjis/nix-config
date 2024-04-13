@@ -6,10 +6,10 @@
 
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [
       ./hardware-configuration.nix
-      inputs.home-manager.nixosModules.default
       ../common.nix
+      inputs.home-manager.nixosModules.default
     ];
 
   # xremap
@@ -36,21 +36,6 @@
   };
 
   nix.settings.experimental-features = [ "nix-command" "flakes"];
-
-  nixpkgs.config = {
-    allowUnfree = true;
-    permittedInsecurePackages = [
-        "electron-25.9.0"
-    ];
-  };
-
-  home-manager = {
-    useGlobalPkgs = true;
-    extraSpecialArgs = { inherit inputs; };
-    users = {
-      zshen = import ./home.nix;
-    };
-  };
 
   networking= {
     hostName = "nixos"; # Define your hostname.
@@ -180,6 +165,4 @@
   #
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "24.05"; # Did you read the comment?
-
 }
-
