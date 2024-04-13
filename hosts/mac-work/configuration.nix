@@ -14,13 +14,7 @@
     shell = pkgs.zsh;
   };
 
-  home-manager = {
-    useGlobalPkgs = true;
-    extraSpecialArgs = { inherit inputs; };
-    users = {
-      ${currentSystemUser} = import ./home.nix;
-    };
-  };
+  home-manager.users.${currentSystemUser} = import ./home.nix;
 
   fonts.fonts = with pkgs; [
     font-awesome
