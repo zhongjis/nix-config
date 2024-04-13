@@ -6,10 +6,10 @@
 
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [
       ./hardware-configuration.nix
-      inputs.home-manager.nixosModules.default
       ../common.nix
+      inputs.home-manager.nixosModules.default
     ];
 
   # xremap
@@ -36,21 +36,6 @@
   };
 
   nix.settings.experimental-features = [ "nix-command" "flakes"];
-
-  nixpkgs.config = {
-    allowUnfree = true;
-    permittedInsecurePackages = [
-        "electron-25.9.0"
-    ];
-  };
-
-  home-manager = {
-    useGlobalPkgs = true;
-    extraSpecialArgs = { inherit inputs; };
-    users = {
-      zshen = import ./home.nix;
-    };
-  };
 
   networking= {
     hostName = "nixos"; # Define your hostname.
@@ -98,30 +83,18 @@
     isNormalUser = true;
     extraGroups = [ "wheel" "input" ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
+      terraform
+      kubectl
+      kubelogin
+      brightnessctl
+      obsidian
+      firefox
+      font-manager
+      kdePackages.dolphin
+      evince # pdf viewer
     ];
     shell = pkgs.zsh;
   };
-
-  fonts.packages = with pkgs; [
-    noto-fonts
-    noto-fonts-cjk
-    noto-fonts-emoji
-    font-awesome
-    liberation_ttf
-    fira-code
-    fira-code-symbols
-    mplus-outline-fonts.githubRelease
-    dina-font
-    proggyfonts
-    (nerdfonts.override { 
-        fonts = [ 
-         "FiraCode" 
-         "DroidSansMono" 
-         "Agave"
-         "JetBrainsMono"
-        ]; 
-    })
-  ];
 
   # hyprland related settings
   # environment.sessionVariables = {
@@ -134,9 +107,7 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    wget
-  ];
+  environment.systemPackages = with pkgs; [];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -180,6 +151,4 @@
   #
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "24.05"; # Did you read the comment?
-
 }
-

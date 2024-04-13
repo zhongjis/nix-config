@@ -24,34 +24,27 @@
 
   outputs = { self, nixpkgs, nix-darwin, nixos-hardware, ... }@inputs:
     let
-      systems = [ "x86_64-linux" "aarch64-darwin" ];
-      forEachSupportedSystem = f: nixpkgs.lib.genAttrs systems (system: f {
-        pkgs = import nixpkgs { inherit system; };
-      });
-
+      overlays = [
+        inputs.neovim-nightly-overlay.overlay
+        inputs.nixpkgs-terraform.overlays.default
+      ];
+      mkSystem = import ./lib/mksystem.nix {
+        inherit overlays nixpkgs inputs;
+      };
     in
     {
-      nixosConfigurations = {
-        default = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = { inherit inputs; };
-          modules = [ 
-            ./hosts/default/configuration.nix
-            inputs.home-manager.nixosModules.default
-            nixos-hardware.nixosModules.lenovo-thinkpad-t480
-          ];
+      nixosConfigurations.thinkpad-t480 =
+        mkSystem "thinkpad-t480" {
+          system   = "x86_64-linux";
+          user     = "zshen";
+          hardware = "lenovo-thinkpad-t480";
         };
-      };
 
-      darwinConfigurations = {
-        mac-work = nix-darwin.lib.darwinSystem {
-          system = "aarch64-darwin";
-          specialArgs = { inherit inputs; };
-          modules = [
-            ./hosts/work-mac/configuration.nix
-            inputs.home-manager.darwinModules.home-manager
-          ]; 
+      darwinConfigurations.mac-m1-max = 
+        mkSystem "mac-m1-max" {
+          system  = "aarch64-darwin";
+          user    = "zshen";
+          darwin  = true;
         };
-      };
     };
 }

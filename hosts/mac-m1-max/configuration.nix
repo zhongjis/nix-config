@@ -1,38 +1,17 @@
-{ inputs, pkgs, ... }:
+{ inputs, pkgs, currentSystemUser, ... }:
 
 {
   imports = 
     [ 
       inputs.home-manager.darwinModules.default
-      ../../modules/nix-darwin/skhd
-      ../../modules/nix-darwin/yabai
       ../common.nix
+      ../../modules/nix-darwin
     ];
 
-  users.users.zshen = {
+  users.users.${currentSystemUser} = {
     packages = with pkgs; [];
     shell = pkgs.zsh;
   };
-
-  home-manager = {
-    useGlobalPkgs = true;
-    extraSpecialArgs = { inherit inputs; };
-    users = {
-      zshen = import ./home.nix;
-    };
-  };
-
-  fonts.fonts = with pkgs; [
-    font-awesome
-    (nerdfonts.override { 
-        fonts = [ 
-         "FiraCode" 
-         "DroidSansMono" 
-         "Agave"
-         "JetBrainsMono"
-        ]; 
-    })
-  ];
 
   homebrew = {
     enable = true;
@@ -59,22 +38,10 @@
     ];
   };
 
-  nixpkgs = {
-    overlays = [ 
-      inputs.nixpkgs-terraform.overlays.default
-      inputs.neovim-nightly-overlay.overlay
-    ];
-    config = {
-      allowUnfree = true;
-    };
-  };
-
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
   environment.systemPackages = with pkgs; [
     terraform-versions."1.5.2"
-    kubectl
-    kubelogin
   ];
 
   # Auto upgrade nix package and the daemon service.
