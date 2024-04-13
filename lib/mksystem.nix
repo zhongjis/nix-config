@@ -6,13 +6,27 @@ name:
 {
   system,
   user,
+  hardware ? "",
   darwin ? false,
 }:
 
 let
   hostConfiguration = ../hosts/${name}/configuration.nix;
-  systemFunc = if darwin then inputs.nix-darwin.lib.darwinSystem else nixpkgs.lib.nixosSystem;
-  home-manager-module = if darwin then inputs.home-manager.darwinModules.home-manager else inputs.home-manager.nixosModules.default;
+  systemFunc = 
+    if darwin then 
+      inputs.nix-darwin.lib.darwinSystem 
+    else 
+      nixpkgs.lib.nixosSystem;
+  hmModule = 
+    if darwin then 
+      inputs.home-manager.darwinModules.home-manager 
+    else 
+      inputs.home-manager.nixosModules.default;
+  hardwareModule =
+    if hardware != "" then
+      inputs.nixos-hardware.nixosModules.${hardware}
+    else
+      {};
 in 
 systemFunc {
   system = system;
@@ -27,7 +41,8 @@ systemFunc {
     }
 
     hostConfiguration 
-    home-manager-module
+    hmModule
+    hardwareModule
 
     {
       config._module.args = {

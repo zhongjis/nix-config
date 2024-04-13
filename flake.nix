@@ -33,17 +33,12 @@
       };
     in
     {
-      nixosConfigurations = {
-        default = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = { inherit inputs; };
-          modules = [ 
-            ./hosts/default/configuration.nix
-            inputs.home-manager.nixosModules.default
-            nixos-hardware.nixosModules.lenovo-thinkpad-t480
-          ];
+      nixosConfigurations.default =
+        mkSystem "default" {
+          system   = "x86_64-linux";
+          user     = "zshen";
+          hardware = "lenovo-thinkpad-t480";
         };
-      };
 
       darwinConfigurations.mac-work = 
         mkSystem "mac-work" {
