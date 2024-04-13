@@ -39,8 +39,8 @@
       shellAliases = {
           ls = "eza --long --header --git";
           la = "eza --long --header --git -a";
-          nixswitch = "sudo nixos-rebuild switch --flake ~/nix-config/#default";
-          nixtest = "sudo nixos-rebuild test --flake ~/nix-config/#default";
+          nixswitch = "sudo nixos-rebuild switch --flake ~/nix-config/#thinkpad-t480";
+          nixtest = "sudo nixos-rebuild test --flake ~/nix-config/#thinkpad-t480";
       };
     };
 
