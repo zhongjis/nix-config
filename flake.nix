@@ -40,8 +40,8 @@
           hardware = "lenovo-thinkpad-t480";
         };
 
-      darwinConfigurations.mac-work = 
-        mkSystem "mac-work" {
+      darwinConfigurations.work-mac = 
+        mkSystem "work-mac" {
           system  = "aarch64-darwin";
           user    = "zshen";
           darwin  = true;
