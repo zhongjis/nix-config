@@ -1,12 +1,12 @@
 { config, pkgs, lib, inputs, ... }:
 {
   imports = [
-    ../../modules/home-manager/zsh.nix
-    ../../modules/home-manager/alacritty
+    ../../modules/home-manager/common/zsh.nix
+    ../../modules/home-manager/common/alacritty
     # ../../modules/home-manager/git.nix
-    ../../modules/home-manager/nvim
-    ../../modules/home-manager/tmux
-    ../../modules/home-manager/k9s.nix
+    ../../modules/home-manager/common/nvim
+    ../../modules/home-manager/common/tmux
+    ../../modules/home-manager/common/k9s.nix
   ];
 
   # Home Manager needs a bit of information about you and the paths it should
