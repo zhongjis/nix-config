@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, config, ... }:
 
 {
   imports = [
@@ -10,11 +10,18 @@
     ./tmux
   ];
 
-  alacritty.enable = lib.mkDefault true;
-  zsh.enable = lib.mkDefault true;
-  neovim.enable = lib.mkDefault true;
-  tmux.enable = lib.mkDefault true;
+  options = {
+    common.enable =
+      lib.mkEnableOption "enable common packages";
+  };
 
-  git.enable = lib.mkDefault false;
-  k9s.enable = lib.mkDefault false;
+  config = lib.mkIf config.common.enable {
+    alacritty.enable = lib.mkDefault true;
+    zsh.enable = lib.mkDefault true;
+    neovim.enable = lib.mkDefault true;
+    tmux.enable = lib.mkDefault true;
+
+    git.enable = lib.mkDefault false;
+    k9s.enable = lib.mkDefault false;
+  };
 }

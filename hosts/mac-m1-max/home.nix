@@ -1,9 +1,10 @@
 { config, pkgs, lib, inputs, ... }:
 {
   imports = [
-    ../../modules/home-manager/common
+    ../../modules/home-manager
   ];
 
+  # override common module options
   k9s.enable = true;
 
   # Home Manager needs a bit of information about you and the paths it should

@@ -2,11 +2,14 @@
 
 {
   imports = [
-    ../../modules/home-manager/window-manager
-    ../../modules/home-manager/common
+    ../../modules/home-manager
   ];
 
+  # override common module options
   git.enable = true;
+
+  # enable window-manager module
+  window-manager.enable = true;
 
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
