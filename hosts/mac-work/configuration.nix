@@ -1,4 +1,4 @@
-{ inputs, pkgs, ... }:
+{ inputs, pkgs, currentSystemUser, ... }:
 
 {
   imports = 
@@ -9,7 +9,7 @@
       ../common.nix
     ];
 
-  users.users.zshen = {
+  users.users.${currentSystemUser} = {
     packages = with pkgs; [];
     shell = pkgs.zsh;
   };
@@ -18,7 +18,7 @@
     useGlobalPkgs = true;
     extraSpecialArgs = { inherit inputs; };
     users = {
-      zshen = import ./home.nix;
+      ${currentSystemUser} = import ./home.nix;
     };
   };
 
@@ -65,6 +65,8 @@
     terraform-versions."1.5.2"
     kubectl
     kubelogin
+    gh
+    graphviz
   ];
 
   # Auto upgrade nix package and the daemon service.

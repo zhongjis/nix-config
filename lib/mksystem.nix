@@ -7,12 +7,10 @@ name:
   system,
   user,
   darwin ? false,
-  wsl ? false
 }:
 
 let
   hostConfiguration = ../hosts/${name}/configuration.nix;
-
   systemFunc = if darwin then inputs.nix-darwin.lib.darwinSystem else nixpkgs.lib.nixosSystem;
   home-manager-module = if darwin then inputs.home-manager.darwinModules.home-manager else inputs.home-manager.nixosModules.default;
 in 
@@ -30,5 +28,14 @@ systemFunc {
 
     hostConfiguration 
     home-manager-module
+
+    {
+      config._module.args = {
+        currentSystem = system;
+        currentSystemName = name;
+        currentSystemUser = user;
+        inputs = inputs;
+      };
+    }
   ];
 }
