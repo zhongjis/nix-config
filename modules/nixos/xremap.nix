@@ -1,17 +1,24 @@
-{ inputs }:
+{ lib, config, inputs }:
 
 {
-  imports = [
-    inputs.xremap-flake.homeManagerModules.default
-  ];
+  options = {
+    xremap.enable =
+      lib.mkEnableOption "enable xremap";
+  };
 
-  services.xremap = {
-    withWlroots = true;
-    yamlConfig = ''
-      modmap:
-        - name: main remaps
-          remap:
-            CapsLock: esc
-    '';
+  config = lib.mkIf config.xremap.enalbe {
+    imports = [
+      inputs.xremap-flake.homeManagerModules.default
+    ];
+
+    services.xremap = {
+      withWlroots = true;
+      yamlConfig = ''
+        modmap:
+          - name: main remaps
+            remap:
+              CapsLock: esc
+      '';
+    };
   };
 }
