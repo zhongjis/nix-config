@@ -8,6 +8,7 @@
     ../../modules/home-manager/common/tmux
     ../../modules/home-manager/common/k9s.nix
   ];
+  neovim.enable = true;
 
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
