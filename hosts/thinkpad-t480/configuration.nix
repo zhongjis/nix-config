@@ -9,6 +9,7 @@
     [
       ./hardware-configuration.nix
       ../common.nix
+      ../../modules/nixos
       inputs.home-manager.nixosModules.default
     ];
 
