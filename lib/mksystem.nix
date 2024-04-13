@@ -47,7 +47,7 @@ systemFunc {
     {
       home-manager = {
         useGlobalPkgs = true;
-        useUserPackages = false;
+        useUserPackages = true;
         extraSpecialArgs = { inherit inputs; };
         users.${user} = import ../hosts/${name}/home.nix;
       };

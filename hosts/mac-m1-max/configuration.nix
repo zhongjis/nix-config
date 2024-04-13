@@ -13,18 +13,6 @@
     shell = pkgs.zsh;
   };
 
-  fonts.fonts = with pkgs; [
-    font-awesome
-    (nerdfonts.override { 
-        fonts = [ 
-         "FiraCode" 
-         "DroidSansMono" 
-         "Agave"
-         "JetBrainsMono"
-        ]; 
-    })
-  ];
-
   homebrew = {
     enable = true;
     casks = [
@@ -54,10 +42,6 @@
   # $ nix-env -qaP | grep wget
   environment.systemPackages = with pkgs; [
     terraform-versions."1.5.2"
-    kubectl
-    kubelogin
-    gh
-    graphviz
   ];
 
   # Auto upgrade nix package and the daemon service.
