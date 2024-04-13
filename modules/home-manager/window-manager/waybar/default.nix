@@ -1,5 +1,7 @@
 { 
-    pkgs, 
+    pkgs,
+    lib,
+    config,
     ... 
 }:let 
     mainBarConfig = {
@@ -129,18 +131,25 @@
       ${builtins.readFile ./style.css}
     '';
 in {
-  programs.waybar = {
-    enable = true;
-    package = pkgs.waybar.overrideAttrs (oldAttrs: {
-      mesonFlags = oldAttrs.mesonFlags ++ ["-Dexperimental=true"];
-    });
-    settings.mainBar = mainBarConfig;
-    style = css;
+  options = {
+    waybar.enable = 
+      lib.mkEnableOption "enables waybar";
   };
 
-  home.packages = with pkgs; [
-    (pkgs.writeScriptBin "restart-waybar" ''
-    ${builtins.readFile ./restart-waybar.sh}
-  '')
-  ];
+  config = lib.mkIf config.waybar.enable {
+      programs.waybar = {
+        enable = true;
+        package = pkgs.waybar.overrideAttrs (oldAttrs: {
+          mesonFlags = oldAttrs.mesonFlags ++ ["-Dexperimental=true"];
+        });
+        settings.mainBar = mainBarConfig;
+        style = css;
+      };
+
+      home.packages = with pkgs; [
+        (pkgs.writeScriptBin "restart-waybar" ''
+        ${builtins.readFile ./restart-waybar.sh}
+      '')
+      ];
+  };
 }

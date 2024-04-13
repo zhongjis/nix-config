@@ -1,7 +1,6 @@
 { config, pkgs, lib, inputs, ... }:
 
 {
-
   imports = [
     ../../modules/home-manager/window-manager
     ../../modules/home-manager/common

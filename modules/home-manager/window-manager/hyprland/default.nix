@@ -1,26 +1,33 @@
-{ pkgs, ... }:
+{ pkgs, lib, config, ... }:
 
 {
-  home.packages = with pkgs; [
-    dunst
-    lxqt.lxqt-policykit
+  options = {
+    hyprland.enable = 
+      lib.mkEnableOption "enables hyprland";
+  };
 
-    brightnessctl # brightness control
-    pavucontrol # volume control GUI
+  config = lib.mkIf config.hyprland.enable {
+    home.packages = with pkgs; [
+      dunst
+      lxqt.lxqt-policykit
 
-    wl-clipboard
-    cliphist
-  ];
+      brightnessctl # brightness control
+      pavucontrol # volume control GUI
 
-  xdg.portal.enable = true;
-  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
-  xdg.portal.config.common.default = "*";
+      wl-clipboard
+      cliphist
+    ];
 
-  wayland.windowManager.hyprland = {
-    enable = true;
-    xwayland.enable = true;
-    extraConfig = ''
-      ${builtins.readFile ./hyprland.conf}
-    '';
+    xdg.portal.enable = true;
+    xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+    xdg.portal.config.common.default = "*";
+
+    wayland.windowManager.hyprland = {
+      enable = true;
+      xwayland.enable = true;
+      extraConfig = ''
+        ${builtins.readFile ./hyprland.conf}
+      '';
+    };
   };
 }
