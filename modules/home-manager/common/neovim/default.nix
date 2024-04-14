@@ -65,19 +65,42 @@
           config = toLua "require(\"harpoon\"):setup()";
         }
 
-        # **lsp** TODO
-        # {
-        #   plugin = nvim-lspconfig;
-        #   config = toLuaFile ./nvim/plugin/lsp.lua;
-        # }
+        # **lsp**
+        mason-nvim
+        mason-lspconfig-nvim
+        mason-tool-installer-nvim
+
+        {
+          plugin = fidget-nvim;
+          config = toLua "require(\"fidget\").setup()";
+        }
+
+        {
+          plugin = neodev-nvim;
+          config = toLua "require(\"neodev\").setup()";
+        }
+
+        {
+          plugin = nvim-lspconfig;
+          config = toLuaFile ./plugins/lsp.lua;
+        }
+
+        # **cmp**
+        luasnip
+        friendly-snippets
+        cmp_luasnip
+        cmp-nvim-lsp
+        cmp-path
+        {
+          plugin = nvim-cmp;
+          config = toLuaFile ./plugins/cmp.lua;
+        }
 
         # **conform**
         {
           plugin = conform-nvim;
           config = toLuaFile ./plugins/conform.lua;
         }
-
-        # **cmp** TODO
 
         # **theme**
         tokyonight-nvim
@@ -95,7 +118,7 @@
           config = toLuaFile ./plugins/mini.lua;
         }
 
-        # **nvim-treesitter** TODO
+        # **nvim-treesitter**
         {
           plugin = nvim-treesitter.withAllGrammars;
           config = toLuaFile ./plugins/treesitter.lua;
