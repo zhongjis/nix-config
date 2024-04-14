@@ -96,6 +96,12 @@
         }
 
         # **nvim-treesitter** TODO
+
+        # **oil.nvim**
+        {
+          plugin = oil-nvim;
+          config = toLua "require(\"oil\").setup()";
+        }
       ];
 
       extraLuaConfig = ''
