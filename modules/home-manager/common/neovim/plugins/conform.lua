@@ -23,3 +23,11 @@ require("conform").setup({
 		-- javascript = { { "prettierd", "prettier" } },
 	},
 })
+
+require("conform").formatters.stylua = {
+	prepend_args = function(self, ctx)
+		return { 
+			"--config-path", "$STYLUA_CONFIG"
+		}
+	end,
+}
