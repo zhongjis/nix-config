@@ -28,22 +28,82 @@
       ];
 
       plugins = with pkgs.vimPlugins; [
-        # {
-        #   plugin = comment-nvim;
-        #   config = toLua "require(\"Comment\").setup()";
-        # }
+        vim-sleuth
 
+        # **coment.nvim**
+        {
+          plugin = comment-nvim;
+          config = toLua "require(\"Comment\").setup()";
+        }
+
+        # **gitsigns.nvim**
+        {
+          plugin = gitsigns-nvim;
+          config = toLuaFile ./plugins/gitsigns.lua;
+        }
+
+        # **which-key**
+        {
+          plugin = which-key-nvim;
+          config = toLuaFile ./plugins/which-key.lua;
+        }
+
+        # **telescope.nvim**
+        plenary-nvim
+        telescope-fzf-native-nvim
+        telescope-ui-select-nvim
+        nvim-web-devicons
+
+        {
+          plugin = telescope-nvim;
+          config = toLuaFile ./plugins/telescope.lua;
+        }
+
+        # **harpoon**
+        {
+          plugin = harpoon2;
+          config = toLua "require(\"harpoon\"):setup()";
+        }
+
+        # **lsp** TODO
         # {
         #   plugin = nvim-lspconfig;
         #   config = toLuaFile ./nvim/plugin/lsp.lua;
         # }
+
+        # **conform**
+        {
+          plugin = conform-nvim;
+          config = toLuaFile ./plugins/conform.lua;
+        }
+
+        # **cmp** TODO
+
+        # **theme**
+        tokyonight-nvim
+
+        # **todo-comments.nvim**
+        # plenary-nvim
+        {
+          plugin = todo-comments-nvim;
+          config = toLua "require(\"todo-comments\").setup{ signs = false }";
+        }
+
+        # **mini.nvim**
+        {
+          plugin = mini-nvim;
+          config = toLuaFile ./plugins/mini.lua;
+        }
+
+        # **nvim-treesitter** TODO
       ];
 
       extraLuaConfig = ''
         ${builtins.readFile ./config/options.lua}
         ${builtins.readFile ./config/keymaps.lua}
         ${builtins.readFile ./config/autocmds.lua}
-        ${builtins.readFile ./kickstart.lua}
+
+        vim.cmd.colorscheme 'tokyonight-night'
       '';
     };
 
