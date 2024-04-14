@@ -96,6 +96,10 @@
         }
 
         # **nvim-treesitter** TODO
+        {
+          plugin = nvim-treesitter.withAllGrammars;
+          config = toLuaFile ./plugins/treesitter.lua;
+        }
 
         # **oil.nvim**
         {
