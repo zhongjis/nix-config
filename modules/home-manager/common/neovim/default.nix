@@ -129,6 +129,14 @@
             plugin = oil-nvim;
             config = toLua "require(\"oil\").setup()";
           }
+
+          # **noice.nvim**
+          nui-nvim
+          nvim-notify
+          {
+            plugin = noice-nvim;
+            config = toLuaFile ./plugins/noice.lua;
+          }
         ];
 
         extraLuaConfig = ''

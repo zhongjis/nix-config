@@ -28,6 +28,7 @@
       "box-drive"
 
       # dev tools
+      "sublime-merge"
       "alacritty"
       "charles"
       "microsoft-openjdk11"
