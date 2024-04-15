@@ -2,7 +2,7 @@
 
 {
   options = {
-    yabai.enable = 
+    yabai.enable =
       lib.mkEnableOption "enables yabai";
   };
 

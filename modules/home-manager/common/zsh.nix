@@ -2,7 +2,7 @@
 
 {
   options = {
-    zsh.enable = 
+    zsh.enable =
       lib.mkEnableOption "enables zsh";
   };
 
@@ -12,18 +12,18 @@
       enableCompletion = true;
       dotDir = ".config/zsh";
       autosuggestion = {
-          enable = true;
-          highlight = "fg=#ff00ff,bg=cyan,bold,underline";
+        enable = true;
+        highlight = "fg=#ff00ff,bg=cyan,bold,underline";
       };
       syntaxHighlighting.enable = true;
       oh-my-zsh = {
         enable = true;
-        plugins = [ 
+        plugins = [
           "git"
           "terraform"
           "vi-mode"
           # "autojump"
-          "sublime" 
+          "sublime"
           "sublime-merge"
           "mvn"
           "kubectl"
@@ -37,10 +37,10 @@
         size = 10000;
       };
       shellAliases = {
-          ls = "eza --long --header --git";
-          la = "eza --long --header --git -a";
-          nixswitch = "sudo nixos-rebuild switch --flake ~/nix-config/#thinkpad-t480";
-          nixtest = "sudo nixos-rebuild test --flake ~/nix-config/#thinkpad-t480";
+        ls = "eza --long --header --git";
+        la = "eza --long --header --git -a";
+        nixswitch = "sudo nixos-rebuild switch --flake ~/nix-config/#thinkpad-t480";
+        nixtest = "sudo nixos-rebuild test --flake ~/nix-config/#thinkpad-t480";
       };
     };
 

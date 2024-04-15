@@ -2,7 +2,7 @@
 
 {
   options = {
-    alacritty.enable = 
+    alacritty.enable =
       lib.mkEnableOption "enables alacritty";
   };
 
@@ -14,7 +14,7 @@
 
         shell = {
           program = "${lib.getExe pkgs.zsh}";
-          args = ["-l" "-c" "tmux attach || tmux new-session -d -s home"];
+          args = [ "-l" "-c" "tmux attach || tmux new-session -d -s home" ];
         };
         cursor.style.blinking = "Always";
         font = {

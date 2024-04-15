@@ -2,7 +2,7 @@
 
 {
   options = {
-    tmux.enable = 
+    tmux.enable =
       lib.mkEnableOption "enables tmux";
   };
 

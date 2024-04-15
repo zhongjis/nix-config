@@ -6,7 +6,7 @@
   ];
 
   options = {
-    xremap.enable = 
+    xremap.enable =
       lib.mkEnableOption "enables xremap";
   };
 

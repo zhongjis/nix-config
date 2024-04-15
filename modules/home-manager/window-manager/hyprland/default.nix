@@ -2,7 +2,7 @@
 
 {
   options = {
-    hyprland.enable = 
+    hyprland.enable =
       lib.mkEnableOption "enables hyprland";
   };
 

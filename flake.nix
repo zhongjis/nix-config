@@ -12,8 +12,8 @@
     };
 
     nix-darwin = {
-      url = "github:LnL7/nix-darwin"; 
-      inputs.nixpkgs.follows = "nixpkgs"; 
+      url = "github:LnL7/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     hyprland.url = "github:hyprwm/Hyprland";
@@ -35,16 +35,16 @@
     {
       nixosConfigurations.thinkpad-t480 =
         mkSystem "thinkpad-t480" {
-          system   = "x86_64-linux";
-          user     = "zshen";
+          system = "x86_64-linux";
+          user = "zshen";
           hardware = "lenovo-thinkpad-t480";
         };
 
-      darwinConfigurations.mac-m1-max = 
+      darwinConfigurations.mac-m1-max =
         mkSystem "mac-m1-max" {
-          system  = "aarch64-darwin";
-          user    = "zshen";
-          darwin  = true;
+          system = "aarch64-darwin";
+          user = "zshen";
+          darwin = true;
         };
     };
 }

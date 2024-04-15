@@ -2,7 +2,7 @@
 
 {
   options = {
-    rofi.enable = 
+    rofi.enable =
       lib.mkEnableOption "enables rofi";
   };
 
@@ -16,8 +16,8 @@
 
     home.packages = with pkgs; [
       (pkgs.writeScriptBin "rofi-toggle" ''
-      ${builtins.readFile ./rofi-toggle.sh}
-    '')
+        ${builtins.readFile ./rofi-toggle.sh}
+      '')
     ];
   };
 }
