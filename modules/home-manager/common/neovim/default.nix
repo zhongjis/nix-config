@@ -137,6 +137,10 @@
             plugin = noice-nvim;
             config = toLuaFile ./plugins/noice.lua;
           }
+
+          # **lazygit.nvim**
+          # plenary-nvim
+          lazygit-nvim
         ];
 
         extraLuaConfig = ''

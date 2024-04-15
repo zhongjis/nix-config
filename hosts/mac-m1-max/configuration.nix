@@ -47,8 +47,9 @@
   environment.systemPackages = with pkgs; [
     terraform-versions."1.5.2"
     docker_26
-    jdk11
+    jdk11 # TODO: this jdk cannot be found easily by intelliJ
     bitwarden-cli
+    php
   ];
 
   # Auto upgrade nix package and the daemon service.
