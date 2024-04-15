@@ -143,10 +143,6 @@
     home.packages = with pkgs; [
         lazygit
     ];
-    home.file.".config/nvim/stylua.toml".source = ./plugins/stylua.toml; 
-    home.sessionVariables = {
-      STYLUA_CONFIG = "~/.config/nvim/stylua.toml";
-    };
   };
 
 }
