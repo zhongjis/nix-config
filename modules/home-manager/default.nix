@@ -18,13 +18,13 @@
     graphviz
     wget
     font-awesome
-    (nerdfonts.override { 
-        fonts = [ 
-         "FiraCode" 
-         "DroidSansMono" 
-         "Agave"
-         "JetBrainsMono"
-        ]; 
+    (nerdfonts.override {
+      fonts = [
+        "FiraCode"
+        "DroidSansMono"
+        "Agave"
+        "JetBrainsMono"
+      ];
     })
   ];
 

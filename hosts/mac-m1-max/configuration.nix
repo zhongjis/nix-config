@@ -1,15 +1,15 @@
 { inputs, pkgs, currentSystemUser, ... }:
 
 {
-  imports = 
-    [ 
+  imports =
+    [
       inputs.home-manager.darwinModules.default
       ../common.nix
       ../../modules/nix-darwin
     ];
 
   users.users.${currentSystemUser} = {
-    packages = with pkgs; [];
+    packages = with pkgs; [ ];
     shell = pkgs.zsh;
   };
 

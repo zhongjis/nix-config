@@ -3,44 +3,43 @@
 { nixpkgs, overlays, inputs }:
 
 name:
-{
-  system,
-  user,
-  hardware ? "",
-  darwin ? false,
+{ system
+, user
+, hardware ? ""
+, darwin ? false
 }:
 
 let
   hostConfiguration = ../hosts/${name}/configuration.nix;
-  systemFunc = 
-    if darwin then 
-      inputs.nix-darwin.lib.darwinSystem 
-    else 
+  systemFunc =
+    if darwin then
+      inputs.nix-darwin.lib.darwinSystem
+    else
       nixpkgs.lib.nixosSystem;
-  hmModule = 
-    if darwin then 
-      inputs.home-manager.darwinModules.home-manager 
-    else 
+  hmModule =
+    if darwin then
+      inputs.home-manager.darwinModules.home-manager
+    else
       inputs.home-manager.nixosModules.default;
   hardwareModule =
     if hardware != "" then
       inputs.nixos-hardware.nixosModules.${hardware}
     else
-      {};
-in 
+      { };
+in
 systemFunc {
   system = system;
   specialArgs = { inherit inputs; };
 
   modules = [
-    { 
+    {
       nixpkgs = {
-        overlays = overlays; 
+        overlays = overlays;
         config.allowUnfree = true;
       };
     }
 
-    hostConfiguration 
+    hostConfiguration
     hmModule
     hardwareModule
 

@@ -15,8 +15,8 @@
   # xremap
   hardware.uinput.enable = true;
   users.groups = {
-    uinput.members = ["zshen"];
-    input.members = ["zshen"];
+    uinput.members = [ "zshen" ];
+    input.members = [ "zshen" ];
   };
 
   # Use the systemd-boot EFI boot loader.
@@ -35,11 +35,11 @@
     };
   };
 
-  nix.settings.experimental-features = [ "nix-command" "flakes"];
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  networking= {
+  networking = {
     hostName = "nixos"; # Define your hostname.
-    networkmanager.enable = true;  # Easiest to use and most distros use this by default.
+    networkmanager.enable = true; # Easiest to use and most distros use this by default.
   };
 
   # Set your time zone.
@@ -50,9 +50,9 @@
   console = {
     earlySetup = true;
     font = "${pkgs.terminus_font}/share/consolefonts/ter-128n.psf.gz";
-    packages = with pkgs; [ terminus_font];
+    packages = with pkgs; [ terminus_font ];
     keyMap = "us";
-  #   useXkbConfig = true; # use xkb.options in tty.
+    #   useXkbConfig = true; # use xkb.options in tty.
   };
 
   # ZRAM
@@ -60,7 +60,7 @@
     enable = true;
     memoryPercent = 50;
   };
-  
+
   # Enable CUPS to print documents.
   services.printing.enable = true;
 
@@ -107,7 +107,7 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [];
+  environment.systemPackages = with pkgs; [ ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

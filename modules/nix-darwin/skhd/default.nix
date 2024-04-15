@@ -2,7 +2,7 @@
 
 {
   options = {
-    skhd.enable = 
+    skhd.enable =
       lib.mkEnableOption "enables skhd";
   };
 
