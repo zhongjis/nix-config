@@ -15,6 +15,12 @@
 
   homebrew = {
     enable = true;
+    onActivation = {
+      autoUpdate = false;
+      # TODO: migrate to use 'uninstall' or 'zap'
+      # https://daiderd.com/nix-darwin/manual/index.html#opt-homebrew.onActivation.cleanup
+      cleanup = "none";
+    };
     casks = [
       # productivity
       "alfred"
@@ -31,7 +37,6 @@
       "sublime-merge"
       "alacritty"
       "charles"
-      "microsoft-openjdk11"
       "devtoys"
       "docker"
       "intellij-idea"
@@ -43,6 +48,7 @@
   # $ nix-env -qaP | grep wget
   environment.systemPackages = with pkgs; [
     terraform-versions."1.5.2"
+    jdk11
   ];
 
   # Auto upgrade nix package and the daemon service.
