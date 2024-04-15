@@ -17,9 +17,7 @@
     enable = true;
     onActivation = {
       autoUpdate = false;
-      # TODO: migrate to use 'uninstall' or 'zap'
-      # https://daiderd.com/nix-darwin/manual/index.html#opt-homebrew.onActivation.cleanup
-      cleanup = "none";
+      cleanup = "zap";
     };
     casks = [
       # productivity
@@ -48,7 +46,9 @@
   # $ nix-env -qaP | grep wget
   environment.systemPackages = with pkgs; [
     terraform-versions."1.5.2"
+    docker_26
     jdk11
+    bitwarden-cli
   ];
 
   # Auto upgrade nix package and the daemon service.

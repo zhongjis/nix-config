@@ -22,7 +22,7 @@
           "git"
           "terraform"
           "vi-mode"
-          # "autojump"
+          "autojump"
           "sublime"
           "sublime-merge"
           "mvn"
@@ -51,6 +51,7 @@
 
     home.packages = with pkgs; [
       eza
+      autojump
     ];
   };
 }
