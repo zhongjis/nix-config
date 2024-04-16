@@ -50,8 +50,12 @@ local servers = {
   --
   -- But for many setups, the LSP (`tsserver`) will work just fine
   -- tsserver = {},
-  --
-
+  nil_ls = {},
+  jsonls = {},
+  yamlls = {},
+  terraformls = {},
+  tflint = {},
+  dockerls = {},
   lua_ls = {
     -- cmd = {...},
     -- filetypes = { ...},
@@ -78,6 +82,7 @@ vim.list_extend(ensure_installed, {
 require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
 require("mason-lspconfig").setup({
+  ---@type table<string, fun(server_name: string)>?
   handlers = {
     function(server_name)
       local server = servers[server_name] or {}
