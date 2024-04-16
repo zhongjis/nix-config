@@ -72,12 +72,12 @@
 
           {
             plugin = fidget-nvim;
-            config = toLua "require(\"fidget\").setup()";
+            config = toLua "require('fidget').setup()";
           }
 
           {
             plugin = neodev-nvim;
-            config = toLua "require(\"neodev\").setup()";
+            config = toLua "require('neodev').setup()";
           }
 
           {
@@ -104,12 +104,16 @@
 
           # **theme**
           tokyonight-nvim
+          {
+            plugin = catppuccin-nvim;
+            config = toLuaFile ./plugins/catppuccin.lua;
+          }
 
           # **todo-comments.nvim**
           # plenary-nvim
           {
             plugin = todo-comments-nvim;
-            config = toLua "require(\"todo-comments\").setup{ signs = false }";
+            config = toLua "require('todo-comments').setup{ signs = false }";
           }
 
           # **mini.nvim**
@@ -127,16 +131,16 @@
           # **oil.nvim**
           {
             plugin = oil-nvim;
-            config = toLua "require(\"oil\").setup()";
+            config = toLua "require('oil').setup()";
           }
 
           # **noice.nvim**
-          nui-nvim
-          nvim-notify
-          {
-            plugin = noice-nvim;
-            config = toLuaFile ./plugins/noice.lua;
-          }
+          # nui-nvim
+          # nvim-notify
+          # {
+          #   plugin = noice-nvim;
+          #   config = toLuaFile ./plugins/noice.lua;
+          # }
 
           # **lazygit.nvim**
           # plenary-nvim
@@ -147,8 +151,7 @@
           ${builtins.readFile ./config/options.lua}
           ${builtins.readFile ./config/keymaps.lua}
           ${builtins.readFile ./config/autocmds.lua}
-
-          vim.cmd.colorscheme 'tokyonight-night'
+          vim.cmd.colorscheme "catppuccin"
         '';
       };
 

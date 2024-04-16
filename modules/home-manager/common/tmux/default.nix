@@ -16,7 +16,8 @@
       historyLimit = 100000;
       clock24 = true;
       extraConfig = ''
-        # true color https://gist.github.com/andersevenrud/015e61af2fd264371032763d4ed965b6
+        # true color 
+        # https://gist.github.com/andersevenrud/015e61af2fd264371032763d4ed965b6
         set -g default-terminal "tmux-256color"
         set -ag terminal-overrides ",xterm-256color:RGB"
 

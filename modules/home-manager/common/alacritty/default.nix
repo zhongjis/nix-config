@@ -25,11 +25,14 @@
         window = {
           decorations = "buttonless";
           dynamic_padding = false;
-          opacity = 0.95;
+          opacity = 1.00;
           padding = {
             x = 18;
             y = 18;
           };
+        };
+        env = {
+          TERM = "xterm-256color";
         };
       };
     };
