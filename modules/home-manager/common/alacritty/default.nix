@@ -16,12 +16,15 @@
           program = "${lib.getExe pkgs.zsh}";
           args = [ "-l" "-c" "tmux attach || tmux new-session -d -s home" ];
         };
+
         cursor.style.blinking = "Always";
+
         font = {
           normal.family = "Firacode Nerd Font";
           bold.style = "Bold";
           size = 13;
         };
+
         window = {
           decorations = "buttonless";
           dynamic_padding = false;
@@ -31,9 +34,11 @@
             y = 18;
           };
         };
+
         env = {
           TERM = "xterm-256color";
         };
+
         colors = {
           primary = {
             background = "#1E1E2E";
