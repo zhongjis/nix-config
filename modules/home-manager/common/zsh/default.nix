@@ -20,13 +20,14 @@
         enable = true;
         plugins = [
           "git"
+          "gh"
           "terraform"
           "vi-mode"
           "autojump"
-          "sublime"
           "sublime-merge"
           "mvn"
           "kubectl"
+          "kubectx" # TODO: verify it is working
         ];
         theme = "refined";
       };
@@ -51,6 +52,8 @@
       enable = true;
       enableZshIntegration = true;
     };
+
+    # TODO: figure out a zsh script allow me search zsh history and run cmds
 
     home.packages = with pkgs; [
       eza

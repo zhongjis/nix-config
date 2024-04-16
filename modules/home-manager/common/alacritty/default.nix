@@ -14,7 +14,7 @@
 
         shell = {
           program = "${lib.getExe pkgs.zsh}";
-          args = [ "-l" "-c" "tmux attach || tmux new-session -d -s home" ];
+          args = [ "-l" "-c" "tmux attach || tmux new-session -d -s home && tmux attach -t home" ];
         };
 
         cursor.style.blinking = "Always";

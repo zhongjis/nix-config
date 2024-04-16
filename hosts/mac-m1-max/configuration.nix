@@ -24,7 +24,6 @@
       "alfred"
       "bartender"
       "bitwarden"
-      "caffeine"
       "flux"
       "github"
       "spotify"
@@ -36,7 +35,6 @@
       "alacritty"
       "charles"
       "devtoys"
-      "docker"
       "intellij-idea"
       "mongodb-compass"
     ];
@@ -50,6 +48,10 @@
     jdk11 # TODO: this jdk cannot be found easily by intelliJ
     bitwarden-cli
     php
+    kubectl
+    maven
+    python3
+    neofetch
   ];
 
   # Auto upgrade nix package and the daemon service.

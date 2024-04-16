@@ -2,6 +2,7 @@
 -- 1. better nix lsp
 -- 2. better terraform lsp
 -- 3. better lua lsp 'undefined glboal vim'
+-- 4. markdown lsp & formatter
 vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
   callback = function(event)
