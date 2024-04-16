@@ -6,18 +6,18 @@ name:
 { system
 , user
 , hardware ? ""
-, darwin ? false
+, isDarwin ? false
 }:
 
 let
   hostConfiguration = ../hosts/${name}/configuration.nix;
   systemFunc =
-    if darwin then
+    if isDarwin then
       inputs.nix-darwin.lib.darwinSystem
     else
       nixpkgs.lib.nixosSystem;
   hmModule =
-    if darwin then
+    if isDarwin then
       inputs.home-manager.darwinModules.home-manager
     else
       inputs.home-manager.nixosModules.default;
@@ -47,7 +47,7 @@ systemFunc {
       home-manager = {
         useGlobalPkgs = true;
         useUserPackages = true;
-        extraSpecialArgs = { inherit inputs; };
+        extraSpecialArgs = { inherit inputs isDarwin; };
         users.${user} = import ../hosts/${name}/home.nix;
       };
     }

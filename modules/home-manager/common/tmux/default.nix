@@ -1,5 +1,11 @@
-{ pkgs, lib, config, ... }:
-
+{ pkgs, lib, config, isDarwin, ... }:
+let
+  keyboardCmd =
+    if isDarwin then
+      "xclip -in -selection clipboard"
+    else
+      "tmux show-buffer | wl-copy";
+in
 {
   options = {
     tmux.enable =
@@ -21,6 +27,12 @@
         set -g default-terminal "tmux-256color"
         set -ag terminal-overrides ",xterm-256color:RGB"
 
+        # copy to clipboard
+        bind-key -T copy-mode-vi v send -X begin-selection
+        bind-key -T copy-mode-vi V send -X select-line
+        bind-key -T copy-mode-vi y send -X copy-pipe-and-cancel '${keyboardCmd}'
+
+        # other settings
         set -g detach-on-destroy off     # don't exit from tmux when closing a session \n
         set -g renumber-windows on       # renumber all windows when any window is closed \n
         set -g status-left-length 15     # could be any number
