@@ -42,6 +42,9 @@
         nixswitch = "sudo nixos-rebuild switch --flake ~/nix-config/#thinkpad-t480";
         nixtest = "sudo nixos-rebuild test --flake ~/nix-config/#thinkpad-t480";
       };
+      initExtra = ''
+        ${builtins.readFile ./catppuccin_mocha-zsh-syntax-highlighting.zsh}
+      '';
     };
 
     programs.fzf = {

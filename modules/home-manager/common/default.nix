@@ -5,7 +5,7 @@
     ./alacritty
     ./git.nix
     ./k9s.nix
-    ./zsh.nix
+    ./zsh
     ./neovim
     ./tmux
   ];
