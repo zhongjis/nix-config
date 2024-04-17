@@ -44,7 +44,7 @@ end, { desc = "[S]earch [N]eovim files" })
 -- **harpoon**
 local harpoon = require("harpoon")
 vim.keymap.set("n", "<leader>a", function()
-  harpoon:list():append()
+  harpoon:list():add()
 end, { desc = "Harpoon: add file to list" })
 vim.keymap.set("n", "<leader>h", function()
   harpoon.ui:toggle_quick_menu(harpoon:list())

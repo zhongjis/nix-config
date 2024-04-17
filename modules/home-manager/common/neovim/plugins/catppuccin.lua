@@ -1,3 +1,4 @@
+-- NOTE: https://github.com/catppuccin/nvim
 require("catppuccin").setup({
   flavour = "mocha",
   integrations = {
@@ -13,5 +14,7 @@ require("catppuccin").setup({
     fidget = true,
     harpoon = true,
     mason = true,
+    noice = true,
+    notify = true,
   },
 })

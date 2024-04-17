@@ -91,6 +91,8 @@
           cmp_luasnip
           cmp-nvim-lsp
           cmp-path
+          cmp-cmdline
+          cmp-buffer
           {
             plugin = nvim-cmp;
             config = toLuaFile ./plugins/cmp.lua;
@@ -135,12 +137,12 @@
           }
 
           # **noice.nvim**
-          # nui-nvim
-          # nvim-notify
-          # {
-          #   plugin = noice-nvim;
-          #   config = toLuaFile ./plugins/noice.lua;
-          # }
+          nui-nvim
+          nvim-notify
+          {
+            plugin = noice-nvim;
+            config = toLuaFile ./plugins/noice.lua;
+          }
 
           # **lazygit.nvim**
           # plenary-nvim
