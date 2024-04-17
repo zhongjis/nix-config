@@ -1,8 +1,8 @@
 -- TODO:
 -- 1. better nix lsp
 -- 2. better terraform lsp
--- 3. better lua lsp 'undefined glboal vim'
--- 4. markdown lsp & formatter
+-- 3. markdown lsp & formatter
+-- 4. consider trouble.nvim?
 vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
   callback = function(event)
@@ -40,14 +40,15 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
 local servers = {
-  nil_ls = {
-    capabilities = capabilities,
-  },
+  rnix = {},
   jsonls = {},
   yamlls = {},
   terraformls = {},
   tflint = {},
   dockerls = {},
+  jdtls = {},
+  marksman = {},
+  markdownlint = {},
   lua_ls = {
     settings = {
       Lua = {
