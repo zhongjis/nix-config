@@ -45,11 +45,14 @@
   environment.systemPackages = with pkgs; [
     terraform-versions."1.5.2"
     docker_26
-    jdk11 # TODO: this jdk cannot be found easily by intelliJ
+
+    # **java**
+    maven
+
     bitwarden-cli
     php
     kubectl
-    maven
+    kubelogin
     python3
     neofetch
   ];
