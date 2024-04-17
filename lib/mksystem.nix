@@ -2,7 +2,7 @@
 # particular architecture.
 { nixpkgs, overlays, inputs }:
 
-name:
+systemName:
 { system
 , user
 , hardware ? ""
@@ -10,7 +10,7 @@ name:
 }:
 
 let
-  hostConfiguration = ../hosts/${name}/configuration.nix;
+  hostConfiguration = ../hosts/${systemName}/configuration.nix;
   systemFunc =
     if isDarwin then
       inputs.nix-darwin.lib.darwinSystem
@@ -47,15 +47,15 @@ systemFunc {
       home-manager = {
         useGlobalPkgs = true;
         useUserPackages = true;
-        extraSpecialArgs = { inherit inputs isDarwin; };
-        users.${user} = import ../hosts/${name}/home.nix;
+        extraSpecialArgs = { inherit inputs isDarwin systemName; };
+        users.${user} = import ../hosts/${systemName}/home.nix;
       };
     }
 
     {
       config._module.args = {
         currentSystem = system;
-        currentSystemName = name;
+        currentSystemName = systemName;
         currentSystemUser = user;
         inputs = inputs;
       };

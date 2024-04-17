@@ -1,5 +1,10 @@
-{ pkgs, config, lib, ... }:
-
+{ pkgs, config, lib, systemName, ... }:
+let
+  fontSize =
+    if systemName == "mac-m1-max" then
+      20
+    else 13;
+in
 {
   options = {
     alacritty.enable =
@@ -22,7 +27,7 @@
         font = {
           normal.family = "Firacode Nerd Font";
           bold.style = "Bold";
-          size = 13;
+          size = fontSize;
         };
 
         window = {
