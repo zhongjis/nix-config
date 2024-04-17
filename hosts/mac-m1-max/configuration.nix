@@ -48,6 +48,7 @@
 
     # **java**
     maven
+    jdk
 
     bitwarden-cli
     php

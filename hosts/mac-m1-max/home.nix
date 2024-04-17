@@ -4,13 +4,6 @@
     ../../modules/home-manager
   ];
 
-  # TODO: make it an option to enable
-
-  programs.java = {
-    enable = true;
-    package = pkgs.jdk11;
-  };
-
   # override common module options
   k9s.enable = true;
 
