@@ -69,3 +69,6 @@ end, { desc = "[F]ormat buffer" })
 
 -- **lazygit.nvim**
 vim.keymap.set("n", "<leader>gg", "<cmd>LazyGit<CR>", { desc = "LazyGit" })
+
+-- **undotree**
+vim.keymap.set("n", "<leader>u", "<cmd>UndotreeToggle<CR>", { desc = "[U]ndotree Toggle" })

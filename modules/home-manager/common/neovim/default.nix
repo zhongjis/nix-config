@@ -145,6 +145,8 @@
           # **lazygit.nvim**
           # plenary-nvim
           lazygit-nvim
+
+          undotree
         ];
 
         extraLuaConfig = ''
