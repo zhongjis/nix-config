@@ -138,7 +138,10 @@
 
           # **noice.nvim**
           nui-nvim
-          nvim-notify
+          {
+            plugin = nvim-notify;
+            config = toLuaFile ./plugins/notify.lua;
+          }
           {
             plugin = noice-nvim;
             config = toLuaFile ./plugins/noice.lua;
