@@ -41,13 +41,13 @@ nix search nixpkgs <package-name>
 - alacritty 
 	- [x] term color is not working properly on macOS
 	- [ ] toggle alacritty is not working properly 'skhd not found'
-	- [ ] font too small on mac, too big on t480
+	- [x] font too small on mac, too big on t480
 - neovim
 	- [x] nightly is still not working
 	- [x] auto format on nix file
 	- [ ] use space instead of tabs in auto completion
     - [ ] markdown lsp
 - tmux
-	- [ ] tmux clipboard with system clipboard
+	- [x] tmux clipboard with system clipboard
 - github actions
 	- [ ] add github actions to verify change works on both macos and nixos (at least compiles)
