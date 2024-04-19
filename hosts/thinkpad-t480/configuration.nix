@@ -11,6 +11,7 @@
       ../common.nix
       inputs.home-manager.nixosModules.default
     ];
+
   fonts.packages = with pkgs; [
     noto-fonts
     noto-fonts-cjk
@@ -24,6 +25,7 @@
     (nerdfonts.override {
       fonts = [
         "FiraCode"
+        "JetBrainsMono"
       ];
     })
   ];
