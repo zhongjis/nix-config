@@ -11,7 +11,6 @@ let
     spacing = 4;
     modules-left = [
       "wlr/taskbar"
-      "hyprland/window"
     ];
     modules-center = [
       "hyprland/workspaces"
