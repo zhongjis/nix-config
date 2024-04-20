@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ pkgs, lib, config, ... }:
 {
   options = {
     fzf.enable =
@@ -23,6 +23,14 @@
         prompt = "#cba6f7";
         "hl+" = "#f38ba8";
       };
+      changeDirWidgetCommand = "fd --type -d";
+      changeDirWidgetOptions = [
+        "--preview 'tree -C {} | head -200'"
+      ];
     };
+
+    home.packages = with pkgs; [
+      fd
+    ];
   };
 }
