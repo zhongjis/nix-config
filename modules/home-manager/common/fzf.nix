@@ -1,6 +1,6 @@
 { lib, config, ... }:
 {
-  optoins = {
+  options = {
     fzf.enalbe =
       lib.mkEnableOption "enable fzf";
   };

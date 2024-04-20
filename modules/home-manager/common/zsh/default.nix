@@ -48,13 +48,6 @@
       '';
     };
 
-    programs.fzf = {
-      enable = true;
-      enableZshIntegration = true;
-    };
-
-    # TODO: figure out a zsh script allow me search zsh history and run cmds
-
     home.packages = with pkgs; [
       eza
       autojump
