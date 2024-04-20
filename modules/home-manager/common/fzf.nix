@@ -1,8 +1,8 @@
 { lib, config, ... }:
 {
   options = {
-    fzf.enalbe =
-      lib.mkEnableOption "enable fzf";
+    fzf.enable =
+      lib.mkEnableOption "enables fzf";
   };
 
   config = lib.mkIf config.fzf.enable {
