@@ -9,6 +9,7 @@
     ./zsh
     ./neovim
     ./tmux
+    ./lazygit
   ];
 
   options = {
@@ -22,6 +23,7 @@
     fzf.enable = lib.mkDefault true;
     neovim.enable = lib.mkDefault true;
     tmux.enable = lib.mkDefault true;
+    lazygit.enable = lib.mkDefault true;
 
     git.enable = lib.mkDefault false;
     k9s.enable = lib.mkDefault false;
