@@ -2,7 +2,7 @@
 let
   fontSize =
     if systemName == "mac-m1-max" then
-      20
+      18
     else 13;
 in
 {
