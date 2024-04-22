@@ -1,8 +1,6 @@
-{ pkgs, ... }:
-{
-  programs.zsh.enable = true;
-
-  fonts = with pkgs; [
+{ pkgs, isDarwin, ... }:
+let
+  font_list = with pkgs; [
     noto-fonts
     noto-fonts-cjk
     noto-fonts-emoji
@@ -19,4 +17,15 @@
       ];
     })
   ];
+in
+{
+  programs.zsh.enable = true;
+
+  fonts =
+    if isDarwin then {
+      fontDir.enable = true;
+      fonts = font_list;
+    } else {
+      packages = font_list;
+    };
 }

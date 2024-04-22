@@ -6,10 +6,11 @@ systemName:
 { system
 , user
 , hardware ? ""
-, isDarwin ? false
+, darwin ? false
 }:
 
 let
+  isDarwin = darwin;
   hostConfiguration = ../hosts/${systemName}/configuration.nix;
   systemFunc =
     if isDarwin then
@@ -58,6 +59,7 @@ systemFunc {
         currentSystemName = systemName;
         currentSystemUser = user;
         inputs = inputs;
+        isDarwin = darwin;
       };
     }
   ];
