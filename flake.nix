@@ -20,8 +20,8 @@
     xremap-flake.url = "github:xremap/nix-flake";
     nixpkgs-terraform.url = "github:stackbuilders/nixpkgs-terraform";
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
+    catppuccin.url = "github:catppuccin/nix";
   };
-
   outputs = { self, nixpkgs, nix-darwin, nixos-hardware, ... }@inputs:
     let
       overlays = [

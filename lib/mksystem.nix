@@ -25,8 +25,11 @@ let
   hardwareModule =
     if hardware != "" then
       inputs.nixos-hardware.nixosModules.${hardware}
-    else
-      { };
+    else { };
+  catppuccinModule =
+    if !isDarwin then
+      inputs.catppuccin.nixModules.catppuccin
+    else { };
 in
 systemFunc {
   system = system;
@@ -43,13 +46,18 @@ systemFunc {
     hostConfiguration
     hmModule
     hardwareModule
+    catppuccinModule
+    { catppuccin.flavour = "mocha"; }
 
     {
       home-manager = {
         useGlobalPkgs = true;
         useUserPackages = true;
         extraSpecialArgs = { inherit inputs isDarwin systemName; };
-        users.${user} = import ../hosts/${systemName}/home.nix;
+        users.${user}.imports = [
+          ../hosts/${systemName}/home.nix
+          inputs.catppuccin.homeManagerModules.catppuccin
+        ];
       };
     }
 
