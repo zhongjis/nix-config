@@ -48,6 +48,9 @@
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
   console = {
+    catppuccin.enable = true;
+    catppuccin.flavour = "mocha";
+
     earlySetup = true;
     font = "${pkgs.terminus_font}/share/consolefonts/ter-128n.psf.gz";
     packages = with pkgs; [ terminus_font ];
