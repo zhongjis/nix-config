@@ -40,13 +40,13 @@ nix search nixpkgs <package-name>
 	- [x] zsh syntax highlighting
 - alacritty 
 	- [x] term color is not working properly on macOS
-	- [ ] toggle alacritty is not working properly 'skhd not found'
 	- [x] font too small on mac, too big on t480
+	- [ ] toggle alacritty is not working properly 'skhd not found'
 - neovim
 	- [x] nightly is still not working
 	- [x] auto format on nix file
 	- [ ] use space instead of tabs in auto completion
-    - [ ] markdown lsp
+	- [ ] markdown lsp
 - tmux
 	- [x] tmux clipboard with system clipboard
 - github actions
