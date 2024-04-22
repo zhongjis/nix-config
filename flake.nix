@@ -48,7 +48,7 @@
         mkSystem "mac-m1-max" {
           system = "aarch64-darwin";
           user = "zshen";
-          isDarwin = true;
+          darwin = true;
         };
     };
 }
