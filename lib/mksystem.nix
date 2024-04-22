@@ -28,7 +28,7 @@ let
     else { };
   catppuccinModule =
     if !isDarwin then
-      inputs.catppuccin.nixModules.catppuccin
+      inputs.catppuccin.nixosModules.catppuccin
     else { };
 in
 systemFunc {
@@ -47,7 +47,6 @@ systemFunc {
     hmModule
     hardwareModule
     catppuccinModule
-    { catppuccin.flavour = "mocha"; }
 
     {
       home-manager = {

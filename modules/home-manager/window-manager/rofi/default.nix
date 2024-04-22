@@ -9,6 +9,7 @@
   config = lib.mkIf config.rofi.enable {
     programs.rofi = {
       enable = true;
+
       package = pkgs.rofi-wayland;
       terminal = "${pkgs.alacritty}/bin/alacritty";
       theme = "gruvbox-dark-hard";
