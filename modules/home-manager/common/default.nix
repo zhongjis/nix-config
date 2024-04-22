@@ -2,14 +2,14 @@
 
 {
   imports = [
-    ./alacritty
+    ./alacritty.nix
     ./git.nix
     ./k9s.nix
     ./fzf.nix
     ./zsh
     ./neovim
     ./tmux
-    ./lazygit
+    ./lazygit.nix
   ];
 
   options = {
