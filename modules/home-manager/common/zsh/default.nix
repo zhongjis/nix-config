@@ -38,14 +38,21 @@
         size = 10000;
       };
       shellAliases = {
-        ls = "eza --long --header --git";
-        la = "eza --long --header --git -a";
+        cat = "bat";
+        ls = "eza --color=always --long --git --no-user --no-permissions";
+        la = "eza --color=always --long --git --no-user --no-permissions -a";
         nixswitch = "sudo nixos-rebuild switch --flake ~/nix-config/#thinkpad-t480";
         nixtest = "sudo nixos-rebuild test --flake ~/nix-config/#thinkpad-t480";
       };
       initExtra = ''
         ${builtins.readFile ./catppuccin_mocha-zsh-syntax-highlighting.zsh}
       '';
+    };
+
+    programs.bat = {
+      enable = true;
+      catppuccin.enable = true;
+      catppuccin.flavour = "mocha";
     };
 
     home.packages = with pkgs; [
