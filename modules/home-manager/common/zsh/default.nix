@@ -39,10 +39,9 @@
       };
       shellAliases = {
         cat = "bat";
-        ls = "eza --color=always --long --git --no-user --no-permissions";
-        la = "eza --color=always --long --git --no-user --no-permissions -a";
-        nixswitch = "sudo nixos-rebuild switch --flake ~/nix-config/#thinkpad-t480";
-        nixtest = "sudo nixos-rebuild test --flake ~/nix-config/#thinkpad-t480";
+        nixswitch = "sudo nixos-rebuild switch --flake ~/nix-config/#thinkpad-t480 --show-trace";
+        nixtest = "sudo nixos-rebuild test --flake ~/nix-config/#thinkpad-t480 --show-trace";
+        darwinswitch = "darwin-rebuild switch --flake .#mac-m1-max --show-trace";
       };
       initExtra = ''
         ${builtins.readFile ./catppuccin_mocha-zsh-syntax-highlighting.zsh}
@@ -55,8 +54,19 @@
       catppuccin.flavour = "mocha";
     };
 
+    programs.eza = {
+      enable = true;
+      enableZshIntegration = true;
+      git = true;
+      icons = true;
+      extraOptions = [
+        "--group-directories-first"
+        "--long"
+        "--no-user"
+      ];
+    };
+
     home.packages = with pkgs; [
-      eza
       autojump
     ];
   };
