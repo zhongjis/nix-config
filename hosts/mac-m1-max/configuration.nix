@@ -52,10 +52,14 @@
 
     bitwarden-cli
     php
+
     kubectl
     kubelogin
-    python3
+
     neofetch
+
+    python312
+    python312Packages.pip
   ];
 
   # Auto upgrade nix package and the daemon service.
