@@ -36,6 +36,14 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 })
 
+vim.api.nvim_create_autocmd("LspDetach", {
+  group = vim.api.nvim_create_augroup("kickstart-lsp-detach", { clear = true }),
+  callback = function(event)
+    vim.lsp.buf.clear_references()
+    vim.api.nvim_clear_autocmds({ group = "kickstart-lsp-highlight", buffer = event.buf })
+  end,
+})
+
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
@@ -71,17 +79,15 @@ local servers = {
   },
 }
 
-require("mason").setup()
-
 local ensure_installed = vim.tbl_keys(servers or {})
 vim.list_extend(ensure_installed, {
   "stylua",
   "nixpkgs-fmt",
 })
+
 require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
 require("mason-lspconfig").setup({
-  ---@type table<string, fun(server_name: string)>?
   handlers = {
     function(server_name)
       local server = servers[server_name] or {}

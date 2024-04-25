@@ -66,23 +66,23 @@
           }
 
           # **lsp**
-          mason-nvim
+          {
+            plugin = mason-nvim;
+            config = toLua "require('mason').setup()";
+          }
           mason-lspconfig-nvim
           mason-tool-installer-nvim
-
+          {
+            plugin = nvim-lspconfig;
+            config = toLuaFile ./plugins/lsp.lua;
+          }
           {
             plugin = fidget-nvim;
             config = toLua "require('fidget').setup()";
           }
-
           {
             plugin = neodev-nvim;
             config = toLua "require('neodev').setup()";
-          }
-
-          {
-            plugin = nvim-lspconfig;
-            config = toLuaFile ./plugins/lsp.lua;
           }
 
           # **cmp**
