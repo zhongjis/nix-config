@@ -28,6 +28,27 @@
         ];
 
         plugins = with pkgs.vimPlugins; [
+          # **lsp**
+          {
+            plugin = mason-nvim;
+            config = toLua "require('mason').setup()";
+          }
+          mason-lspconfig-nvim
+          mason-tool-installer-nvim
+          {
+            plugin = nvim-lspconfig;
+            config = toLuaFile ./plugins/lsp.lua;
+          }
+          {
+            plugin = fidget-nvim;
+            config = toLua "require('fidget').setup()";
+          }
+          {
+            plugin = neodev-nvim;
+            config = toLua "require('neodev').setup()";
+          }
+
+          # **sleuth**
           vim-sleuth
 
           # **coment.nvim**
@@ -48,6 +69,10 @@
             config = toLuaFile ./plugins/which-key.lua;
           }
 
+          # **trouble.nvim**
+          # TODO: reenable this plugin
+          # trouble-nvim
+
           # **telescope.nvim**
           plenary-nvim
           telescope-fzf-native-nvim
@@ -63,26 +88,6 @@
           {
             plugin = harpoon2;
             config = toLua "require(\"harpoon\"):setup()";
-          }
-
-          # **lsp**
-          {
-            plugin = mason-nvim;
-            config = toLua "require('mason').setup()";
-          }
-          mason-lspconfig-nvim
-          mason-tool-installer-nvim
-          {
-            plugin = nvim-lspconfig;
-            config = toLuaFile ./plugins/lsp.lua;
-          }
-          {
-            plugin = fidget-nvim;
-            config = toLua "require('fidget').setup()";
-          }
-          {
-            plugin = neodev-nvim;
-            config = toLua "require('neodev').setup()";
           }
 
           # **cmp**
@@ -126,7 +131,15 @@
 
           # **nvim-treesitter**
           {
-            plugin = nvim-treesitter.withAllGrammars;
+            plugin = nvim-treesitter.withPlugins (p: [
+              p.c
+              p.java
+              p.nix
+              p.terraform
+              p.python
+              p.yaml
+              p.json
+            ]);
             config = toLuaFile ./plugins/treesitter.lua;
           }
 

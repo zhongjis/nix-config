@@ -1,11 +1,15 @@
 -- TODO: possibly undo using telescope undo extension?
+-- local actions = require("telescope.actions")
+-- local trouble = require("trouble.providers.telescope")
+
 require("telescope").setup({
   -- You can put your default mappings / updates / etc. in here
   --  All the info you're looking for is in `:help telescope.setup()`
   --
   -- defaults = {
   --   mappings = {
-  --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
+  --     i = { ["<c-t>"] = trouble.open_with_trouble },
+  --     n = { ["<c-t>"] = trouble.open_with_trouble },
   --   },
   -- },
   -- pickers = {}
