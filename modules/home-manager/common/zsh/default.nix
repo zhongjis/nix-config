@@ -29,7 +29,6 @@
           "kubectl"
           "kubectx" # TODO: verify it is working
         ];
-        theme = "refined";
       };
       history = {
         expireDuplicatesFirst = true;
@@ -46,6 +45,11 @@
       initExtra = ''
         ${builtins.readFile ./catppuccin_mocha-zsh-syntax-highlighting.zsh}
       '';
+    };
+
+    programs.starship = {
+      enable = true;
+      enableZshIntegration = true;
     };
 
     programs.bat = {
