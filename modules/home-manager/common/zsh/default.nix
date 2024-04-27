@@ -27,7 +27,6 @@
           "sublime-merge"
           "mvn"
           "kubectl"
-          "kubectx" # TODO: verify it is working
         ];
       };
       history = {
@@ -49,7 +48,21 @@
 
     programs.starship = {
       enable = true;
+      catppuccin.enable = true;
+      # catppuccin.flavour = "mocha";
+
       enableZshIntegration = true;
+
+      settings = {
+        aws = {
+          disabled = true;
+        };
+        kubernetes = {
+          disabled = false;
+          format = "[⛵ $context \($namespace\)](dimmed green) \n";
+          detect_folders = [ "inventories" "templates" ];
+        };
+      };
     };
 
     programs.bat = {
