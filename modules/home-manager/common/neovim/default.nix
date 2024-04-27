@@ -21,10 +21,12 @@
         vimdiffAlias = true;
 
         extraPackages = with pkgs; [
-          ripgrep
           nodejs_21
-          unzip
-          cargo
+
+          ripgrep
+
+          stylua
+          nixpkgs-fmt
         ];
 
         plugins = with pkgs.vimPlugins; [
