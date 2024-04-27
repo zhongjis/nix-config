@@ -122,6 +122,12 @@
             config = toLuaFile ./plugins/catppuccin.lua;
           }
 
+          # **lualine.nvim**
+          {
+            plugin = lualine-nvim;
+            config = toLuaFile ./plugins/lualine.lua;
+          }
+
           # **todo-comments.nvim**
           # plenary-nvim
           {
