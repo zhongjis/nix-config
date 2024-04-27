@@ -14,7 +14,7 @@
       in
       {
         enable = true;
-        package = pkgs.neovim-nightly;
+        # package = pkgs.neovim-nightly;
 
         viAlias = true;
         vimAlias = true;
@@ -29,23 +29,38 @@
 
         plugins = with pkgs.vimPlugins; [
           # **lsp**
-          {
-            plugin = mason-nvim;
-            config = toLua "require('mason').setup()";
-          }
+          # {
+          #   plugin = neodev-nvim;
+          #   config = toLua "require('neodev').setup()";
+          # }
+
+          mason-nvim
           mason-lspconfig-nvim
-          mason-tool-installer-nvim
+          nvim-lspconfig
+
+          # **cmp**
+          nvim-cmp
+          cmp-buffer
+          cmp-path
+          cmp_luasnip
+          cmp-cmdline
+          cmp-nvim-lsp
+          cmp-nvim-lua
+
+          # **snippets**
+          luasnip
+          friendly-snippets
+
+          # **lsp-zero**
           {
-            plugin = nvim-lspconfig;
+            plugin = lsp-zero-nvim;
             config = toLuaFile ./plugins/lsp.lua;
           }
+
+          # lsp status
           {
             plugin = fidget-nvim;
             config = toLua "require('fidget').setup()";
-          }
-          {
-            plugin = neodev-nvim;
-            config = toLua "require('neodev').setup()";
           }
 
           # **sleuth**
@@ -88,19 +103,6 @@
           {
             plugin = harpoon2;
             config = toLua "require(\"harpoon\"):setup()";
-          }
-
-          # **cmp**
-          luasnip
-          friendly-snippets
-          cmp_luasnip
-          cmp-nvim-lsp
-          cmp-path
-          cmp-cmdline
-          cmp-buffer
-          {
-            plugin = nvim-cmp;
-            config = toLuaFile ./plugins/cmp.lua;
           }
 
           # **conform**
