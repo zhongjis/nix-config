@@ -27,7 +27,7 @@ require("conform").formatters.stylua = {
       "--indent-width",
       2,
       "--column-width",
-      120,
+      80,
       "--sort-requires",
     }
   end,
