@@ -9,6 +9,7 @@ lsp_zero.on_attach(function(client, bufnr)
     vim.keymap.set("n", keys, func, { buffer = bufnr, desc = "LSP: " .. desc })
   end
 
+  -- stylua: ignore start
   map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
   map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
   map("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
@@ -19,6 +20,7 @@ lsp_zero.on_attach(function(client, bufnr)
   map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
   map("K", vim.lsp.buf.hover, "Hover Documentation")
   map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
+  -- stylua: ignore end
 
   if client and client.server_capabilities.documentHighlightProvider then
     vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
@@ -79,7 +81,7 @@ require("mason-lspconfig").setup({
 local cmp = require("cmp")
 local luasnip = require("luasnip")
 luasnip.config.setup()
-local cmp_format = require('lsp-zero').cmp_format({ details = true })
+local cmp_format = require("lsp-zero").cmp_format({ details = true })
 
 cmp.setup({
   snippet = {
@@ -113,7 +115,7 @@ cmp.setup({
     { name = "path" },
     { name = "buffer" },
   },
-  formatting = cmp_format
+  formatting = cmp_format,
 })
 
 -- `/` cmdline setup.
