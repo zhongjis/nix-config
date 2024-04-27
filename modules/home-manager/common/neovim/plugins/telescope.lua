@@ -1,17 +1,27 @@
--- TODO: possibly undo using telescope undo extension?
--- local actions = require("telescope.actions")
--- local trouble = require("trouble.providers.telescope")
+local actions = require("telescope.actions")
 
-require("telescope").setup({
+local open_with_trouble = require("trouble.sources.telescope").open
+-- Use this to add more results without clearing the trouble list
+local add_to_trouble = require("trouble.sources.telescope").add
+
+local telescope = require("telescope")
+
+telescope.setup({
   -- You can put your default mappings / updates / etc. in here
   --  All the info you're looking for is in `:help telescope.setup()`
   --
-  -- defaults = {
-  --   mappings = {
-  --     i = { ["<c-t>"] = trouble.open_with_trouble },
-  --     n = { ["<c-t>"] = trouble.open_with_trouble },
-  --   },
-  -- },
+  defaults = {
+    mappings = {
+      i = {
+        ["<c-t>"] = open_with_trouble,
+        ["<c-a>"] = add_to_trouble,
+      },
+      n = {
+        ["<c-t>"] = open_with_trouble,
+        ["<c-a>"] = add_to_trouble,
+      },
+    },
+  },
   -- pickers = {}
   extensions = {
     ["ui-select"] = {

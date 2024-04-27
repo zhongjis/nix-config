@@ -45,10 +45,10 @@ end, { desc = "[S]earch [N]eovim files" })
 local harpoon = require("harpoon")
 vim.keymap.set("n", "<leader>a", function()
   harpoon:list():add()
-end, { desc = "Harpoon: add file to list" })
+end, { desc = "Harpoon: [a]dd file to list" })
 vim.keymap.set("n", "<leader>h", function()
   harpoon.ui:toggle_quick_menu(harpoon:list())
-end, { desc = "Harpoon: quick menu" })
+end, { desc = "[H]arpoon: quick menu" })
 vim.keymap.set("n", "<c-h>", function()
   harpoon:list():select(1)
 end, { desc = "Harpoon: go to file 1" })
@@ -74,19 +74,24 @@ vim.keymap.set("n", "<leader>gg", "<cmd>LazyGit<CR>", { desc = "LazyGit" })
 vim.keymap.set("n", "<leader>u", "<cmd>UndotreeToggle<CR>", { desc = "[U]ndotree Toggle" })
 
 -- **trouble.nvim**
--- vim.keymap.set("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics (Trouble)" })
--- vim.keymap.set(
---   "n",
---   "<leader>xX",
---   "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
---   { desc = "Buffer Diagnostics (Trouble)" }
--- )
--- -- vim.keymap.set("n", "<leader>cs", "<cmd>Trouble symbols toggle focus=false<cr>", { desc = "Symbols (Trouble)" })
--- vim.keymap.set(
---   "n",
---   "<leader>cl",
---   "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
---   { desc = "LSP Definitions / references / ... (Trouble)" }
--- )
--- vim.keymap.set("n", "<leader>xL", "<cmd>Trouble loclist toggle<cr>", { desc = "Location List (Trouble)" })
--- vim.keymap.set("n", "<leader>xQ", "<cmd>Trouble qflist toggle<cr>", { desc = "Quickfix List (Trouble)" })
+vim.keymap.set("n", "<leader>td", "<cmd>Trouble diagnostics toggle<cr>", { desc = "[T]rouble: [D]iagnostics" })
+vim.keymap.set(
+  "n",
+  "<leader>tb",
+  "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
+  { desc = "[T]rouble: [B]uffer Diagnostics" }
+)
+vim.keymap.set(
+  "n",
+  "<leader>tt",
+  "<cmd>Trouble symbols toggle focus=false<cr>",
+  { desc = "[T]rouble: [T]oggle Symbol)" }
+)
+vim.keymap.set(
+  "n",
+  "<leader>tl",
+  "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
+  { desc = "[T]rouble: [L]SP Definitions / references / ..." }
+)
+vim.keymap.set("n", "<leader>tl", "<cmd>Trouble loclist toggle<cr>", { desc = "[T]rouble: [L]ocation List" })
+vim.keymap.set("n", "<leader>tq", "<cmd>Trouble qflist toggle<cr>", { desc = "[T]rouble: [Q]uickfix List" })

@@ -20,9 +20,9 @@
         vimAlias = true;
         vimdiffAlias = true;
 
-        extraPackages = with pkgs; [
-          nodejs_21
+        withNodeJs = true;
 
+        extraPackages = with pkgs; [
           ripgrep
 
           stylua
@@ -30,12 +30,18 @@
         ];
 
         plugins = with pkgs.vimPlugins; [
+          # **trouble.nvim**
+          nvim-web-devicons
+          {
+            plugin = trouble-nvim;
+            config = toLua "require('trouble').setup()";
+          }
+
           # **telescope.nvim**
+          # nvim-web-devicons
           plenary-nvim
           telescope-fzf-native-nvim
           telescope-ui-select-nvim
-          nvim-web-devicons
-
           {
             plugin = telescope-nvim;
             config = toLuaFile ./plugins/telescope.lua;
@@ -96,10 +102,6 @@
             plugin = which-key-nvim;
             config = toLuaFile ./plugins/which-key.lua;
           }
-
-          # **trouble.nvim**
-          # TODO: reenable this plugin
-          # trouble-nvim
 
           # **harpoon**
           {

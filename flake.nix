@@ -19,9 +19,15 @@
     hyprland.url = "github:hyprwm/Hyprland";
     xremap-flake.url = "github:xremap/nix-flake";
     nixpkgs-terraform.url = "github:stackbuilders/nixpkgs-terraform";
-    neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     # https://github.com/catppuccin/nix/tree/main/modules/home-manager
     catppuccin.url = "github:catppuccin/nix";
+
+    # neovim
+    neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
+    trouble-v3 = {
+      url = "github:folke/trouble.nvim/dev";
+      flake = false;
+    };
   };
   outputs = { self, nixpkgs, nix-darwin, nixos-hardware, ... }@inputs:
     let
@@ -31,6 +37,15 @@
         (final: prev: rec {
           jdk = prev."jdk${toString 11}";
           maven = prev.maven.override { inherit jdk; };
+        })
+        (final: prev: {
+          vimPlugins = prev.vimPlugins // {
+            trouble-nvim = prev.vimUtils.buildVimPlugin
+              {
+                name = "trouble.nvim";
+                src = inputs.trouble-v3;
+              };
+          };
         })
       ];
       mkSystem = import ./lib/mksystem.nix {

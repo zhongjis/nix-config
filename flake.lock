@@ -816,6 +816,7 @@
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_3",
         "nixpkgs-terraform": "nixpkgs-terraform",
+        "trouble-v3": "trouble-v3",
         "xremap-flake": "xremap-flake"
       }
     },
@@ -921,6 +922,23 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default-linux",
+        "type": "github"
+      }
+    },
+    "trouble-v3": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1713772979,
+        "narHash": "sha256-TjQ8UiV1BqmAddhu9iu+X1HbmCS6SQoIOyXbe8gZRqo=",
+        "owner": "folke",
+        "repo": "trouble.nvim",
+        "rev": "b4b9a11b3578d510963f6f681fecb4631ae992c3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "folke",
+        "ref": "dev",
+        "repo": "trouble.nvim",
         "type": "github"
       }
     },
