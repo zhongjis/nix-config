@@ -28,11 +28,22 @@
         ];
 
         plugins = with pkgs.vimPlugins; [
+          # **telescope.nvim**
+          plenary-nvim
+          telescope-fzf-native-nvim
+          telescope-ui-select-nvim
+          nvim-web-devicons
+
+          {
+            plugin = telescope-nvim;
+            config = toLuaFile ./plugins/telescope.lua;
+          }
+
           # **lsp**
-          # {
-          #   plugin = neodev-nvim;
-          #   config = toLua "require('neodev').setup()";
-          # }
+          {
+            plugin = neodev-nvim;
+            config = toLua "require('neodev').setup()";
+          }
 
           mason-nvim
           mason-lspconfig-nvim
@@ -87,17 +98,6 @@
           # **trouble.nvim**
           # TODO: reenable this plugin
           # trouble-nvim
-
-          # **telescope.nvim**
-          plenary-nvim
-          telescope-fzf-native-nvim
-          telescope-ui-select-nvim
-          nvim-web-devicons
-
-          {
-            plugin = telescope-nvim;
-            config = toLuaFile ./plugins/telescope.lua;
-          }
 
           # **harpoon**
           {
