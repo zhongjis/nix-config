@@ -1,6 +1,3 @@
--- TODO:
--- 1. better lua format
--- 2. nix format
 require("conform").setup({
   notify_on_error = false,
   format_on_save = function(bufnr)
@@ -16,6 +13,7 @@ require("conform").setup({
   formatters_by_ft = {
     lua = { "stylua" },
     nix = { "nixpkgs_fmt" },
+    sh = { "shfmt" },
   },
 })
 
@@ -29,6 +27,16 @@ require("conform").formatters.stylua = {
       "--column-width",
       80,
       "--sort-requires",
+    }
+  end,
+}
+
+require("conform").formatters.shfmt = {
+  prepend_args = function(self, ctx)
+    return {
+      "-i",
+      2,
+      "-ci",
     }
   end,
 }

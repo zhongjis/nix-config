@@ -46,6 +46,8 @@ require("mason-lspconfig").setup({
     "yamlls",
     "terraformls",
     "tflint",
+    "bashls",
+    "tsserver",
   },
 
   handlers = {

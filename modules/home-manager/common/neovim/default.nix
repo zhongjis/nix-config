@@ -27,6 +27,7 @@
 
           stylua
           nixpkgs-fmt
+          shfmt
         ];
 
         plugins = with pkgs.vimPlugins; [
@@ -151,6 +152,8 @@
               p.python
               p.yaml
               p.json
+              p.javascript
+              p.typescript
             ]);
             config = toLuaFile ./plugins/treesitter.lua;
           }
