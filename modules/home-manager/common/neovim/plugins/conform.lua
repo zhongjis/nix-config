@@ -1,4 +1,6 @@
-require("conform").setup({
+local conform = require("conform")
+
+conform.setup({
   notify_on_error = false,
   format_on_save = function(bufnr)
     -- Disable "format_on_save lsp_fallback" for languages that don't
@@ -14,10 +16,12 @@ require("conform").setup({
     lua = { "stylua" },
     nix = { "nixpkgs_fmt" },
     sh = { "shfmt" },
+    javascript = { "prettierd" },
+    typescript = { "prettierd" },
   },
 })
 
-require("conform").formatters.stylua = {
+conform.formatters.stylua = {
   prepend_args = function(self, ctx)
     return {
       "--indent-type",
@@ -31,7 +35,7 @@ require("conform").formatters.stylua = {
   end,
 }
 
-require("conform").formatters.shfmt = {
+conform.formatters.shfmt = {
   prepend_args = function(self, ctx)
     return {
       "-i",
@@ -40,3 +44,10 @@ require("conform").formatters.shfmt = {
     }
   end,
 }
+
+-- TODO: setup with more styles
+-- conform.formatters.prettierd = {
+--   prepend_args = function(self, ctx)
+--     return {}
+--   end,
+-- }

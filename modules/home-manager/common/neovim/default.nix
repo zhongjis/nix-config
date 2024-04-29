@@ -28,6 +28,7 @@
           stylua
           nixpkgs-fmt
           shfmt
+          prettierd
         ];
 
         plugins = with pkgs.vimPlugins; [
