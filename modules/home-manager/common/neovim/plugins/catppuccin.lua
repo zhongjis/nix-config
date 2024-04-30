@@ -2,9 +2,8 @@
 require("catppuccin").setup({
   flavour = "mocha",
   integrations = {
-    cmp = true,
     gitsigns = true,
-    nvimtree = false,
+    -- nvimtree = true,
     treesitter = true,
     mini = {
       enabled = true,
@@ -14,8 +13,8 @@ require("catppuccin").setup({
     fidget = true,
     harpoon = true,
     mason = true,
-    noice = true,
-    notify = true,
+    -- noice = true,
+    -- notify = true,
     lsp_trouble = true,
   },
 })
