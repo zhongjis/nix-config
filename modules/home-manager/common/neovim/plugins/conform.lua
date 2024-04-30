@@ -30,7 +30,7 @@ conform.formatters.stylua = {
       "--indent-width",
       2,
       "--column-width",
-      80,
+      85,
       "--sort-requires",
     }
   end,

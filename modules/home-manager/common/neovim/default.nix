@@ -53,14 +53,15 @@
           }
 
           # **lsp**
-          {
-            plugin = neodev-nvim;
-            config = toLua "require('neodev').setup()";
-          }
+          neodev-nvim
+          fidget-nvim
 
           mason-nvim
           mason-lspconfig-nvim
-          nvim-lspconfig
+          {
+            plugin = nvim-lspconfig;
+            config = toLuaFile ./plugins/lsp.lua;
+          }
 
           # **cmp**
           nvim-cmp
@@ -74,18 +75,6 @@
           # **snippets**
           luasnip
           friendly-snippets
-
-          # **lsp-zero**
-          {
-            plugin = lsp-zero-nvim;
-            config = toLuaFile ./plugins/lsp.lua;
-          }
-
-          # lsp status
-          {
-            plugin = fidget-nvim;
-            config = toLua "require('fidget').setup()";
-          }
 
           # **sleuth**
           vim-sleuth

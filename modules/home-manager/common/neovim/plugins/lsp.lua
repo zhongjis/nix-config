@@ -1,42 +1,70 @@
-local lsp_zero = require("lsp-zero")
+vim.api.nvim_create_autocmd("LspAttach", {
+  group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
+  callback = function(event)
+    -- stylua: ignore start
+    local map = function(keys, func, desc)
+      vim.keymap.set("n", keys, func, { buffer = bufnr, desc = "LSP: " .. desc })
+    end
 
-lsp_zero.on_attach(function(client, bufnr)
-  -- see :help lsp-zero-keybindings
-  -- to learn the available actions
-  lsp_zero.default_keymaps({ buffer = bufnr })
+    map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
+    map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
+    map("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
+    map("<leader>D", require("telescope.builtin").lsp_type_definitions, "Type [D]efinition")
+    map("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
+    map("<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
+    map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
+    map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
+    map("K", vim.lsp.buf.hover, "Hover Documentation")
+    map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
+    -- stylua: ignore end
 
-  local map = function(keys, func, desc)
-    vim.keymap.set("n", keys, func, { buffer = bufnr, desc = "LSP: " .. desc })
-  end
+    local client = vim.lsp.get_client_by_id(event.data.client_id)
+    if client and client.server_capabilities.documentHighlightProvider then
+      local highlight_augroup =
+        vim.api.nvim_create_augroup("kickstart-lsp-highlight", { clear = false })
+      vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+        buffer = event.buf,
+        group = highlight_augroup,
+        callback = vim.lsp.buf.document_highlight,
+      })
 
-  -- stylua: ignore start
-  map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
-  map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
-  map("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
-  map("<leader>D", require("telescope.builtin").lsp_type_definitions, "Type [D]efinition")
-  map("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
-  map("<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
-  map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
-  map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
-  map("K", vim.lsp.buf.hover, "Hover Documentation")
-  map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
-  -- stylua: ignore end
+      vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+        buffer = event.buf,
+        group = highlight_augroup,
+        callback = vim.lsp.buf.clear_references,
+      })
+    end
 
-  if client and client.server_capabilities.documentHighlightProvider then
-    vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-      buffer = bufnr,
-      callback = vim.lsp.buf.document_highlight,
+    -- The following autocommand is used to enable inlay hints in your
+    -- code, if the language server you are using supports them
+    --
+    -- This may be unwanted, since they displace some of your code
+    if
+      client
+      and client.server_capabilities.inlayHintProvider
+      and vim.lsp.inlay_hint
+    then
+      map("<leader>th", function()
+        vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+      end, "[T]oggle Inlay [H]ints")
+    end
+  end,
+})
+
+vim.api.nvim_create_autocmd("LspDetach", {
+  group = vim.api.nvim_create_augroup("kickstart-lsp-detach", { clear = true }),
+  callback = function(event)
+    vim.lsp.buf.clear_references()
+    vim.api.nvim_clear_autocmds({
+      group = "kickstart-lsp-highlight",
+      buffer = event.buf,
     })
+  end,
+})
 
-    vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-      buffer = bufnr,
-      callback = vim.lsp.buf.clear_references,
-    })
-  end
-end)
+require("fidget").setup()
+require("neodev").setup()
 
--- to learn how to use mason.nvim
--- read this: https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/guide/integrate-with-mason-nvim.md
 require("mason").setup()
 require("mason-lspconfig").setup({
   ensure_installed = {
@@ -83,7 +111,6 @@ require("mason-lspconfig").setup({
 local cmp = require("cmp")
 local luasnip = require("luasnip")
 luasnip.config.setup()
-local cmp_format = require("lsp-zero").cmp_format({ details = true })
 
 cmp.setup({
   snippet = {
@@ -96,28 +123,16 @@ cmp.setup({
   mapping = cmp.mapping.preset.insert({
     ["<C-n>"] = cmp.mapping.select_next_item(),
     ["<C-p>"] = cmp.mapping.select_prev_item(),
-    ["<C-b>"] = cmp.mapping.scroll_docs(-4),
-    ["<C-f>"] = cmp.mapping.scroll_docs(4),
     ["<C-y>"] = cmp.mapping.confirm({ select = true }),
     ["<C-Space>"] = cmp.mapping.complete({}),
-    ["<C-l>"] = cmp.mapping(function()
-      if luasnip.expand_or_locally_jumpable() then
-        luasnip.expand_or_jump()
-      end
-    end, { "i", "s" }),
-    ["<C-h>"] = cmp.mapping(function()
-      if luasnip.locally_jumpable(-1) then
-        luasnip.jump(-1)
-      end
-    end, { "i", "s" }),
   }),
-  sources = {
+  sources = cmp.config.sources({
     { name = "nvim_lsp" },
     { name = "luasnip" },
     { name = "path" },
+  }, {
     { name = "buffer" },
-  },
-  formatting = cmp_format,
+  }),
 })
 
 -- `/` cmdline setup.
