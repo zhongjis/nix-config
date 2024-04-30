@@ -184,6 +184,8 @@
           lazygit-nvim
 
           undotree
+
+          zen-mode-nvim
         ];
 
         extraLuaConfig = ''

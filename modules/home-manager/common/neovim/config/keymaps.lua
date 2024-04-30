@@ -185,3 +185,10 @@ vim.keymap.set(
   "<cmd>Trouble qflist toggle<cr>",
   { desc = "[T]rouble: [Q]uickfix List" }
 )
+
+-- **zen-mode.nvim**
+vim.keymap.set("n", "<leader>zz", function()
+  require("zen-mode").toggle({
+    width = 0.85, -- width will be 85% of the editor width
+  })
+end, { desc = "Toggle [Z]en Mode" })
