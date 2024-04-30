@@ -23,8 +23,11 @@
         withNodeJs = true;
 
         extraPackages = with pkgs; [
+          cargo # Depdency for Mason Install packages
+
           ripgrep
 
+          # Formatters
           stylua
           nixpkgs-fmt
           shfmt
@@ -166,15 +169,15 @@
           }
 
           # **noice.nvim**
-          nui-nvim
-          {
-            plugin = nvim-notify;
-            config = toLuaFile ./plugins/notify.lua;
-          }
-          {
-            plugin = noice-nvim;
-            config = toLuaFile ./plugins/noice.lua;
-          }
+          # nui-nvim
+          # {
+          #   plugin = nvim-notify;
+          #   config = toLuaFile ./plugins/notify.lua;
+          # }
+          # {
+          #   plugin = noice-nvim;
+          #   config = toLuaFile ./plugins/noice.lua;
+          # }
 
           # **lazygit.nvim**
           # plenary-nvim
