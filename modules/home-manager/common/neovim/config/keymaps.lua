@@ -1,3 +1,6 @@
+local map = function(keys, func, desc)
+  vim.keymap.set("n", keys, func, { buffer = bufnr, desc = "LSP: " .. desc })
+end
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
 -- **diagnostic**
@@ -30,24 +33,9 @@ vim.keymap.set(
 
 -- **telescope**
 local builtin = require("telescope.builtin")
-vim.keymap.set(
-  "n",
-  "<leader>sh",
-  builtin.help_tags,
-  { desc = "[S]earch [H]elp" }
-)
-vim.keymap.set(
-  "n",
-  "<leader>sk",
-  builtin.keymaps,
-  { desc = "[S]earch [K]eymaps" }
-)
-vim.keymap.set(
-  "n",
-  "<leader>sf",
-  builtin.find_files,
-  { desc = "[S]earch [F]iles" }
-)
+vim.keymap.set("n", "<leader>sh", builtin.help_tags, { desc = "[S]earch [H]elp" })
+vim.keymap.set("n", "<leader>sk", builtin.keymaps, { desc = "[S]earch [K]eymaps" })
+vim.keymap.set("n", "<leader>sf", builtin.find_files, { desc = "[S]earch [F]iles" })
 vim.keymap.set(
   "n",
   "<leader>ss",
@@ -60,24 +48,14 @@ vim.keymap.set(
   builtin.grep_string,
   { desc = "[S]earch current [W]ord" }
 )
-vim.keymap.set(
-  "n",
-  "<leader>sg",
-  builtin.live_grep,
-  { desc = "[S]earch by [G]rep" }
-)
+vim.keymap.set("n", "<leader>sg", builtin.live_grep, { desc = "[S]earch by [G]rep" })
 vim.keymap.set(
   "n",
   "<leader>sd",
   builtin.diagnostics,
   { desc = "[S]earch [D]iagnostics" }
 )
-vim.keymap.set(
-  "n",
-  "<leader>sr",
-  builtin.resume,
-  { desc = "[S]earch [R]esume" }
-)
+vim.keymap.set("n", "<leader>sr", builtin.resume, { desc = "[S]earch [R]esume" })
 vim.keymap.set(
   "n",
   "<leader>s.",
@@ -90,15 +68,12 @@ vim.keymap.set(
   builtin.buffers,
   { desc = "[ ] Find existing buffers" }
 )
-
-vim.keymap.set("n", "<leader>/", function()
-  -- You can pass additional configuration to Telescope to change the theme, layout, etc.
-  builtin.current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
-    winblend = 10,
-    previewer = false,
-  }))
-end, { desc = "[/] Fuzzily search in current buffer" })
-
+vim.keymap.set(
+  "n",
+  "<leader>/",
+  builtin.current_buffer_fuzzy_find,
+  { desc = "[/] Fuzzily search in current buffer" }
+)
 vim.keymap.set("n", "<leader>s/", function()
   builtin.live_grep({
     grep_open_files = true,
@@ -185,6 +160,12 @@ vim.keymap.set(
   "<cmd>Trouble qflist toggle<cr>",
   { desc = "[T]rouble: [Q]uickfix List" }
 )
+vim.keymap.set("n", "[t", function()
+  require("trouble").next({ skip_groups = true, jump = true })
+end, { desc = "Go to previous [D]iagnostic message" })
+vim.keymap.set("n", "]t", function()
+  require("trouble").next({ skip_groups = true, jump = true })
+end, { desc = "Go to next [D]iagnostic message" })
 
 -- **zen-mode.nvim**
 vim.keymap.set("n", "<leader>zz", function()

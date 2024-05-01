@@ -147,6 +147,8 @@
               p.json
               p.javascript
               p.typescript
+              p.markdown
+              p.markdown_inline
             ]);
             config = toLuaFile ./plugins/treesitter.lua;
           }
