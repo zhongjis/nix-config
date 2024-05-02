@@ -1,10 +1,7 @@
 -- highlight yank
 vim.api.nvim_create_autocmd("TextYankPost", {
   desc = "Highlight when yanking (copying) text",
-  group = vim.api.nvim_create_augroup(
-    "kickstart-highlight-yank",
-    { clear = true }
-  ),
+  group = vim.api.nvim_create_augroup("kickstart-highlight-yank", { clear = true }),
   callback = function()
     vim.highlight.on_yank()
   end,
@@ -21,4 +18,16 @@ vim.api.nvim_create_autocmd("VimResized", {
   group = "AutoResize",
   pattern = "*",
   command = "wincmd =",
+})
+
+-- Auto save when leave buffer
+vim.api.nvim_create_autocmd("BufLeave", {
+  pattern = "*",
+  callback = function()
+    -- Check the filetype of the current buffer
+    if vim.bo.filetype ~= "oil" then
+      -- Only save the buffer if it's not an 'oil' filetype
+      vim.cmd("silent! update")
+    end
+  end,
 })
