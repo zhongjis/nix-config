@@ -1,3 +1,6 @@
+-- set max popup menu height
+vim.opt.pumheight = 10
+
 local cmp = require("cmp")
 local luasnip = require("luasnip")
 luasnip.config.setup()
@@ -10,8 +13,6 @@ cmp.setup({
   },
   completion = {
     completeopt = "menu,menuone,noinsert",
-    keyword_length = 1,
-    max_item_count = 5,
   },
 
   mapping = cmp.mapping.preset.insert({
