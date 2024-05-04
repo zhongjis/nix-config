@@ -28,6 +28,10 @@ cmp.setup({
   }, {
     { name = "buffer" },
   }),
+  window = {
+    -- completion = cmp.config.window.bordered(),
+    documentation = cmp.config.window.bordered(),
+  },
   formatting = {
     format = function(entry, vim_item)
       if vim.tbl_contains({ "path" }, entry.source.name) then
