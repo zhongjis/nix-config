@@ -11,8 +11,29 @@ map("<leader>e", vim.diagnostic.open_float, "Show diagnostic [E]rror messages")
 map("<leader>dq", vim.diagnostic.setloclist, "Open [D]iagnostic [Q]uickfix list")
 
 -- QuickFix keymaps
-map("<leader>qo", ":copen<CR>", "[O]pen [Q]uickfix list")
-map("<leader>qc", ":cclose<CR>", "[C]lose [Q]uickix list")
+local function toggle_quickfix()
+  -- Check for the existence of a quickfix window
+  local windows = vim.fn.getwininfo()
+  local quickfix_open = false
+  local current_win = vim.api.nvim_get_current_win()
+
+  for _, win in ipairs(windows) do
+    if win.quickfix == 1 then
+      quickfix_open = true
+      break
+    end
+  end
+
+  -- Toggle the quickfix window
+  if quickfix_open then
+    vim.cmd("cclose")
+  else
+    vim.cmd("copen")
+    vim.api.nvim_set_current_win(current_win)
+  end
+end
+
+map("<leader>q", toggle_quickfix, "Toggle [Q]uickfix list")
 map("[q", ":cprev<CR>", "Go to previous [Q]uickfix item")
 map("]q", ":cnext<CR>", "Go to next [Q]quickfix item")
 
