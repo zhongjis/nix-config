@@ -56,6 +56,7 @@
           }
 
           # **cmp**
+          lspkind-nvim
           nvim-cmp
           cmp-buffer
           cmp-path
@@ -102,11 +103,15 @@
           }
 
           # **theme**
-          tokyonight-nvim
           {
-            plugin = catppuccin-nvim;
-            config = toLuaFile ./plugins/catppuccin.lua;
+            plugin = solarized-osaka-nvim;
+            config = toLuaFile ./plugins/themes/solarized-osaka.lua;
           }
+          # tokyonight-nvim
+          # {
+          #   plugin = catppuccin-nvim;
+          #   config = toLuaFile ./plugins/themes/catppuccin.lua;
+          # }
 
           # **lualine.nvim**
           {
@@ -175,7 +180,7 @@
           ${builtins.readFile ./config/options.lua}
           ${builtins.readFile ./config/keymaps.lua}
           ${builtins.readFile ./config/autocmds.lua}
-          vim.cmd.colorscheme "catppuccin"
+          vim.cmd.colorscheme "solarized-osaka"
         '';
       };
 

@@ -816,8 +816,25 @@
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_3",
         "nixpkgs-terraform": "nixpkgs-terraform",
+        "solarized-osaka-nvim": "solarized-osaka-nvim",
         "trouble-v3": "trouble-v3",
         "xremap-flake": "xremap-flake"
+      }
+    },
+    "solarized-osaka-nvim": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1712064408,
+        "narHash": "sha256-t7q+Zxd/D8Kl95YsQghBkeysIubhzFMonYqq7jUAYLE=",
+        "owner": "craftzdog",
+        "repo": "solarized-osaka.nvim",
+        "rev": "92c5def2b522e7869b29b55b448544f226e07524",
+        "type": "github"
+      },
+      "original": {
+        "owner": "craftzdog",
+        "repo": "solarized-osaka.nvim",
+        "type": "github"
       }
     },
     "systems": {

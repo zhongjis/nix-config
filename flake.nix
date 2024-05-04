@@ -28,6 +28,10 @@
       url = "github:folke/trouble.nvim/dev";
       flake = false;
     };
+    solarized-osaka-nvim = {
+      url = "github:craftzdog/solarized-osaka.nvim";
+      flake = false;
+    };
   };
   outputs = { self, nixpkgs, nix-darwin, nixos-hardware, ... }@inputs:
     let
@@ -44,6 +48,11 @@
               {
                 name = "trouble.nvim";
                 src = inputs.trouble-v3;
+              };
+            solarized-osaka-nvim = prev.vimUtils.buildVimPlugin
+              {
+                name = "solarized-osaka.nvim";
+                src = inputs.solarized-osaka-nvim;
               };
           };
         })
