@@ -35,18 +35,10 @@
         ];
 
         plugins = with pkgs.vimPlugins; [
-          # **trouble.nvim**
-          nvim-web-devicons
-          {
-            plugin = trouble-nvim;
-            config = toLua "require('trouble').setup()";
-          }
-
           # **telescope.nvim**
-          # nvim-web-devicons
+          nvim-web-devicons
           plenary-nvim
           telescope-fzf-native-nvim
-          telescope-ui-select-nvim
           {
             plugin = telescope-nvim;
             config = toLuaFile ./plugins/telescope.lua;

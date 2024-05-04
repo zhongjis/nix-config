@@ -1,13 +1,20 @@
 local map = function(keys, func, desc)
-  vim.keymap.set("n", keys, func, { desc = desc })
+  vim.keymap.set("n", keys, func, { desc = desc, noremap = true })
 end
 
-map("n", "<Esc>", "<cmd>nohlsearch<CR>")
+map("<Esc>", "<cmd>nohlsearch<CR>", "")
 
--- **diagnostic**
+--- Diagnostic keymaps
 map("[d", vim.diagnostic.goto_prev, "Go to previous [D]iagnostic message")
 map("]d", vim.diagnostic.goto_next, "Go to next [D]iagnostic message")
 map("<leader>e", vim.diagnostic.open_float, "Show diagnostic [E]rror messages")
+map("<leader>dq", vim.diagnostic.setloclist, "Open [D]iagnostic [Q]uickfix list")
+
+-- QuickFix keymaps
+map("<leader>qo", ":copen<CR>", "[O]pen [Q]uickfix list")
+map("<leader>qc", ":cclose<CR>", "[C]lose [Q]uickix list")
+map("[q", ":cprev<CR>", "Go to previous [Q]uickfix item")
+map("]q", ":cnext<CR>", "Go to next [Q]quickfix item")
 
 -- **oil**
 map("<leader>o", "<CMD>Oil<CR>", "[O]il: Open parent directory")
@@ -72,32 +79,6 @@ map("<leader>gg", "<cmd>LazyGit<CR>", "LazyGit")
 
 -- **undotree**
 map("<leader>u", "<cmd>UndotreeToggle<CR>", "[U]ndotree Toggle")
-
--- **trouble.nvim**
-map("<leader>td", "<cmd>Trouble diagnostics toggle<cr>", "[T]rouble: [D]iagnostics")
-map(
-  "<leader>tb",
-  "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
-  "[T]rouble: [B]uffer Diagnostics"
-)
-map(
-  "<leader>tt",
-  "<cmd>Trouble symbols toggle focus=false<cr>",
-  "[T]rouble: [T]oggle Symbol)"
-)
-map(
-  "<leader>tl",
-  "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
-  "[T]rouble: [L]SP Definitions / references / ..."
-)
-map("<leader>tl", "<cmd>Trouble loclist toggle<cr>", "[T]rouble: [L]ocation List")
-map("<leader>tq", "<cmd>Trouble qflist toggle<cr>", "[T]rouble: [Q]uickfix List")
-map("[t", function()
-  require("trouble").next({ skip_groups = true, jump = true })
-end, "Go to previous [D]iagnostic message")
-map("]t", function()
-  require("trouble").next({ skip_groups = true, jump = true })
-end, "Go to next [D]iagnostic message")
 
 -- **zen-mode.nvim**
 map("<leader>zz", function()
