@@ -40,7 +40,7 @@ let
     };
 
     "clock" = {
-      format = "[{:%H:%M %Y-%m-%d}]";
+      format = "[{:%Y-%m-%d %H:%M}]";
       tooltip-format = "<tt><small>{calendar}</small></tt>";
       calendar = {
         mode = "year";
