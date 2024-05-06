@@ -86,6 +86,7 @@
     isNormalUser = true;
     extraGroups = [ "wheel" "input" ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
+      discord
       terraform
       kubectl
       kubelogin
