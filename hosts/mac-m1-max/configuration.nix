@@ -31,6 +31,7 @@
       "box-drive"
 
       # dev tools
+      "docker"
       "sublime-merge"
       "alacritty"
       "charles"
@@ -44,7 +45,6 @@
   # $ nix-env -qaP | grep wget
   environment.systemPackages = with pkgs; [
     terraform-versions."1.5.2"
-    docker_26
 
     # **java**
     maven

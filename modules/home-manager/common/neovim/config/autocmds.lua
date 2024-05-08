@@ -21,13 +21,13 @@ vim.api.nvim_create_autocmd("VimResized", {
 })
 
 -- Auto save when leave buffer
--- vim.api.nvim_create_autocmd("BufLeave", {
---   pattern = "*",
---   callback = function()
---     -- Check the filetype of the current buffer
---     if vim.bo.filetype ~= "oil" then
---       -- Only save the buffer if it's not an 'oil' filetype
---       vim.cmd("silent! update")
---     end
---   end,
--- })
+vim.api.nvim_create_autocmd("BufLeave", {
+  pattern = "*",
+  callback = function()
+    -- Check the filetype of the current buffer
+    if vim.bo.filetype ~= "oil" then
+      -- Only save the buffer if it's not an 'oil' filetype
+      vim.cmd("silent! update")
+    end
+  end,
+})
