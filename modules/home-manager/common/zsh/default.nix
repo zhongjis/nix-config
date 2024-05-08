@@ -49,7 +49,7 @@
     programs.starship = {
       enable = true;
       catppuccin.enable = true;
-      # catppuccin.flavour = "mocha";
+      catppuccin.flavour = "mocha";
 
       enableZshIntegration = true;
 
