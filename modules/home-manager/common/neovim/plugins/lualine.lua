@@ -1,6 +1,6 @@
 require("lualine").setup({
   options = {
-    theme = "solarized_dark",
+    theme = "catppuccin",
   },
 
   sections = {
