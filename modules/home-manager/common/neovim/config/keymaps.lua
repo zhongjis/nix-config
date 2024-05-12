@@ -5,9 +5,27 @@ end
 map("<Esc>", "<cmd>nohlsearch<CR>", "")
 
 -- **trouble.nvim**
-map("<leader>q", "<cmd>Trouble qflist toggle<cr>", "Toggle Trouble [Q]uickfix List")
-map("]q", "<cmd>Trouble qflist next<cr>", "Go to next [T]rouble item")
-map("[q", "<cmd>Trouble qflist prev<cr>", "Go to previous [T]rouble item")
+map("<leader>q", "<cmd>Trouble qflist toggle<cr>", "Toggle [Q]uickfix List")
+map("]q", function()
+  if require("trouble").is_open() then
+    require("trouble").next({ jump = true })
+  else
+    local ok, err = pcall(vim.cmd.cprev)
+    if not ok then
+      vim.notify(err, vim.log.levels.ERROR)
+    end
+  end
+end, "Go to next [T]rouble item")
+map("[q", function()
+  if require("trouble").is_open() then
+    require("trouble").prev({ jump = true })
+  else
+    local ok, err = pcall(vim.cmd.cprev)
+    if not ok then
+      vim.notify(err, vim.log.levels.ERROR)
+    end
+  end
+end, "Go to previous [T]rouble item")
 map("<leader>e", vim.diagnostic.open_float, "Show diagnostic [E]rror messages")
 
 -- **oil**
