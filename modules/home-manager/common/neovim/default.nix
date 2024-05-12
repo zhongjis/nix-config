@@ -35,6 +35,12 @@
         ];
 
         plugins = with pkgs.vimPlugins; [
+          # **trouble.nvim**
+          {
+            plugin = trouble-nvim;
+            config = toLua "require('trouble').setup()";
+          }
+
           # **telescope.nvim**
           nvim-web-devicons
           plenary-nvim
@@ -148,12 +154,6 @@
               p.markdown_inline
             ]);
             config = toLuaFile ./plugins/treesitter.lua;
-          }
-
-          # **trouble.nvim**
-          {
-            plugin = trouble-nvim;
-            config = toLua "require('trouble').setup()";
           }
 
           # **oil.nvim**

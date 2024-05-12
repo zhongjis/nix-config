@@ -1,3 +1,6 @@
+local actions = require("telescope.actions")
+local trouble = require("trouble")
+
 local telescope = require("telescope")
 
 telescope.setup({
@@ -5,7 +8,16 @@ telescope.setup({
   --  All the info you're looking for is in `:help telescope.setup()`
   --
   defaults = {
-    mappings = {},
+    mappings = {
+      i = {
+        ["<c-q>"] = actions.send_to_qflist,
+        ["<c-a>"] = actions.add_to_qflist,
+      },
+      n = {
+        ["<c-q>"] = actions.send_to_qflist,
+        ["<c-a>"] = actions.add_to_qflist,
+      },
+    },
   },
 })
 

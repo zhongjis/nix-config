@@ -28,10 +28,6 @@ cmp.setup({
   }, {
     { name = "buffer" },
   }),
-  window = {
-    -- completion = cmp.config.window.bordered(),
-    documentation = cmp.config.window.bordered(),
-  },
   formatting = {
     format = function(entry, vim_item)
       if vim.tbl_contains({ "path" }, entry.source.name) then
@@ -84,6 +80,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
     map("gI", vim.lsp.buf.implementation, "[G]oto [I]mplementation")
     map("<leader>D", vim.lsp.buf.type_definition, "Type [D]efinition")
     map("<leader>ds", vim.lsp.buf.document_symbol, "[D]ocument [S]ymbols")
+    map("<leader>dd","<cmd>Trouble diagnostics toggle<cr>","[D]ocument [D]iagnostics List")
+    map("[d", "<cmd>Trouble diagnostics prev<cr>", "Go to previous [D]iagnostic message")
+    map("]d", "<cmd>Trouble diagnostics next<cr>", "Go to next [D]iagnostic message")
     map("<leader>ws", vim.lsp.buf.workspace_symbol, "[W]orkspace [S]ymbols")
     map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
     map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
@@ -106,19 +105,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
         group = highlight_augroup,
         callback = vim.lsp.buf.clear_references,
       })
-    end
-
-    -- The following autocommand is used to enable inlay hints in your
-    -- code, if the language server you are using supports them
-    -- This may be unwanted, since they displace some of your code
-    if
-      client
-      and client.server_capabilities.inlayHintProvider
-      and vim.lsp.inlay_hint
-    then
-      map("<leader>th", function()
-        vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
-      end, "[T]oggle Inlay [H]ints")
     end
   end,
 })

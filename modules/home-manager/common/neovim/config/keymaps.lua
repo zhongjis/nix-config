@@ -4,16 +4,11 @@ end
 
 map("<Esc>", "<cmd>nohlsearch<CR>", "")
 
---- Diagnostic keymaps
-map("[d", vim.diagnostic.goto_prev, "Go to previous [D]iagnostic message")
-map("]d", vim.diagnostic.goto_next, "Go to next [D]iagnostic message")
+-- **trouble.nvim**
+map("<leader>q", "<cmd>Trouble qflist toggle<cr>", "Toggle Trouble [Q]uickfix List")
+map("]q", "<cmd>Trouble qflist next<cr>", "Go to next [T]rouble item")
+map("[q", "<cmd>Trouble qflist prev<cr>", "Go to previous [T]rouble item")
 map("<leader>e", vim.diagnostic.open_float, "Show diagnostic [E]rror messages")
-map("<leader>dq", vim.diagnostic.setloclist, "Open [D]iagnostic [Q]uickfix list")
-
--- QuickFix keymaps
-map("<leader>q", ":Trouble qflist toggle", "Toggle [Q]uickfix list")
-map("[q", ":cprev<CR>", "Go to previous [Q]uickfix item")
-map("]q", ":cnext<CR>", "Go to next [Q]quickfix item")
 
 -- **oil**
 -- TODO: Disable until trouble fix this issue https://github.com/folke/trouble.nvim/issues/397
@@ -22,7 +17,6 @@ map("]q", ":cnext<CR>", "Go to next [Q]quickfix item")
 -- **telescope**
 local builtin = require("telescope.builtin")
 map("<leader>sh", builtin.help_tags, "[S]earch [H]elp")
-map("<leader>sk", builtin.keymaps, "[S]earch [K]eymaps")
 map("<leader>sf", builtin.find_files, "[S]earch [F]iles")
 map("<leader>ss", builtin.builtin, "[S]earch [S]elect Telescope")
 map("<leader>sw", builtin.grep_string, "[S]earch current [W]ord")
@@ -31,22 +25,13 @@ map("<leader>sd", builtin.diagnostics, "[S]earch [D]iagnostics")
 map("<leader>sr", builtin.resume, "[S]earch [R]esume")
 map("<leader>s.", builtin.oldfiles, '[S]earch Recent Files ("." for repeat)')
 map("<leader><leader>", builtin.buffers, "[ ] Find existing buffers")
-map(
-  "<leader>/",
-  builtin.current_buffer_fuzzy_find,
-  "[/] Fuzzily search in current buffer"
-)
+map("/", builtin.current_buffer_fuzzy_find, "[/] Fuzzily search in current buffer")
 map("<leader>s/", function()
   builtin.live_grep({
     grep_open_files = true,
     prompt_title = "Live Grep in Open Files",
   })
 end, "[S]earch [/] in Open Files")
-
--- TODO: migrate this to use nix-config's
--- map("n", "<leader>sn", function()
---   builtin.find_files({ cwd = vim.fn.stdpath("config") )
--- end, "[S]earch [N]eovim files" )
 
 -- **harpoon**
 local harpoon = require("harpoon")
