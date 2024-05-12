@@ -78,11 +78,15 @@ vim.api.nvim_create_autocmd("LspAttach", {
     map("gd", vim.lsp.buf.definition, "[G]oto [D]efinition")
     map("gr", vim.lsp.buf.references, "[G]oto [R]eferences")
     map("gI", vim.lsp.buf.implementation, "[G]oto [I]mplementation")
+
     map("<leader>D", vim.lsp.buf.type_definition, "Type [D]efinition")
     map("<leader>ds", vim.lsp.buf.document_symbol, "[D]ocument [S]ymbols")
+
+    -- NOTE: lsp disgnostics
     map("<leader>dd","<cmd>Trouble diagnostics toggle<cr>","[D]ocument [D]iagnostics List")
     map("[d", "<cmd>Trouble diagnostics prev<cr>", "Go to previous [D]iagnostic message")
     map("]d", "<cmd>Trouble diagnostics next<cr>", "Go to next [D]iagnostic message")
+
     map("<leader>ws", vim.lsp.buf.workspace_symbol, "[W]orkspace [S]ymbols")
     map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
     map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
