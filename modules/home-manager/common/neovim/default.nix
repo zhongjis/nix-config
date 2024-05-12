@@ -150,11 +150,18 @@
             config = toLuaFile ./plugins/treesitter.lua;
           }
 
-          # **oil.nvim**
+          # **trouble.nvim**
           {
-            plugin = oil-nvim;
-            config = toLua "require('oil').setup()";
+            plugin = trouble-nvim;
+            config = toLua "require('trouble').setup()";
           }
+
+          # **oil.nvim**
+          ## TODO: Disable until trouble fix this issue https://github.com/folke/trouble.nvim/issues/397
+          # {
+          #   plugin = oil-nvim;
+          #   config = toLua "require('oil').setup()";
+          # }
 
           # **noice.nvim**
           # nui-nvim
