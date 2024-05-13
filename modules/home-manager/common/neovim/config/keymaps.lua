@@ -42,8 +42,7 @@ map("<leader>sg", builtin.live_grep, "[S]earch by [G]rep")
 map("<leader>sd", builtin.diagnostics, "[S]earch [D]iagnostics")
 map("<leader>sr", builtin.resume, "[S]earch [R]esume")
 map("<leader>s.", builtin.oldfiles, '[S]earch Recent Files ("." for repeat)')
-map("<leader><leader>", builtin.buffers, "[ ] Find existing buffers")
-map("/", builtin.current_buffer_fuzzy_find, "[/] Fuzzily search in current buffer")
+map("<leader>/", builtin.current_buffer_fuzzy_find, "[/] Fuzzily search in current buffer")
 map("<leader>s/", function()
   builtin.live_grep({
     grep_open_files = true,
