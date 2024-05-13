@@ -1,10 +1,12 @@
 require("trouble").setup({
-  icons = false,
   modes = {
     telescope = {
       sort = { "pos", "filename", "severity", "message" },
     },
     quickfix = {
+      sort = { "pos", "filename", "severity", "message" },
+    },
+    qflist = {
       sort = { "pos", "filename", "severity", "message" },
     },
     loclist = {
@@ -15,3 +17,7 @@ require("trouble").setup({
     },
   },
 })
+
+require("trouble.format").formatters.file_icon = function()
+  return ""
+end

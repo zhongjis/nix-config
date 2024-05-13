@@ -38,7 +38,7 @@
           # **trouble.nvim**
           {
             plugin = trouble-nvim;
-            config = toLua "require('trouble').setup()";
+            config = toLuaFile ./plugins/trouble.lua;
           }
 
           # **telescope.nvim**
@@ -157,7 +157,6 @@
           }
 
           # **oil.nvim**
-          ## TODO: Disable until trouble fix this issue https://github.com/folke/trouble.nvim/issues/397
           {
             plugin = oil-nvim;
             config = toLua "require('oil').setup()";

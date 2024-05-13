@@ -8,9 +8,9 @@ map("<Esc>", "<cmd>nohlsearch<CR>", "")
 map("<leader>q", "<cmd>Trouble qflist toggle<cr>", "Toggle [Q]uickfix List")
 map("]q", function()
   if require("trouble").is_open() then
-    require("trouble").next({ jump = true })
+    require("trouble").next({ skip_groups = true, jump = true })
   else
-    local ok, err = pcall(vim.cmd.cprev)
+    local ok, err = pcall(vim.cmd.cnext)
     if not ok then
       vim.notify(err, vim.log.levels.ERROR)
     end
@@ -18,7 +18,7 @@ map("]q", function()
 end, "Go to next [T]rouble item")
 map("[q", function()
   if require("trouble").is_open() then
-    require("trouble").prev({ jump = true })
+    require("trouble").prev({ skip_groups = true, jump = true })
   else
     local ok, err = pcall(vim.cmd.cprev)
     if not ok then
@@ -39,10 +39,12 @@ map("<leader>sf", builtin.find_files, "[S]earch [F]iles")
 map("<leader>ss", builtin.builtin, "[S]earch [S]elect Telescope")
 map("<leader>sw", builtin.grep_string, "[S]earch current [W]ord")
 map("<leader>sg", builtin.live_grep, "[S]earch by [G]rep")
-map("<leader>sd", builtin.diagnostics, "[S]earch [D]iagnostics")
 map("<leader>sr", builtin.resume, "[S]earch [R]esume")
-map("<leader>s.", builtin.oldfiles, '[S]earch Recent Files ("." for repeat)')
-map("<leader>/", builtin.current_buffer_fuzzy_find, "[/] Fuzzily search in current buffer")
+map(
+  "<leader>/",
+  builtin.current_buffer_fuzzy_find,
+  "[/] Fuzzily search in current buffer"
+)
 map("<leader>s/", function()
   builtin.live_grep({
     grep_open_files = true,
