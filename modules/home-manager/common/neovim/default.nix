@@ -158,10 +158,10 @@
 
           # **oil.nvim**
           ## TODO: Disable until trouble fix this issue https://github.com/folke/trouble.nvim/issues/397
-          # {
-          #   plugin = oil-nvim;
-          #   config = toLua "require('oil').setup()";
-          # }
+          {
+            plugin = oil-nvim;
+            config = toLua "require('oil').setup()";
+          }
 
           # **noice.nvim**
           # nui-nvim
