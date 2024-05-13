@@ -28,9 +28,9 @@ map("[q", function()
 end, "Go to previous [T]rouble item")
 map("<leader>e", vim.diagnostic.open_float, "Show diagnostic [E]rror messages")
 
--- **oil**
--- TODO: Disable until trouble fix this issue https://github.com/folke/trouble.nvim/issues/397
+-- **file explorer**
 -- map("<leader>o", "<CMD>Oil<CR>", "[O]il: Open parent directory")
+map("<leader>o", "<CMD>e .<CR>", "")
 
 -- **telescope**
 local builtin = require("telescope.builtin")
