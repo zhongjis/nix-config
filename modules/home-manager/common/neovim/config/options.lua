@@ -1,47 +1,55 @@
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
-vim.g.have_nerd_font = true
+-- Leader keys
+vim.g.mapleader = " " -- Set global leader key to whitespace
+vim.g.maplocalleader = " " -- Set local leader key to whitespace
 
-vim.opt.termguicolors = true
+-- Appearance
+vim.opt.termguicolors = true -- Enable 24-bit RGB color in the terminal
+vim.opt.number = true -- Show line numbers
+vim.opt.relativenumber = true -- Show relative line numbers
+vim.opt.colorcolumn = "80" -- Highlight the 80th column
+vim.opt.signcolumn = "yes" -- Always show the sign column
+vim.opt.cursorline = true -- Highlight the line with the cursor
+vim.opt.cmdheight = 1
+vim.opt.pumheight = 10 -- set max popup menu height
+vim.opt.pumblend = 10
+vim.g.netrw_banner = 0 -- turn off netrw banner
 
-vim.opt.number = true
-vim.opt.relativenumber = true
+-- Indentation
+vim.opt.tabstop = 4 -- Number of spaces that a <Tab> in the file counts for
+vim.opt.softtabstop = 4 -- Number of spaces that a <Tab> counts for while performing editing operations
+vim.opt.shiftwidth = 4 -- Number of spaces to use for each step of (auto)indent
+vim.opt.expandtab = true -- Convert tabs to spaces
+vim.opt.smartindent = true -- Enable smart indentation
 
-vim.opt.tabstop = 4
-vim.opt.softtabstop = 4
-vim.opt.shiftwidth = 4
-vim.opt.expandtab = true
+-- Search
+vim.opt.hlsearch = true -- Enable search highlighting
+vim.opt.incsearch = true -- Enable incremental search
+vim.opt.ignorecase = true -- Ignore case when searching
+vim.opt.smartcase = true -- Override ignorecase if search contains uppercase letters
 
-vim.opt.smartindent = true
+-- Files and backups
+vim.opt.swapfile = false -- Disable swap file creation
+vim.opt.backup = false -- Disable backup file creation
+vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir" -- Set undo directory
+vim.opt.undofile = true -- Enable persistent undo
 
-vim.opt.wrap = false
+-- Clipboard
+vim.opt.clipboard = "unnamedplus" -- Use the system clipboard
 
-vim.opt.swapfile = false
-vim.opt.backup = false
-vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
-vim.opt.undofile = true
+-- Command behavior
+vim.opt.inccommand = "split" -- Show effects of a command incrementally in a split window
+vim.opt.showmode = false -- Do not display the current mode in the command line
 
-vim.opt.hlsearch = false
-vim.opt.incsearch = true
+-- Display and UI
+vim.opt.wrap = false -- Disable line wrapping
 
-vim.opt.scrolloff = 10
-vim.opt.signcolumn = "yes"
-vim.opt.isfname:append("@-@")
+-- Whitespace characters
+vim.opt.list = true -- Show whitespace characters
+vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" } -- Define how whitespace characters are displayed
 
-vim.opt.updatetime = 50
-vim.opt.timeoutlen = 300
+-- Timing
+vim.opt.updatetime = 50 -- Set the delay (in milliseconds) before the swap file is written to disk
+vim.opt.timeoutlen = 600 -- Set the timeout length (in milliseconds) for a mapped sequence to complete
 
-vim.opt.colorcolumn = "80"
-
-vim.opt.clipboard = "unnamedplus"
-
-vim.opt.showmode = false
-vim.opt.breakindent = true
-vim.opt.ignorecase = true
-vim.opt.smartcase = true
-vim.opt.splitright = true
-vim.opt.splitbelow = true
-vim.opt.list = true
-vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
-vim.opt.inccommand = "split"
-vim.opt.cursorline = true
+-- Scrolling
+vim.opt.scrolloff = 10 -- Keep 10 lines visible above/below the cursor

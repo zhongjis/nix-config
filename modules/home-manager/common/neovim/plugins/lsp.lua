@@ -1,6 +1,3 @@
--- set max popup menu height
-vim.opt.pumheight = 10
-
 local cmp = require("cmp")
 local luasnip = require("luasnip")
 luasnip.config.setup()
