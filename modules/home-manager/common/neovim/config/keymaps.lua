@@ -4,6 +4,13 @@ end
 
 map("<Esc>", "<cmd>nohlsearch<CR>", "")
 
+-- continuous indenting
+vim.keymap.set("v", "<", "<gv")
+vim.keymap.set("v", ">", ">gv")
+
+-- do not override register when paste*
+vim.keymap.set("x", "p", [["_dP]])
+
 -- **trouble.nvim**
 map("<leader>q", "<cmd>Trouble qflist toggle<cr>", "Toggle [Q]uickfix List")
 map("]q", function()
