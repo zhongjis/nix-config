@@ -19,6 +19,7 @@ conform.setup({
     sh = { "shfmt" },
     javascript = { "prettierd" },
     typescript = { "prettierd" },
+    yaml = { "prettierd" },
   },
 })
 
