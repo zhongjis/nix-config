@@ -46,6 +46,7 @@
   environment.systemPackages = with pkgs; [
     raycast
 
+    mongosh
     terraform-versions."1.5.2"
 
     # **java**
