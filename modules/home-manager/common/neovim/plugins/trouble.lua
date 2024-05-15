@@ -1,4 +1,5 @@
 require("trouble").setup({
+  auto_refresh = false,
   modes = {
     telescope = {
       sort = { "pos", "filename", "severity", "message" },
@@ -18,6 +19,7 @@ require("trouble").setup({
   },
 })
 
+-- disable trouble icon
 require("trouble.format").formatters.file_icon = function()
   return ""
 end

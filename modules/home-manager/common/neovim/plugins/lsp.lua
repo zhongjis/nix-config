@@ -7,14 +7,14 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end
 
     -- NOTE: goto actions
-    map("gd", "<cmd>Trouble lsp_definitions<cr>", "[G]oto [D]efinition")
-    map("gD", "<cmd>Trouble lsp_declarations<cr>", "[G]oto [D]eclaration")
-    map("gr", "<cmd>Trouble lsp_references<cr>", "[G]oto [R]eferences")
-    map("gi", "<cmd>Trouble lsp_implementations<cr>", "[G]oto [I]mplementation")
-    map("gtd", "<cmd>Trouble lsp_type_definitions<cr>", "[G]oto [T]ype [D]efinition")
+    map("gd", "<cmd>Trouble lsp_definitions toggle<cr>", "[G]oto [D]efinition")
+    map("gD", "<cmd>Trouble lsp_declarations toggle<cr>", "[G]oto [D]eclaration")
+    map("gr", "<cmd>Trouble lsp_references toggle<cr>", "[G]oto [R]eferences")
+    map("gi", "<cmd>Trouble lsp_implementations toggle<cr>", "[G]oto [I]mplementation")
+    map("gtd", "<cmd>Trouble lsp_type_definitions toggle<cr>", "[G]oto [T]ype [D]efinition")
 
     -- NOTE: document actions
-    map("<leader>ds", "<cmd>Trouble lsp_document_symbols<cr>", "[D]ocument [S]ymbols")
+    map("<leader>ds", "<cmd>Trouble lsp_document_symbols toggle<cr>", "[D]ocument [S]ymbols")
     map("<leader>dd","<cmd>Trouble diagnostics toggle<cr>","[D]ocument [D]iagnostics List")
 
     map("[d", "<cmd>Trouble diagnostics prev<cr>", "Go to previous [D]iagnostic message")

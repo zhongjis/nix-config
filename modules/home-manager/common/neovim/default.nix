@@ -35,12 +35,6 @@
         ];
 
         plugins = with pkgs.vimPlugins; [
-          # **trouble.nvim**
-          {
-            plugin = trouble-nvim;
-            config = toLuaFile ./plugins/trouble.lua;
-          }
-
           # **telescope.nvim**
           nvim-web-devicons
           plenary-nvim
@@ -74,6 +68,12 @@
           # **snippets**
           luasnip
           friendly-snippets
+
+          # **trouble.nvim**
+          {
+            plugin = trouble-nvim;
+            config = toLuaFile ./plugins/trouble.lua;
+          }
 
           # **sleuth**
           vim-sleuth
