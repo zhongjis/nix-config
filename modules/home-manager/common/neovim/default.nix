@@ -57,7 +57,10 @@
 
           # **cmp**
           lspkind-nvim
-          nvim-cmp
+          {
+            plugin = nvim-cmp;
+            config = toLuaFile ./plugins/cmp.lua;
+          }
           cmp-buffer
           cmp-path
           cmp_luasnip
