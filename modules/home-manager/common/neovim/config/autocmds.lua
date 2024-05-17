@@ -22,7 +22,7 @@ vim.api.nvim_create_autocmd("VimResized", {
 
 vim.api.nvim_create_autocmd("BufLeave", {
   desc = "Auto save when leave buffer",
-  group = vim.api.nvim_create_augroup("AutoSaveAndCloseBuffer", { clear = true }),
+  group = vim.api.nvim_create_augroup("AutoSaveBuffer", { clear = true }),
   pattern = "*",
   callback = function()
     -- Check the filetype of the current buffer
