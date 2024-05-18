@@ -39,7 +39,7 @@
         inputs.neovim-nightly-overlay.overlay
         inputs.nixpkgs-terraform.overlays.default
         (final: prev: rec {
-          jdk = prev."jdk${toString 11}";
+          jdk = prev."jdk${toString 17}";
           maven = prev.maven.override { inherit jdk; };
         })
         (final: prev: {
