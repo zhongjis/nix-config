@@ -20,6 +20,7 @@ conform.setup({
     javascript = { "prettierd" },
     typescript = { "prettierd" },
     yaml = { "prettierd" },
+    markdown = { "prettierd" },
   },
 })
 

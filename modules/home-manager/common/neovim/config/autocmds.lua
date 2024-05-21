@@ -20,7 +20,7 @@ vim.api.nvim_create_autocmd("VimResized", {
   command = "wincmd =",
 })
 
-vim.api.nvim_create_autocmd("BufLeave", {
+vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost" }, {
   desc = "Auto save when leave buffer",
   group = vim.api.nvim_create_augroup("AutoSaveBuffer", { clear = true }),
   pattern = "*",
