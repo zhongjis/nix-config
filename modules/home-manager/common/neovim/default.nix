@@ -155,6 +155,7 @@
               p.typescript
               p.markdown
               p.markdown_inline
+              p.hcl
             ]);
             config = toLuaFile ./plugins/treesitter.lua;
           }

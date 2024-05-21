@@ -27,7 +27,6 @@
       "flux"
       "github"
       "spotify"
-      "itsycal"
       "box-drive"
 
       # dev tools
@@ -59,7 +58,9 @@
     kubectl
     kubelogin
 
-    neofetch
+    fastfetch
+
+    vault
 
     python312
     python312Packages.pip
