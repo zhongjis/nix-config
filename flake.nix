@@ -4,7 +4,6 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixos-hardware.url = "github:nixos/nixos-hardware/master";
-    flake-utils.url = "github:numtide/flake-utils";
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -26,10 +25,6 @@
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     trouble-v3 = {
       url = "github:folke/trouble.nvim/dev";
-      flake = false;
-    };
-    solarized-osaka-nvim = {
-      url = "github:craftzdog/solarized-osaka.nvim";
       flake = false;
     };
   };
@@ -56,12 +51,6 @@
               {
                 name = "trouble.nvim";
                 src = inputs.trouble-v3;
-              };
-            solarized-osaka-nvim =
-              prev.vimUtils.buildVimPlugin
-              {
-                name = "solarized-osaka.nvim";
-                src = inputs.solarized-osaka-nvim;
               };
           };
       })
