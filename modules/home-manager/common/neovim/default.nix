@@ -30,6 +30,7 @@
           # Formatters
           stylua
           nixpkgs-fmt
+          alejandra
           shfmt
           prettierd
         ];

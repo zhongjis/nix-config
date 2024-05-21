@@ -15,7 +15,7 @@ conform.setup({
   end,
   formatters_by_ft = {
     lua = { "stylua" },
-    nix = { "nixpkgs_fmt" },
+    nix = { "alejandra" },
     sh = { "shfmt" },
     javascript = { "prettierd" },
     typescript = { "prettierd" },
