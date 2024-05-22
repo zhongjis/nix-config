@@ -19,6 +19,20 @@
   system.keyboard.enableKeyMapping = true;
   system.keyboard.remapCapsLockToEscape = true;
 
+  # Dock
+  system.defaults.dock = {
+    autohide = true;
+    autohide-delay = 0.24;
+    autohide-time-modifier = 1.0;
+    magnification = false;
+    mru-spaces = false;
+    orientation = "left";
+    show-recents = false;
+  };
+
+  # menubar - auto hide menubar, enable when swtiching to sketchybar
+  # system.defaults.NSGlobalDomain._HIHideMenuBar = true;
+
   # TODO: need to emulate shortcuts for mission control, including all swtich desktops
 
   homebrew = {
