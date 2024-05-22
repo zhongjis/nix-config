@@ -13,7 +13,6 @@ vim.opt.cmdheight = 1
 vim.opt.pumheight = 10 -- set max popup menu height
 vim.opt.pumblend = 10
 vim.g.netrw_banner = 0 -- turn off netrw banner
-vim.g.loaded_netrwPlugin = 1 -- turn off netrw
 
 -- Indentation
 vim.opt.tabstop = 4 -- Number of spaces that a <Tab> in the file counts for
