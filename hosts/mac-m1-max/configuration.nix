@@ -1,17 +1,25 @@
-{ inputs, pkgs, currentSystemUser, ... }:
-
 {
-  imports =
-    [
-      inputs.home-manager.darwinModules.default
-      ../common.nix
-      ../../modules/nix-darwin
-    ];
+  inputs,
+  pkgs,
+  currentSystemUser,
+  ...
+}: {
+  imports = [
+    inputs.home-manager.darwinModules.default
+    ../common.nix
+    ../../modules/nix-darwin
+  ];
 
   users.users.${currentSystemUser} = {
-    packages = with pkgs; [ ];
+    packages = with pkgs; [];
     shell = pkgs.zsh;
   };
+
+  # Keyboard
+  system.keyboard.enableKeyMapping = true;
+  system.keyboard.remapCapsLockToEscape = true;
+
+  # TODO: need to emulate shortcuts for mission control, including all swtich desktops
 
   homebrew = {
     enable = true;
@@ -85,4 +93,3 @@
   # The platform the configuration will be used on.
   nixpkgs.hostPlatform = "aarch64-darwin";
 }
-
