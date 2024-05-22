@@ -1,6 +1,8 @@
-{ lib, config, ... }:
-
 {
+  lib,
+  config,
+  ...
+}: {
   options = {
     sketchybar.enable =
       lib.mkEnableOption "enables sketchybar";

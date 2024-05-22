@@ -30,9 +30,6 @@
     show-recents = false;
   };
 
-  # menubar - auto hide menubar, enable when swtiching to sketchybar
-  # system.defaults.NSGlobalDomain._HIHideMenuBar = true;
-
   # TODO: need to emulate shortcuts for mission control, including all swtich desktops
 
   homebrew = {
