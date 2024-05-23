@@ -40,18 +40,31 @@ vim.api.nvim_create_autocmd("LspAttach", {
         group = highlight_augroup,
         callback = vim.lsp.buf.clear_references,
       })
-    end
-  end,
-})
 
-vim.api.nvim_create_autocmd("LspDetach", {
-  group = vim.api.nvim_create_augroup("kickstart-lsp-detach", { clear = true }),
-  callback = function(event)
-    vim.lsp.buf.clear_references()
-    vim.api.nvim_clear_autocmds({
-      group = "kickstart-lsp-highlight",
-      buffer = event.buf,
-    })
+      vim.api.nvim_create_autocmd("LspDetach", {
+        group = vim.api.nvim_create_augroup(
+          "kickstart-lsp-detach",
+          { clear = true }
+        ),
+        callback = function(event2)
+          vim.lsp.buf.clear_references()
+          vim.api.nvim_clear_autocmds({
+            group = "kickstart-lsp-highlight",
+            buffer = event2.buf,
+          })
+        end,
+      })
+    end
+
+    if
+      client
+      and client.server_capabilities.inlayHintProvider
+      and vim.lsp.inlay_hint
+    then
+      map("<leader>th", function()
+        vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+      end, "[T]oggle Inlay [H]ints")
+    end
   end,
 })
 
