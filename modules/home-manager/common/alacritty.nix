@@ -1,11 +1,15 @@
-{ pkgs, config, lib, systemName, ... }:
-let
-  fontSize =
-    if systemName == "mac-m1-max" then
-      18
-    else 13;
-in
 {
+  pkgs,
+  config,
+  lib,
+  systemName,
+  ...
+}: let
+  fontSize =
+    if systemName == "mac-m1-max"
+    then 18
+    else 13;
+in {
   options = {
     alacritty.enable =
       lib.mkEnableOption "enables alacritty";
@@ -15,14 +19,14 @@ in
     programs.alacritty = {
       enable = true;
       catppuccin.enable = true;
-      catppuccin.flavour = "mocha";
+      catppuccin.flavor = "mocha";
 
       settings = {
         live_config_reload = true;
 
         shell = {
           program = "${lib.getExe pkgs.zsh}";
-          args = [ "-l" "-c" "tmux attach || tmux new-session -d -s home && tmux attach -t home" ];
+          args = ["-l" "-c" "tmux attach || tmux new-session -d -s home && tmux attach -t home"];
         };
 
         cursor.style.blinking = "Always";

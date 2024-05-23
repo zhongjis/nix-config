@@ -1,6 +1,8 @@
-{ lib, config, ... }:
-
 {
+  lib,
+  config,
+  ...
+}: {
   options = {
     k9s.enable =
       lib.mkEnableOption "enables k9s";
@@ -10,7 +12,7 @@
     programs.k9s = {
       enable = true;
       catppuccin.enable = true;
-      catppuccin.flavour = "mocha";
+      catppuccin.flavor = "mocha";
 
       settings = {
         k9s = {

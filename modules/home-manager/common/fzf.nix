@@ -1,5 +1,9 @@
-{ pkgs, lib, config, ... }:
 {
+  pkgs,
+  lib,
+  config,
+  ...
+}: {
   options = {
     fzf.enable =
       lib.mkEnableOption "enables fzf";
@@ -9,7 +13,7 @@
     programs.fzf = {
       enable = true;
       catppuccin.enable = true;
-      catppuccin.flavour = "mocha";
+      catppuccin.flavor = "mocha";
 
       enableZshIntegration = true;
       changeDirWidgetCommand = "fd --type -d";

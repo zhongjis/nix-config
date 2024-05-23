@@ -1,6 +1,9 @@
-{ pkgs, lib, config, ... }:
-
 {
+  pkgs,
+  lib,
+  config,
+  ...
+}: {
   options = {
     zsh.enable =
       lib.mkEnableOption "enables zsh";
@@ -49,7 +52,7 @@
     programs.starship = {
       enable = true;
       catppuccin.enable = true;
-      catppuccin.flavour = "mocha";
+      catppuccin.flavor = "mocha";
 
       enableZshIntegration = true;
 
@@ -60,7 +63,7 @@
         kubernetes = {
           disabled = false;
           format = "[⛵ $context \($namespace\)](dimmed green) \n";
-          detect_folders = [ "inventories" "templates" ];
+          detect_folders = ["inventories" "templates"];
         };
       };
     };
@@ -68,7 +71,7 @@
     programs.bat = {
       enable = true;
       catppuccin.enable = true;
-      catppuccin.flavour = "mocha";
+      catppuccin.flavor = "mocha";
     };
 
     programs.eza = {

@@ -1,6 +1,9 @@
-{ pkgs, lib, config, ... }:
-
 {
+  pkgs,
+  lib,
+  config,
+  ...
+}: {
   options = {
     lazygit.enable =
       lib.mkEnableOption "enables lazygit";
@@ -11,7 +14,7 @@
     programs.lazygit = {
       enable = true;
       catppuccin.enable = true;
-      catppuccin.flavour = "mocha";
+      catppuccin.flavor = "mocha";
     };
   };
 }

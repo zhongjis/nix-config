@@ -1,22 +1,22 @@
 # Edit this configuration file to define what should be installed on
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
-
-{ pkgs, inputs, ... }:
-
 {
-  imports =
-    [
-      ./hardware-configuration.nix
-      ../common.nix
-      inputs.home-manager.nixosModules.default
-    ];
+  pkgs,
+  inputs,
+  ...
+}: {
+  imports = [
+    ./hardware-configuration.nix
+    ../common.nix
+    inputs.home-manager.nixosModules.default
+  ];
 
   # xremap
   hardware.uinput.enable = true;
   users.groups = {
-    uinput.members = [ "zshen" ];
-    input.members = [ "zshen" ];
+    uinput.members = ["zshen"];
+    input.members = ["zshen"];
   };
 
   # Use the systemd-boot EFI boot loader.
@@ -29,13 +29,13 @@
     };
     grub = {
       enable = true;
-      devices = [ "nodev" ];
+      devices = ["nodev"];
       efiSupport = true;
       useOSProber = true;
     };
   };
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = ["nix-command" "flakes"];
 
   networking = {
     hostName = "nixos"; # Define your hostname.
@@ -49,11 +49,11 @@
   i18n.defaultLocale = "en_US.UTF-8";
   console = {
     catppuccin.enable = true;
-    catppuccin.flavour = "mocha";
+    catppuccin.flavor = "mocha";
 
     earlySetup = true;
     font = "${pkgs.terminus_font}/share/consolefonts/ter-128n.psf.gz";
-    packages = with pkgs; [ terminus_font ];
+    packages = with pkgs; [terminus_font];
     keyMap = "us";
     #   useXkbConfig = true; # use xkb.options in tty.
   };
@@ -84,7 +84,7 @@
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.zshen = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "input" ]; # Enable ‘sudo’ for the user.
+    extraGroups = ["wheel" "input"]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
       discord
       terraform
@@ -111,7 +111,7 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [ ];
+  environment.systemPackages = with pkgs; [];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
