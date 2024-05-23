@@ -68,7 +68,13 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 })
 
-require("fidget").setup()
+require("fidget").setup({
+  notification = {
+    window = {
+      winblend = 0,
+    },
+  },
+})
 require("neodev").setup()
 
 require("mason").setup()
