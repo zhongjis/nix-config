@@ -2,10 +2,10 @@
   imports = [
     ./skhd
     ./yabai
-    ./sketchybar.nix
+    ./sketchybar
   ];
 
   skhd.enable = lib.mkDefault true;
   yabai.enable = lib.mkDefault true;
-  sketchybar.enable = lib.mkDefault false;
+  sketchybar.enable = lib.mkDefault true;
 }
