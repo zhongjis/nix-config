@@ -38,5 +38,14 @@ vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost" }, {
   desc = "Auto save when leave buffer",
   group = vim.api.nvim_create_augroup("AutoSaveBuffer", { clear = true }),
   pattern = "*",
-  command = "silent wa",
+  callback = function()
+    -- Get the file type and buffer type of the current buffer
+    local filetype = vim.bo.filetype
+    local buftype = vim.bo.buftype
+
+    -- If the file type is not 'oil' and the buffer is not a 'nofile' buffer, save the file
+    if filetype ~= "oil" and buftype ~= "nofile" then
+      vim.cmd("silent wa")
+    end
+  end,
 })
