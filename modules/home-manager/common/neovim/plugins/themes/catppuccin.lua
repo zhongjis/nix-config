@@ -17,6 +17,6 @@ require("catppuccin").setup({
     mason = true,
     -- noice = true,
     -- notify = true,
-    -- lsp_trouble = true,
+    lsp_trouble = true,
   },
 })
