@@ -23,6 +23,8 @@
 
       withNodeJs = true;
 
+      home.sessionVariables.EDITOR = "nvim";
+
       extraPackages = with pkgs; [
         cargo # Depdency for Mason Install packages
 

@@ -11,10 +11,6 @@
   common.enable = lib.mkDefault true;
   window-manager.enable = lib.mkDefault false;
 
-  home.sessionVariables = {
-    EDITOR = "nvim";
-  };
-
   home.packages = with pkgs; [
     awscli
     gh
