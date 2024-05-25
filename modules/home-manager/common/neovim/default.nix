@@ -10,6 +10,8 @@
   };
 
   config = lib.mkIf config.neovim.enable {
+    home.sessionVariables.EDITOR = "nvim";
+
     programs.neovim = let
       toLua = str: "lua << EOF\n${str}\nEOF\n";
       toLuaFile = file: "lua << EOF\n${builtins.readFile file}\nEOF\n";
@@ -22,8 +24,6 @@
       vimdiffAlias = true;
 
       withNodeJs = true;
-
-      home.sessionVariables.EDITOR = "nvim";
 
       extraPackages = with pkgs; [
         cargo # Depdency for Mason Install packages
