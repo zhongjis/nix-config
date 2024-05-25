@@ -11,6 +11,8 @@
   common.enable = lib.mkDefault true;
   window-manager.enable = lib.mkDefault false;
 
+  xdg.enable = true;
+
   home.packages = with pkgs; [
     awscli
     gh

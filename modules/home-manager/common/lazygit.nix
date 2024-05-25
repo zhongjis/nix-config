@@ -10,7 +10,6 @@
   };
 
   config = lib.mkIf config.lazygit.enable {
-    xdg.enable = true;
     programs.lazygit = {
       enable = true;
       catppuccin.enable = true;
