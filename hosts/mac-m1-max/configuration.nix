@@ -65,7 +65,7 @@
     raycast
 
     mongosh
-    terraform-versions."1.5.2"
+    terraform-versions."1.6.6"
 
     # **java**
     maven
