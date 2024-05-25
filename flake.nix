@@ -35,26 +35,8 @@
     nixos-hardware,
     ...
   } @ inputs: let
-    overlays = [
-      inputs.neovim-nightly-overlay.overlay
-      inputs.nixpkgs-terraform.overlays.default
-      (final: prev: rec {
-        jdk = prev."jdk${toString 17}";
-        maven = prev.maven.override {inherit jdk;};
-      })
-      (final: prev: {
-        vimPlugins =
-          prev.vimPlugins
-          // {
-            trouble-nvim =
-              prev.vimUtils.buildVimPlugin
-              {
-                name = "trouble.nvim";
-                src = inputs.trouble-v3;
-              };
-          };
-      })
-    ];
+    overlays = import ./overlays {inherit inputs;};
+
     mkSystem = import ./lib/mksystem.nix {
       inherit overlays nixpkgs inputs;
     };
