@@ -36,6 +36,7 @@ in {
       package = pkgs.sketchybar;
       config =
         ''
+          #!/usr/bin/env bash
           # source: https://github.com/FelixKratz/dotfiles
 
           source "${colors}" # Loads all defined colors

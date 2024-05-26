@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Color Palette
 export BLACK=0xff181926
@@ -14,7 +14,7 @@ export TRANSPARENT=0x00000000
 
 # General bar colors
 export BAR_COLOR=0xcc24273a
-export ICON_COLOR=$WHITE # Color of all icons
+export ICON_COLOR=$WHITE  # Color of all icons
 export LABEL_COLOR=$WHITE # Color of all labels
 export BACKGROUND_1=0xff3c3e4f
 export BACKGROUND_2=0xff494d64
