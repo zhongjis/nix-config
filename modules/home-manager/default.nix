@@ -19,6 +19,7 @@
     graphviz
     wget
     font-awesome
+    sketchybar-app-font
     (nerdfonts.override {
       fonts = [
         "FiraCode"
