@@ -4,56 +4,10 @@
   pkgs,
   ...
 }: let
-  inherit (pkgs) writeTextFile;
-
-  batteryScript = writeTextFile {
-    name = "sketchybar-battery.sh";
-    text = ''
-      ${builtins.readFile ./plugins/battery.sh}
-    '';
-  };
-
-  spotifyScript = writeTextFile {
-    name = "sketchybar-spotify.sh";
-    text = ''
-      ${builtins.readFile ./plugins/spotify.sh}
-    '';
-  };
-
-  clockScript = writeTextFile {
-    name = "sketchybar-clock.sh";
-    text = ''
-      ${builtins.readFile ./plugins/clock.sh}
-    '';
-  };
-
-  current_spaceScript = writeTextFile {
-    name = "sketchybar-current-space.sh";
-    text = ''
-      ${builtins.readFile ./plugins/current_space.sh}
-    '';
-  };
-
-  front_appScript = writeTextFile {
-    name = "sketchybar-front-app.sh";
-    text = ''
-      ${builtins.readFile ./plugins/front_app.sh}
-    '';
-  };
-
-  volumeScript = writeTextFile {
-    name = "sketchybar-volume.sh";
-    text = ''
-      ${builtins.readFile ./plugins/volume.sh}
-    '';
-  };
-
-  weatherScript = writeTextFile {
-    name = "sketchybar-weather.sh";
-    text = ''
-      ${builtins.readFile ./plugins/weather.sh}
-    '';
-  };
+  colors = ./config/colors.sh;
+  icons = ./config/icons.sh;
+  item_dir = ./config/items;
+  plugin_dir = ./config/plugins;
 in {
   options = {
     sketchybar.enable =
@@ -61,27 +15,82 @@ in {
   };
 
   config = lib.mkIf config.sketchybar.enable {
+    # https://github.com/FelixKratz/dotfiles/tree/e6422df2bfe674a771f5e92b478e5999e945ccf0
     system.defaults.NSGlobalDomain._HIHideMenuBar = true;
 
     services.sketchybar = {
       enable = true;
+      package = pkgs.sketchybar;
       config = ''
-        ${builtins.readFile ./sketchybarrc}
+        #!/usr/bin/env sh
+
+        source "${colors}" # Loads all defined colors
+        source "${icons}" # Loads all defined icons
+
+        ITEM_DIR="${item_dir}" # Directory where the items are configured
+        PLUGIN_DIR="${plugin_dir}" # Directory where all the plugin scripts are stored
+
+        FONT="SF Pro" # Needs to have Regular, Bold, Semibold, Heavy and Black variants
+        SPACE_CLICK_SCRIPT="yabai -m space --focus \$SID 2>/dev/null" # The script that is run for clicking on space components
+
+        PADDINGS=3 # All paddings use this value (icon, label, background and bar paddings)
+
+        POPUP_BORDER_WIDTH=2
+        POPUP_CORNER_RADIUS=11
+
+        SHADOW=on
+
+        # Setting up the general bar appearance and default values
+        sketchybar --bar     height=39                                           \
+                             corner_radius=9                                     \
+                             border_width=0                                      \
+                             margin=10                                           \
+                             blur_radius=50                                      \
+                             position=top                                        \
+                             padding_left=10                                     \
+                             padding_right=10                                    \
+                             color=$BAR_COLOR                                    \
+                             topmost=off                                         \
+                             sticky=on                                           \
+                             font_smoothing=off                                  \
+                             y_offset=10                                         \
+                             shadow=$SHADOW                                      \
+                             notch_width=200                                     \
+                                                                                 \
+                   --default drawing=on                                          \
+                             updates=when_shown                                  \
+                             label.font="$FONT:Semibold:13.0"                    \
+                             icon.font="$FONT:Bold:14.0"                         \
+                             icon.color=$ICON_COLOR                              \
+                             label.color=$LABEL_COLOR                            \
+                             icon.padding_left=$PADDINGS                         \
+                             icon.padding_right=$PADDINGS                        \
+                             label.padding_left=$PADDINGS                        \
+                             label.padding_right=$PADDINGS                       \
+                             background.padding_right=$PADDINGS                  \
+                             background.padding_left=$PADDINGS                   \
+                             popup.background.border_width=$POPUP_BORDER_WIDTH   \
+                             popup.background.corner_radius=$POPUP_CORNER_RADIUS \
+                             popup.background.border_color=$POPUP_BORDER_COLOR   \
+                             popup.background.color=$POPUP_BACKGROUND_COLOR      \
+                             popup.background.shadow.drawing=$SHADOW
+
+        # Left
+        source "$ITEM_DIR/apple.sh"
+        source "$ITEM_DIR/spaces.sh"
+        source "$ITEM_DIR/front_app.sh"
+
+        # Right
+        source "$ITEM_DIR/github.sh"
+        source "$ITEM_DIR/mail.sh"
+        source "$ITEM_DIR/calendar.sh"
+        source "$ITEM_DIR/cpu.sh"
+
+        ############## FINALIZING THE SETUP ##############
+        sketchybar --update
+
+        echo "sketchybar configuation loaded.."
       '';
-
-      extraPackages = with pkgs; [
-        jq
-      ];
-    };
-
-    environment.etc = {
-      ".config/sketchybar/plugins/battery.sh".source = "${batteryScript}";
-      ".config/sketchybar/plugins/spotify.sh".source = "${spotifyScript}";
-      ".config/sketchybar/plugins/clock.sh".source = "${clockScript}";
-      ".config/sketchybar/plugins/current_space.sh".source = "${current_spaceScript}";
-      ".config/sketchybar/plugins/front_app.sh".source = "${front_appScript}";
-      ".config/sketchybar/plugins/volume.sh".source = "${volumeScript}";
-      ".config/sketchybar/plugins/weather.sh".source = "${weatherScript}";
     };
   };
 }
