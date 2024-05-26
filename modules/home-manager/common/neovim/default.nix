@@ -156,7 +156,6 @@ in {
             p.c
             p.java
             p.nix
-            p.terraform
             p.python
             p.yaml
             p.json
@@ -165,6 +164,7 @@ in {
             p.markdown
             p.markdown_inline
             p.hcl
+            p.terraform
           ]);
           config = toLuaFile ./plugins/treesitter.lua;
         }
