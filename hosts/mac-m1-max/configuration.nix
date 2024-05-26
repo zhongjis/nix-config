@@ -38,6 +38,9 @@
       autoUpdate = false;
       cleanup = "zap";
     };
+    brews = [
+      "switchaudio-osx"
+    ];
     casks = [
       # productivity
       "alfred"
@@ -56,6 +59,9 @@
       "devtoys"
       "intellij-idea"
       "mongodb-compass"
+
+      # fonts
+      "sf-symbols"
     ];
   };
 

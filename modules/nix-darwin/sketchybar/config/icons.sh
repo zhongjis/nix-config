@@ -1,14 +1,13 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-# TODO: https://www.nerdfonts.com/cheat-sheet
 # General Icons
-LOADING=󰔟
-APPLE=
-PREFERENCES=
-ACTIVITY=
-LOCK=󱅞
-BELL=
-BELL_DOT=
+LOADING=􀖇
+APPLE=􀣺
+PREFERENCES=􀺽
+ACTIVITY=􀒓
+LOCK=􀒳
+BELL=􀋚
+BELL_DOT=􀝗
 
 # Git Icons
 GIT_ISSUE=􀍷
@@ -32,17 +31,16 @@ YABAI_FLOAT=􀢌
 YABAI_GRID=􀧍
 
 # Battery Icons
-BATTERY_100=
-BATTERY_75=
-BATTERY_50=
-BATTERY_25=
-BATTERY_0=
-BATTERY_CHARGING=
+BATTERY_100=􀛨
+BATTERY_75=􀺸
+BATTERY_50=􀺶
+BATTERY_25=􀛩
+BATTERY_0=􀛪
+BATTERY_CHARGING=􀢋
 
-# WiFi
-WIFI_CONNECTED=󰖩
-WIFI_DISCONNECTED=󰖩
-
-# Clock
-CLOCK=
-CALENDAR=
+# Volume Icons
+VOLUME_100=􀊩
+VOLUME_66=􀊧
+VOLUME_33=􀊥
+VOLUME_10=􀊡
+VOLUME_0=􀊣

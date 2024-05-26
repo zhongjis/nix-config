@@ -1,21 +1,20 @@
-{ pkgs ? import <nixpkgs> { }, ... }:
-
+{pkgs ? import <nixpkgs> {}, ...}:
 with pkgs;
-stdenv.mkDerivation {
-  pname = "sketchybar-helper";
-  version = "0.1.0";
+  stdenv.mkDerivation {
+    pname = "sketchybar-helper";
+    version = "0.1.0";
 
-  src = ./.;
+    src = ./.;
 
-  nativeBuildInputs = [ gnumake clang ];
-  buildInputs = [ ];
+    nativeBuildInputs = [gnumake clang];
+    buildInputs = [];
 
-  buildPhase = ''
-    make
-  '';
+    buildPhase = ''
+      make
+    '';
 
-  installPhase = ''
-    mkdir -p $out/bin
-    mv helper $out/bin/sketchybar-helper
-  '';
-}
+    installPhase = ''
+      mkdir -p $out/bin
+      mv helper $out/bin/sketchybar-helper
+    '';
+  }

@@ -13,32 +13,32 @@
 
 # global settings
 yabai -m config \
-	mouse_follows_focus off \
-	focus_follows_mouse on \
-	window_origin_display default \
-	window_placement second_child \
-	window_zoom_persist on \
-	window_shadow float \
-	window_animation_duration 0.1 \
-	window_animation_frame_rate 120 \
-	window_opacity_duration 0.0 \
-	active_window_opacity 1.0 \
-	normal_window_opacity 0.80 \
-	window_opacity off \
-	insert_feedback_color 0xffd75f5f \
-	split_ratio 0.50 \
-	split_type auto \
-	auto_balance off \
-	top_padding 10 \
-	bottom_padding 10 \
-	left_padding 10 \
-	right_padding 10 \
-	window_gap 8 \
-	layout bsp \
-	mouse_modifier fn \
-	mouse_action1 move \
-	mouse_action2 resize \
-	mouse_drop_action swap
+  mouse_follows_focus off \
+  focus_follows_mouse on \
+  window_origin_display default \
+  window_placement second_child \
+  window_zoom_persist on \
+  window_shadow float \
+  window_animation_duration 0.1 \
+  window_animation_frame_rate 120 \
+  window_opacity_duration 0.0 \
+  active_window_opacity 1.0 \
+  normal_window_opacity 0.80 \
+  window_opacity off \
+  insert_feedback_color 0xffd75f5f \
+  split_ratio 0.50 \
+  split_type auto \
+  auto_balance off \
+  top_padding 10 \
+  bottom_padding 10 \
+  left_padding 10 \
+  right_padding 10 \
+  window_gap 8 \
+  layout bsp \
+  mouse_modifier fn \
+  mouse_action1 move \
+  mouse_action2 resize \
+  mouse_drop_action swap
 
 echo "yabai configuration loaded.."
 
@@ -53,3 +53,16 @@ yabai -m rule --add app="^Sublime Merge$" manage=off
 yabai -m rule --add app="^DevToys$" manage=off
 # yabai -m rule --add app="^Things$" manage=off
 
+# needed for yabai window state and running application icons) yabai events
+yabai -m signal --add event=window_focused action="sketchybar --trigger window_focus"
+yabai -m signal --add event=window_created action="sketchybar --trigger windows_on_spaces"
+yabai -m signal --add event=window_destroyed action="sketchybar --trigger windows_on_spaces"
+
+# needed for yabai window state and running application icons) skhd shortcuts should trigger the sketchybar events
+lalt - space : yabai -m window --toggle float
+sketchybar --trigger window_focus
+shift + lalt - f : yabai -m window --toggle zoom-fullscreen
+sketchybar --trigger window_focus
+lalt - f : yabai -m window --toggle zoom-parent
+sketchybar --trigger window_focus
+shift + lalt - 1 : yabai -m window --space 1 && sketchybar --trigger windows_on_spaces
