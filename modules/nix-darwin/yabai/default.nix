@@ -1,6 +1,8 @@
-{ lib, config, ... }:
-
 {
+  lib,
+  config,
+  ...
+}: {
   options = {
     yabai.enable =
       lib.mkEnableOption "enables yabai";
