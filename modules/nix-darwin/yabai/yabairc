@@ -11,37 +11,49 @@
 # sudo yabai --load-sa
 #
 
+yabai -m signal --add event=window_focused action="sketchybar --trigger window_focus"
+yabai -m signal --add event=window_created action="sketchybar --trigger windows_on_spaces"
+yabai -m signal --add event=window_destroyed action="sketchybar --trigger windows_on_spaces"
+
 # global settings
-yabai -m config \
+yabai -m config external_bar all:49:0 \
+  window_border on \
   mouse_follows_focus off \
-  focus_follows_mouse on \
-  window_origin_display default \
+  focus_follows_mouse off \
+  window_zoom_persist off \
   window_placement second_child \
-  window_zoom_persist on \
+  window_topmost off \
   window_shadow float \
-  window_animation_duration 0.1 \
-  window_animation_frame_rate 120 \
-  window_opacity_duration 0.0 \
+  window_opacity on \
+  window_opacity_duration 0.15 \
   active_window_opacity 1.0 \
-  normal_window_opacity 0.80 \
-  window_opacity off \
-  insert_feedback_color 0xffd75f5f \
+  normal_window_opacity 0.95 \
+  window_border_width 2 \
+  window_border_hidpi off \
+  window_border_radius 11 \
+  window_animation_duration 0.22 \
+  active_window_border_color 0xffe1e3e4 \
+  normal_window_border_color 0xff2a2f38 \
+  insert_feedback_color 0xff9dd274 \
   split_ratio 0.50 \
-  split_type auto \
   auto_balance off \
+  mouse_modifier fn \
+  mouse_action1 move \
+  mouse_action2 resize \
+  mouse_drop_action swap \
+  \
   top_padding 10 \
   bottom_padding 10 \
   left_padding 10 \
   right_padding 10 \
-  window_gap 8 \
-  layout bsp \
-  mouse_modifier fn \
-  mouse_action1 move \
-  mouse_action2 resize \
-  mouse_drop_action swap
+  window_gap 8
 
-echo "yabai configuration loaded.."
-
+# Exclude problematic apps from being managed:
+yabai -m rule --add app="^(LuLu|Vimac|Calculator|Software Update|Dictionary|VLC|System Preferences|System Settings|zoom.us|Photo Booth|Archive Utility|Python|LibreOffice|App Store|Steam|Alfred|Activity Monitor)$" manage=off
+yabai -m rule --add label="Finder" app="^Finder$" title="(Co(py|nnect)|Move|Info|Pref)" manage=off
+yabai -m rule --add label="Safari" app="^Safari$" title="^(General|(Tab|Password|Website|Extension)s|AutoFill|Se(arch|curity)|Privacy|Advance)$" manage=off
+yabai -m rule --add label="About This Mac" app="System Information" title="About This Mac" manage=off
+yabai -m rule --add label="Select file to save to" app="^Inkscape$" title="Select file to save to" manage=off
 yabai -m rule --add app="^System Settings$" manage=off
 yabai -m rule --add app="^Calculator$" manage=off
 yabai -m rule --add app="^Alfred Preferences$" manage=off
@@ -51,18 +63,8 @@ yabai -m rule --add app="^vault_token_generator_v2_mac$" manage=off
 yabai -m rule --add app="^Unclutter$" manage=off
 yabai -m rule --add app="^Sublime Merge$" manage=off
 yabai -m rule --add app="^DevToys$" manage=off
+
 # yabai -m rule --add app="^Things$" manage=off
+yabai -m config layout bsp
 
-# needed for yabai window state and running application icons) yabai events
-yabai -m signal --add event=window_focused action="sketchybar --trigger window_focus"
-yabai -m signal --add event=window_created action="sketchybar --trigger windows_on_spaces"
-yabai -m signal --add event=window_destroyed action="sketchybar --trigger windows_on_spaces"
-
-# needed for yabai window state and running application icons) skhd shortcuts should trigger the sketchybar events
-lalt - space : yabai -m window --toggle float
-sketchybar --trigger window_focus
-shift + lalt - f : yabai -m window --toggle zoom-fullscreen
-sketchybar --trigger window_focus
-lalt - f : yabai -m window --toggle zoom-parent
-sketchybar --trigger window_focus
-shift + lalt - 1 : yabai -m window --space 1 && sketchybar --trigger windows_on_spaces
+echo "yabai configuration loaded.."

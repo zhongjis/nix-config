@@ -35,12 +35,10 @@
   homebrew = {
     enable = true;
     onActivation = {
-      autoUpdate = false;
+      autoUpdate = true;
+      upgrade = true;
       cleanup = "zap";
     };
-    brews = [
-      "switchaudio-osx"
-    ];
     casks = [
       # productivity
       "alfred"
@@ -59,9 +57,6 @@
       "devtoys"
       "intellij-idea"
       "mongodb-compass"
-
-      # fonts
-      "sf-symbols"
     ];
   };
 

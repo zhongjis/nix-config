@@ -30,11 +30,19 @@ in {
       serviceConfig.RunAtLoad = true;
     };
 
+    homebrew.brews = ["switchaudio-osx"];
+    homebrew.casks = [
+      "sf-symbols"
+      "font-sf-mono"
+      "font-sf-pro"
+    ];
+
     services.sketchybar = {
       enable = true;
       package = pkgs.sketchybar;
       extraPackages = with pkgs; [
         jq
+        lua
       ];
 
       config = ''
