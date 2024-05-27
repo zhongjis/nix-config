@@ -37,7 +37,6 @@ in
       {
         nixpkgs = {
           overlays = [
-            inputs.neovim-nightly-overlay.overlay
             inputs.nixpkgs-terraform.overlays.default
             overlays.modifications
             overlays.unstable-packages

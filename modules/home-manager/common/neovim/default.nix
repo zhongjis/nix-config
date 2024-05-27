@@ -2,6 +2,7 @@
   pkgs,
   lib,
   config,
+  inputs,
   ...
 }: let
   reloadNvim = ''
@@ -22,7 +23,7 @@ in {
       toLuaFile = file: "lua << EOF\n${builtins.readFile file}\nEOF\n";
     in {
       enable = true;
-      package = pkgs.neovim-nightly;
+      package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
 
       viAlias = true;
       vimAlias = true;
