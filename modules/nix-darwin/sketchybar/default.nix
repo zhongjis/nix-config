@@ -200,7 +200,7 @@ in {
             --set web background.color=0xff57627A  \
             --set web background.height=21 \
             --set web background.padding_left=12 \
-            --set web click_script="open -a Firefox.app" \
+            --set web click_script="open -a Thorium.app" \
 
           # SPACE 2: CODE ICON
           sketchybar -m --add space code left \
@@ -214,7 +214,7 @@ in {
             --set code background.color=0xff57627A  \
             --set code background.height=21 \
             --set code background.padding_left=7 \
-            --set code click_script="$HOME/.nix-profile/bin/wezterm" \
+            --set code click_script="open -a Alacritty.app" \
 
           # SPACE 3: MUSIC ICON
           #sketchybar -m --add space music left \
