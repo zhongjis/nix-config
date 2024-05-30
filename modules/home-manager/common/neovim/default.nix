@@ -23,7 +23,8 @@ in {
       toLuaFile = file: "lua << EOF\n${builtins.readFile file}\nEOF\n";
     in {
       enable = true;
-      package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
+      # package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
+      package = pkgs.unstable.neovim-unwrapped;
 
       viAlias = true;
       vimAlias = true;

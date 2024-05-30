@@ -23,7 +23,7 @@
     catppuccin.url = "github:catppuccin/nix";
 
     # neovim
-    neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
+    # neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     trouble-v3 = {
       url = "github:folke/trouble.nvim/dev";
       flake = false;
