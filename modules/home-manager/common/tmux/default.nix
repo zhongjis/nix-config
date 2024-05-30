@@ -1,12 +1,15 @@
-{ pkgs, lib, config, isDarwin, ... }:
-let
-  keyboardCmd =
-    if isDarwin then
-      "xclip -in -selection clipboard"
-    else
-      "tmux show-buffer | wl-copy";
-in
 {
+  pkgs,
+  lib,
+  config,
+  isDarwin,
+  ...
+}: let
+  keyboardCmd =
+    if isDarwin
+    then "xclip -in -selection clipboard"
+    else "tmux show-buffer | wl-copy";
+in {
   options = {
     tmux.enable =
       lib.mkEnableOption "enables tmux";
@@ -22,7 +25,7 @@ in
       historyLimit = 100000;
       clock24 = true;
       extraConfig = ''
-        # true color 
+        # true color
         # https://gist.github.com/andersevenrud/015e61af2fd264371032763d4ed965b6
         set -g default-terminal "tmux-256color"
         set -ag terminal-overrides ",xterm-256color:RGB"

@@ -1,5 +1,8 @@
-{ pkgs, isDarwin, ... }:
-let
+{
+  pkgs,
+  isDarwin,
+  ...
+}: let
   font_list = with pkgs; [
     noto-fonts
     noto-fonts-cjk
@@ -17,15 +20,16 @@ let
       ];
     })
   ];
-in
-{
+in {
   programs.zsh.enable = true;
 
   fonts =
-    if isDarwin then {
+    if isDarwin
+    then {
       fontDir.enable = true;
       fonts = font_list;
-    } else {
+    }
+    else {
       packages = font_list;
     };
 }

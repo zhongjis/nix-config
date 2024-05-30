@@ -1,6 +1,9 @@
-{ pkgs, lib, config, ... }:
-
 {
+  pkgs,
+  lib,
+  config,
+  ...
+}: {
   options = {
     hyprland.enable =
       lib.mkEnableOption "enables hyprland";
@@ -19,7 +22,7 @@
     ];
 
     xdg.portal.enable = true;
-    xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+    xdg.portal.extraPortals = [pkgs.xdg-desktop-portal-gtk];
     xdg.portal.config.common.default = "*";
 
     wayland.windowManager.hyprland = {

@@ -2,7 +2,6 @@
   pkgs,
   lib,
   config,
-  inputs,
   ...
 }: let
   toLua = str: "lua << EOF\n${str}\nEOF\n";

@@ -1,9 +1,9 @@
-{ pkgs
-, lib
-, config
-, ...
-}:
-let
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}: let
   mainBarConfig = {
     layer = "top";
     position = "top";
@@ -86,7 +86,7 @@ let
     "backlight" = {
       # "device"= "acpi_video1";
       format = "{percent}% {icon}";
-      format-icons = [ "" "" "" "" "" "" "" "" "" ];
+      format-icons = ["" "" "" "" "" "" "" "" ""];
     };
 
     "battery" = {
@@ -129,8 +129,7 @@ let
   css = ''
     ${builtins.readFile ./style.css}
   '';
-in
-{
+in {
   options = {
     waybar.enable =
       lib.mkEnableOption "enables waybar";
@@ -140,7 +139,7 @@ in
     programs.waybar = {
       enable = true;
       package = pkgs.waybar.overrideAttrs (oldAttrs: {
-        mesonFlags = oldAttrs.mesonFlags ++ [ "-Dexperimental=true" ];
+        mesonFlags = oldAttrs.mesonFlags ++ ["-Dexperimental=true"];
       });
       settings.mainBar = mainBarConfig;
       style = css;

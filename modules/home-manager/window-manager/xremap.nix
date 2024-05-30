@@ -1,6 +1,9 @@
-{ lib, config, inputs, ... }:
-
 {
+  lib,
+  config,
+  inputs,
+  ...
+}: {
   imports = [
     inputs.xremap-flake.homeManagerModules.default
   ];
