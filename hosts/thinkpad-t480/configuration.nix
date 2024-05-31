@@ -9,6 +9,7 @@
   imports = [
     ./hardware-configuration.nix
     ../common.nix
+    ../../modules/nixos/gaming.nix
     inputs.home-manager.nixosModules.default
   ];
 
@@ -78,8 +79,6 @@
     pulse.enable = true;
     jack.enable = true;
   };
-
-  hardware.opengl.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.zshen = {
