@@ -145,7 +145,7 @@ in {
       style = css;
     };
 
-    home.packages = with pkgs; [
+    home.packages = [
       (pkgs.writeScriptBin "restart-waybar" ''
         ${builtins.readFile ./restart-waybar.sh}
       '')
