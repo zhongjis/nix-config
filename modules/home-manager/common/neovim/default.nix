@@ -2,19 +2,9 @@
   pkgs,
   lib,
   config,
+  inputs,
   ...
 }: let
-  toLua = str: "lua << EOF\n${str}\nEOF\n";
-  toLuaFile = file: "lua << EOF\n${builtins.readFile file}\nEOF\n";
-
-  standardPlugins = with pkgs.vimPlugins; [
-    # **trouble.nvim**
-    {
-      plugin = trouble-nvim;
-      config = toLuaFile ./plugins/trouble.lua;
-    }
-  ];
-
   reloadNvim = ''
     XDG_RUNTIME_DIR=''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
     for server in $XDG_RUNTIME_DIR/nvim.*; do
@@ -28,7 +18,10 @@ in {
   };
 
   config = lib.mkIf config.neovim.enable {
-    programs.neovim = {
+    programs.neovim = let
+      toLua = str: "lua << EOF\n${str}\nEOF\n";
+      toLuaFile = file: "lua << EOF\n${builtins.readFile file}\nEOF\n";
+    in {
       enable = true;
       # package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
       package = pkgs.unstable.neovim-unwrapped;
@@ -52,159 +45,157 @@ in {
         prettierd
       ];
 
-      plugins = with pkgs.vimPlugins;
-        [
-          # **telescope.nvim**
-          nvim-web-devicons
-          plenary-nvim
-          telescope-fzf-native-nvim
-          {
-            plugin = telescope-nvim;
-            config = toLuaFile ./plugins/telescope.lua;
-          }
+      plugins = with pkgs.vimPlugins; [
+        # **telescope.nvim**
+        nvim-web-devicons
+        plenary-nvim
+        telescope-fzf-native-nvim
+        {
+          plugin = telescope-nvim;
+          config = toLuaFile ./plugins/telescope.lua;
+        }
 
-          # **lsp**
-          neodev-nvim
-          fidget-nvim
+        # **lsp**
+        neodev-nvim
+        fidget-nvim
 
-          mason-nvim
-          mason-lspconfig-nvim
-          {
-            plugin = nvim-lspconfig;
-            config = toLuaFile ./plugins/lsp.lua;
-          }
+        mason-nvim
+        mason-lspconfig-nvim
+        {
+          plugin = nvim-lspconfig;
+          config = toLuaFile ./plugins/lsp.lua;
+        }
 
-          # **cmp**
-          lspkind-nvim
-          {
-            plugin = nvim-cmp;
-            config = toLuaFile ./plugins/cmp.lua;
-          }
-          cmp-buffer
-          cmp-path
-          cmp_luasnip
-          cmp-cmdline
-          cmp-nvim-lsp
-          cmp-nvim-lua
+        # **cmp**
+        lspkind-nvim
+        {
+          plugin = nvim-cmp;
+          config = toLuaFile ./plugins/cmp.lua;
+        }
+        cmp-buffer
+        cmp-path
+        cmp_luasnip
+        cmp-cmdline
+        cmp-nvim-lsp
+        cmp-nvim-lua
 
-          # **snippets**
-          luasnip
-          friendly-snippets
+        # **snippets**
+        luasnip
+        friendly-snippets
 
-          # **trouble.nvim**
-          {
-            plugin = trouble-nvim;
-            config = toLuaFile ./plugins/trouble.lua;
-          }
+        # **trouble.nvim**
+        {
+          plugin = trouble-nvim;
+          config = toLuaFile ./plugins/trouble.lua;
+        }
 
-          # **sleuth**
-          vim-sleuth
+        # **sleuth**
+        vim-sleuth
 
-          # **coment.nvim**
-          {
-            plugin = comment-nvim;
-            config = toLua "require(\"Comment\").setup()";
-          }
+        # **coment.nvim**
+        {
+          plugin = comment-nvim;
+          config = toLua "require(\"Comment\").setup()";
+        }
 
-          # **gitsigns.nvim**
-          {
-            plugin = gitsigns-nvim;
-            config = toLuaFile ./plugins/gitsigns.lua;
-          }
+        # **gitsigns.nvim**
+        {
+          plugin = gitsigns-nvim;
+          config = toLuaFile ./plugins/gitsigns.lua;
+        }
 
-          # **which-key**
-          {
-            plugin = which-key-nvim;
-            config = toLuaFile ./plugins/which-key.lua;
-          }
+        # **which-key**
+        {
+          plugin = which-key-nvim;
+          config = toLuaFile ./plugins/which-key.lua;
+        }
 
-          # **harpoon**
-          {
-            plugin = harpoon2;
-            config = toLua "require(\"harpoon\"):setup()";
-          }
+        # **harpoon**
+        {
+          plugin = harpoon2;
+          config = toLua "require(\"harpoon\"):setup()";
+        }
 
-          # **conform**
-          {
-            plugin = conform-nvim;
-            config = toLuaFile ./plugins/conform.lua;
-          }
+        # **conform**
+        {
+          plugin = conform-nvim;
+          config = toLuaFile ./plugins/conform.lua;
+        }
 
-          # **theme**
-          # {
-          #   plugin = solarized-osaka-nvim;
-          #   config = toLuaFile ./plugins/themes/solarized-osaka.lua;
-          # }
-          # tokyonight-nvim
-          {
-            plugin = catppuccin-nvim;
-            config = toLuaFile ./plugins/themes/catppuccin.lua;
-          }
+        # **theme**
+        # {
+        #   plugin = solarized-osaka-nvim;
+        #   config = toLuaFile ./plugins/themes/solarized-osaka.lua;
+        # }
+        # tokyonight-nvim
+        {
+          plugin = catppuccin-nvim;
+          config = toLuaFile ./plugins/themes/catppuccin.lua;
+        }
 
-          # **lualine.nvim**
-          {
-            plugin = lualine-nvim;
-            config = toLuaFile ./plugins/lualine.lua;
-          }
+        # **lualine.nvim**
+        {
+          plugin = lualine-nvim;
+          config = toLuaFile ./plugins/lualine.lua;
+        }
 
-          # **todo-comments.nvim**
-          # plenary-nvim
-          {
-            plugin = todo-comments-nvim;
-            config = toLua "require('todo-comments').setup{ signs = false }";
-          }
+        # **todo-comments.nvim**
+        # plenary-nvim
+        {
+          plugin = todo-comments-nvim;
+          config = toLua "require('todo-comments').setup{ signs = false }";
+        }
 
-          # **mini.nvim**
-          {
-            plugin = mini-nvim;
-            config = toLuaFile ./plugins/mini.lua;
-          }
+        # **mini.nvim**
+        {
+          plugin = mini-nvim;
+          config = toLuaFile ./plugins/mini.lua;
+        }
 
-          # **nvim-treesitter**
-          {
-            plugin = nvim-treesitter.withPlugins (p: [
-              p.c
-              p.java
-              p.nix
-              p.python
-              p.yaml
-              p.json
-              p.javascript
-              p.typescript
-              p.markdown
-              p.markdown_inline
-              p.hcl
-              p.terraform
-            ]);
-            config = toLuaFile ./plugins/treesitter.lua;
-          }
+        # **nvim-treesitter**
+        {
+          plugin = nvim-treesitter.withPlugins (p: [
+            p.c
+            p.java
+            p.nix
+            p.python
+            p.yaml
+            p.json
+            p.javascript
+            p.typescript
+            p.markdown
+            p.markdown_inline
+            p.hcl
+            p.terraform
+          ]);
+          config = toLuaFile ./plugins/treesitter.lua;
+        }
 
-          # **oil.nvim**
-          {
-            plugin = oil-nvim;
-            config = toLua "require('oil').setup()";
-          }
+        # **oil.nvim**
+        {
+          plugin = oil-nvim;
+          config = toLua "require('oil').setup()";
+        }
 
-          # **noice.nvim**
-          # nui-nvim
-          # {
-          #   plugin = nvim-notify;
-          #   config = toLuaFile ./plugins/notify.lua;
-          # }
-          # {
-          #   plugin = noice-nvim;
-          #   config = toLuaFile ./plugins/noice.lua;
-          # }
+        # **noice.nvim**
+        # nui-nvim
+        # {
+        #   plugin = nvim-notify;
+        #   config = toLuaFile ./plugins/notify.lua;
+        # }
+        # {
+        #   plugin = noice-nvim;
+        #   config = toLuaFile ./plugins/noice.lua;
+        # }
 
-          # **lazygit.nvim**
-          # plenary-nvim
-          lazygit-nvim
+        # **lazygit.nvim**
+        # plenary-nvim
+        lazygit-nvim
 
-          undotree
+        undotree
 
-          zen-mode-nvim
-        ]
-        ++ standardPlugins;
+        zen-mode-nvim
+      ];
 
       extraLuaConfig = ''
         ${builtins.readFile ./config/options.lua}

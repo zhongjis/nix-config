@@ -24,8 +24,12 @@
 
     # neovim
     # neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
-    trouble-v3 = {
-      url = "github:folke/trouble.nvim/dev";
+    trouble-nvim = {
+      url = "github:folke/trouble.nvim";
+      flake = false;
+    };
+    oil-nvim = {
+      url = "github:stevearc/oil.nvim";
       flake = false;
     };
   };

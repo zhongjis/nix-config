@@ -16,7 +16,13 @@
           prev.vimUtils.buildVimPlugin
           {
             name = "trouble.nvim";
-            src = inputs.trouble-v3;
+            src = inputs.trouble-nvim;
+          };
+        oil-nvim =
+          prev.vimUtils.buildVimPlugin
+          {
+            name = "oil.nvim";
+            src = inputs.oil-nvim;
           };
       };
   };

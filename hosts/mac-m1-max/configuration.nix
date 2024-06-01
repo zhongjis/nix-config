@@ -48,6 +48,7 @@
       "github"
       "spotify"
       "box-drive"
+      "google-chrome"
 
       # dev tools
       "docker"
