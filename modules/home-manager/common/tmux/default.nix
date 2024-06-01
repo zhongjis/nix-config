@@ -58,7 +58,7 @@ in {
       ];
     };
 
-    home.packages = with pkgs; [
+    home.packages = [
       (pkgs.writeScriptBin "tmux-sessionizer" ''
         ${builtins.readFile ./tmux-sessionizer.sh}
       '')

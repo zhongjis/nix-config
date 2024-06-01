@@ -12,6 +12,7 @@
     ./neovim
     ./tmux
     ./lazygit.nix
+    ./fastfetch.nix
   ];
 
   options = {
@@ -26,6 +27,7 @@
     neovim.enable = lib.mkDefault true;
     tmux.enable = lib.mkDefault true;
     lazygit.enable = lib.mkDefault true;
+    fastfetch.enable = lib.mkDefault true;
 
     git.enable = lib.mkDefault false;
     k9s.enable = lib.mkDefault false;
