@@ -2,7 +2,6 @@
   pkgs,
   lib,
   config,
-  inputs,
   ...
 }: let
   reloadNvim = ''
@@ -11,6 +10,9 @@
       nvim --server $server --remote-send '<Esc>:source $MYVIMRC<CR>' &
     done
   '';
+
+  toLua = str: "lua << EOF\n${str}\nEOF\n";
+  toLuaFile = file: "lua << EOF\n${builtins.readFile file}\nEOF\n";
 in {
   options = {
     neovim.enable =
@@ -18,10 +20,7 @@ in {
   };
 
   config = lib.mkIf config.neovim.enable {
-    programs.neovim = let
-      toLua = str: "lua << EOF\n${str}\nEOF\n";
-      toLuaFile = file: "lua << EOF\n${builtins.readFile file}\nEOF\n";
-    in {
+    programs.neovim = {
       enable = true;
       # package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
       package = pkgs.unstable.neovim-unwrapped;
@@ -44,6 +43,11 @@ in {
         shfmt
         prettierd
       ];
+
+      extraLuaPackages = luaPkgs:
+        with luaPkgs; [
+          jsregexp
+        ];
 
       plugins = with pkgs.vimPlugins; [
         # **telescope.nvim**

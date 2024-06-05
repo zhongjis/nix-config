@@ -3,7 +3,11 @@
   pkgs,
   currentSystemUser,
   ...
-}: {
+}: let
+  unstable_pkgs = with pkgs.unstable; [
+    azure-cli
+  ];
+in {
   imports = [
     inputs.home-manager.darwinModules.default
     ../common.nix
@@ -63,29 +67,29 @@
 
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
-  environment.systemPackages = with pkgs; [
-    raycast
+  environment.systemPackages = with pkgs;
+    [
+      raycast
 
-    mongosh
-    terraform-versions."1.6.6"
+      mongosh
+      terraform-versions."1.6.6"
 
-    # **java**
-    maven
-    jdk
+      # **java**
+      maven
+      jdk
 
-    bitwarden-cli
-    php
+      bitwarden-cli
+      php
 
-    kubectl
-    kubelogin
+      kubectl
+      kubelogin
 
-    fastfetch
+      vault
 
-    vault
-
-    python312
-    python312Packages.pip
-  ];
+      python312
+      python312Packages.pip
+    ]
+    ++ unstable_pkgs;
 
   # Auto upgrade nix package and the daemon service.
   services.nix-daemon.enable = true;

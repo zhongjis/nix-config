@@ -15,9 +15,13 @@
 
   home.packages = with pkgs; [
     awscli
+    fastfetch
+
     gh
     graphviz
     wget
+
+    # fonts
     font-awesome
     sketchybar-app-font
     (nerdfonts.override {
