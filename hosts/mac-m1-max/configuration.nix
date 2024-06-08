@@ -53,6 +53,7 @@ in {
       "spotify"
       "box-drive"
       "google-chrome"
+      "dash@6"
 
       # dev tools
       "docker"
