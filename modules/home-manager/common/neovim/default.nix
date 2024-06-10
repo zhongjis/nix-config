@@ -84,8 +84,8 @@ in {
         cmp-nvim-lua
 
         # **snippets**
-        luasnip
         friendly-snippets
+        luasnip
 
         # **trouble.nvim**
         {
