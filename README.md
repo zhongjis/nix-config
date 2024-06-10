@@ -52,24 +52,45 @@ nix search nixpkgs <package-name>
 
 NOTE: most of the changes (like for neovim) are changed on the way while im using it. this list just for later in case I have nothing to do.
 
-- global
-  - [ ] set global packages
-  - [ ] consider migrate to flakeUtils?
-- waybar
-  - [ ] can always use some love. but not sure what to change.
-- zsh
-  - [x] zsh syntax highlighting
-- darwin - [ ] docker is not working directly downloaded from nixpkgs. seems relate to docker-daemon is not running. right now is using brew to manage it
-- alacritty
-  - [x] term color is not working properly on macOS
-  - [x] font too small on mac, too big on t480
-  - [~] ~~toggle alacritty is not working properly 'skhd not found'~~
-- neovim
-  - [x] nightly is still not working
-  - [x] auto format on nix file
-  - [~] ~~use space instead of tabs in auto completion~~ (im happy with the default now)
-  - [ ] markdown lsp
-- tmux
-  - [x] tmux clipboard with system clipboard
-- github actions
-  - [ ] add github actions to verify change works on both macos and nixos (at least compiles)
+## Global
+
+- [ ] set global packages
+- [ ] consider migrate to use flakeUtils?
+
+### alacritty
+
+- [x] term color is not working properly on macOS
+- [x] font too small on mac, too big on t480
+- [~] ~~toggle alacritty is not working properly 'skhd not found'~~ (I no longer want it)
+
+### zsh
+
+- [x] zsh syntax highlighting
+
+### neovim
+
+- [x] nightly is still not working
+- [x] auto format on nix file
+- [~] ~~use space instead of tabs in auto completion~~ (im happy with the default now)
+- [ ] markdown lint
+- [ ] verify luasnippet is working correctly
+
+### tmux
+
+- [x] tmux clipboard with system clipboard
+
+## nixos
+
+### waybar
+
+- [ ] copy sketchybar style to waybar
+
+## nix-darwin
+
+- [ ] docker is not working directly downloaded from nixpkgs. seems relate to docker-daemon is not running. right now is using brew to manage it
+
+## testing
+
+### github actions
+
+- [ ] add github actions to verify change works on both macos and nixos (at least compiles)
