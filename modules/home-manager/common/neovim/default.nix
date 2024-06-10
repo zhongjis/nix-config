@@ -46,7 +46,7 @@ in {
 
       extraLuaPackages = luaPkgs:
         with luaPkgs; [
-          jsregexp
+          jsregexp # for luasnip
         ];
 
       plugins = with pkgs.vimPlugins; [
