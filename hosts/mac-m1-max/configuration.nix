@@ -45,7 +45,6 @@ in {
     };
     casks = [
       # productivity
-      "alfred"
       "bartender"
       "bitwarden"
       "flux"
