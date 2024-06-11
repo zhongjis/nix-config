@@ -56,6 +56,7 @@ NOTE: most of the changes (like for neovim) are changed on the way while im usin
 
 - [ ] set global packages
 - [ ] consider migrate to use flakeUtils?
+- [ ] consider separate home-manager module?
 
 ### alacritty
 
@@ -79,11 +80,19 @@ NOTE: most of the changes (like for neovim) are changed on the way while im usin
 
 - [x] tmux clipboard with system clipboard
 
+### LazyGit
+
+- [ ] lazygit is broken on push
+
 ## nixos
 
 ### waybar
 
 - [ ] copy sketchybar style to waybar
+
+### gaming
+
+- [ ] create/copy a nvidia module setup
 
 ## nix-darwin
 
