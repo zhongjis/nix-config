@@ -32,6 +32,23 @@ in {
     mru-spaces = false;
     orientation = "left";
     show-recents = false;
+
+    # hot corner
+    wvous-br-corner = 1; # disabled
+    wvous-bl-corner = 1; # disabled
+    wvous-tr-corner = 1; # disabled
+    wvous-tl-corner = 1; # disabled
+  };
+
+  # Finder
+  system.defaults.finder = {
+    AppleShowAllExtensions = true;
+    AppleShowAllFiles = true;
+    FXDefaultSearchScope = "SCcf"; # this folder
+    FXPreferredViewStyle = "Nlsv"; # list view
+    QuitMenuItem = true; # allow quit finder
+    ShowPathbar = true;
+    ShowStatusBar = true;
   };
 
   # TODO: need to emulate shortcuts for mission control, including all swtich desktops

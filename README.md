@@ -58,6 +58,10 @@ NOTE: most of the changes (like for neovim) are changed on the way while im usin
 - [ ] consider migrate to use flakeUtils?
 - [ ] consider separate home-manager module?
 
+### starship
+
+- [ ] parent path not shown when in git worktree dir
+
 ### alacritty
 
 - [x] term color is not working properly on macOS
