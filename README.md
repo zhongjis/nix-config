@@ -71,6 +71,7 @@ NOTE: most of the changes (like for neovim) are changed on the way while im usin
 ### zsh
 
 - [x] zsh syntax highlighting
+- [ ] bat syntax highlighting
 
 ### neovim
 

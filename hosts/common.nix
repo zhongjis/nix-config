@@ -23,13 +23,5 @@
 in {
   programs.zsh.enable = true;
 
-  fonts =
-    if isDarwin
-    then {
-      fontDir.enable = true;
-      fonts = font_list;
-    }
-    else {
-      packages = font_list;
-    };
+  fonts.packages = font_list;
 }

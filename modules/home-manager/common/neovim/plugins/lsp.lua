@@ -88,6 +88,7 @@ require("mason-lspconfig").setup({
     "tflint",
     "bashls",
     "tsserver",
+    "jdtls",
   },
 
   handlers = {

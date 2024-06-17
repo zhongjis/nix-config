@@ -1,7 +1,6 @@
 {
   lib,
   config,
-  pkgs,
   ...
 }: {
   options = {
@@ -12,7 +11,6 @@
   config = lib.mkIf config.lazygit.enable {
     programs.lazygit = {
       enable = true;
-      package = pkgs.unstable.lazygit;
       catppuccin.enable = true;
       catppuccin.flavor = "mocha";
     };
