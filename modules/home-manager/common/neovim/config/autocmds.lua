@@ -44,7 +44,7 @@ vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost" }, {
     local buftype = vim.bo.buftype
 
     -- If the file type is not 'oil' and the buffer is not a 'nofile' buffer, save the file
-    if filetype ~= "oil" and buftype ~= "nofile" and filetype ~= "harpoon" then
+    if filetype ~= "oil" and buftype ~= "nofile" and filetype ~= "harpoon" and filetype ~= "trouble" then
       vim.cmd("silent wa")
     end
   end,

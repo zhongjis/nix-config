@@ -69,7 +69,7 @@ in {
       "spotify"
       "box-drive"
       "google-chrome"
-      "dash@6"
+      "dash"
 
       # dev tools
       "docker"
@@ -105,6 +105,8 @@ in {
 
       python312
       python312Packages.pip
+
+      redis
     ]
     ++ unstable_pkgs;
 
