@@ -5,7 +5,7 @@
   ...
 }: let
   unstable_pkgs = with pkgs.unstable; [
-    azure-cli
+    # placeholder
   ];
 in {
   imports = [
@@ -107,6 +107,8 @@ in {
       python312Packages.pip
 
       redis
+
+      azure-cli
     ]
     ++ unstable_pkgs;
 
