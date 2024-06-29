@@ -13,6 +13,12 @@
       enable = true;
       userName = "zshen";
       userEmail = "zhongjie.x.shen@gmail.com";
+
+      aliases = {};
+
+      attributes = [
+        "push.default current"
+      ];
     };
   };
 }
