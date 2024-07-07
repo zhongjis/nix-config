@@ -42,6 +42,7 @@ in {
         alejandra
         shfmt
         prettierd
+        black
       ];
 
       extraLuaPackages = luaPkgs:

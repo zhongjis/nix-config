@@ -40,7 +40,7 @@ in {
         window = {
           decorations = "buttonless";
           dynamic_padding = false;
-          opacity = 0.95;
+          opacity = 0.8;
           padding = {
             x = 18;
             y = 18;

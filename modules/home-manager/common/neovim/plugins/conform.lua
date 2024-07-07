@@ -26,6 +26,7 @@ conform.setup({
     typescript = { "prettierd" },
     yaml = { "prettierd" },
     markdown = { "prettierd" },
+    python = { "black" },
   },
 })
 
