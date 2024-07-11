@@ -197,9 +197,14 @@ in {
         # plenary-nvim
         lazygit-nvim
 
+        # **undotree**
         undotree
 
+        # **zen-mode-nvim
         zen-mode-nvim
+
+        # **copilot.vim**
+        copilot-vim
       ];
 
       extraLuaConfig = ''
