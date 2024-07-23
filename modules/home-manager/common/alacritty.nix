@@ -41,6 +41,7 @@ in {
           decorations = "buttonless";
           dynamic_padding = false;
           opacity = 0.8;
+          blur = true;
           padding = {
             x = 18;
             y = 18;
