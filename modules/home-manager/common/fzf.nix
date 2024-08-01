@@ -19,7 +19,6 @@
         "--preview 'tree -C {} | head -200'"
       ];
       colors = {
-        bg = "#1e1e2e";
         "bg+" = "#313244";
         spinner = "#f5e0dc";
         hl = "#f38ba8";
