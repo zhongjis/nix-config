@@ -1,25 +1,26 @@
 #!/usr/bin/env bash
-# Your script's content here.
+# File: tmux-sessionizer
+
 if [[ $# -eq 1 ]]; then
-	selected=$1
+  selected="$1"
 else
-	selected=$(find ~ ~/personal ~/work -mindepth 1 -maxdepth 1 -type d | fzf)
+  selected=$(find ~ ~/personal ~/work -mindepth 1 -maxdepth 1 -type d | fzf)
 fi
 
-if [[ -z $selected ]]; then
-	exit 0
+if [[ -z "$selected" ]]; then
+  exit 0
 fi
 
-selected_name=$(basename "$selected" | tr . _)
+selected_name=$(basename "$selected")
 tmux_running=$(pgrep tmux)
 
-if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
-	tmux new-session -s $selected_name -c $selected
-	exit 0
+if [[ -z "$TMUX" ]] && [[ -z "$tmux_running" ]]; then
+  tmux new-session -s "$selected_name" -c "$selected"
+  exit 0
 fi
 
-if ! tmux has-session -t=$selected_name 2>/dev/null; then
-	tmux new-session -ds $selected_name -c $selected
+if ! tmux has-session -t="$selected_name" 2>/dev/null; then
+  tmux new-session -ds "$selected_name" -c "$selected"
 fi
 
-tmux switch-client -t $selected_name
+tmux switch-client -t "$selected_name"
