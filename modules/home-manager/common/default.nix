@@ -11,6 +11,8 @@
     ./zsh
     ./neovim
     ./tmux
+    ./thefuck.nix
+    ./zoxide.nix
     ./lazygit.nix
     ./fastfetch.nix
   ];
@@ -28,6 +30,8 @@
     tmux.enable = lib.mkDefault true;
     lazygit.enable = lib.mkDefault true;
     fastfetch.enable = lib.mkDefault true;
+    thefuck.enable = lib.mkDefault true;
+    zoxide.enable = lib.mkDefault true;
 
     git.enable = lib.mkDefault false;
     k9s.enable = lib.mkDefault false;
