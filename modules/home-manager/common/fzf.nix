@@ -18,6 +18,7 @@
       changeDirWidgetOptions = [
         "--preview 'tree -C {} | head -200'"
       ];
+      # https://github.com/catppuccin/fzf/issues/9
       colors = {
         "bg+" = "#313244";
         spinner = "#f5e0dc";
