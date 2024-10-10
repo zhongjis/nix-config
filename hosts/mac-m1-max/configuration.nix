@@ -9,7 +9,6 @@
   ];
 in {
   imports = [
-    inputs.home-manager.darwinModules.default
     ../common.nix
     ../../modules/nix-darwin
   ];

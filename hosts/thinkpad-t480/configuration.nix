@@ -10,7 +10,6 @@
     ./hardware-configuration.nix
     ../common.nix
     ../../modules/nixos/gaming.nix
-    inputs.home-manager.nixosModules.default
   ];
 
   # xremap

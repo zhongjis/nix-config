@@ -41,6 +41,7 @@
     nix-darwin,
     nixos-hardware,
     nh_darwin,
+    home-manager,
     ...
   } @ inputs: let
     overlays = import ./overlays {inherit inputs;};
@@ -48,6 +49,8 @@
     mkSystem = import ./lib/mksystem.nix {
       inherit overlays nixpkgs inputs;
     };
+
+    pkgs = nixpkgs.legacyPackages.aarch64-darwin;
   in {
     nixosConfigurations.thinkpad-t480 = mkSystem "thinkpad-t480" {
       system = "x86_64-linux";
@@ -59,6 +62,16 @@
       system = "aarch64-darwin";
       user = "zshen";
       darwin = true;
+    };
+
+    homeConfigurations."zshen-mac" = home-manager.lib.homeManagerConfiguration {
+      inherit pkgs;
+      modules = [./hosts/mac-m1-max/home.nix];
+    };
+
+    homeConfigurations."zshen-linux" = home-manager.lib.homeManagerConfiguration {
+      inherit pkgs;
+      modules = [./hosts/thinkpad-t480/home.nix];
     };
   };
 }
