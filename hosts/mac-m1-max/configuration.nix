@@ -109,6 +109,7 @@ in {
       redis
 
       azure-cli
+      nh
     ]
     ++ unstable_pkgs;
 
