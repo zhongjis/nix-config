@@ -14,7 +14,7 @@
   xdg.enable = true;
 
   home.packages = with pkgs; [
-    awscli
+    awscli2
     fastfetch
 
     gh

@@ -56,7 +56,7 @@ NOTE: most of the changes (like for neovim) are changed on the way while im usin
 
 - [ ] set global packages
 - [ ] consider migrate to use flakeUtils?
-- [ ] consider separate home-manager module?
+- [ ] separate home manager to individual install?
 
 ### starship
 
