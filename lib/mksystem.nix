@@ -54,18 +54,6 @@ in
       nhDarwinModule
 
       {
-        home-manager = {
-          useGlobalPkgs = true;
-          useUserPackages = true;
-          extraSpecialArgs = {inherit inputs isDarwin systemName;};
-          users.${user}.imports = [
-            ../hosts/${systemName}/home.nix
-            inputs.catppuccin.homeManagerModules.catppuccin
-          ];
-        };
-      }
-
-      {
         config._module.args = {
           currentSystem = system;
           currentSystemName = systemName;

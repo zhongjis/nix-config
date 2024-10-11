@@ -42,6 +42,7 @@
     nixos-hardware,
     nh_darwin,
     home-manager,
+    catppuccin,
     ...
   } @ inputs: let
     overlays = import ./overlays {inherit inputs;};
@@ -66,12 +67,18 @@
 
     homeConfigurations."zshen-mac" = home-manager.lib.homeManagerConfiguration {
       inherit pkgs;
-      modules = [./hosts/mac-m1-max/home.nix];
+      modules = [
+        ./hosts/mac-m1-max/home.nix
+        catppuccin.homeManagerModules.catppuccin
+      ];
     };
 
     homeConfigurations."zshen-linux" = home-manager.lib.homeManagerConfiguration {
       inherit pkgs;
-      modules = [./hosts/thinkpad-t480/home.nix];
+      modules = [
+        ./hosts/thinkpad-t480/home.nix
+        catppuccin.homeManagerModules.catppuccin
+      ];
     };
   };
 }
