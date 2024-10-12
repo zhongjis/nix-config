@@ -17,10 +17,11 @@ in {
   programs.nh = {
     enable = true;
     alias = true;
-    clean.enable = true;
+    clean = {
+      enable = true;
+      extraArgs = "--keep-since 14d --keep 24";
+    };
     # package = nh_darwin.packages.${pkgs.stdenv.hostPlatform.system}.default;
-    # clean.extraArgs = "--keep-since 14d --keep 24";
-    # flake = "/Users/zshen/personal/nix-config";
   };
 
   users.users.${currentSystemUser} = {
