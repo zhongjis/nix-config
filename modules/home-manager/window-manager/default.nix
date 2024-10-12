@@ -7,7 +7,7 @@
     ./hyprland
     ./waybar
     ./rofi
-    ./xremap.nix
+    ./xremap
   ];
 
   options = {
