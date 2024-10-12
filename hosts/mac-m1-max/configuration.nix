@@ -74,7 +74,6 @@ in {
       # dev tools
       "docker"
       "sublime-merge"
-      "alacritty"
       "charles"
       "devtoys"
       "intellij-idea"
