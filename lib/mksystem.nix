@@ -45,8 +45,10 @@ in
             overlays.modifications
             overlays.unstable-packages
           ];
-          config.allowUnfree = true;
-          config.allowUnfreePredicate = _: true;
+          config = {
+            allowUnfree = true;
+            allowUnfreePredicate = _: true;
+          };
         };
       }
 
