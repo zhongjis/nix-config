@@ -32,12 +32,15 @@
       url = "github:stevearc/oil.nvim";
       flake = false;
     };
+
+    nh_darwin.url = "github:ToyVo/nh_darwin";
   };
   outputs = {
     self,
     nixpkgs,
     nix-darwin,
     nixos-hardware,
+    nh_darwin,
     ...
   } @ inputs: let
     overlays = import ./overlays {inherit inputs;};

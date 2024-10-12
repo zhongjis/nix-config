@@ -28,6 +28,10 @@
     if !isDarwin
     then inputs.catppuccin.nixosModules.catppuccin
     else {};
+  nhDarwinModule =
+    if isDarwin
+    then inputs.nh_darwin.nixDarwinModules.prebuiltin
+    else {};
 in
   systemFunc {
     system = system;
@@ -50,6 +54,7 @@ in
       hmModule
       hardwareModule
       catppuccinModule
+      nhDarwinModule
 
       {
         home-manager = {

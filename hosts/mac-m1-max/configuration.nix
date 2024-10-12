@@ -14,6 +14,15 @@ in {
     ../../modules/nix-darwin
   ];
 
+  programs.nh = {
+    enable = true;
+    alias = true;
+    clean.enable = true;
+    # package = nh_darwin.packages.${pkgs.stdenv.hostPlatform.system}.default;
+    # clean.extraArgs = "--keep-since 14d --keep 24";
+    # flake = "/Users/zshen/personal/nix-config";
+  };
+
   users.users.${currentSystemUser} = {
     packages = with pkgs; [];
     shell = pkgs.zsh;
@@ -108,7 +117,6 @@ in {
       redis
 
       azure-cli
-      nh
     ]
     ++ unstable_pkgs;
 
