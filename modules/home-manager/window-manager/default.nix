@@ -12,7 +12,7 @@
 
   options = {
     window-manager.enable =
-      lib.mkEnableOption "enable neovim";
+      lib.mkEnableOption "enable hyprland window manager, only available in Linux platform";
   };
 
   config = lib.mkIf config.window-manager.enable {
