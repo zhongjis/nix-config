@@ -42,7 +42,7 @@
         cat = "bat";
         nixswitch = "sudo nixos-rebuild switch --flake ~/nix-config/#thinkpad-t480 --show-trace";
         nixtest = "sudo nixos-rebuild test --flake ~/nix-config/#thinkpad-t480 --show-trace";
-        darwinswitch = "darwin-rebuild switch --flake .#mac-m1-max --show-trace";
+        darwinswitch = "nh os switch /Users/zshen/personal/nix-config --hostname mac-m1-mac";
       };
       initExtra = ''
         ${builtins.readFile ./catppuccin_mocha-zsh-syntax-highlighting.zsh}
