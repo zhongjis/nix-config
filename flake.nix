@@ -51,7 +51,9 @@
       inherit overlays nixpkgs inputs;
     };
 
-    pkgs = nixpkgs.legacyPackages.aarch64-darwin;
+    mkHomeManager = import ./lib/mkhomemanager.nix {
+      inherit overlays nixpkgs inputs;
+    };
   in {
     nixosConfigurations.thinkpad-t480 = mkSystem "thinkpad-t480" {
       system = "x86_64-linux";
@@ -65,20 +67,14 @@
       darwin = true;
     };
 
-    homeConfigurations."zshen-mac" = home-manager.lib.homeManagerConfiguration {
-      inherit pkgs;
-      modules = [
-        ./hosts/mac-m1-max/home.nix
-        catppuccin.homeManagerModules.catppuccin
-      ];
+    homeConfigurations."zshen-mac" = mkHomeManager "mac-m1-max" {
+      system = "aarch64-darwin";
+      darwin = true;
     };
 
-    homeConfigurations."zshen-linux" = home-manager.lib.homeManagerConfiguration {
-      inherit pkgs;
-      modules = [
-        ./hosts/thinkpad-t480/home.nix
-        catppuccin.homeManagerModules.catppuccin
-      ];
+    homeConfigurations."zshen-linux" = mkHomeManager "thinkpad-t480" {
+      system = "x86_64-linux";
+      darwin = false;
     };
   };
 }

@@ -8,37 +8,32 @@
   system,
   darwin ? false,
 }: let
-  isDarwin = darwin;
-  hostConfiguration = ../hosts/${systemName}/home.nix;
-  systemFunc = inputs.home-manager.lib.homeManagerConfiguration;
-  catppuccinModule = inputs.catppuccin.homeManagerModules.catppuccin;
+  homeConfiguration = ../hosts/${systemName}/home.nix;
+  pkgsWithOverlay = import nixpkgs {
+    inherit system;
+    overlays = [
+      inputs.nixpkgs-terraform.overlays.default
+      overlays.modifications
+      overlays.unstable-packages
+    ];
+    config = {
+      allowUnfree = true;
+      allowUnfreePredicate = _: true;
+    };
+  };
 in
-  systemFunc {
-    system = system;
+  inputs.home-manager.lib.homeManagerConfiguration {
+    pkgs = pkgsWithOverlay;
     extraSpecialArgs = {inherit inputs;};
 
     modules = [
-      {
-        nixpkgs = {
-          overlays = [
-            inputs.nixpkgs-terraform.overlays.default
-            overlays.modifications
-            overlays.unstable-packages
-          ];
-          config = {
-            allowUnfree = true;
-            allowUnfreePredicate = _: true;
-          };
-        };
-      }
-
-      hostConfiguration
-      catppuccinModule
+      homeConfiguration
+      inputs.catppuccin.homeManagerModules.catppuccin
 
       {
         config._module.args = {
-          currentSystem = system;
-          currentSystemName = systemName;
+          system = system;
+          systemName = systemName;
           inputs = inputs;
           isDarwin = darwin;
         };
