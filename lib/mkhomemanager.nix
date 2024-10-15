@@ -32,8 +32,8 @@ in
 
       {
         config._module.args = {
-          system = system;
-          systemName = systemName;
+          currentSystem = system;
+          currentSystemName = systemName;
           inputs = inputs;
           isDarwin = darwin;
         };

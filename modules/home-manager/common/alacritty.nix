@@ -2,11 +2,11 @@
   pkgs,
   config,
   lib,
-  systemName,
+  currentSystemName,
   ...
 }: let
   fontSize =
-    if systemName == "mac-m1-max"
+    if currentSystemName == "mac-m1-max"
     then 18
     else 13;
 in {
