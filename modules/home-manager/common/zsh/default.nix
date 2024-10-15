@@ -5,18 +5,16 @@
   currentSystemName,
   ...
 }: let
-  oswitchCMD =
-    if currentSystemName == "mac-m1-max"
-    then "nh os switch . --hostname mac-m1-max"
-    else "nh os switch . --hostname thinkpad-t480";
-  otestCMD =
-    if currentSystemName == "mac-m1-max"
-    then "nh os test . --hostname mac-m1-max"
-    else "nh os test . --hostname thinkpad-t480";
+  oswitchCMD = "nh os switch . --hostname ${currentSystemName}";
+  otestCMD = "nh os test . --hostname ${currentSystemName}";
   hswitchCMD =
     if currentSystemName == "mac-m1-max"
     then "nh home switch . -c zshen-mac"
-    else "nh home switch . -c zshen";
+    else "nh home switch . -c zshen-linux";
+  htestCMD =
+    if currentSystemName == "mac-m1-max"
+    then "nh home test . -c zshen-mac"
+    else "nh home test . -c zshen-linux";
 in {
   options = {
     zsh.enable =
@@ -57,6 +55,7 @@ in {
         oswitch = oswitchCMD;
         otest = otestCMD;
         hswitch = hswitchCMD;
+        htest = htestCMD;
       };
       initExtra = ''
         ${builtins.readFile ./catppuccin_mocha-zsh-syntax-highlighting.zsh}
