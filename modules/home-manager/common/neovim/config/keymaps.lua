@@ -13,7 +13,7 @@ vim.keymap.set("x", "p", [["_dP]])
 
 -- **trouble.nvim**
 map("<leader>q", "<cmd>Trouble qflist toggle<cr>", "Toggle [Q]uickfix List")
-map("]q", function()
+map("]t", function()
   if require("trouble").is_open() then
     require("trouble").next({ skip_groups = true, jump = true })
   else
@@ -23,7 +23,7 @@ map("]q", function()
     end
   end
 end, "Go to next [T]rouble item")
-map("[q", function()
+map("[t", function()
   if require("trouble").is_open() then
     require("trouble").prev({ skip_groups = true, jump = true })
   else
