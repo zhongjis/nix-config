@@ -87,7 +87,7 @@ require("mason-lspconfig").setup({
     "terraformls",
     "tflint",
     "bashls",
-    "tsserver",
+    "ts_ls",
     "jdtls",
     "pyright",
   },

@@ -1,14 +1,12 @@
-require("which-key").setup()
+require("which-key").setup({
+  icons= false
+})
 
-require("which-key").register({
-  { "<leader>c", group = "[C]ode" },
-  { "<leader>c_", hidden = true },
-  { "<leader>d", group = "[D]ocument" },
-  { "<leader>d_", hidden = true },
-  { "<leader>r", group = "[R]ename" },
-  { "<leader>r_", hidden = true },
-  { "<leader>s", group = "[S]earch" },
-  { "<leader>s_", hidden = true },
-  { "<leader>w", group = "[W]orkspace" },
-  { "<leader>w_", hidden = true },
+require("which-key").add({
+  { "", group = "[S]earch" },
+  { "", group = "[D]ocument" },
+  { "", group = "[C]ode" },
+  { "", group = "[R]ename" },
+  { "", group = "[W]orkspace" },
+  { "", desc = "", hidden = true, mode = { "n", "n", "n", "n", "n" } },
 })
