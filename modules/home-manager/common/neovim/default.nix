@@ -50,7 +50,7 @@ in {
           jsregexp # for luasnip
         ];
 
-      plugins = with pkgs.vimPlugins; [
+      plugins = with pkgs.unstable.vimPlugins; [
         # **telescope.nvim**
         nvim-web-devicons
         plenary-nvim
