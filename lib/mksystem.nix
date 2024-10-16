@@ -16,10 +16,6 @@
     if isDarwin
     then inputs.nix-darwin.lib.darwinSystem
     else nixpkgs.lib.nixosSystem;
-  hmModule =
-    if isDarwin
-    then inputs.home-manager.darwinModules.home-manager
-    else inputs.home-manager.nixosModules.default;
   hardwareModule =
     if hardware != ""
     then inputs.nixos-hardware.nixosModules.${hardware}
@@ -53,22 +49,9 @@ in
       }
 
       hostConfiguration
-      hmModule
       hardwareModule
       catppuccinModule
       nhDarwinModule
-
-      {
-        home-manager = {
-          useGlobalPkgs = true;
-          useUserPackages = true;
-          extraSpecialArgs = {inherit inputs isDarwin systemName;};
-          users.${user}.imports = [
-            ../hosts/${systemName}/home.nix
-            inputs.catppuccin.homeManagerModules.catppuccin
-          ];
-        };
-      }
 
       {
         config._module.args = {

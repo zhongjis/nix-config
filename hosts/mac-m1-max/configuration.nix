@@ -9,19 +9,16 @@
   ];
 in {
   imports = [
-    inputs.home-manager.darwinModules.default
     ../common.nix
     ../../modules/nix-darwin
   ];
 
   programs.nh = {
     enable = true;
-    alias = true;
     clean = {
       enable = true;
       extraArgs = "--keep-since 14d --keep 24";
     };
-    # package = nh_darwin.packages.${pkgs.stdenv.hostPlatform.system}.default;
   };
 
   users.users.${currentSystemUser} = {

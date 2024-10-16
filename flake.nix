@@ -41,11 +41,17 @@
     nix-darwin,
     nixos-hardware,
     nh_darwin,
+    home-manager,
+    catppuccin,
     ...
   } @ inputs: let
     overlays = import ./overlays {inherit inputs;};
 
     mkSystem = import ./lib/mksystem.nix {
+      inherit overlays nixpkgs inputs;
+    };
+
+    mkHomeManager = import ./lib/mkhomemanager.nix {
       inherit overlays nixpkgs inputs;
     };
   in {
@@ -59,6 +65,16 @@
       system = "aarch64-darwin";
       user = "zshen";
       darwin = true;
+    };
+
+    homeConfigurations."zshen-mac" = mkHomeManager "mac-m1-max" {
+      system = "aarch64-darwin";
+      darwin = true;
+    };
+
+    homeConfigurations."zshen-linux" = mkHomeManager "thinkpad-t480" {
+      system = "x86_64-linux";
+      darwin = false;
     };
   };
 }

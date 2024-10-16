@@ -2,8 +2,20 @@
   pkgs,
   lib,
   config,
+  currentSystemName,
   ...
-}: {
+}: let
+  oswitchCMD = "nh os switch . --hostname ${currentSystemName}";
+  otestCMD = "nh os test . --hostname ${currentSystemName}";
+  hswitchCMD =
+    if currentSystemName == "mac-m1-max"
+    then "nh home switch . -c zshen-mac"
+    else "nh home switch . -c zshen-linux";
+  htestCMD =
+    if currentSystemName == "mac-m1-max"
+    then "nh home test . -c zshen-mac"
+    else "nh home test . -c zshen-linux";
+in {
   options = {
     zsh.enable =
       lib.mkEnableOption "enables zsh";
@@ -40,9 +52,10 @@
       };
       shellAliases = {
         cat = "bat";
-        nixswitch = "sudo nixos-rebuild switch --flake ~/nix-config/#thinkpad-t480 --show-trace";
-        nixtest = "sudo nixos-rebuild test --flake ~/nix-config/#thinkpad-t480 --show-trace";
-        darwinswitch = "nh os switch /Users/zshen/personal/nix-config --hostname mac-m1-mac";
+        oswitch = oswitchCMD;
+        otest = otestCMD;
+        hswitch = hswitchCMD;
+        htest = htestCMD;
       };
       initExtra = ''
         ${builtins.readFile ./catppuccin_mocha-zsh-syntax-highlighting.zsh}
