@@ -82,6 +82,7 @@ in {
       "dash"
       "raycast"
       "arc"
+      "alfred"
 
       # dev tools
       "docker"
