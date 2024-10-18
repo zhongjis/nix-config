@@ -58,6 +58,8 @@ in {
     ShowStatusBar = true;
   };
 
+  system.defaults.universalaccess.reduceMotion = true;
+
   # TODO: need to emulate shortcuts for mission control, including all swtich desktops
 
   homebrew = {
@@ -77,6 +79,8 @@ in {
       "box-drive"
       "google-chrome"
       "dash"
+      "raycast"
+      "arc"
 
       # dev tools
       "docker"

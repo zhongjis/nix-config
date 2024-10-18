@@ -14,6 +14,8 @@
   xdg.enable = true;
 
   home.packages = with pkgs; [
+    obsidian
+
     awscli2
     fastfetch
 
