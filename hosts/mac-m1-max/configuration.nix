@@ -27,8 +27,10 @@ in {
   };
 
   # Keyboard
-  system.keyboard.enableKeyMapping = true;
-  system.keyboard.remapCapsLockToEscape = true;
+  system = {
+    keyboard.enableKeyMapping = true;
+    keyboard.remapCapsLockToEscape = true;
+  };
 
   # Dock
   system.defaults.dock = {
@@ -58,6 +60,7 @@ in {
     ShowStatusBar = true;
   };
 
+  # NOTE: need to allow full diskaccess for terminal emulator for the following
   system.defaults.universalaccess.reduceMotion = true;
 
   # TODO: need to emulate shortcuts for mission control, including all swtich desktops
