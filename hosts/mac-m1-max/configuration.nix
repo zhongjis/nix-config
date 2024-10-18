@@ -69,6 +69,7 @@ in {
       upgrade = true;
       cleanup = "zap";
     };
+
     casks = [
       # productivity
       "bartender"
@@ -90,6 +91,11 @@ in {
       "intellij-idea"
       "mongodb-compass"
     ];
+
+    masApps = {
+      Things3 = 904280696;
+      Unclutter = 577085396;
+    };
   };
 
   # List packages installed in system profile. To search by name, run:
