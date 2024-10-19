@@ -2,19 +2,36 @@
 
 ## build cmds
 
-- install nix (https://zero-to-nix.com/start/install)
+### install nix (https://zero-to-nix.com/start/install)
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 ```
 
-- switch MacOS
+### Global
+
+```bash
+oswitch
+hswitch
+```
+
+### MacOS
+
+- setup
+
+```bash
+nix run nix-darwin --extra-experimental-features 'nix-command flakes' -- switch --flake .#mac-m1-max
+```
+
+- switch
 
 ```bash
 darwin-rebuild switch --flake .#mac-m1-max
 darwin-rebuild --list-generations
 darwin-rebuild switch --switch-generation 41
 ```
+
+### NixOS
 
 - switch NixOS
 

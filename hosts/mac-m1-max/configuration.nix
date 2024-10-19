@@ -73,6 +73,10 @@ in {
       cleanup = "zap";
     };
 
+    brews = [
+      "bitwarden-cli"
+    ];
+
     casks = [
       # productivity
       "bartender"
