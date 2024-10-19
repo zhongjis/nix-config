@@ -15,6 +15,7 @@
     ./zoxide.nix
     ./lazygit.nix
     ./fastfetch.nix
+    ./kitty.nix
   ];
 
   options = {
@@ -24,6 +25,7 @@
 
   config = lib.mkIf config.common.enable {
     alacritty.enable = lib.mkDefault true;
+    kitty.enable = lib.mkDefault true;
     zsh.enable = lib.mkDefault true;
     fzf.enable = lib.mkDefault true;
     neovim.enable = lib.mkDefault true;

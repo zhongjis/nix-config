@@ -70,14 +70,6 @@ in {
       enableZshIntegration = true;
 
       settings = {
-        aws = {
-          disabled = true;
-        };
-        # kubernetes = {
-        #   disabled = false;
-        #   format = "[⛵ $context \($namespace\)](dimmed green) \n";
-        #   detect_folders = ["inventories" "templates"];
-        # };
       };
     };
 
