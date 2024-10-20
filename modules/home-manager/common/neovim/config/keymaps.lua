@@ -38,20 +38,6 @@ map("<leader>e", vim.diagnostic.open_float, "Show diagnostic [E]rror messages")
 -- **file explorer**
 map("<leader>o", "<cmd>Oil<cr>", "[O]il: Open parent directory")
 
--- map("<leader>o", function()
---   local filetype = vim.bo.filetype
---   if filetype == "netrw" then
---     -- Navigate to the parent directory in netrw
---     local current_path = vim.fn.expand("%:p")
---     local parent_path = vim.fn.fnamemodify(current_path, ":h:h")
---     vim.cmd("Explore " .. parent_path)
---   else
---     -- Open the directory of the current file in netrw
---     local file_dir = vim.fn.expand("%:p:h")
---     vim.cmd("Explore " .. file_dir)
---   end
--- end, "")
-
 -- **telescope**
 local builtin = require("telescope.builtin")
 map("<leader>sh", builtin.help_tags, "[S]earch [H]elp")
