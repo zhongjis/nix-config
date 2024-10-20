@@ -11,28 +11,7 @@ vim.keymap.set("v", ">", ">gv")
 -- do not override register when paste*
 vim.keymap.set("x", "p", [["_dP]])
 
--- **trouble.nvim**
-map("<leader>q", "<cmd>Trouble qflist toggle<cr>", "Toggle [Q]uickfix List")
-map("]t", function()
-  if require("trouble").is_open() then
-    require("trouble").next({ skip_groups = true, jump = true })
-  else
-    local ok, err = pcall(vim.cmd.cnext)
-    if not ok then
-      vim.notify(err, vim.log.levels.ERROR)
-    end
-  end
-end, "Go to next [T]rouble item")
-map("[t", function()
-  if require("trouble").is_open() then
-    require("trouble").prev({ skip_groups = true, jump = true })
-  else
-    local ok, err = pcall(vim.cmd.cprev)
-    if not ok then
-      vim.notify(err, vim.log.levels.ERROR)
-    end
-  end
-end, "Go to previous [T]rouble item")
+-- diagnostic
 map("<leader>e", vim.diagnostic.open_float, "Show diagnostic [E]rror messages")
 
 -- **file explorer**
