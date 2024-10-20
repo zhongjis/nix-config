@@ -75,6 +75,7 @@ in {
 
     brews = [
       "bitwarden-cli"
+      "jq"
     ];
 
     casks = [
