@@ -15,8 +15,8 @@ require("catppuccin").setup({
     fidget = true,
     harpoon = true,
     mason = true,
-    -- noice = true,
-    -- notify = true,
+    noice = true,
+    notify = true,
     lsp_trouble = true,
   },
 })
