@@ -102,12 +102,6 @@ in {
           config = toLuaFile ./plugins/gitsigns.lua;
         }
 
-        # **which-key**
-        # {
-        #   plugin = which-key-nvim;
-        #   config = toLuaFile ./plugins/which-key.lua;
-        # }
-
         # **harpoon**
         {
           plugin = harpoon2;
