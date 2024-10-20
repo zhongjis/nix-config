@@ -4,13 +4,6 @@
   config,
   ...
 }: let
-  reloadNvim = ''
-    XDG_RUNTIME_DIR=''${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
-    for server in $XDG_RUNTIME_DIR/nvim.*; do
-      nvim --server $server --remote-send '<Esc>:source $MYVIMRC<CR>' &
-    done
-  '';
-
   toLua = str: "lua << EOF\n${str}\nEOF\n";
   toLuaFile = file: "lua << EOF\n${builtins.readFile file}\nEOF\n";
 in {
@@ -215,12 +208,8 @@ in {
       '';
     };
 
-    xdg.configFile."nvim/init.lua".onChange = reloadNvim;
-
     home.packages = with pkgs; [
       lazygit
     ];
-
-    home.sessionVariables.EDITOR = "nvim";
   };
 }
