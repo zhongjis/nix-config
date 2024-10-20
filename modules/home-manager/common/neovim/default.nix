@@ -25,6 +25,10 @@ in {
 
       withNodeJs = true;
 
+      extraLuaPackages = luaPkgs:
+        with luaPkgs; [
+          jsregexp # for luasnip
+        ];
       extraPackages = with pkgs; [
         cargo # Depdency for Mason Install packages
 
@@ -38,11 +42,6 @@ in {
         prettierd
         black
       ];
-
-      extraLuaPackages = luaPkgs:
-        with luaPkgs; [
-          jsregexp # for luasnip
-        ];
 
       plugins = with pkgs.unstable.vimPlugins; [
         # **telescope.nvim**
