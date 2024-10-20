@@ -103,10 +103,10 @@ in {
         }
 
         # **which-key**
-        {
-          plugin = which-key-nvim;
-          config = toLuaFile ./plugins/which-key.lua;
-        }
+        # {
+        #   plugin = which-key-nvim;
+        #   config = toLuaFile ./plugins/which-key.lua;
+        # }
 
         # **harpoon**
         {
@@ -121,11 +121,6 @@ in {
         }
 
         # **theme**
-        # {
-        #   plugin = solarized-osaka-nvim;
-        #   config = toLuaFile ./plugins/themes/solarized-osaka.lua;
-        # }
-        # tokyonight-nvim
         {
           plugin = catppuccin-nvim;
           config = toLuaFile ./plugins/themes/catppuccin.lua;
