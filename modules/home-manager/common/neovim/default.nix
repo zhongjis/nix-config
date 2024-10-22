@@ -165,15 +165,15 @@ in {
         }
 
         # **noice.nvim**
-        nui-nvim
-        {
-          plugin = nvim-notify;
-          config = toLuaFile ./plugins/notify.lua;
-        }
-        {
-          plugin = noice-nvim;
-          config = toLuaFile ./plugins/noice.lua;
-        }
+        # nui-nvim
+        # {
+        #   plugin = nvim-notify;
+        #   config = toLuaFile ./plugins/notify.lua;
+        # }
+        # {
+        #   plugin = noice-nvim;
+        #   config = toLuaFile ./plugins/noice.lua;
+        # }
 
         # **lazygit.nvim**
         # plenary-nvim

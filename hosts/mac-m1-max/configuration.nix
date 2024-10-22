@@ -99,6 +99,7 @@ in {
       "devtoys"
       "intellij-idea"
       "mongodb-compass"
+      "zed"
     ];
 
     masApps = {
