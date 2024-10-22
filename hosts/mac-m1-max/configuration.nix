@@ -13,6 +13,9 @@ in {
     ../../modules/nix-darwin
   ];
 
+  # yabai.enable = false;
+  # skhd.enable = false;
+
   programs.nh = {
     enable = true;
     clean = {
@@ -91,6 +94,7 @@ in {
       "raycast"
       "arc"
       "alfred"
+      # "nikitabobko/tap/aerospace"
 
       # dev tools
       "docker"
