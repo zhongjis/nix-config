@@ -132,14 +132,17 @@ require("lspconfig").nixd.setup({
       -- formatting = {
       --   command = { "alejandra" },
       -- },
-      -- options = {
-      --   nixos = {
-      --     expr= '(builtins.getFlake "/PATH/TO/FLAKE").nixosConfigurations.CONFIGNAME.options',
-      --   },
-      --   home_manager = {
-      --     expr= '(builtins.getFlake "/PATH/TO/FLAKE").homeConfigurations.CONFIGNAME.options',
-      --   },
-      -- },
+      options = {
+        nixos = {
+          expr = '(builtins.getFlake "/Users/zshen/personal/nix-config").nixosConfigurations.thinkpad-t480.options',
+        },
+        nix_darwin = {
+          expr = '(builtins.getFlake "/Users/zshen/personal/nix-config").darwinConfigurations.mac-m1-max.options',
+        },
+        home_manager = {
+          expr = '(builtins.getFlake "/Users/zshen/personal/nix-config").homeConfigurations.zshen-mac.options',
+        },
+      },
     },
   },
 })
