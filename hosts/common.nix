@@ -1,6 +1,7 @@
 {
   pkgs,
   isDarwin,
+  inputs,
   ...
 }: let
   font_list = with pkgs; [
@@ -24,4 +25,10 @@ in {
   programs.zsh.enable = true;
 
   fonts.packages = font_list;
+
+  environment.systemPackages = with pkgs; [
+    nixd
+  ];
+
+  nix.nixPath = ["nixpkgs=${inputs.nixpkgs}"];
 }
