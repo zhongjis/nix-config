@@ -36,13 +36,7 @@
     nh_darwin.url = "github:ToyVo/nh_darwin";
   };
   outputs = {
-    self,
     nixpkgs,
-    nix-darwin,
-    nixos-hardware,
-    nh_darwin,
-    home-manager,
-    catppuccin,
     ...
   } @ inputs: let
     overlays = import ./overlays {inherit inputs;};
