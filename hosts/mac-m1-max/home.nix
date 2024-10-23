@@ -32,5 +32,6 @@
     #   org.gradle.console=verbose
     #   org.gradle.daemon.idletimeout=3600000
     # '';
+    ".config/aerospace/.aerospace.toml".source = ../../modules/nix-darwin/aerospace/aerospace.toml;
   };
 }

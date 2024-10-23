@@ -14,7 +14,5 @@ in {
     homebrew.casks = [
       "nikitabobko/tap/aerospace"
     ];
-
-    xdg.configFile.aerospace.source = ./aerospace.toml;
   };
 }
