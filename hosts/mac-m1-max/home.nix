@@ -32,8 +32,5 @@
     #   org.gradle.console=verbose
     #   org.gradle.daemon.idletimeout=3600000
     # '';
-
-    # TODO: add configuration option for aerospace. which is darwin only
-    ".config/aerospace/.aerospace.toml".source = ../../modules/nix-darwin/aerospace/aerospace.toml;
   };
 }
