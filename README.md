@@ -72,39 +72,20 @@ NOTE: most of the changes (like for neovim) are changed on the way while im usin
 ## Global
 
 - [ ] set global packages
-- [ ] consider migrate to use flakeUtils?
-- [x] separate home manager to individual install?
 
 ### starship
 
 - [ ] parent path not shown when in git worktree dir
 
-### alacritty
-
-- [x] term color is not working properly on macOS
-- [x] font too small on mac, too big on t480
-- [~] ~~toggle alacritty is not working properly 'skhd not found'~~ (I no longer want it)
-
 ### zsh
 
-- [x] zsh syntax highlighting
 - [ ] bat syntax highlighting
 
 ### neovim
 
-- [x] nightly is still not working
-- [x] auto format on nix file
 - [~] ~~use space instead of tabs in auto completion~~ (im happy with the default now)
 - [ ] markdown lint
 - [ ] verify luasnippet is working correctly
-
-### tmux
-
-- [x] tmux clipboard with system clipboard
-
-### LazyGit
-
-- [ ] lazygit is broken on push
 
 ## nixos
 
@@ -119,6 +100,7 @@ NOTE: most of the changes (like for neovim) are changed on the way while im usin
 ## nix-darwin
 
 - [ ] docker is not working directly downloaded from nixpkgs. seems relate to docker-daemon is not running. right now is using brew to manage it
+- [ ] aerospace and sketchybar integration not working
 
 ## testing
 
