@@ -118,6 +118,13 @@
       sketchybar -m --set "$NAME" label="" drawing=off
     fi
   '';
+  aerospace-sh = pkgs.writeShellScriptBin "aerospace.sh" ''
+    if [ "$1" = "$FOCUSED_WORKSPACE" ]; then
+        sketchybar --set $NAME background.drawing=on
+    else
+        sketchybar --set $NAME background.drawing=off
+    fi
+  '';
 in {
   options = {
     sketchybar.enable =
@@ -227,6 +234,23 @@ in {
             --set spotify_indicator script="${spotify-indicator-sh}/bin/spotify-indicator.sh" \
             --set spotify_indicator click_script="osascript -e 'tell application \"Spotify\" to pause'" \
             --subscribe spotify_indicator spotify_change \
+
+          # SPACE 4: AEROSPACE
+          for sid in $(aerospace list-workspaces --all); do
+              sketchybar --add item space.$sid left \
+                  --subscribe space.$sid aerospace_workspace_change \
+                  --set space.$sid \
+                  background.color=0x44ffffff \
+                  background.corner_radius=5 \
+                  background.height=20 \
+                  background.drawing=off \
+                  label="$sid" \
+                  click_script="aerospace workspace $sid" \
+                  script="${aerospace-sh}/bin/aerospace.sh $sid"
+          done
+
+          # AEROSPACE STATUS
+          sketchybar --add event aerospace_workspace_change
 
         ############## ITEM DEFAULTS ###############
           sketchybar -m --default \
