@@ -24,6 +24,8 @@ in {
       shellIntegration.enableZshIntegration = true;
 
       settings = {
+        confirm_os_window_close = "0";
+
         font_family = "FiraCode Nerd Font";
         bold_font = "auto";
         italic_font = "auto";
