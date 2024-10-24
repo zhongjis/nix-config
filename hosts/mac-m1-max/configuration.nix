@@ -95,6 +95,7 @@ in {
       "raycast"
       "arc"
       "alfred"
+      "zen-browser"
 
       # dev tools
       "docker"
@@ -104,6 +105,10 @@ in {
       "intellij-idea"
       "mongodb-compass"
       "zed"
+
+      # duplicates: already included in full-system. but adding them for alfred app
+      "kitty"
+      "obsidian"
     ];
 
     masApps = {
