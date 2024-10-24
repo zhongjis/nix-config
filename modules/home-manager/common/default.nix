@@ -4,7 +4,6 @@
   ...
 }: {
   imports = [
-    ./alacritty.nix
     ./git.nix
     ./k9s.nix
     ./fzf.nix
@@ -15,7 +14,7 @@
     ./zoxide.nix
     ./lazygit.nix
     ./fastfetch.nix
-    ./kitty.nix
+    ./terminals
   ];
 
   options = {
