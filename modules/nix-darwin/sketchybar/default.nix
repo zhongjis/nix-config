@@ -4,82 +4,14 @@
   pkgs,
   ...
 }: let
-  date-time-sh = pkgs.writeShellScriptBin "date-time.sh" ''
-    sketchybar -m --set $NAME label="$(date '+%a %d %b %H:%M')"
-  '';
-  top-mem-sh = pkgs.writeShellScriptBin "top-mem.sh" ''
-    TOPPROC=$(ps axo "%cpu,ucomm" | sort -nr | tail +1 | head -n1 | awk '{printf "%.0f%% %s\n", $1, $2}' | sed -e 's/com.apple.//g')
-    TOPMEM=$(ps axo "rss" | sort -nr | tail +1 | head -n1 | awk '{printf "%.0fMB %s\n", $1 / 1024, $2}' | sed -e 's/com.apple.//g')
-    MEM=$(echo $TOPMEM | sed -nr 's/([^MB]+).*/\1/p')
-    sketchybar -m --set $NAME label="$TOPMEM"
-  '';
-  cpu-sh = pkgs.writeShellScriptBin "cpu.sh" ''
-    CORE_COUNT=$(sysctl -n machdep.cpu.thread_count)
-    CPU_INFO=$(ps -eo pcpu,user)
-    CPU_SYS=$(echo "$CPU_INFO" | grep -v $(whoami) | sed "s/[^ 0-9\.]//g" | awk "{sum+=\$1} END {print sum/(100.0 * $CORE_COUNT)}")
-    CPU_USER=$(echo "$CPU_INFO" | grep $(whoami) | sed "s/[^ 0-9\.]//g" | awk "{sum+=\$1} END {print sum/(100.0 * $CORE_COUNT)}")
-    sketchybar -m --set  cpu_percent label=$(echo "$CPU_SYS $CPU_USER" | awk '{printf "%.0f\n", ($1 + $2)*100}')%
-  '';
-  caffeine-sh = pkgs.writeShellScriptBin "caffeine.sh" ''
-    if pgrep -q 'caffeinate'
-    then
-      sketchybar --set $NAME icon="󰅶"
-    else
-      sketchybar --set $NAME icon="󰛊"
-    fi
-  '';
-  caffeine-click-sh = pkgs.writeShellScriptBin "caffeine-click.sh" ''
-    if pgrep -q 'caffeinate'
-    then
-      killall caffeinate
-      sketchybar --set $NAME icon="󰛊"
-    else
-      caffeinate -d & disown
-      sketchybar --set $NAME icon="󰅶"
-    fi
-  '';
+  date-time-sh = pkgs.writeShellScriptBin "date-time.sh" ./plugins/date-time.sh;
+  top-mem-sh = pkgs.writeShellScriptBin "top-mem.sh" ./plugins/top-mem.sh;
+  cpu-sh = pkgs.writeShellScriptBin "cpu.sh" ./plugins/cpu.sh;
+  caffeine-sh = pkgs.writeShellScriptBin "caffeine.sh" ./plugins/caffeine.sh;
+  caffeine-click-sh = pkgs.writeShellScriptBin "caffeine-click.sh" ./plugins/caffeine-click.sh;
   battery-sh = pkgs.writeShellScriptBin "battery.sh" ./plugins/battery.sh;
-  top-proc-sh = pkgs.writeShellScriptBin "top-proc.sh" ''
-    TOPPROC=$(ps axo "%cpu,ucomm" | sort -nr | tail +1 | head -n1 | awk '{printf "%.0f%% %s\n", $1, $2}' | sed -e 's/com.apple.//g')
-    CPUP=$(echo $TOPPROC | sed -nr 's/([^\%]+).*/\1/p')
-    if [ $CPUP -gt 75 ]; then
-      sketchybar -m --set $NAME label="$TOPPROC"
-    else
-      sketchybar -m --set $NAME label=""
-    fi
-  '';
-  spotify-indicator-sh = pkgs.writeShellScriptBin "spotify-indicator.sh" ''
-    RUNNING="$(osascript -e 'if application "Spotify" is running then return 0')"
-    if [ $RUNNING != 0 ]
-    then
-      RUNNING=1
-    fi
-    PLAYING=1
-    TRACK=""
-    ALBUM=""
-    ARTIST=""
-    if [[ $RUNNING -eq 0 ]]
-    then
-      [[ "$(osascript -e 'if application "Spotify" is running then tell application "Spotify" to get player state')" == "playing" ]] && PLAYING=0
-      TRACK="$(osascript -e 'tell application "Spotify" to get name of current track')"
-      ARTIST="$(osascript -e 'tell application "Spotify" to get artist of current track')"
-      ALBUM="$(osascript -e 'tell application "Spotify" to get album of current track')"
-    fi
-    if [[ -n "$TRACK" ]]
-    then
-      sketchybar -m --set "$NAME" drawing=on
-      [[ "$PLAYING" -eq 0 ]] && ICON=""
-      [[ "$PLAYING" -eq 1 ]] && ICON=""
-      if [ "$ARTIST" == "" ]
-      then
-        sketchybar -m --set "$NAME" label="''${ICON} ''${TRACK} - ''${ALBUM}"
-      else
-        sketchybar -m --set "$NAME" label="''${ICON} ''${TRACK} - ''${ARTIST}"
-      fi
-    else
-      sketchybar -m --set "$NAME" label="" drawing=off
-    fi
-  '';
+  top-proc-sh = pkgs.writeShellScriptBin "top-proc.sh" ./plugins/top-proc.sh;
+  spotify-indicator-sh = pkgs.writeShellScriptBin "spotify-indicator.sh" ./plugins/spotify-indicator.sh;
 in {
   options = {
     sketchybar.enable =
