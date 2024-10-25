@@ -17,8 +17,8 @@ in {
       settings = {
         after-login-command = [];
         # after-startup-command = ["exec-and-forget sketchybar"];
-        exec-on-workspace-change = ["/bin/bash" "-c" "sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE"];
         # start-at-login = true;
+        exec-on-workspace-change = ["/bin/bash" "-c" "sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE"];
         enable-normalization-flatten-containers = true;
         enable-normalization-opposite-orientation-for-nested-containers = true;
 
