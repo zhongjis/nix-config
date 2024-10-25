@@ -38,45 +38,7 @@
       sketchybar --set $NAME icon="󰅶"
     fi
   '';
-  battery-sh = pkgs.writeShellScriptBin "battery.sh" ''
-    if pmset -g ac | grep -q 'Family Code = 0x0000' # No battery (i.e. Mac Mini, Mac Pro, etc.)
-    then
-      sketchybar \
-        --set $NAME \
-          icon.color="0xFFFFFFFF" \
-          icon="󰚥" \
-          label="AC"
-    else
-      data=$(pmset -g batt)
-      battery_percent=$(echo $data | grep -Eo "\d+%" | cut -d% -f1)
-      charging=$(echo $data | grep 'AC Power')
-
-      case "$battery_percent" in
-        100)    icon="󰁹" color=0xFFFFFFFF ;;
-        9[0-9]) icon="󰂂" color=0xFFFFFFFF ;;
-        8[0-9]) icon="󰂁" color=0xFFFFFFFF ;;
-        7[0-9]) icon="󰂀" color=0xFFFFFFFF ;;
-        6[0-9]) icon="󰁿" color=0xFFFFFFFF ;;
-        5[0-9]) icon="󰁾" color=0xFFFFFFFF ;;
-        4[0-9]) icon="󰁽" color=0xFFFFFFFF ;;
-        3[0-9]) icon="󰁼" color=0xFFFFFFFF ;;
-        2[0-9]) icon="󰁻" color=0xFFFFFFFF ;;
-        1[0-9]) icon="󰁺" color=0xFFFFFFFF ;;
-        *)      icon="󰂃" color=0xFFFFFFFF ;;
-      esac
-
-      # if is charging
-      if ! [ -z "$charging" ]; then
-        icon="$icon 󰚥"
-      fi
-
-      sketchybar \
-        --set $NAME \
-          icon.color="$color" \
-          icon="$icon" \
-          label="$battery_percent%"
-    fi
-  '';
+  battery-sh = pkgs.writeShellScriptBin "battery.sh" ./plugins/battery.sh;
   top-proc-sh = pkgs.writeShellScriptBin "top-proc.sh" ''
     TOPPROC=$(ps axo "%cpu,ucomm" | sort -nr | tail +1 | head -n1 | awk '{printf "%.0f%% %s\n", $1, $2}' | sed -e 's/com.apple.//g')
     CPUP=$(echo $TOPPROC | sed -nr 's/([^\%]+).*/\1/p')
@@ -116,13 +78,6 @@
       fi
     else
       sketchybar -m --set "$NAME" label="" drawing=off
-    fi
-  '';
-  aerospace-sh = pkgs.writeShellScriptBin "aerospace.sh" ''
-    if [ "$1" = "$FOCUSED_WORKSPACE" ]; then
-        sketchybar --set $NAME background.drawing=on
-    else
-        sketchybar --set $NAME background.drawing=off
     fi
   '';
 in {
@@ -191,7 +146,7 @@ in {
             --set web background.color=0xff57627A  \
             --set web background.height=21 \
             --set web background.padding_left=12 \
-            --set web click_script="open -a Thorium.app" \
+            --set web click_script="open -a Zen \Browser.app" \
 
           # SPACE 2: CODE ICON
           sketchybar -m --add space code left \
@@ -205,7 +160,7 @@ in {
             --set code background.color=0xff57627A  \
             --set code background.height=21 \
             --set code background.padding_left=7 \
-            --set code click_script="open -a Alacritty.app" \
+            --set code click_script="open -a kitty.app" \
 
           # SPACE 3: MUSIC ICON
           sketchybar -m --add space music left \
@@ -234,23 +189,6 @@ in {
             --set spotify_indicator script="${spotify-indicator-sh}/bin/spotify-indicator.sh" \
             --set spotify_indicator click_script="osascript -e 'tell application \"Spotify\" to pause'" \
             --subscribe spotify_indicator spotify_change \
-
-          # SPACE 4: AEROSPACE
-          for sid in $(aerospace list-workspaces --all); do
-              sketchybar --add item space.$sid left \
-                  --subscribe space.$sid aerospace_workspace_change \
-                  --set space.$sid \
-                  background.color=0x44ffffff \
-                  background.corner_radius=5 \
-                  background.height=20 \
-                  background.drawing=off \
-                  label="$sid" \
-                  click_script="aerospace workspace $sid" \
-                  script="${aerospace-sh}/bin/aerospace.sh $sid"
-          done
-
-          # AEROSPACE STATUS
-          sketchybar --add event aerospace_workspace_change
 
         ############## ITEM DEFAULTS ###############
           sketchybar -m --default \
@@ -341,6 +279,9 @@ in {
 
         ############## FINALIZING THE SETUP ##############
         sketchybar -m --update
+
+        # HOT RELOAD
+        sketchybar --hotload true
 
         echo "sketchybar configuration loaded.."
       '';
