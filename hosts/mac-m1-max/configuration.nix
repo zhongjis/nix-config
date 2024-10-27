@@ -13,10 +13,6 @@ in {
     ../../modules/nix-darwin
   ];
 
-  yabai.enable = false;
-  skhd.enable = false;
-  aerospace.enable = true;
-
   programs.nh = {
     enable = true;
     clean = {
