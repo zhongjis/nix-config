@@ -34,6 +34,12 @@
     };
 
     nh_darwin.url = "github:ToyVo/nh_darwin";
+
+    # secret management
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
   outputs = {nixpkgs, ...} @ inputs: let
     overlays = import ./overlays {inherit inputs;};
