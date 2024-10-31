@@ -40,6 +40,20 @@ nix run github:vimjoyer/nix-update-input # upgrade specific input
 nix search nixpkgs <package-name> # search nixpkgs
 ```
 
+## secret management
+
+I am using [sops-nix](https://github.com/Mic92/sops-nix)'s home-manager module.
+
+```nix
+age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
+```
+
+```bash
+nix run nixpkgs#sops -- secrets.yaml # view secrets
+```
+
+more about sops see https://github.com/getsops/sops#2usage
+
 # TODOs
 
 NOTE: most of the changes (like for neovim) are changed on the way while im using it. this list just for later in case I have nothing to do.
@@ -80,3 +94,7 @@ NOTE: most of the changes (like for neovim) are changed on the way while im usin
 
 - [ ] docker is not working directly downloaded from nixpkgs. seems relate to docker-daemon is not running. right now is using brew to manage it
 - [ ] aerospace and sketchybar integration not working
+
+```
+
+```
