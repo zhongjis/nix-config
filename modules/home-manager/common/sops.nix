@@ -14,4 +14,6 @@
       "ssh/private_keys/github_adobe_zshen".path = "%r/.ssh/github_adobe_zshen";
     };
   };
+
+  systemd.user.services.mbsync.Unit.After = ["sops-nix.service"];
 }
