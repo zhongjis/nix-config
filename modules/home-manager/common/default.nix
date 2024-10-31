@@ -15,6 +15,7 @@
     ./lazygit.nix
     ./fastfetch.nix
     ./terminals
+    ./sops.nix
   ];
 
   options = {
