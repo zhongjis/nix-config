@@ -1,14 +1,17 @@
 {inputs, ...}: {
   imports = [
-    inputs.sops.nix.homeManagerModules.sops
+    inputs.sops-nix.homeManagerModules.sops
   ];
 
   sops = {
-    defaultSopsFiles = ../../../secrets.yaml;
+    age.keyFile = "%r/.config/sops/age/keys.txt";
+
+    defaultSopsFile = ../../../secrets.yaml;
     validateSopsFiles = false;
 
-    age = {
-      path = "%r/.config/sops/age/keys.txt";
+    secrets = {
+      "ssh/private_keys/github_com_zhongjis".path = "%r/.ssh/github_com_zhongjis";
+      "ssh/private_keys/github_adobe_zshen".path = "%r/.ssh/github_adobe_zshen";
     };
   };
 }
