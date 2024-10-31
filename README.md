@@ -92,6 +92,6 @@ NOTE: most of the changes (like for neovim) are changed on the way while im usin
 - [ ] docker is not working directly downloaded from nixpkgs. seems relate to docker-daemon is not running. right now is using brew to manage it
 - [ ] aerospace and sketchybar integration not working
 
-```
+# Special Thanks
 
-```
+- https://github.com/vimjoyer/
