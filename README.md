@@ -1,21 +1,19 @@
-# cmds
+# zshen's nix-config
 
-## build cmds
-
-### install nix (https://zero-to-nix.com/start/install)
+## install nix (https://zero-to-nix.com/start/install)
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 ```
 
-### Global
+## Global
 
 ```bash
-oswitch # darwinswitch
+oswitch # os switch
 hswitch # home-manager switch
 ```
 
-### MacOS
+## MacOS-only
 
 ```bash
 # first time setup
@@ -27,13 +25,12 @@ darwin-rebuild --list-generations
 darwin-rebuild switch --switch-generation 41
 ```
 
-### NixOS
+## NixOS-only
 
 - switch NixOS (TBD)
-
 - test NixOS (TBD)
 
-## nix cmds
+## useful nix cmds
 
 ```bash
 nix run github:vimjoyer/nix-update-input # upgrade specific input
@@ -58,7 +55,7 @@ more about sops see https://github.com/getsops/sops#2usage
 
 NOTE: most of the changes (like for neovim) are changed on the way while im using it. this list just for later in case I have nothing to do.
 
-## Global
+### Global
 
 - [ ] set global packages
 
