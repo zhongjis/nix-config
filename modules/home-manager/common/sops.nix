@@ -14,11 +14,17 @@
     validateSopsFiles = true;
 
     secrets = {
-      "private_keys/github_com_zhongjis" = {
+      "github_com_zhongjis/private_key" = {
         path = "${config.home.homeDirectory}/.ssh/github_com_zhongjis";
       };
-      "private_keys/github_adobe_zshen" = {
+      "github_com_zhongjis/public_key" = {
+        path = "${config.home.homeDirectory}/.ssh/github_com_zhongjis.pub";
+      };
+      "github_adobe_zshen/private_key" = {
         path = "${config.home.homeDirectory}/.ssh/github_adobe_zshen";
+      };
+      "github_adobe_zshen/public_key" = {
+        path = "${config.home.homeDirectory}/.ssh/github_adobe_zshen.pub";
       };
     };
   };
