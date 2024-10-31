@@ -11,21 +11,17 @@ curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix 
 ### Global
 
 ```bash
-oswitch
-hswitch
+oswitch # darwinswitch
+hswitch # home-manager switch
 ```
 
 ### MacOS
 
-- setup
-
 ```bash
+# first time setup
 nix run nix-darwin --extra-experimental-features 'nix-command flakes' -- switch --flake .#mac-m1-max
-```
 
-- switch
-
-```bash
+# switch
 darwin-rebuild switch --flake .#mac-m1-max
 darwin-rebuild --list-generations
 darwin-rebuild switch --switch-generation 41
@@ -33,36 +29,15 @@ darwin-rebuild switch --switch-generation 41
 
 ### NixOS
 
-- switch NixOS
+- switch NixOS (TBD)
 
-```bash
-
-```
-
-- test NixOS
-
-```bash
-
-```
+- test NixOS (TBD)
 
 ## nix cmds
 
-- upgrade specific package
-
 ```bash
-
-```
-
-- make nix lsp work
-
-```bash
-nix flake archive
-```
-
-- search nixpkgs
-
-```bash
-nix search nixpkgs <package-name>
+nix run github:vimjoyer/nix-update-input # upgrade specific input
+nix search nixpkgs <package-name> # search nixpkgs
 ```
 
 # TODOs
@@ -77,13 +52,17 @@ NOTE: most of the changes (like for neovim) are changed on the way while im usin
 
 - [ ] parent path not shown when in git worktree dir
 
+### bat
+
+- [ ] syntax highlighting error when apply home-manager config
+- [ ] make it simple with just syntax highlighting
+
 ### zsh
 
 - [ ] bat syntax highlighting
 
 ### neovim
 
-- [~] ~~use space instead of tabs in auto completion~~ (im happy with the default now)
 - [ ] markdown lint
 - [ ] verify luasnippet is working correctly
 
@@ -101,9 +80,3 @@ NOTE: most of the changes (like for neovim) are changed on the way while im usin
 
 - [ ] docker is not working directly downloaded from nixpkgs. seems relate to docker-daemon is not running. right now is using brew to manage it
 - [ ] aerospace and sketchybar integration not working
-
-## testing
-
-### github actions
-
-- [ ] add github actions to verify change works on both macos and nixos (at least compiles)
