@@ -17,7 +17,6 @@
     obsidian
 
     awscli2
-    fastfetch
 
     gh
     graphviz

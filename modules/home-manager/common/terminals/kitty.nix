@@ -26,7 +26,7 @@ in {
       settings = {
         confirm_os_window_close = "0";
 
-        font_family = "FiraCode Nerd Font";
+        font_family = "FiraCode Nerd Font Propo";
         bold_font = "auto";
         italic_font = "auto";
         bold_italic_font = "auto";
