@@ -1,19 +1,27 @@
 # zshen's nix-config
 
-## install nix (https://zero-to-nix.com/start/install)
+This is my nix-config for my personal use. It is a work in progress and will be updated as I continue to use it.
+
+## Special Thanks
+
+- https://github.com/vimjoyer/
+
+## Get Started
+
+1. install nix (https://zero-to-nix.com/start/install)
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 ```
 
-## Global
+2. clone this repo
+3. setup keys.txt (for sops-nix)
 
-```bash
-oswitch # os switch
-hswitch # home-manager switch
+```nix
+age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
 ```
 
-## MacOS-only
+### Nix-Darwin
 
 ```bash
 # first time setup
@@ -25,25 +33,26 @@ darwin-rebuild --list-generations
 darwin-rebuild switch --switch-generation 41
 ```
 
-## NixOS-only
+### NixOS
 
 - switch NixOS (TBD)
 - test NixOS (TBD)
 
-## useful nix cmds
+## Useful cmds
 
 ```bash
+# useful nix cmds
 nix run github:vimjoyer/nix-update-input # upgrade specific input
 nix search nixpkgs <package-name> # search nixpkgs
+
+# rebuild system use nix-helper
+oswitch # os switch
+hswitch # home-manager switch
 ```
 
-## secret management
+## Secret Management
 
 I am using [sops-nix](https://github.com/Mic92/sops-nix)'s home-manager module.
-
-```nix
-age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
-```
 
 ```bash
 nix run nixpkgs#sops -- secrets.yaml # view secrets
@@ -91,7 +100,3 @@ NOTE: most of the changes (like for neovim) are changed on the way while im usin
 
 - [ ] docker is not working directly downloaded from nixpkgs. seems relate to docker-daemon is not running. right now is using brew to manage it
 - [ ] aerospace and sketchybar integration not working
-
-# Special Thanks
-
-- https://github.com/vimjoyer/
