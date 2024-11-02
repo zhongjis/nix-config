@@ -51,7 +51,7 @@ in {
         size = 10000;
       };
       shellAliases = {
-        cat = "bat";
+        cat = "bat -p";
         oswitch = oswitchCMD;
         otest = otestCMD;
         hswitch = hswitchCMD;
@@ -77,6 +77,11 @@ in {
       enable = true;
       catppuccin.enable = true;
       catppuccin.flavor = "mocha";
+    };
+
+    programs.carapace = {
+      enable = true;
+      enableZshIntegration = true;
     };
 
     programs.eza = {
