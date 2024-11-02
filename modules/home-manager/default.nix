@@ -5,7 +5,7 @@
 }: {
   imports = [
     ./common
-    ./window-manager
+    ./nixos
   ];
 
   common.enable = lib.mkDefault true;
