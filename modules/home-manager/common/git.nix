@@ -11,7 +11,7 @@
   config = lib.mkIf config.git.enable {
     programs.git = {
       enable = true;
-      userName = "zshen";
+      userName = "zhongjis";
       userEmail = "zhongjie.x.shen@gmail.com";
 
       aliases = {};

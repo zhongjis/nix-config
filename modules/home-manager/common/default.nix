@@ -26,6 +26,7 @@
   config = lib.mkIf config.common.enable {
     alacritty.enable = lib.mkDefault true;
     kitty.enable = lib.mkDefault true;
+
     zsh.enable = lib.mkDefault true;
     fzf.enable = lib.mkDefault true;
     neovim.enable = lib.mkDefault true;
@@ -34,7 +35,6 @@
     fastfetch.enable = lib.mkDefault true;
     thefuck.enable = lib.mkDefault true;
     zoxide.enable = lib.mkDefault true;
-
     git.enable = lib.mkDefault false;
     k9s.enable = lib.mkDefault false;
   };
