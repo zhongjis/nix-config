@@ -14,6 +14,7 @@
   xdg.enable = true;
 
   home.packages = with pkgs; [
+    sops
     obsidian
 
     awscli2
