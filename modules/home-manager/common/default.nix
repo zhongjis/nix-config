@@ -35,7 +35,7 @@
     git.enable = lib.mkDefault false;
     k9s.enable = lib.mkDefault false;
 
-    terminal_emulators.enable = lib.mkDefault true;
-    terminal_multiplexers.enable = lib.mkDefault true;
+    terminal_emulator.enable = lib.mkDefault true;
+    terminal_multiplexer.enable = lib.mkDefault true;
   };
 }
