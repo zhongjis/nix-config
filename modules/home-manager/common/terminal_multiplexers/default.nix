@@ -14,7 +14,7 @@
   };
 
   config = lib.mkIf config.terminal_multiplexer.enable {
-    tmux.enable = lib.mkDefault true;
-    zellij.enable = lib.mkDefault false;
+    tmux.enable = lib.mkDefault false;
+    zellij.enable = lib.mkDefault true;
   };
 }
