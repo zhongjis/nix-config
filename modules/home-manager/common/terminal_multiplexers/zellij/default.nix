@@ -17,13 +17,8 @@
 
       catppuccin.enable = true;
       catppuccin.flavor = "mocha";
-
-      settings = {
-        copy_command =
-          if isDarwin
-          then "xclip -selection clipboard"
-          else "wl-copy";
-      };
     };
+
+    xdg.configFile."zellij/config.kdl".source = ./zellij.kdl;
   };
 }

@@ -5,7 +5,7 @@
 }: {
   imports = [
     ./tmux
-    ./zellij.nix
+    ./zellij
   ];
 
   options = {
