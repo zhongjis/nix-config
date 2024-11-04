@@ -18,6 +18,10 @@ in {
   config = lib.mkIf config.tmux.enable {
     programs.tmux = {
       enable = true;
+
+      catppuccin.enable = true;
+      catppuccin.flavor = "mocha";
+
       baseIndex = 1;
       escapeTime = 0;
       keyMode = "vi";
@@ -44,18 +48,6 @@ in {
         set -g renumber-windows on       # renumber all windows when any window is closed \n
         set -g status-left-length 15     # could be any number
       '';
-      plugins = with pkgs; [
-        {
-          plugin = tmuxPlugins.dracula;
-          extraConfig = ''
-            set -g @plugin 'dracula/tmux'
-            set -g @dracula-show-powerline false
-            set -g @dracula-show-flags false
-            set -g @dracula-show-left-icon session
-            set -g @dracula-plugins "battery"
-          '';
-        }
-      ];
     };
 
     home.packages = [
