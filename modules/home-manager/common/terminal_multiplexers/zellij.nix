@@ -2,6 +2,7 @@
   pkgs,
   lib,
   config,
+  isDarwin,
   ...
 }: {
   options = {
@@ -12,12 +13,17 @@
   config = lib.mkIf config.zellij.enable {
     programs.zellij = {
       enable = true;
-      enableZshIntegration = false;
+      enableZshIntegration = true;
 
       catppuccin.enable = true;
       catppuccin.flavor = "mocha";
 
-      settings = {};
+      settings = {
+        copy_command =
+          if isDarwin
+          then "xclip -selection clipboard"
+          else "wl-copy";
+      };
     };
   };
 }
