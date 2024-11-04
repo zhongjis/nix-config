@@ -12,7 +12,12 @@
   config = lib.mkIf config.zellij.enable {
     programs.zellij = {
       enable = true;
-      enableZshIntegration = true;
+      enableZshIntegration = false;
+
+      catppuccin.enable = true;
+      catppuccin.flavor = "mocha";
+
+      settings = {};
     };
   };
 }

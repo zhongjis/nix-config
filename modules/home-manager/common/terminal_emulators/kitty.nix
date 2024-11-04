@@ -37,7 +37,7 @@ in {
         background_opacity = "0.8";
         background_blur = "20";
 
-        shell = "${lib.getExe pkgs.zsh} -l -c 'tmux attach || tmux new-session -d -s home \"fastfetch; exec $SHELL\" && tmux attach -t home'";
+        # shell = "${lib.getExe pkgs.zsh} -l -c 'tmux attach || tmux new-session -d -s home \"fastfetch; exec $SHELL\" && tmux attach -t home'";
       };
     };
   };
