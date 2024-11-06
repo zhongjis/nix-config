@@ -24,7 +24,7 @@ in {
   config = lib.mkIf config.zsh.enable {
     programs.zsh = {
       enable = true;
-      enableCompletion = true;
+      # enableCompletion = true;
       dotDir = ".config/zsh";
       autosuggestion = {
         enable = true;
@@ -40,8 +40,8 @@ in {
           "vi-mode"
           "autojump"
           "sublime-merge"
-          "mvn"
-          "kubectl"
+          # "mvn"
+          # "kubectl"
         ];
       };
       history = {
