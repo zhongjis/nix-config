@@ -36,12 +36,8 @@ in {
         plugins = [
           "git"
           "gh"
-          "terraform"
-          "vi-mode"
-          "autojump"
           "sublime-merge"
-          # "mvn"
-          # "kubectl"
+          "mvn"
         ];
       };
       history = {
@@ -59,6 +55,7 @@ in {
       };
       initExtra = ''
         ${builtins.readFile ./catppuccin_mocha-zsh-syntax-highlighting.zsh}
+        bindkey -v
       '';
     };
 
