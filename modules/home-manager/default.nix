@@ -1,15 +1,25 @@
 {
   pkgs,
   lib,
+  isDarwin,
   ...
 }: {
   imports = [
     ./common
-    ./nixos
+    ./linux
+    ./darwin
   ];
 
   common.enable = lib.mkDefault true;
-  window-manager.enable = lib.mkDefault false;
+
+  linux-hm-modules.enable =
+    if isDarwin
+    then lib.mkDefault false
+    else lib.mkDefault true;
+  darwin-hm-modules.enable =
+    if isDarwin
+    then lib.mkDefault true
+    else lib.mkDefault false;
 
   xdg.enable = true;
 
