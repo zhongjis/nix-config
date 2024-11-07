@@ -16,10 +16,10 @@
     if isDarwin
     then lib.mkDefault false
     else lib.mkDefault true;
-  # darwin-hm-modules.enable =
-  #   if isDarwin
-  #   then lib.mkDefault true
-  #   else lib.mkDefault false;
+  darwin-hm-modules.enable =
+    if isDarwin
+    then lib.mkDefault true
+    else lib.mkDefault false;
 
   xdg.enable = true;
 
