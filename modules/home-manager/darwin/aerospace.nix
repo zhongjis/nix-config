@@ -3,9 +3,6 @@
   config,
   ...
 }: {
-  imports = [
-    ./aerospace.nix
-  ];
   options = {
     aerospace.enable =
       lib.mkEnableOption "enable aerospace packages";
