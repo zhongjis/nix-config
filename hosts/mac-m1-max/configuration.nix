@@ -120,8 +120,6 @@ in {
   # $ nix-env -qaP | grep wget
   environment.systemPackages = with pkgs;
     [
-      raycast
-
       mongosh
       terraform-versions."1.6.6"
 
