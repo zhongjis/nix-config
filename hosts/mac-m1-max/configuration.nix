@@ -73,6 +73,10 @@ in {
       cleanup = "zap";
     };
 
+    taps = [
+      "nikitabobko/tap"
+    ];
+
     brews = [
       "bitwarden-cli"
       "jq"
@@ -90,7 +94,7 @@ in {
       "dash"
       "alfred"
       "zen-browser"
-      "nikitabobko/tap/aerospace"
+      "aerospace"
 
       # dev tools
       "docker"
