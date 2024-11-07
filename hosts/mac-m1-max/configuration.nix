@@ -88,10 +88,9 @@ in {
       "box-drive"
       "google-chrome"
       "dash"
-      "raycast"
-      "arc"
       "alfred"
       "zen-browser"
+      "nikitabobko/tap/aerospace"
 
       # dev tools
       "docker"
