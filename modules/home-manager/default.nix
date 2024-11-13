@@ -12,10 +12,11 @@
 
   common.enable = lib.mkDefault true;
 
-  linux-hm-modules.enable =
-    if isDarwin
-    then lib.mkDefault false
-    else lib.mkDefault true;
+  linux-hm-modules.enable = false;
+  # linux-hm-modules.enable =
+  #   if isDarwin
+  #   then lib.mkDefault false
+  #   else lib.mkDefault true;
   darwin-hm-modules.enable =
     if isDarwin
     then lib.mkDefault true
