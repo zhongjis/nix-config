@@ -78,5 +78,10 @@
       system = "x86_64-linux";
       darwin = false;
     };
+
+    homeConfigurations."zshen-razer" = mkHomeManager "razer-14" {
+      system = "x86_64-linux";
+      darwin = false;
+    };
   };
 }
