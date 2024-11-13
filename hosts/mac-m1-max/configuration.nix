@@ -95,6 +95,7 @@ in {
       "alfred"
       "zen-browser"
       "aerospace"
+      "caffeine"
 
       # dev tools
       "docker"
