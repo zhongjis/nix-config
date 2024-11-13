@@ -58,6 +58,11 @@
       hardware = "lenovo-thinkpad-t480";
     };
 
+    nixosConfigurations.razer-14 = mkSystem "razer-14" {
+      system = "x86_64-linux";
+      user = "zshen";
+    };
+
     darwinConfigurations.mac-m1-max = mkSystem "mac-m1-max" {
       system = "aarch64-darwin";
       user = "zshen";
