@@ -3,11 +3,16 @@
   lib,
   ...
 }: {
-  hardware.graphics = {
+  # hardware.opengl has been changed to hardware.graphics
+  # hardware.graphics = {
+  #   enable = true;
+  #   enable32Bit = true;
+  # };
+  hardware.opengl = {
     enable = true;
-    enable32Bit = true;
+    driSupport = true;
+    driSupport32Bit = true;
   };
-  # hardware.opengl has beed changed to hardware.graphics
 
   services.xserver.videoDrivers = ["nvidia"];
   # services.xserver.videoDrivers = ["amdgpu"];
@@ -45,6 +50,7 @@
   environment.systemPackages = with pkgs; [
     mangohud
     protonup
+    discord
   ];
 
   programs.gamemode.enable = true;
