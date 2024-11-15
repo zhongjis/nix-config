@@ -17,6 +17,9 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  # razer
+  hardware.openrazer.enable = true;
+
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
@@ -85,7 +88,7 @@
   users.users.zshen = {
     isNormalUser = true;
     description = "Jason";
-    extraGroups = ["networkmanager" "wheel"];
+    extraGroups = ["networkmanager" "wheel" "openrazer"];
     packages = with pkgs; [
       kdePackages.kate
       #  thunderbird
@@ -107,6 +110,8 @@
     neovim
     git
     nh
+    openrazer-daemon
+    polychromatic
   ];
 
   nix.settings.experimental-features = ["nix-command" "flakes"];
