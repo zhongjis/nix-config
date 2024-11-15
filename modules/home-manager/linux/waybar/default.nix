@@ -138,7 +138,7 @@ in {
   config = lib.mkIf config.waybar.enable {
     programs.waybar = {
       enable = true;
-      package = pkgs.unstable.waybar.overrideAttrs (oldAttrs: {
+      package = pkgs.waybar.overrideAttrs (oldAttrs: {
         mesonFlags = oldAttrs.mesonFlags ++ ["-Dexperimental=true"];
       });
       settings.mainBar = mainBarConfig;
