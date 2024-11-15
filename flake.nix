@@ -16,7 +16,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    hyprland.url = "github:hyprwm/Hyprland";
+    hyprland = {
+      url = "github:hyprwm/Hyprland";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
+
     xremap-flake.url = "github:xremap/nix-flake";
     nixpkgs-terraform.url = "github:stackbuilders/nixpkgs-terraform";
     # https://github.com/catppuccin/nix/tree/main/modules/home-manager
