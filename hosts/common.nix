@@ -28,6 +28,7 @@ in {
 
   environment.systemPackages = with pkgs.unstable; [
     nixd
+    unzip
   ];
 
   nix.nixPath = ["nixpkgs=${inputs.nixpkgs}"];
