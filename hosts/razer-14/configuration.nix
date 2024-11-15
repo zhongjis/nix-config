@@ -10,6 +10,7 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ../common.nix
+    ./gaming.nix
   ];
 
   # Bootloader.
@@ -89,6 +90,7 @@
       kdePackages.kate
       #  thunderbird
     ];
+    shell = pkgs.zsh;
   };
 
   # Install firefox.
