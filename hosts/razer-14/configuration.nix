@@ -7,11 +7,10 @@
   ...
 }: {
   imports = [
-    # Include the results of the hardware scan.
+    ../../modules/nixos/hyprland
     ./hardware-configuration.nix
     ../common.nix
     ./gaming.nix
-    ../../modules/nixos/hyprland
   ];
 
   # Bootloader.
@@ -44,13 +43,6 @@
     LC_TELEPHONE = "en_US.UTF-8";
     LC_TIME = "en_US.UTF-8";
   };
-
-  # Enable the X11 windowing system.
-  # You can disable this if you're only using the Wayland session.
-  services.xserver.enable = true;
-
-  # Enable the KDE Plasma Desktop Environment.
-  services.displayManager.sddm.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {

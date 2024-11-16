@@ -3,6 +3,13 @@
   pkgs,
   ...
 }: {
+  services.xserver.enable = true;
+
+  services.displayManager.sddm = {
+    enable = true;
+    wayland.enable = true;
+  };
+
   programs.hyprland = {
     enable = true;
     # package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
