@@ -15,7 +15,6 @@
   };
 
   services.xserver.videoDrivers = ["nvidia"];
-  # services.xserver.videoDrivers = ["amdgpu"];
 
   hardware.nvidia.modesetting.enable = true;
   hardware.nvidia.prime = {
@@ -46,14 +45,13 @@
 
   programs.steam.enable = true;
   programs.steam.gamescopeSession.enable = true;
+  programs.gamemode.enable = true;
 
   environment.systemPackages = with pkgs; [
     mangohud
     protonup
     discord
   ];
-
-  programs.gamemode.enable = true;
 
   environment.sessionVariables = {
     STEAM_EXTRA_COMPAT_TOOLS_PATHS = "\${HOME}/.steam/root/compatibilitytools.d";
