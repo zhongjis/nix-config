@@ -5,11 +5,31 @@
 }: {
   programs.hyprland = {
     enable = true;
-    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-    portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+    # package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+    # portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+    xwayland.enable = true;
+
+    # extraConfig = ''
+    #   ${builtins.readFile ./hyprland-default.conf}
+    # '';
   };
 
+  environment.systemPackages = with pkgs; [
+    dunst
+    lxqt.lxqt-policykit
+
+    brightnessctl # brightness control
+    pavucontrol # volume control GUI
+
+    wl-clipboard
+    cliphist
+  ];
+
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
+
+  xdg.portal.enable = true;
+  xdg.portal.extraPortals = [pkgs.xdg-desktop-portal-gtk];
+  xdg.portal.config.common.default = "*";
 
   # NOTE: if game has issue
   # hardware.opengl = {
