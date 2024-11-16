@@ -24,10 +24,6 @@
     # package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
     # portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
     xwayland.enable = true;
-
-    extraConfig = ''
-      ${builtins.readFile ./hyprland.conf}
-    '';
   };
 
   environment.systemPackages = with pkgs; [
@@ -39,6 +35,8 @@
 
     wl-clipboard
     cliphist
+
+    dolphin
   ];
 
   environment.sessionVariables.NIXOS_OZONE_WL = "1";

@@ -13,6 +13,13 @@
     ./gaming.nix
   ];
 
+  # xremap
+  hardware.uinput.enable = true;
+  users.groups = {
+    uinput.members = ["zshen"];
+    input.members = ["zshen"];
+  };
+
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -27,7 +34,7 @@
   networking.networkmanager.enable = true;
 
   # Set your time zone.
-  time.timeZone = "America/Denver";
+  services.automatic-timezoned.enable = true;
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
@@ -44,6 +51,12 @@
     LC_TIME = "en_US.UTF-8";
   };
 
+  # ZRAM
+  zramSwap = {
+    enable = true;
+    memoryPercent = 50;
+  };
+
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
@@ -53,9 +66,10 @@
   # Enable CUPS to print documents.
   services.printing.enable = true;
 
-  # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
+  # Enable sound.
+  sound.enable = true;
   security.rtkit.enable = true;
+  # Enable pipewire for screen sharing sound
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -65,7 +79,7 @@
   };
 
   # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
+  services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.zshen = {
@@ -77,6 +91,10 @@
     ];
     shell = pkgs.zsh;
   };
+
+  # better power consumption
+  services.thermald.enable = true;
+  services.tlp.enable = true;
 
   environment.systemPackages = with pkgs; [
     neovim
