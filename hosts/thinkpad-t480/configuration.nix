@@ -98,11 +98,6 @@
     shell = pkgs.zsh;
   };
 
-  # hyprland related settings
-  # environment.sessionVariables = {
-  #   NIXOS_OZONE_WL = "1";
-  # };
-
   # better power consumption
   services.thermald.enable = true;
   services.tlp.enable = true;

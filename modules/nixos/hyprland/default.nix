@@ -25,9 +25,9 @@
     # portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
     xwayland.enable = true;
 
-    # extraConfig = ''
-    #   ${builtins.readFile ./hyprland-default.conf}
-    # '';
+    extraConfig = ''
+      ${builtins.readFile ./hyprland.conf}
+    '';
   };
 
   environment.systemPackages = with pkgs; [

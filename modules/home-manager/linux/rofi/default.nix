@@ -14,12 +14,12 @@
       enable = true;
 
       package = pkgs.rofi-wayland;
-      terminal = "${pkgs.alacritty}/bin/alacritty";
+      terminal = "${pkgs.kitty}/bin/kitty";
       theme = "gruvbox-dark-hard";
     };
 
     home.packages = with pkgs; [
-      (pkgs.writeScriptBin "rofi-toggle" ''
+      (writeScriptBin "rofi-toggle" ''
         ${builtins.readFile ./rofi-toggle.sh}
       '')
     ];
