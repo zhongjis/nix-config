@@ -16,19 +16,23 @@
 
   services.xserver.videoDrivers = ["nvidia"];
 
-  hardware.nvidia.modesetting.enable = true;
-  hardware.nvidia.prime = {
-    offload = {
-      enable = true;
-      enableOffloadCmd = true;
+  hardware.nvidia = {
+    modesetting.enable = true;
+    open = true;
+    nvidiaSettings = true;
+    prime = {
+      offload = {
+        enable = true;
+        enableOffloadCmd = true;
+      };
+
+      # integrated
+      # intelBusId = "PCI:0:0:0";
+      amdgpuBusId = "PCI:4:0:0";
+
+      # dedicated
+      nvidiaBusId = "PCI:1:0:0";
     };
-
-    # integrated
-    # intelBusId = "PCI:0:0:0";
-    amdgpuBusId = "PCI:4:0:0";
-
-    # dedicated
-    nvidiaBusId = "PCI:1:0:0";
   };
 
   specialisation = {
