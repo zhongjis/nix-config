@@ -26,6 +26,7 @@
   home.packages = with pkgs; [
     sops
     obsidian
+    bitwarden
 
     awscli2
 
