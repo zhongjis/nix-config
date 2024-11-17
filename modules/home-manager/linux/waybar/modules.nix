@@ -3,7 +3,7 @@
     ${builtins.readFile ./scripts/WaybarCava.sh}
   '';
 in {
-  value =
+  fileText =
     /*
     json
     */
@@ -506,12 +506,12 @@ in {
               "interval": 86400, // once every day
               "tooltip": true,
           },
-          // "custom/keyboard": {
-          //     "exec": "cat ~/.cache/kb_layout",
-          //     "interval": 1,
-          //     "format": " {}",
-          //     "on-click": "~/.config/hypr/scripts/SwitchKeyboardLayout.sh",
-          //     },
+          "custom/keyboard": {
+              "exec": "cat ~/.cache/kb_layout",
+              "interval": 1,
+              "format": " {}",
+              "on-click": "~/.config/hypr/scripts/SwitchKeyboardLayout.sh",
+          },
           "custom/light_dark": {
               "format": "{}",
               "exec": "echo ; echo 󰔎 Dark-Light switcher",

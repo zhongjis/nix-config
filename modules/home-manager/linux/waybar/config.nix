@@ -1,5 +1,5 @@
 {
-  value =
+  fileText =
     /*
     json
     */
