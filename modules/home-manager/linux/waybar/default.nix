@@ -4,8 +4,8 @@
   config,
   ...
 }: let
-  cava-sh = pkgs.writeShellScript ./scripts/WaybarCava.sh;
   config = (import ./config.nix).value;
+  modules = (import ./modules.nix).value;
 in {
   options = {
     waybar.enable =
@@ -24,7 +24,7 @@ in {
     };
 
     xdg.configFile."waybar/config".text = config;
-    xdg.configFile."waybar/modules".source = ./modules;
+    xdg.configFile."waybar/modules".text = modules;
 
     home.packages = with pkgs; [
       playerctl
