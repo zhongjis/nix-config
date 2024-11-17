@@ -105,6 +105,7 @@ color: #CCCCCC;
 #battery.charging, #battery.full, #battery.discharging {
   color: #CF876F;
 }
+
 #battery.critical:not(.charging) {
   color: #D6DCE7;
 }

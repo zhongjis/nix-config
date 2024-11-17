@@ -31,6 +31,12 @@ in {
       extraConfig = ''
         set-option -g default-shell ${pkgs.zsh}/bin/zsh
 
+        # pane movement like vim
+        bind-key l select-pane -L
+        bind-key k select-pane -D
+        bind-key i select-pane -U
+        bind-key j select-pane -R
+
         # true color
         # https://gist.github.com/andersevenrud/015e61af2fd264371032763d4ed965b6
         set -g default-terminal "tmux-256color"

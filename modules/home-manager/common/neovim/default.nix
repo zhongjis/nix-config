@@ -155,6 +155,7 @@ in {
             p.hcl
             p.terraform
             p.kdl
+            p.toml
           ]);
           config = toLuaFile ./plugins/treesitter.lua;
         }

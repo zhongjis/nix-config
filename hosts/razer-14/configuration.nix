@@ -4,6 +4,7 @@
 {
   config,
   pkgs,
+  inputs,
   ...
 }: {
   imports = [
@@ -103,6 +104,7 @@
     openrazer-daemon
     polychromatic
     firefox
+    inputs.zen-browser.packages."${system}".specific
   ];
 
   nix.settings.experimental-features = ["nix-command" "flakes"];
