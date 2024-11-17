@@ -27,6 +27,7 @@ conform.setup({
     yaml = { "prettierd" },
     markdown = { "prettierd" },
     python = { "black" },
+    css = { "prettierd" },
   },
 })
 
