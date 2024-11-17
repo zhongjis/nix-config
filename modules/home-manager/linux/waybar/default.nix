@@ -5,7 +5,7 @@
   ...
 }: let
   waybarConfig = (import ./config.nix).fileText;
-  waybarModules = (import ./modules.nix).fileText;
+  waybarModules = (import ./modules.nix {inherit pkgs;}).fileText;
 in {
   options = {
     waybar.enable =
