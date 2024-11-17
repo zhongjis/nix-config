@@ -1,4 +1,8 @@
-{
+{pkgs, ...}: let
+  waybar-canva = pkgs.writeShellScript ''
+    ${builtins.readFile ./scripts/WaybarCava.sh}
+  '';
+in {
   value =
     /*
     json

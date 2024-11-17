@@ -4,8 +4,8 @@
   config,
   ...
 }: let
-  config = (import ./config.nix).value;
-  modules = (import ./modules.nix).value;
+  waybarConfig = (import ./config.nix).value;
+  waybarModules = (import ./modules.nix).value;
 in {
   options = {
     waybar.enable =
@@ -23,8 +23,8 @@ in {
       '';
     };
 
-    xdg.configFile."waybar/config".text = config;
-    xdg.configFile."waybar/modules".text = modules;
+    xdg.configFile."waybar/config".text = waybarConfig;
+    xdg.configFile."waybar/modules".text = waybarModules;
 
     home.packages = with pkgs; [
       playerctl
