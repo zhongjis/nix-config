@@ -1,16 +1,10 @@
-{pkgs, ...}: let
-  waybar-canva = pkgs.writeShellScript ''
-    ${builtins.readFile ./scripts/WaybarCava.sh}
-  '';
-in {
+{
   fileText =
     /*
     json
     */
     ''
       {
-          // HYPRLAND WORKSPACES. CHOOSE as desired and place on waybar configs
-          // CIRCLES Style
           "hyprland/workspaces": {
               "active-only": false,
               "all-outputs": true,

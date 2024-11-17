@@ -24,7 +24,7 @@ in {
     };
 
     xdg.configFile."waybar/config".text = waybarConfig;
-    # xdg.configFile."waybar/modules".text = waybarModules;
+    xdg.configFile."waybar/modules".text = waybarModules;
 
     home.packages = with pkgs; [
       playerctl
