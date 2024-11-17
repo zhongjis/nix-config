@@ -141,12 +141,15 @@ in {
       package = pkgs.waybar.overrideAttrs (oldAttrs: {
         mesonFlags = oldAttrs.mesonFlags ++ ["-Dexperimental=true"];
       });
-      settings.mainBar = mainBarConfig;
-      style = css;
+      # settings.mainBar = mainBarConfig;
+      # style = css;
     };
 
-    home.packages = [
-      (pkgs.writeScriptBin "restart-waybar" ''
+    home.packages = with pkgs; [
+      playerctl
+      cava
+      swaynotificationcenter
+      (writeScriptBin "restart-waybar" ''
         ${builtins.readFile ./restart-waybar.sh}
       '')
     ];
