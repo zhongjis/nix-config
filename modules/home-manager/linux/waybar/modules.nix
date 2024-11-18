@@ -1,5 +1,10 @@
 {pkgs, ...}: let
-  cava-sh = pkgs.writeShellScript ./scripts/WaybarCava.sh;
+  cava-sh = pkgs.writeShellScript "hypr-cava.sh" ./scripts/Cava_Viz.sh;
+  brightness-sh = pkgs.writeShellScript "hypr-brightness.sh" ./scripts/Brightness.sh;
+  change-blur-sh = pkgs.writeShellScript "hypr-change-blur.sh" ./scripts/ChangeBlur.sh;
+  wlogout-sh = pkgs.writeShellScript "hypr-wlogout.sh" ./scripts/Wlogout.sh;
+  volume-sh = pkgs.writeShellScript "hypr-volume.sh" ./scripts/Volume.sh;
+  keyhints-sh = pkgs.writeShellScript "hypr-keyhints.sh" ./scripts/KeyHints.sh;
 in {
   fileText =
     /*
@@ -175,8 +180,8 @@ in {
               "on-click-middle": "",
               "on-click-right": "",
               "on-update": "",
-              "on-scroll-up": "~/.config/hypr/scripts/Brightness.sh --inc",
-              "on-scroll-down": "~/.config/hypr/scripts/Brightness.sh --dec",
+              "on-scroll-up": "${brightness-sh} --inc",
+              "on-scroll-down": "${brightness-sh} --dec",
               "smooth-scrolling-threshold": 1,
           },
           "battery": {
@@ -214,8 +219,8 @@ in {
               "format-time": "{H}h {M}min",
               "tooltip": true,
               "tooltip-format": "{timeTo} {power}w",
-              "on-click-middle": "~/.config/hypr/scripts/ChangeBlur.sh",
-              "on-click-right": "~/.config/hypr/scripts/Wlogout.sh",
+              "on-click-middle": "${change-blur-sh}",
+              "on-click-right": "${wlogout-sh}",
           },
           "bluetooth": {
               "format": "",
@@ -229,8 +234,8 @@ in {
           },
           "clock": {
               "interval": 1,
-              "format": " {:%I:%M %p}", // AM PM format
-              //"format": " {:%H:%M:%S}",
+              // "format": " {:%I:%M %p}", // AM PM format
+              "format": " {:%H:%M:%S}",
               "format-alt": " {:%H:%M   %Y, %d %B, %A}",
               "tooltip-format": "<tt><small>{calendar}</small></tt>",
               "calendar": {
@@ -422,10 +427,10 @@ in {
                   ],
               },
               "scroll-step": 5.0,
-              "on-click": "~/.config/hypr/scripts/Volume.sh --toggle",
+              "on-click": "${volume-sh} --toggle",
               "on-click-right": "pavucontrol -t 3",
-              "on-scroll-up": "~/.config/hypr/scripts/Volume.sh --inc",
-              "on-scroll-down": "~/.config/hypr/scripts/Volume.sh --dec",
+              "on-scroll-up": "${volume-sh} --inc",
+              "on-scroll-down": "${volume-sh} --dec",
               "tooltip-format": "{icon} {desc} | {volume}%",
               "smooth-scrolling-threshold": 1,
           },
@@ -433,10 +438,10 @@ in {
               "format": "{format_source}",
               "format-source": " {volume}%",
               "format-source-muted": "",
-              "on-click": "~/.config/hypr/scripts/Volume.sh --toggle-mic",
+              "on-click": "${volume-sh} --toggle-mic",
               "on-click-right": "pavucontrol -t 4",
-              "on-scroll-up": "~/.config/hypr/scripts/Volume.sh --mic-inc",
-              "on-scroll-down": "~/.config/hypr/scripts/Volume.sh --mic-dec",
+              "on-scroll-up": "${volume-sh} --mic-inc",
+              "on-scroll-down": "${volume-sh} --mic-dec",
               "tooltip-format": "{source_desc} | {source_volume}%",
               "scroll-step": 5,
           },
@@ -463,10 +468,10 @@ in {
           "wireplumber": {
               "format": "{icon} {volume} %",
               "format-muted": " Mute",
-              "on-click": "~/.config/hypr/scripts/Volume.sh --toggle",
+              "on-click": "${volume-sh} --toggle",
               "on-click-right": "pavucontrol -t 3",
-              "on-scroll-up": "~/.config/hypr/scripts/Volume.sh --inc",
-              "on-scroll-down": "~/.config/hypr/scripts/Volume.sh --dec",
+              "on-scroll-up": "${volume-sh} --inc",
+              "on-scroll-down": "${volume-sh} --dec",
               "format-icons": [
                   "",
                   "",
@@ -498,7 +503,7 @@ in {
           "custom/keybinds": {
               "format": "󰺁 HINT!",
               "exec": "echo ; echo  Key Hints SUPER H",
-              "on-click": "~/.config/hypr/scripts/KeyHints.sh",
+              "on-click": "${keyhints-sh}",
               "interval": 86400, // once every day
               "tooltip": true,
           },
@@ -535,7 +540,7 @@ in {
           },
           // This is a custom cava visualizer
           "custom/cava_mviz": {
-              "exec": "~/.config/hypr/scripts/WaybarCava.sh",
+              "exec": "${cava-sh}",
               "format": "{}"
           },
           "custom/playerctl": {
