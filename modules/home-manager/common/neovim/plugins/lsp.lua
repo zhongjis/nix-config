@@ -129,18 +129,15 @@ require("lspconfig").nixd.setup({
       nixpkgs = {
         expr = "import <nixpkgs> { }",
       },
-      -- formatting = {
-      --   command = { "alejandra" },
-      -- },
       options = {
         nixos = {
-          expr = '(builtins.getFlake "/Users/zshen/personal/nix-config").nixosConfigurations.thinkpad-t480.options',
+          expr = '(builtins.getFlake "~/personal/nix-config").nixosConfigurations.razer-14.options',
         },
-        nix_darwin = {
-          expr = '(builtins.getFlake "/Users/zshen/personal/nix-config").darwinConfigurations.mac-m1-max.options',
-        },
+        -- nix_darwin = {
+        --   expr = '(builtins.getFlake "~/personal/nix-config").darwinConfigurations.mac-m1-max.options',
+        -- },
         home_manager = {
-          expr = '(builtins.getFlake "/Users/zshen/personal/nix-config").homeConfigurations.zshen-mac.options',
+          expr = '(builtins.getFlake "~/personal/nix-config").homeConfigurations.zshen-razer.options',
         },
       },
     },

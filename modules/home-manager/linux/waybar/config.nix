@@ -40,11 +40,12 @@
               "custom/hint",
           ],
           "modules-right": [
-              "network#speed",
+              "group/motherboard",
               "group/connections",
               "custom/separator#line",
               "tray",
               "mpris",
+              "network",
               "group/audio",
               "custom/separator#line",
               "keyboard-state",
