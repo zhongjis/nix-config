@@ -560,7 +560,7 @@ in {
           "custom/power": {
               "format": "⏻ ",
               "exec": "echo ; echo 󰟡 power // blur",
-              "on-click": "~/.config/hypr/scripts/Wlogout.sh",
+              "on-click": "%{wlogout-sh}",
               "on-click-right": "${change-blur-sh}",
               "interval": 86400, // once every day
               "tooltip": true,
@@ -757,7 +757,7 @@ in {
           "custom/power_vertical": {
               "format": "⏻",
               "exec": "echo ; echo 󰟡 power // blur",
-              "on-click": "~/.config/hypr/scripts/Wlogout.sh",
+              "on-click": "${wlogout-sh}",
               "on-click-right": "~/.config/hypr/scripts/ChangeBlur.sh",
               "interval": 86400, // once every day
               "tooltip": true,
