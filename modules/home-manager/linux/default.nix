@@ -4,10 +4,8 @@
   ...
 }: {
   imports = [
-    ./waybar
-    ./rofi
     ./xremap
-    ./hyprland
+    ./zshen-hyprland
   ];
 
   options = {
@@ -16,9 +14,7 @@
   };
 
   config = lib.mkIf config.linux-hm-modules.enable {
-    hyprland.enable = lib.mkDefault true;
-    waybar.enable = lib.mkDefault true;
-    rofi.enable = lib.mkDefault true;
+    zshen-hyprland.enable = lib.mkDefault true;
     xremap.enable = lib.mkDefault true;
   };
 }
