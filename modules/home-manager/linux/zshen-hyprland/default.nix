@@ -6,6 +6,7 @@
   imports = [
     ./rofi
     ./waybar
+    ./swaync
     ./hyprland
   ];
   options = {
@@ -14,8 +15,9 @@
   };
 
   config = lib.mkIf config.zshen-hyprland.enable {
-    rofi.enable = lib.mkDefault true;
     hyprland.enable = lib.mkDefault true;
+    rofi.enable = lib.mkDefault true;
     waybar.enable = lib.mkDefault true;
+    swaync.enable = lib.mkDefault true;
   };
 }
