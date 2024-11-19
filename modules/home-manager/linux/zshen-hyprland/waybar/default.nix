@@ -30,7 +30,6 @@ in {
       blueman
       playerctl
       cava
-      swaynotificationcenter
       (writeScriptBin "restart-waybar" ''
         ${builtins.readFile ./restart-waybar.sh}
       '')
