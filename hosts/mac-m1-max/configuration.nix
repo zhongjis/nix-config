@@ -122,7 +122,7 @@ in {
   environment.systemPackages = with pkgs;
     [
       mongosh
-      terraform-versions."1.6.6"
+      terraform-versions."1.9.8"
 
       # **java**
       maven
