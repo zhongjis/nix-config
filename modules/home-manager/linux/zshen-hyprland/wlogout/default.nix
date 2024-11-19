@@ -11,7 +11,7 @@
   config = lib.mkIf config.wlogout.enable {
     xdg.configFile."wlogout/icons".source = ./icons;
 
-    services.wlogout = {
+    programs.wlogout = {
       enable = true;
       layout = [
         {
