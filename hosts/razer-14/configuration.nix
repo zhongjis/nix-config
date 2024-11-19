@@ -68,7 +68,6 @@
   services.printing.enable = true;
 
   # Enable sound.
-  sound.enable = true;
   security.rtkit.enable = true;
   # Enable pipewire for screen sharing sound
   services.pipewire = {
