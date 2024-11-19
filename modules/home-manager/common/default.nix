@@ -14,6 +14,7 @@
     ./lazygit.nix
     ./fastfetch.nix
     ./sops.nix
+    ./yazi.nix
 
     ./terminal_emulators
     ./terminal_multiplexers
@@ -32,6 +33,7 @@
     fastfetch.enable = lib.mkDefault true;
     thefuck.enable = lib.mkDefault true;
     zoxide.enable = lib.mkDefault true;
+    yazi.enable = lib.mkDefault true;
     git.enable = lib.mkDefault false;
     k9s.enable = lib.mkDefault false;
 
