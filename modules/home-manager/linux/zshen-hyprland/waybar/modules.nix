@@ -1,11 +1,11 @@
 {pkgs, ...}: let
-  cava-sh = pkgs.writeShellScript "hypr-cava.sh" ./scripts/Cava_Viz.sh;
-  brightness-sh = pkgs.writeShellScript "hypr-brightness.sh" ./scripts/Brightness.sh;
-  change-blur-sh = pkgs.writeShellScript "hypr-change-blur.sh" ./scripts/ChangeBlur.sh;
-  wlogout-sh = pkgs.writeShellScript "hypr-wlogout.sh" ./scripts/Wlogout.sh;
-  volume-sh = pkgs.writeShellScript "hypr-volume.sh" ./scripts/Volume.sh;
-  keyhints-sh = pkgs.writeShellScript "hypr-keyhints.sh" ./scripts/KeyHints.sh;
-  weather-py = pkgs.writeScript "hypr-weather.py" ./scripts/Weather.py;
+  cava-sh = pkgs.writeShellScript "hypr-cava.sh" ./scripts/cava_viz.sh;
+  brightness-sh = pkgs.writeShellScript "hypr-brightness.sh" ./scripts/brightness.sh;
+  change-blur-sh = pkgs.writeShellScript "hypr-change-blur.sh" ./scripts/change_blur.sh;
+  wlogout-sh = pkgs.writeShellScript "hypr-wlogout.sh" ./scripts/wlogout.sh;
+  volume-sh = pkgs.writeShellScript "hypr-volume.sh" ./scripts/volume.sh;
+  keyhints-sh = pkgs.writeShellScript "hypr-keyhints.sh" ./scripts/key_hints.sh;
+  weather-py = pkgs.writeScript "hypr-weather.py" ./scripts/weather.py;
 in {
   fileText =
     /*

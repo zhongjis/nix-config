@@ -7,7 +7,6 @@
       {
           "include": "~/.config/waybar/modules",
           "layer": "top",
-          //"mode": "dock",
           "exclusive": true,
           "passthrough": false,
           "position": "top",
@@ -48,7 +47,6 @@
               "network",
               "group/audio",
               "custom/separator#line",
-              "keyboard-state",
               "custom/keyboard",
               "custom/lock",
               "custom/power",
