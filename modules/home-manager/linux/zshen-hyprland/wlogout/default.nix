@@ -1,6 +1,7 @@
 {
   lib,
   config,
+  pkgs,
   ...
 }: {
   options = {
@@ -16,7 +17,7 @@
       layout = [
         {
           label = "lock";
-          action = "$HOME/.config/hypr/scripts/LockScreen.sh";
+          action = "hyprlock";
           text = "Lock";
           keybind = "l";
         }
