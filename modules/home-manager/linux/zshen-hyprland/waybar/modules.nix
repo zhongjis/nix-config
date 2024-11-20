@@ -5,7 +5,7 @@
   wlogout-sh = pkgs.writeShellScript "hypr-wlogout.sh" ./scripts/wlogout.sh;
   volume-sh = pkgs.writeShellScript "hypr-volume.sh" ./scripts/volume.sh;
   keyhints-sh = pkgs.writeShellScript "hypr-keyhints.sh" ./scripts/key_hints.sh;
-  weather-py = pkgs.writeScript "hypr-weather.py" ./scripts/weather.py;
+  weather-py = pkgs.writers.writePython3 "hypr-weather.py" {libraries = [pkgs.python3Packages.pyquery];} ./scripts/weather.py;
 in {
   fileText =
     /*

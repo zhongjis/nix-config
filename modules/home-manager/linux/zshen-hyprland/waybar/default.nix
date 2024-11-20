@@ -27,6 +27,7 @@ in {
     xdg.configFile."waybar/modules".text = waybarModules;
 
     home.packages = with pkgs.unstable; [
+      jq
       blueman
       playerctl
       cava

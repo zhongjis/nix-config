@@ -45,6 +45,15 @@ conform.formatters.stylua = {
   end,
 }
 
+conform.formatters.black = {
+  prepend_args = function(self, ctx)
+    return {
+      "--line-length",
+      79,
+    }
+  end,
+}
+
 conform.formatters.shfmt = {
   prepend_args = function(self, ctx)
     return {
