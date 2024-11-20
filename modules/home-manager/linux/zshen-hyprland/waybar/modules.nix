@@ -527,7 +527,7 @@ in {
               "exec": "echo ; echo 󰷛  screen lock",
               "interval": 86400, // once every day
               "tooltip": true,
-              "on-click": "~/.config/hypr/scripts/LockScreen.sh",
+              "on-click": "hyprlock",
           },
           "custom/menu": {
               "format": " {}",
