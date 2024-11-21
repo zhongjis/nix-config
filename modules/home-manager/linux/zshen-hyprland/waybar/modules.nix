@@ -4,6 +4,7 @@
   change-blur-sh = pkgs.writeShellScript "hypr-change-blur.sh" ./scripts/change_blur.sh;
   volume-sh = pkgs.writeShellScript "hypr-volume.sh" ./scripts/volume.sh;
   keyhints-sh = pkgs.writeShellScript "hypr-keyhints.sh" ./scripts/key_hints.sh;
+  wlogout-sh = pkgs.writeShellScript "hypr-keyhints.sh" ./scripts/wlogout.sh;
   weather-py = pkgs.writers.writePython3 "hypr-weather.py" {libraries = [pkgs.python3Packages.pyquery];} ./scripts/weather.py;
 in {
   fileText =
@@ -220,7 +221,7 @@ in {
               "tooltip": true,
               "tooltip-format": "{timeTo} {power}w",
               "on-click-middle": "${change-blur-sh}",
-              "on-click-right": "wlogout",
+              "on-click-right": "${wlogout-sh}",
           },
           "bluetooth": {
               "format": "",
@@ -491,15 +492,6 @@ in {
                   "rofi",
               ]
           },
-          "custom/cycle_wall": {
-              "format": " ",
-              "exec": "echo ; echo 󰸉 wallpaper select",
-              "on-click": "~/.config/hypr/scripts/WallpaperSelect.sh",
-              "on-click-right": "~/.config/hypr/scripts/Wallpaper.sh",
-              "on-click-middle": "~/.config/hypr/scripts/WaybarStyles.sh",
-              "interval": 86400, // once every day
-              "tooltip": true,
-          },
           "custom/keybinds": {
               "format": "󰺁 HINT!",
               "exec": "echo ; echo  Key Hints SUPER H",
@@ -507,12 +499,6 @@ in {
               "interval": 86400, // once every day
               "tooltip": true,
           },
-          //"custom/keyboard": {
-          //    "exec": "cat ~/.cache/kb_layout",
-          //    "interval": 1,
-          //    "format": " {}",
-          //    "on-click": "~/.config/hypr/scripts/SwitchKeyboardLayout.sh",
-          //},
           "custom/light_dark": {
               "format": "{}",
               "exec": "echo ; echo 󰔎 Dark-Light switcher",
@@ -559,7 +545,7 @@ in {
           "custom/power": {
               "format": "⏻ ",
               "exec": "echo ; echo 󰟡 power // blur",
-              "on-click": "wlogout",
+              "on-click": "${wlogout-sh}",
               "on-click-right": "${change-blur-sh}",
               "interval": 86400, // once every day
               "tooltip": true,
@@ -583,14 +569,6 @@ in {
               "on-click": "sleep 0.1 && swaync-client -t -sw",
               "on-click-right": "swaync-client -d -sw",
               "escape": true,
-          },
-          // NOTE:! This is only for Arch and Arch Based Distros
-          "custom/updater": {
-              "format": " {}",
-              "exec": "checkupdates | wc -l",
-              "exec-if": "[[ $(checkupdates | wc -l) ]]",
-              "interval": 15,
-              "on-click": "kitty -T update paru -Syu || yay -Syu && notify-send 'The system has been updated'",
           },
           "custom/weather": {
               "format": "{}",
@@ -633,133 +611,6 @@ in {
               "format": "   ",
               "interval": "once",
               "tooltip": false
-          },
-          // Modules below are for vertical layout
-          "backlight#vertical": {
-              "interval": 2,
-              "align": 0.35,
-              "rotate": 1,
-              "format": "{icon}",
-              //"format-icons": ["󰃞", "󰃟", "󰃠"],
-              "format-icons": [
-                  "",
-                  "",
-                  "",
-                  "",
-                  "",
-                  "",
-                  "",
-                  "",
-                  "",
-                  "",
-                  "",
-                  "",
-                  "",
-                  "",
-                  ""
-              ],
-              "on-click": "",
-              "on-click-middle": "",
-              "on-click-right": "",
-              "on-update": "",
-              "on-scroll-up": "${brightness-sh} --inc",
-              "on-scroll-down": "${brightness-sh} --dec",
-              "smooth-scrolling-threshold": 1,
-              "tooltip-format": "{percent}%",
-          },
-          "clock#vertical": {
-              "format": "{:\n%H\n%M\n%S\n\n \n%d\n%m\n%y}",
-              "interval": 1,
-              //"format": "{:\n%I\n%M\n%p\n\n \n%d\n%m\n%y}",
-              "tooltip": true,
-              "tooltip-format": "{calendar}",
-              "calendar": {
-                  "mode": "year",
-                  "mode-mon-col": 3,
-                  "format": {
-                      "today": "<span color='#0dbc79'>{}</span>",
-                  }
-              }
-          },
-          "cpu#vertical": {
-              "format": "󰍛\n{usage}%",
-              "interval": 1,
-              "on-click-right": "gnome-system-monitor",
-          },
-          "memory#vertical": {
-              "interval": 10,
-              "format": "󰾆\n{percentage}%",
-              "format-alt": "󰾆\n{used:0.1f}G",
-              "format-alt-click": "click",
-              "tooltip": true,
-              "tooltip-format": "{used:0.1f}GB/{total:0.1f}G",
-              "on-click-right": "kitty --title btop sh -c 'btop'",
-          },
-          "pulseaudio#vertical": {
-              "format": "{icon}",
-              "format-bluetooth": "󰂰",
-              "format-muted": "󰖁",
-              "format-icons": {
-                  "headphone": "",
-                  "hands-free": "",
-                  "headset": "",
-                  "phone": "",
-                  "portable": "",
-                  "car": "",
-                  "default": [
-                      "",
-                      "",
-                      "󰕾",
-                      ""
-                  ],
-                  "tooltip-format": "{icon} {desc} | {volume}%",
-                  "ignored-sinks": [
-                      "Easy Effects Sink"
-                  ],
-              },
-              "scroll-step": 5.0,
-              "on-click": "${volume-sh} --toggle",
-              "on-click-right": "pavucontrol -t 3",
-              "on-scroll-up": "${volume-sh} --inc",
-              "on-scroll-down": "${volume-sh} --dec",
-              "tooltip-format": "{icon} {desc} | {volume}%",
-              "smooth-scrolling-threshold": 1,
-          },
-          "pulseaudio#microphone_vertical": {
-              "format": "{format_source}",
-              "format-source": "󰍬",
-              "format-source-muted": "󰍭",
-              "on-click-right": "pavucontrol",
-              "on-click": "${volume-sh} --toggle-mic",
-              "on-scroll-up": "${volume-sh} --mic-inc",
-              "on-scroll-down": "${volume-sh} --mic-dec",
-              "max-volume": 100,
-              "tooltip": true,
-              "tooltip-format": "{source_desc} | {source_volume}%",
-          },
-          "temperature#vertical": {
-              "interval": 10,
-              "tooltip": true,
-              "hwmon-path": [
-                  "/sys/class/hwmon/hwmon1/temp1_input",
-                  "/sys/class/thermal/thermal_zone0/temp"
-              ],
-              //"thermal-zone": 0,
-              "critical-threshold": 80,
-              "format-critical": "{icon}\n{temperatureC}°C",
-              "format": " {icon}",
-              "format-icons": [
-                  "󰈸"
-              ],
-              "on-click-right": "kitty --title nvtop sh -c 'nvtop'"
-          },
-          "custom/power_vertical": {
-              "format": "⏻",
-              "exec": "echo ; echo 󰟡 power // blur",
-              "on-click": "wlogout",
-              "on-click-right": "~/.config/hypr/scripts/ChangeBlur.sh",
-              "interval": 86400, // once every day
-              "tooltip": true,
           },
       }
     '';

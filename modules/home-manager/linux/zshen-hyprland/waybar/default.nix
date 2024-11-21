@@ -28,6 +28,7 @@ in {
 
     home.packages = with pkgs.unstable; [
       jq
+      pamixer
       blueman
       playerctl
       cava

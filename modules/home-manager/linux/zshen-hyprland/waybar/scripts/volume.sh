@@ -1,4 +1,5 @@
 # Scripts for volume controls for audio and mic
+
 # Get Volume
 get_volume() {
   volume=$(pamixer --get-volume)
