@@ -28,7 +28,8 @@ in {
 
     home.packages = with pkgs.unstable; [
       jq
-      blueman
+      pamixer
+      gnome-system-monitor
       playerctl
       cava
       (writeScriptBin "restart-waybar" ''

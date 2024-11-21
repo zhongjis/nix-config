@@ -14,6 +14,15 @@
     ./gaming.nix
   ];
 
+  # nh
+  programs.nh = {
+    enable = true;
+    package = pkgs.unstable.nh;
+    clean.enable = true;
+    clean.extraArgs = "--keep-since 30d --keep 10";
+    flake = "/home/zshen/personal/nix-config";
+  };
+
   # xremap
   hardware.uinput.enable = true;
   users.groups = {
@@ -22,8 +31,22 @@
   };
 
   # Bootloader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader = {
+    systemd-boot.enable = false;
+    efi = {
+      canTouchEfiVariables = true;
+      efiSysMountPoint = "/boot";
+    };
+
+    grub = {
+      enable = true;
+      device = "nodev";
+      efiSupport = true;
+      useOSProber = false;
+      catppuccin.enable = true;
+      catppuccin.flavor = "mocha";
+    };
+  };
 
   # razer
   hardware.openrazer.enable = true;

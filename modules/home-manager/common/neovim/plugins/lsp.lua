@@ -89,6 +89,7 @@ require("mason-lspconfig").setup({
     "ts_ls",
     "jdtls",
     "pyright",
+    "bashls",
   },
 
   handlers = {

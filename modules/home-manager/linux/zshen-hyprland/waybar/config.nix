@@ -41,6 +41,7 @@
           "modules-right": [
               "group/motherboard",
               "group/connections",
+              "bluetooth",
               "custom/separator#line",
               "tray",
               "mpris",
