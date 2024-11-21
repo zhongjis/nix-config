@@ -29,7 +29,6 @@ in {
     home.packages = with pkgs.unstable; [
       jq
       pamixer
-      blueman
       gnome-system-monitor
       playerctl
       cava

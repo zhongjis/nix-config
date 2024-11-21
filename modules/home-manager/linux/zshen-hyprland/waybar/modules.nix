@@ -1,10 +1,11 @@
 {pkgs, ...}: let
-  cava-sh = pkgs.writeShellScript "hypr-cava.sh" ./scripts/cava_viz.sh;
-  change-blur-sh = pkgs.writeShellScript "hypr-change-blur.sh" ./scripts/change_blur.sh;
-  volume-sh = pkgs.writeShellScript "hypr-volume.sh" ./scripts/volume.sh;
-  keyhints-sh = pkgs.writeShellScript "hypr-keyhints.sh" ./scripts/key_hints.sh;
-  wlogout-sh = pkgs.writeShellScript "hypr-keyhints.sh" ./scripts/wlogout.sh;
-  weather-py = pkgs.writers.writePython3 "hypr-weather.py" {libraries = [pkgs.python3Packages.pyquery];} ./scripts/weather.py;
+  cava-sh = pkgs.writeShellScript "waybar-cava" (builtins.readFile ./scripts/cava_viz.sh);
+  brightness-sh = pkgs.writeShellScript "waybar-brightness" (builtins.readFile ./scripts/brightness.sh);
+  change-blur-sh = pkgs.writeShellScript "waybar-change-blur" (builtins.readFile ./scripts/change_blur.sh);
+  volume-sh = pkgs.writeShellScript "waybar-volume" (builtins.readFile ./scripts/volume.sh);
+  keyhints-sh = pkgs.writeShellScript "waybar-keyhints" (builtins.readFile ./scripts/key_hints.sh);
+  wlogout-sh = pkgs.writeShellScript "waybar-wlogout" (builtins.readFile ./scripts/wlogout.sh);
+  weather-py = pkgs.writers.writePython3 "waybar-weather" {libraries = [pkgs.python3Packages.pyquery];} ./scripts/weather.py;
 in {
   fileText =
     /*

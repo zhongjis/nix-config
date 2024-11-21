@@ -4,7 +4,7 @@
   config,
   ...
 }: let
-  uptime-sh = pkgs.writeShellScript "uptime-nixos.sh" ./scripts/uptime-nixos.sh;
+  uptime-sh = pkgs.writeShellScript "uptime-nixos" (builtins.readFile ./scripts/uptime-nixos.sh);
 in {
   options = {
     hyprland.enable =
