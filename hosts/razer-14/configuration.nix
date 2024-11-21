@@ -23,6 +23,11 @@
     flake = "/home/zshen/personal/nix-config";
   };
 
+  # Bluetooth
+  hardware.bluetooth.enable = true;
+  hardware.bluetooth.powerOnBoot = true;
+  services.blueman.enable = true;
+
   # xremap
   hardware.uinput.enable = true;
   users.groups = {
