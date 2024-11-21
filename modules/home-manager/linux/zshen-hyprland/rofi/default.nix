@@ -12,10 +12,11 @@
   config = lib.mkIf config.rofi.enable {
     programs.rofi = {
       enable = true;
+      catppuccin.enable = true;
+      catppuccin.flavor = "mocha";
 
       package = pkgs.rofi-wayland;
       terminal = "${pkgs.kitty}/bin/kitty";
-      theme = "gruvbox-dark-hard";
     };
 
     home.packages = with pkgs; [
