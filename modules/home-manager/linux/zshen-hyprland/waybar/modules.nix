@@ -1,6 +1,5 @@
 {pkgs, ...}: let
   cava-sh = pkgs.writeShellScript "hypr-cava.sh" ./scripts/cava_viz.sh;
-  brightness-sh = pkgs.writeShellScript "hypr-brightness.sh" ./scripts/brightness.sh;
   change-blur-sh = pkgs.writeShellScript "hypr-change-blur.sh" ./scripts/change_blur.sh;
   volume-sh = pkgs.writeShellScript "hypr-volume.sh" ./scripts/volume.sh;
   keyhints-sh = pkgs.writeShellScript "hypr-keyhints.sh" ./scripts/key_hints.sh;

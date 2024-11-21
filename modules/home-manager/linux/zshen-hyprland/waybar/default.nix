@@ -30,6 +30,7 @@ in {
       jq
       pamixer
       blueman
+      gnome-system-monitor
       playerctl
       cava
       (writeScriptBin "restart-waybar" ''
