@@ -31,18 +31,18 @@ dec_volume() {
 # Toggle Mute
 toggle_mute() {
   if [ "$(pamixer --get-mute)" == "false" ]; then
-    pamixer -m && notify-send -e -u low "Volume Switched OFF"
+    pamixer -m
   elif [ "$(pamixer --get-mute)" == "true" ]; then
-    pamixer -u && notify-send -e -u low "Volume Switched ON"
+    pamixer -u
   fi
 }
 
 # Toggle Mic
 toggle_mic() {
   if [ "$(pamixer --default-source --get-mute)" == "false" ]; then
-    pamixer --default-source -m && notify-send -e -u low "Microphone Switched OFF"
+    pamixer --default-source -m
   elif [ "$(pamixer --default-source --get-mute)" == "true" ]; then
-    pamixer -u --default-source u && notify-send -e -u low "Microphone Switched ON"
+    pamixer -u --default-source u
   fi
 }
 
