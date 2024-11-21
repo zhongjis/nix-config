@@ -128,7 +128,6 @@ in {
       maven
       jdk
 
-      bitwarden-cli
       php
 
       kubectl

@@ -7,8 +7,8 @@
   # You can change versions, add patches, set compilation flags, anything really.
   # https://nixos.wiki/wiki/Overlays
   modifications = final: prev: rec {
-    jdk = prev."jdk${toString 17}";
-    maven = prev.maven.override {inherit jdk;};
+    # jdk = prev."jdk${toString 17}";
+    # maven = prev.maven.override {inherit jdk;};
     vimPlugins =
       prev.vimPlugins
       // {
