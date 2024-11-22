@@ -384,7 +384,8 @@ in {
                   "󰤢",
                   "󰤥",
                   "󰤨"
-              ]
+              ],
+              "on-click": "kitty nmtui"
           },
           "network#speed": {
               "interval": 1,
@@ -405,7 +406,7 @@ in {
                   "󰤥",
                   "󰤨"
               ],
-              "on-click": "nmtui",
+              "on-click": "kitty nmtui"
           },
           "pulseaudio": {
               "format": "{icon} {volume}%",
