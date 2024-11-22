@@ -32,7 +32,7 @@
     lxqt.lxqt-policykit
 
     brightnessctl # brightness control
-    pavucontrol # volume control GUI
+    lxqt.pavucontrol-qt # volume control
 
     wl-clipboard
     cliphist
