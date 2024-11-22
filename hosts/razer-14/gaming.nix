@@ -1,5 +1,6 @@
 {
   pkgs,
+  config,
   lib,
   ...
 }: {
@@ -14,6 +15,7 @@
     modesetting.enable = true;
     open = false;
     nvidiaSettings = true;
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
     prime = {
       offload = {
         enable = true;
@@ -24,18 +26,6 @@
       nvidiaBusId = "PCI:1:0:0";
     };
   };
-
-  # specialisation = {
-  #   gaming-time.configuration = {
-  #     hardware.nvidia = {
-  #       prime.sync.enable = lib.mkForce true;
-  #       prime.offload = {
-  #         enable = lib.mkForce false;
-  #         enableOffloadCmd = lib.mkForce false;
-  #       };
-  #     };
-  #   };
-  # };
 
   programs.steam = {
     enable = true;
