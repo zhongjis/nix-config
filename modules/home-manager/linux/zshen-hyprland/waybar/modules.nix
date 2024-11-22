@@ -404,7 +404,8 @@ in {
                   "󰤢",
                   "󰤥",
                   "󰤨"
-              ]
+              ],
+              "on-click": "nmtui",
           },
           "pulseaudio": {
               "format": "{icon} {volume}%",
@@ -577,7 +578,6 @@ in {
               "interval": 3600,
               "return-type": "json",
               "exec": "${weather-py}",
-              //"exec": "~/.config/hypr/UserScripts/Weather.py",
               "exec-if": "ping wttr.in -c1",
               "tooltip": true,
           },

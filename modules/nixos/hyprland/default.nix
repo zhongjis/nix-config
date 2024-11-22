@@ -42,9 +42,17 @@
 
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
-  xdg.portal.enable = true;
-  xdg.portal.extraPortals = [pkgs.xdg-desktop-portal-gtk];
-  xdg.portal.config.common.default = "*";
+  xdg.portal = {
+    enable = true;
+    wlr.enable = false;
+    extraPortals = [
+      pkgs.xdg-desktop-portal-gtk
+    ];
+    configPackages = [
+      pkgs.xdg-desktop-portal-gtk
+      pkgs.xdg-desktop-portal
+    ];
+  };
 
   # NOTE: if game has issue
   # hardware.opengl = {
