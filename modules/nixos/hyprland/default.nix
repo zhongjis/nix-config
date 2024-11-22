@@ -28,10 +28,8 @@
   };
 
   environment.systemPackages = with pkgs; [
-    dunst
-    lxqt.lxqt-policykit
-
     brightnessctl # brightness control
+    lxqt.lxqt-policykit
     lxqt.pavucontrol-qt # volume control
 
     wl-clipboard
