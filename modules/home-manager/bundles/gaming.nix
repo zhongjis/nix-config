@@ -29,14 +29,4 @@
 
     steamtinkerlaunch
   ];
-
-  myHomeManager.impermanence.cache.directories = [
-    ".local/share/Steam"
-    ".local/share/bottles"
-    ".config/r2modmanPlus-local"
-
-    "Games"
-
-    ".config/heroic"
-  ];
 }

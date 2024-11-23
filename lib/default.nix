@@ -134,7 +134,13 @@ in rec {
   # ========================== Extenders =========================== #
 
   # Evaluates nixos/home-manager module and extends it's options / config
-  extendModule = {path, ...} @ args: {pkgs, ...} @ margs: let
+  extendModule = {path, ...} @ args: {
+    pkgs,
+    currentSystem,
+    currentSystemName,
+    isDarwin,
+    ...
+  } @ margs: let
     eval =
       if (builtins.isString path) || (builtins.isPath path)
       then import path margs
