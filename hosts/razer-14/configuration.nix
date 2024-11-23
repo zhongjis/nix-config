@@ -1,17 +1,13 @@
 {
-  config,
   pkgs,
-  lib,
   inputs,
-  outputs,
   currentSystem,
-  myLib,
   ...
 }: {
   imports = [
     ./hardware-configuration.nix
     ../common.nix
-    ./gaming.nix
+    ./nvidia.nix
   ];
 
   myNixOS = {
