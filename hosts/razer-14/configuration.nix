@@ -16,6 +16,8 @@
 
   myNixOS = {
     hyprland.enable = true;
+    sddm.enable = true;
+    power-management = true;
   };
 
   # nh

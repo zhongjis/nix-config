@@ -5,14 +5,6 @@
 }: {
   services.xserver.enable = true;
 
-  services.displayManager.sddm = {
-    enable = true;
-    package = pkgs.kdePackages.sddm;
-    wayland.enable = true;
-    catppuccin.enable = true;
-    catppuccin.flavor = "mocha";
-  };
-
   programs.uwsm = {
     enable = true;
     waylandCompositors.hyprland = {
