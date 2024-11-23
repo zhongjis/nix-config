@@ -17,16 +17,8 @@
   myNixOS = {
     hyprland.enable = true;
     sddm.enable = true;
-    power-management = true;
-  };
-
-  # nh
-  programs.nh = {
-    enable = true;
-    package = pkgs.unstable.nh;
-    clean.enable = true;
-    clean.extraArgs = "--keep-since 30d --keep 10";
-    flake = "/home/zshen/personal/nix-config";
+    power-management.enable = true;
+    nh.enable = true;
   };
 
   # Bluetooth
@@ -58,9 +50,6 @@
       catppuccin.flavor = "mocha";
     };
   };
-
-  # razer
-  hardware.openrazer.enable = true;
 
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -99,7 +88,12 @@
   };
 
   # Enable CUPS to print documents.
-  services.printing.enable = true;
+  services = {
+    hardware.openrgb.enable = true;
+    flatpak.enable = true;
+    udisks2.enable = true;
+    printing.enable = true;
+  };
 
   # Enable sound.
   security.rtkit.enable = true;
@@ -127,9 +121,11 @@
   };
 
   # better power consumption
-  services.thermald.enable = true;
+  # services.thermald.enable = true;
   # services.tlp.enable = true;
-  services.power-profiles-daemon.enable = true;
+  # services.power-profiles-daemon.enable = true;
+
+  hardware.cpu.amd.updateMicrocode = true;
 
   environment.systemPackages = with pkgs; [
     neovim
