@@ -11,16 +11,12 @@
   ];
 
   myNixOS = {
+    bundles.general-desktop.enable = true;
     hyprland.enable = true;
     sddm.enable = true;
     power-management.enable = true;
     nh.enable = true;
   };
-
-  # Bluetooth
-  hardware.bluetooth.enable = true;
-  hardware.bluetooth.powerOnBoot = true;
-  services.blueman.enable = true;
 
   # xremap
   hardware.uinput.enable = true;
@@ -52,24 +48,6 @@
   networking.hostName = "nixos"; # Define your hostname.
   networking.networkmanager.enable = true;
 
-  # TimeZone
-  time.timeZone = "America/Denver";
-
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
-
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_US.UTF-8";
-    LC_IDENTIFICATION = "en_US.UTF-8";
-    LC_MEASUREMENT = "en_US.UTF-8";
-    LC_MONETARY = "en_US.UTF-8";
-    LC_NAME = "en_US.UTF-8";
-    LC_NUMERIC = "en_US.UTF-8";
-    LC_PAPER = "en_US.UTF-8";
-    LC_TELEPHONE = "en_US.UTF-8";
-    LC_TIME = "en_US.UTF-8";
-  };
-
   # ZRAM
   zramSwap = {
     enable = true;
@@ -88,17 +66,6 @@
     flatpak.enable = true;
     udisks2.enable = true;
     printing.enable = true;
-  };
-
-  # Enable sound.
-  security.rtkit.enable = true;
-  # Enable pipewire for screen sharing sound
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-    jack.enable = true;
   };
 
   # Enable touchpad support (enabled default in most desktopManager).

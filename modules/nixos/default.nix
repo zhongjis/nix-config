@@ -18,17 +18,17 @@
     })
     (myLib.filesIn ./features);
 
-  # Taking all modules in ./bundles and adding enables to them
+  # Taking all module bundles in ./bundles and adding bundle.enables to them
   bundles =
     myLib.extendModules
     (name: {
       extraOptions = {
-        myNixOS.${name}.enable = lib.mkEnableOption "enable my ${name} configuration";
+        myNixOS.bundles.${name}.enable = lib.mkEnableOption "enable ${name} module bundle";
       };
 
-      configExtension = config: (lib.mkIf cfg.${name}.enable config);
+      configExtension = config: (lib.mkIf cfg.bundles.${name}.enable config);
     })
-    (myLib.filesIn ./features);
+    (myLib.filesIn ./bundles);
 in {
   imports =
     []
