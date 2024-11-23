@@ -29,7 +29,7 @@ in rec {
       if isDarwin
       then inputs.nix-darwin.lib.darwinSystem
       else nixpkgs.lib.nixosSystem;
-    hardwareModule =
+    hardwareConfiguration =
       if hardware != ""
       then inputs.nixos-hardware.nixosModules.${hardware}
       else {};
@@ -49,7 +49,10 @@ in rec {
       };
 
       modules = [
+        hostConfiguration
+        hardwareConfiguration
         outputs.nixosModules.default
+
         {
           nixpkgs = {
             overlays = [
@@ -64,8 +67,6 @@ in rec {
           };
         }
 
-        hostConfiguration
-        hardwareModule
         catppuccinModule
         nhDarwinModule
 
@@ -101,7 +102,7 @@ in rec {
   in
     inputs.home-manager.lib.homeManagerConfiguration {
       pkgs = pkgsWithOverlay;
-      extraSpecialArgs = {inherit inputs;};
+      extraSpecialArgs = {inherit inputs outputs myLib;};
 
       modules = [
         homeConfiguration
