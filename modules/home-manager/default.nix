@@ -3,6 +3,7 @@
   isDarwin,
   config,
   myLib,
+  currentSystemName,
   ...
 }: let
   cfg = config.myHomeManager;
@@ -39,16 +40,14 @@ in {
     ++ features
     ++ bundles;
 
-  linux-hm-modules.enable =
-    if isDarwin
-    then lib.mkDefault false
-    else lib.mkDefault true;
-  darwin-hm-modules.enable =
-    if isDarwin
-    then lib.mkDefault true
-    else lib.mkDefault false;
-
   xdg.enable = true;
+
+  nixpkgs = {
+    config = {
+      allowUnfree = true;
+      experimental-features = "nix-command flakes";
+    };
+  };
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;

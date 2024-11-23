@@ -5,6 +5,7 @@
 
   myHomeManager = {
     bundles.general.enable = true;
+    bundles.linux.enable = true;
   };
 
   # override common module options
