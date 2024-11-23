@@ -1,13 +1,40 @@
-{lib, ...}: {
-  imports = [
-    ./skhd
-    ./yabai
-    ./sketchybar
-    ./aerospace
-  ];
+{
+  lib,
+  config,
+  myLib,
+  ...
+}: let
+  cfg = config.myNixDawin;
 
-  skhd.enable = lib.mkDefault false;
-  yabai.enable = lib.mkDefault false;
-  aerospace.enable = lib.mkDefault false;
-  sketchybar.enable = lib.mkDefault false;
+  # Taking all modules in ./features and adding enables to them
+  features =
+    myLib.extendModules
+    (name: {
+      extraOptions = {
+        myNixOS.${name}.enable = lib.mkEnableOption "enable my ${name} configuration";
+      };
+
+      configExtension = config: (lib.mkIf cfg.${name}.enable config);
+    })
+    (myLib.filesIn ./features);
+
+  # Taking all module bundles in ./bundles and adding bundle.enables to them
+  bundles =
+    myLib.extendModules
+    (name: {
+      extraOptions = {
+        myNixOS.bundles.${name}.enable = lib.mkEnableOption "enable ${name} module bundle";
+      };
+
+      configExtension = config: (lib.mkIf cfg.bundles.${name}.enable config);
+    })
+    (myLib.filesIn ./bundles);
+in {
+  imports =
+    []
+    ++ features
+    ++ bundles;
+  # ++ services;
+
+  nix.settings.experimental-features = "nix-command flakes";
 }
