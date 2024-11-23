@@ -6,6 +6,7 @@
   myHomeManager = {
     bundles.general.enable = true;
     bundles.linux.enable = true;
+    bundles.gaming.enable = false;
   };
 
   # override common module options

@@ -98,10 +98,6 @@ in rec {
         overlays.modifications
         overlays.unstable-packages
       ];
-      config = {
-        allowUnfree = true;
-        allowUnfreePredicate = _: true;
-      };
     };
   in
     inputs.home-manager.lib.homeManagerConfiguration {

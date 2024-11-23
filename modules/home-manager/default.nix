@@ -2,8 +2,6 @@
   lib,
   config,
   myLib,
-  isDarwin,
-  currentSystemName,
   ...
 }: let
   cfg = config.myHomeManager;
