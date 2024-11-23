@@ -33,10 +33,7 @@
     (myLib.filesIn ./bundles);
 in {
   imports =
-    [
-      ./linux
-      ./darwin
-    ]
+    []
     ++ features
     ++ bundles;
 
