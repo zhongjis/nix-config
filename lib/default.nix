@@ -4,7 +4,7 @@
   overlays,
   ...
 }: let
-  myLib = (import ./default.nix) {inherit inputs;};
+  myLib = (import ./default.nix) {inherit inputs nixpkgs overlays;};
   outputs = inputs.self.outputs;
 in rec {
   # ================================================================ #

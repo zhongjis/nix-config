@@ -1,18 +1,22 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
 {
   config,
   pkgs,
+  lib,
   inputs,
+  outputs,
+  currentSystem,
+  myLib,
   ...
 }: {
   imports = [
-    ../../modules/nixos/hyprland
     ./hardware-configuration.nix
     ../common.nix
     ./gaming.nix
   ];
+
+  myNixOS = {
+    hyprland.enable = true;
+  };
 
   # nh
   programs.nh = {
@@ -131,10 +135,8 @@
     openrazer-daemon
     polychromatic
     firefox
-    inputs.zen-browser.packages."${system}".specific
+    inputs.zen-browser.packages."${currentSystem}".specific
   ];
-
-  nix.settings.experimental-features = ["nix-command" "flakes"];
 
   system.stateVersion = "24.05"; # Did you read the comment?
 }
