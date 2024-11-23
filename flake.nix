@@ -69,19 +69,21 @@
         };
       };
 
-      homeConfigurations."zshen-mac" = mkHome "mac-m1-max" {
-        system = "aarch64-darwin";
-        darwin = true;
+      homeConfigurations = {
+        zshen-mac = mkHome "mac-m1-max" {
+          system = "aarch64-darwin";
+          darwin = true;
+        };
+        zshen-linux = mkHome "thinkpad-t480" {
+          system = "x86_64-linux";
+          darwin = false;
+        };
+        zshen-razer = mkHome "razer-14" {
+          system = "x86_64-linux";
+          darwin = false;
+        };
       };
 
-      homeConfigurations."zshen-linux" = mkHome "thinkpad-t480" {
-        system = "x86_64-linux";
-        darwin = false;
-      };
-
-      homeConfigurations."zshen-razer" = mkHome "razer-14" {
-        system = "x86_64-linux";
-        darwin = false;
-      };
+      nixosModules.default = ./modules/nixos;
     };
 }

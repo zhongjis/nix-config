@@ -44,9 +44,12 @@ in rec {
   in
     systemFunc {
       system = system;
-      specialArgs = {inherit inputs;};
+      specialArgs = {
+        inherit inputs outputs myLib;
+      };
 
       modules = [
+        outputs.nixosModules.default
         {
           nixpkgs = {
             overlays = [
