@@ -9,7 +9,7 @@
   imports = [
     ./hardware-configuration.nix
     ../common.nix
-    ../../modules/nixos/gaming.nix
+    ./gaming.nix
   ];
 
   # xremap
