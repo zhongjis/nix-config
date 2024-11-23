@@ -1,8 +1,4 @@
-{
-  inputs,
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   services.xserver.enable = true;
 
   programs.uwsm = {
@@ -26,8 +22,6 @@
 
     wl-clipboard
     cliphist
-
-    dolphin
   ];
 
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
@@ -42,18 +36,5 @@
       pkgs.xdg-desktop-portal-gtk
       pkgs.xdg-desktop-portal
     ];
-  };
-
-  # NOTE: if game has issue
-  # hardware.opengl = {
-  #   package = pkgs.unstable.mesa.drivers;
-  #   # if you also want 32-bit support (e.g for Steam)
-  #   driSupport32Bit = true;
-  #   package32 = pkgs.unstable.pkgsi686Linux.mesa.drivers;
-  # };
-
-  nix.settings = {
-    substituters = ["https://hyprland.cachix.org"];
-    trusted-public-keys = ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
   };
 }

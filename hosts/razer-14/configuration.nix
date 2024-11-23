@@ -7,15 +7,12 @@
   imports = [
     ./hardware-configuration.nix
     ../common.nix
-    ./nvidia.nix
   ];
 
   myNixOS = {
     bundles.general-desktop.enable = true;
-    hyprland.enable = true;
-    sddm.enable = true;
-    power-management.enable = true;
-    nh.enable = true;
+    bundles.hyprland-wm.enable = true;
+    services.nvidia.enable = true;
   };
 
   # xremap
@@ -82,10 +79,10 @@
     shell = pkgs.zsh;
   };
 
-  # better power consumption
-  # services.thermald.enable = true;
-  # services.tlp.enable = true;
-  # services.power-profiles-daemon.enable = true;
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
+  };
 
   hardware.cpu.amd.updateMicrocode = true;
 

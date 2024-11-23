@@ -1,9 +1,9 @@
-{
-  pkgs,
-  lib,
-  ...
-}: {
-  # Time ZOne
+{pkgs, ...}: {
+  myNixOS.nh.enable = true;
+  myNixOS.power-management.enable = true;
+  myNixOS.cachix.enable = true;
+
+  # Time Zone
   time.timeZone = "America/Denver";
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
@@ -55,15 +55,8 @@
 
   hardware = {
     enableAllFirmware = true;
-
     bluetooth.enable = true;
     bluetooth.powerOnBoot = true;
-
-    opengl = {
-      enable = true;
-      driSupport32Bit = true;
-      # driSupport = true;
-    };
   };
   services.blueman.enable = true;
 

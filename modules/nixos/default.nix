@@ -29,12 +29,24 @@
       configExtension = config: (lib.mkIf cfg.bundles.${name}.enable config);
     })
     (myLib.filesIn ./bundles);
+
+  # Taking all module services in ./services and adding services.enables to them
+  services =
+    myLib.extendModules
+    (name: {
+      extraOptions = {
+        myNixOS.services.${name}.enable = lib.mkEnableOption "enable ${name} service";
+      };
+
+      configExtension = config: (lib.mkIf cfg.services.${name}.enable config);
+    })
+    (myLib.filesIn ./services);
 in {
   imports =
     []
     ++ features
-    ++ bundles;
-  # ++ services;
+    ++ bundles
+    ++ services;
 
   config = {
     nix.settings.experimental-features = ["nix-command" "flakes"];
