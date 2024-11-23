@@ -46,45 +46,42 @@
   };
   outputs = {nixpkgs, ...} @ inputs: let
     overlays = import ./overlays {inherit inputs;};
+    myLib = import ./lib/default.nix {inherit overlays nixpkgs inputs;};
+  in
+    with myLib; {
+      nixosConfigurations = {
+        thinkpad-t480 = mkSystem "thinkpad-t480" {
+          system = "x86_64-linux";
+          user = "zshen";
+          hardware = "lenovo-thinkpad-t480";
+        };
+        razer-14 = mkSystem "razer-14" {
+          system = "x86_64-linux";
+          user = "zshen";
+        };
+      };
 
-    mkSystem = import ./lib/mksystem.nix {
-      inherit overlays nixpkgs inputs;
-    };
+      darwinConfigurations = {
+        mac-m1-max = mkSystem "mac-m1-max" {
+          system = "aarch64-darwin";
+          user = "zshen";
+          darwin = true;
+        };
+      };
 
-    mkHomeManager = import ./lib/mkhomemanager.nix {
-      inherit overlays nixpkgs inputs;
-    };
-  in {
-    nixosConfigurations.thinkpad-t480 = mkSystem "thinkpad-t480" {
-      system = "x86_64-linux";
-      user = "zshen";
-      hardware = "lenovo-thinkpad-t480";
-    };
+      homeConfigurations."zshen-mac" = mkHome "mac-m1-max" {
+        system = "aarch64-darwin";
+        darwin = true;
+      };
 
-    nixosConfigurations.razer-14 = mkSystem "razer-14" {
-      system = "x86_64-linux";
-      user = "zshen";
-    };
+      homeConfigurations."zshen-linux" = mkHome "thinkpad-t480" {
+        system = "x86_64-linux";
+        darwin = false;
+      };
 
-    darwinConfigurations.mac-m1-max = mkSystem "mac-m1-max" {
-      system = "aarch64-darwin";
-      user = "zshen";
-      darwin = true;
+      homeConfigurations."zshen-razer" = mkHome "razer-14" {
+        system = "x86_64-linux";
+        darwin = false;
+      };
     };
-
-    homeConfigurations."zshen-mac" = mkHomeManager "mac-m1-max" {
-      system = "aarch64-darwin";
-      darwin = true;
-    };
-
-    homeConfigurations."zshen-linux" = mkHomeManager "thinkpad-t480" {
-      system = "x86_64-linux";
-      darwin = false;
-    };
-
-    homeConfigurations."zshen-razer" = mkHomeManager "razer-14" {
-      system = "x86_64-linux";
-      darwin = false;
-    };
-  };
 }
