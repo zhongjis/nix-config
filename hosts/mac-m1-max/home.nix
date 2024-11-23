@@ -5,6 +5,7 @@
 }: {
   myHomeManager = {
     bundles.general.enable = true;
+    bundles.darwin.enable = true;
   };
 
   home.username = "zshen";
