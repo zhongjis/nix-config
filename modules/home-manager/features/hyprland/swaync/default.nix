@@ -1,23 +1,12 @@
-{
-  lib,
-  config,
-  ...
-}: {
-  options = {
-    swaync.enable =
-      lib.mkEnableOption "enable sway notification center";
-  };
+{lib, ...}: {
+  xdg.configFile."swaync/icons".source = ./icons;
+  xdg.configFile."swaync/images".source = ./images;
 
-  config = lib.mkIf config.swaync.enable {
-    xdg.configFile."swaync/icons".source = ./icons;
-    xdg.configFile."swaync/images".source = ./images;
-
-    services.swaync = {
-      enable = true;
-      settings = lib.importJSON ./config.json;
-      style = ''
-        ${builtins.readFile ./style.css}
-      '';
-    };
+  services.swaync = {
+    enable = true;
+    settings = lib.importJSON ./config.json;
+    style = ''
+      ${builtins.readFile ./style.css}
+    '';
   };
 }
