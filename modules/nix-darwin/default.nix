@@ -4,14 +4,14 @@
   myLib,
   ...
 }: let
-  cfg = config.myNixDawin;
+  cfg = config.myNixDarwin;
 
   # Taking all modules in ./features and adding enables to them
   features =
     myLib.extendModules
     (name: {
       extraOptions = {
-        myNixOS.${name}.enable = lib.mkEnableOption "enable my ${name} configuration";
+        myNixDarwin.${name}.enable = lib.mkEnableOption "enable my ${name} configuration";
       };
 
       configExtension = config: (lib.mkIf cfg.${name}.enable config);
@@ -23,7 +23,7 @@
     myLib.extendModules
     (name: {
       extraOptions = {
-        myNixOS.bundles.${name}.enable = lib.mkEnableOption "enable ${name} module bundle";
+        myNixDarwin.bundles.${name}.enable = lib.mkEnableOption "enable ${name} module bundle";
       };
 
       configExtension = config: (lib.mkIf cfg.bundles.${name}.enable config);

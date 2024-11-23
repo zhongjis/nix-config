@@ -4,6 +4,7 @@
   ...
 }: {
   myNixDarwin.aerospace.enable = lib.mkDefault true;
+  myNixDarwin.nh.enable = lib.mkDefault true;
 
   homebrew = {
     enable = true;

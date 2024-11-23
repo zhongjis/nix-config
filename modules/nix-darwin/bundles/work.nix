@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{pkgs, ...}: let
+  unstable_pkgs = with pkgs.unstable; [
+    # placeholder
+  ];
+in {
   environment.systemPackages = with pkgs;
     [
       mongosh
