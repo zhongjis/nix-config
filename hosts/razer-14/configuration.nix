@@ -63,7 +63,7 @@
   networking.networkmanager.enable = true;
 
   # Set your time zone.
-  services.automatic-timezoned.enable = true;
+  time.timeZone = "America/Denver";
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
