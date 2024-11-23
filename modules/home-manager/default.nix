@@ -1,8 +1,8 @@
 {
   lib,
-  isDarwin,
   config,
   myLib,
+  isDarwin,
   currentSystemName,
   ...
 }: let
