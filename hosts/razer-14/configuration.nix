@@ -36,6 +36,7 @@
   # Bootloader.
   boot.loader = {
     systemd-boot.enable = false;
+
     efi = {
       canTouchEfiVariables = true;
       efiSysMountPoint = "/boot";
@@ -45,19 +46,17 @@
       enable = true;
       device = "nodev";
       efiSupport = true;
-      useOSProber = false;
+      useOSProber = true;
       catppuccin.enable = true;
       catppuccin.flavor = "mocha";
     };
   };
 
+  # Network
   networking.hostName = "nixos"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-  # Enable networking
   networking.networkmanager.enable = true;
 
-  # Set your time zone.
+  # TimeZone
   time.timeZone = "America/Denver";
 
   # Select internationalisation properties.
