@@ -17,7 +17,10 @@ in {
     shellIntegration.enableZshIntegration = true;
 
     settings = {
+      enable_audio_bell = "no";
       confirm_os_window_close = "0";
+
+      cursor_text_color = "background";
 
       font_family = "FiraCode Nerd Font Propo";
       bold_font = "auto";

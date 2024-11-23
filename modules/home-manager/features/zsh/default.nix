@@ -50,42 +50,4 @@ in {
       bindkey -v
     '';
   };
-
-  programs.starship = {
-    enable = true;
-    catppuccin.enable = true;
-    catppuccin.flavor = "mocha";
-
-    enableZshIntegration = true;
-
-    settings = {
-    };
-  };
-
-  programs.bat = {
-    enable = true;
-    catppuccin.enable = true;
-    catppuccin.flavor = "mocha";
-  };
-
-  programs.carapace = {
-    enable = true;
-    enableZshIntegration = true;
-  };
-
-  programs.eza = {
-    enable = true;
-    enableZshIntegration = true;
-    git = true;
-    icons = "auto";
-    extraOptions = [
-      "--group-directories-first"
-      "--long"
-      "--no-user"
-    ];
-  };
-
-  home.packages = with pkgs; [
-    autojump
-  ];
 }
