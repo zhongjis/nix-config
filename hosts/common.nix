@@ -1,6 +1,5 @@
 {
   pkgs,
-  isDarwin,
   inputs,
   ...
 }: let

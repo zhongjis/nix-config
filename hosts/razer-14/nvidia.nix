@@ -1,7 +1,6 @@
 {
   pkgs,
   config,
-  lib,
   ...
 }: {
   hardware.graphics = {
@@ -32,7 +31,6 @@
   };
 
   environment.systemPackages = with pkgs; [
-    nvidia-offload
     pciutils
   ];
 }
