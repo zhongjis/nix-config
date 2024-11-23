@@ -1,9 +1,6 @@
 {
-  pkgs,
   config,
   lib,
-  inputs,
-  outputs,
   myLib,
   ...
 }: let
@@ -22,7 +19,8 @@
     (myLib.filesIn ./features);
 in {
   imports =
-    features;
+    []
+    ++ features;
   # ++ bundles
   # ++ services;
 

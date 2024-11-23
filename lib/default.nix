@@ -41,6 +41,10 @@ in rec {
       if isDarwin
       then inputs.nh_darwin.nixDarwinModules.prebuiltin
       else {};
+    systemModules =
+      if isDarwin
+      then outputs.nixDarwinModules.default
+      else outputs.nixosModules.default;
   in
     systemFunc {
       system = system;
@@ -51,7 +55,7 @@ in rec {
       modules = [
         hostConfiguration
         hardwareConfiguration
-        outputs.nixosModules.default
+        systemModules
 
         {
           nixpkgs = {
@@ -107,6 +111,7 @@ in rec {
       modules = [
         homeConfiguration
         inputs.catppuccin.homeManagerModules.catppuccin
+        outputs.homeManagerModules.default
 
         {
           config._module.args = {

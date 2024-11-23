@@ -85,5 +85,7 @@
       };
 
       nixosModules.default = ./modules/nixos;
+      nixDarwinModules.default = ./modules/nix-darwin;
+      homeManagerModules.default = ./modules/home-manager;
     };
 }

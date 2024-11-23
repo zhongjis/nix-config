@@ -1,13 +1,11 @@
-{
-  config,
-  pkgs,
-  lib,
-  inputs,
-  ...
-}: {
+{pkgs, ...}: {
   imports = [
     ../../modules/home-manager
   ];
+
+  myHomeManager = {
+    bundles.general.enable = true;
+  };
 
   # override common module options
   git.enable = true;
@@ -19,7 +17,6 @@
   home.stateVersion = "23.11"; # Please read the comment before changing.
 
   home.packages = with pkgs; [
-    bitwarden
   ];
 
   home.file = {};
