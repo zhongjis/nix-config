@@ -108,7 +108,7 @@
   users.users.zshen = {
     isNormalUser = true;
     description = "Jason";
-    extraGroups = ["networkmanager" "wheel" "openrazer"];
+    extraGroups = ["networkmanager" "wheel"];
     packages = with pkgs; [
       kdePackages.kate
     ];
@@ -125,7 +125,6 @@
   environment.systemPackages = with pkgs; [
     neovim
     git
-    openrazer-daemon
     polychromatic
     firefox
     inputs.zen-browser.packages."${currentSystem}".specific
