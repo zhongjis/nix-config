@@ -128,7 +128,6 @@
   environment.systemPackages = with pkgs; [
     neovim
     git
-    nh
     openrazer-daemon
     polychromatic
     firefox
