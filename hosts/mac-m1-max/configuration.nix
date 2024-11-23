@@ -63,8 +63,6 @@ in {
   # NOTE: need to allow full diskaccess for terminal emulator for the following
   system.defaults.universalaccess.reduceMotion = true;
 
-  # TODO: need to emulate shortcuts for mission control, including all swtich desktops
-
   homebrew = {
     enable = true;
     onActivation = {
