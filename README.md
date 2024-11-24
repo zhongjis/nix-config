@@ -66,7 +66,7 @@ NOTE: most of the changes (like for neovim) are changed on the way while im usin
 
 ### Global
 
-- [x] set global packages
+- [ ] set global packages
 
 ### starship
 
@@ -74,7 +74,7 @@ NOTE: most of the changes (like for neovim) are changed on the way while im usin
 
 ### bat
 
-- [x] syntax highlighting error when apply home-manager config
+- [ ] syntax highlighting error when apply home-manager config
 - [ ] make it simple with just syntax highlighting
 
 ### zsh
@@ -83,22 +83,20 @@ NOTE: most of the changes (like for neovim) are changed on the way while im usin
 
 ### neovim
 
-- [-] markdown lint
+- [ ] markdown lint
 - [ ] verify luasnippet is working correctly
 
 ## nixos
 
 ### waybar
 
-- [-] copy sketchybar style to waybar
+- [ ] copy sketchybar style to waybar
 
 ### gaming
 
-- [x] create/copy a nvidia module setup
+- [ ] create/copy a nvidia module setup
 
 ## nix-darwin
 
-- [x] docker is not working directly downloaded from nixpkgs. seems relate to docker-daemon is not running. right now is using brew to manage it
-- [-] aerospace and sketchybar integration not working
-
-## stylix
+- [ ] docker is not working directly downloaded from nixpkgs. seems relate to docker-daemon is not running. right now is using brew to manage it
+- [ ] aerospace and sketchybar integration not working

@@ -43,57 +43,48 @@
     };
 
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
-
-    # https://github.com/niksingh710/minimal-tmux-status/
-    minimal-tmux = {
-      url = "github:niksingh710/minimal-tmux-status";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
   outputs = {nixpkgs, ...} @ inputs: let
     overlays = import ./overlays {inherit inputs;};
-    myLib = import ./lib/default.nix {inherit overlays nixpkgs inputs;};
-  in
-    with myLib; {
-      nixosConfigurations = {
-        thinkpad-t480 = mkSystem "thinkpad-t480" {
-          system = "x86_64-linux";
-          user = "zshen";
-          hardware = "lenovo-thinkpad-t480";
-        };
-        razer-14 = mkSystem "razer-14" {
-          system = "x86_64-linux";
-          user = "zshen";
-        };
-      };
 
-      darwinConfigurations = {
-        mac-m1-max = mkSystem "mac-m1-max" {
-          system = "aarch64-darwin";
-          user = "zshen";
-          darwin = true;
-        };
-      };
-
-      homeConfigurations = {
-        zshen-mac = mkHome "mac-m1-max" {
-          system = "aarch64-darwin";
-          darwin = true;
-        };
-        zshen-linux = mkHome "thinkpad-t480" {
-          system = "x86_64-linux";
-          darwin = false;
-        };
-        zshen-razer = mkHome "razer-14" {
-          system = "x86_64-linux";
-          darwin = false;
-        };
-      };
-
-      nixosModules.default = ./modules/nixos;
-      nixDarwinModules.default = ./modules/nix-darwin;
-      homeManagerModules.default = ./modules/home-manager;
-      homeManagerModules.linux = ./modules/home-manager-linux;
-      homeManagerModules.darwin = ./modules/home-manager-darwin;
+    mkSystem = import ./lib/mksystem.nix {
+      inherit overlays nixpkgs inputs;
     };
+
+    mkHomeManager = import ./lib/mkhomemanager.nix {
+      inherit overlays nixpkgs inputs;
+    };
+  in {
+    nixosConfigurations.thinkpad-t480 = mkSystem "thinkpad-t480" {
+      system = "x86_64-linux";
+      user = "zshen";
+      hardware = "lenovo-thinkpad-t480";
+    };
+
+    nixosConfigurations.razer-14 = mkSystem "razer-14" {
+      system = "x86_64-linux";
+      user = "zshen";
+    };
+
+    darwinConfigurations.mac-m1-max = mkSystem "mac-m1-max" {
+      system = "aarch64-darwin";
+      user = "zshen";
+      darwin = true;
+    };
+
+    homeConfigurations."zshen-mac" = mkHomeManager "mac-m1-max" {
+      system = "aarch64-darwin";
+      darwin = true;
+    };
+
+    homeConfigurations."zshen-linux" = mkHomeManager "thinkpad-t480" {
+      system = "x86_64-linux";
+      darwin = false;
+    };
+
+    homeConfigurations."zshen-razer" = mkHomeManager "razer-14" {
+      system = "x86_64-linux";
+      darwin = false;
+    };
+  };
 }
