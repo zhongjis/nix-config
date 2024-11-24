@@ -5,6 +5,7 @@
   ...
 }: {
   services.xserver.videoDrivers = ["nvidia"];
+  boot.kernelParams = ["nvidia.NVreg_PreserveVideoMemoryAllocations=1"];
 
   hardware.nvidia = {
     modesetting.enable = true;
@@ -12,7 +13,7 @@
     nvidiaSettings = true;
     package = config.boot.kernelPackages.nvidiaPackages.stable;
 
-    powerManagement.enable = false;
+    powerManagement.enable = true;
     powerManagement.finegrained = false;
 
     prime = {
