@@ -1,6 +1,6 @@
 {pkgs, ...}: {
-  myHomeManager = {
-    bundles.general.enable = true;
+  myHomeManager.bundles.general.enable = true;
+  myHomeManagerLinux = {
     bundles.linux.enable = true;
     bundles.gaming.enable = true;
   };

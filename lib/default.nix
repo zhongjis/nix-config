@@ -103,6 +103,11 @@ in rec {
     currentSystem = system;
     currentSystemName = systemName;
     isDarwin = darwin;
+
+    systemSpecificHomeManagerModules =
+      if isDarwin
+      then outputs.homeManagerModules.darwin
+      else outputs.homeManagerModules.linux;
   in
     inputs.home-manager.lib.homeManagerConfiguration {
       pkgs = pkgsWithOverlay;
@@ -121,6 +126,12 @@ in rec {
         homeConfiguration
         inputs.catppuccin.homeManagerModules.catppuccin
         outputs.homeManagerModules.default
+        # systemSpecificHomeManagerModules
+        (
+          if isDarwin
+          then outputs.homeManagerModules.darwin
+          else outputs.homeManagerModules.linux
+        )
       ];
     };
 
