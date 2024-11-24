@@ -1,4 +1,8 @@
-{pkgs, ...}: let
+{
+  pkgs,
+  config,
+  ...
+}: let
   uptime-sh = pkgs.writeShellScript "uptime-nixos" (builtins.readFile ./scripts/uptime-nixos.sh);
 in {
   # hyprland
@@ -131,6 +135,16 @@ in {
           on-timeout = "loginctl lock-session"; # command to run when timeout has passed
         }
       ];
+    };
+  };
+
+  xdg.configFile."wallpapers".source = ./wallpapers;
+
+  services.hyprpaper = {
+    enable = true;
+    settings = {
+      preload = "${config.home.homeDirectory}/.config/wallpapers/1330031.jpg";
+      wallpaper = "monitor, ${config.home.homeDirectory}/.config/wallpapers/1330031.jpg";
     };
   };
 }
