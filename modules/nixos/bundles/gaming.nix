@@ -3,7 +3,6 @@
     STEAM_EXTRA_COMPAT_TOOLS_PATHS = "\${HOME}/.steam/root/compatibilitytools.d";
   };
 
-  programs.mangohud.enable = true;
   programs.gamemode = {
     enable = true;
     settings = {
@@ -17,24 +16,14 @@
   programs.steam.gamescopeSession.enable = true;
 
   environment.systemPackages = with pkgs; [
+    mangohud
+    gamescope
     protonup
-    dxvk
 
     # parsec-bin
     discord
 
-    gamescope
-
-    # heroic
-    mangohud
-
-    r2modman
-
-    heroic
-
-    er-patcher
-    bottles
-
+    # steamtinkerlaunch %command%
     steamtinkerlaunch
   ];
 }
