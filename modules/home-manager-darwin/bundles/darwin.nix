@@ -1,3 +1,3 @@
 {lib, ...}: {
-  myNixDarwin.aerospace.enable = true;
+  myHomeManagerDarwin.aerospace.enable = true;
 }
