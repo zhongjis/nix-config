@@ -43,6 +43,12 @@
     };
 
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
+
+    # https://github.com/niksingh710/minimal-tmux-status/
+    minimal-tmux = {
+      url = "github:niksingh710/minimal-tmux-status";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
   outputs = {nixpkgs, ...} @ inputs: let
     overlays = import ./overlays {inherit inputs;};
