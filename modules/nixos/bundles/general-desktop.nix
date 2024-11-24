@@ -1,4 +1,9 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  inputs,
+  currentSystem,
+  ...
+}: {
   myNixOS.nh.enable = true;
   myNixOS.power-management.enable = true;
   myNixOS.cachix.enable = true;
@@ -33,15 +38,19 @@
     enable32Bit = true;
   };
 
-  environment.systemPackages = with pkgs.unstable; [
+  environment.systemPackages = with pkgs; [
     nixd
     unzip
     zip
     wget
+    git
+
+    neovim
 
     obsidian
     spotify
     bitwarden
+    inputs.zen-browser.packages."${currentSystem}".specific
   ];
 
   fonts.packages = with pkgs; [

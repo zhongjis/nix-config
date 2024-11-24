@@ -75,7 +75,7 @@
   users.users.zshen = {
     isNormalUser = true;
     description = "Jason";
-    extraGroups = ["networkmanager" "wheel" "openrazer"];
+    extraGroups = ["networkmanager" "wheel" "openrazer" "audio"];
     packages = with pkgs; [
       kdePackages.kate
     ];
@@ -86,10 +86,7 @@
 
   environment.systemPackages = with pkgs; [
     openrazer-daemon
-    neovim
-    git
     polychromatic
-    inputs.zen-browser.packages."${currentSystem}".specific
   ];
 
   system.stateVersion = "24.05"; # Did you read the comment?
