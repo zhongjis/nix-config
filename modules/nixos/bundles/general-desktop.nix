@@ -40,7 +40,9 @@
 
     obsidian
     spotify
+    bitwarden
   ];
+
   fonts.packages = with pkgs; [
     # fonts
     (nerdfonts.override {

@@ -1,8 +1,10 @@
 {...}: {
   programs.git = {
     enable = true;
-    userName = "zhongjis";
-    userEmail = "zhongjie.x.shen@gmail.com";
+
+    # configure username and email in home.nix
+    # userName = "zhongjis";
+    # userEmail = "zhongjie.x.shen@gmail.com";
 
     aliases = {};
 
