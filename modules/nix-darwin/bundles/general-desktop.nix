@@ -3,7 +3,7 @@
   lib,
   ...
 }: {
-  myNixDarwin.aerospace.enable = lib.mkDefault true;
+  myNixDarwin.aerospace.enable = lib.mkDefault false;
   myNixDarwin.nh.enable = lib.mkDefault true;
 
   homebrew = {
@@ -36,6 +36,7 @@
       "alfred"
       "zen-browser"
       "caffeine"
+      "aerospace"
 
       # dev tools
       "docker"
