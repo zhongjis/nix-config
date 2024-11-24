@@ -26,15 +26,16 @@
     pulse.enable = true;
     jack.enable = true;
   };
-
-  fonts.packages = with pkgs; [
+  environment.systemPackages = with pkgs.unstable; [
+    nixd
     unzip
     zip
     wget
 
     obsidian
     spotify
-
+  ];
+  fonts.packages = with pkgs; [
     # fonts
     (nerdfonts.override {
       fonts = [
