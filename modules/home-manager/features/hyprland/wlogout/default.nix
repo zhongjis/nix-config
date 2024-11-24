@@ -1,8 +1,11 @@
-{...}: {
+{isDarwin, ...}: {
   xdg.configFile."wlogout/icons".source = ./icons;
 
   programs.wlogout = {
-    enable = true;
+    enable =
+      if isDarwin
+      then false
+      else true;
     layout = [
       {
         label = "lock";

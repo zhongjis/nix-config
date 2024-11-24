@@ -1,6 +1,13 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  isDarwin,
+  ...
+}: {
   programs.rofi = {
-    enable = true;
+    enable =
+      if isDarwin
+      then false
+      else true;
     catppuccin.enable = true;
     catppuccin.flavor = "mocha";
 
