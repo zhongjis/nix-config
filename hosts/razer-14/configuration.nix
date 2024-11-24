@@ -81,11 +81,6 @@
     shell = pkgs.zsh;
   };
 
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true;
-  };
-
   hardware.cpu.amd.updateMicrocode = true;
 
   environment.systemPackages = with pkgs; [

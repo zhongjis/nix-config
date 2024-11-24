@@ -26,6 +26,12 @@
     pulse.enable = true;
     jack.enable = true;
   };
+
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
+  };
+
   environment.systemPackages = with pkgs.unstable; [
     nixd
     unzip
