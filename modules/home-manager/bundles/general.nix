@@ -33,7 +33,6 @@
 
   home.packages = with pkgs; [
     obsidian
-    bitwarden
 
     sops
     awscli2
