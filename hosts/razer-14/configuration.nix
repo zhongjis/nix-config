@@ -85,6 +85,8 @@
   hardware.cpu.amd.updateMicrocode = true;
 
   environment.systemPackages = with pkgs; [
+    inputs.zen-browser.packages."${currentSystem}".specific
+
     openrazer-daemon
     polychromatic
   ];

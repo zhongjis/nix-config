@@ -50,7 +50,6 @@
     obsidian
     spotify
     bitwarden
-    inputs.zen-browser.packages."${currentSystem}".specific
   ];
 
   fonts.packages = with pkgs; [
