@@ -1,18 +1,11 @@
-{
-  pkgs,
-  isDarwin,
-  ...
-}: let
+{pkgs, ...}: let
   uptime-sh = pkgs.writeShellScript "uptime-nixos" (builtins.readFile ./scripts/uptime-nixos.sh);
 in {
   # hyprland
   xdg.configFile."hypr/hyprland.conf".source = ./hyprland.conf;
 
   home.pointerCursor = {
-    gtk.enable =
-      if isDarwin
-      then false
-      else true;
+    enable = true;
     # x11.enable = true;
     package = pkgs.bibata-cursors;
     name = "Bibata-Modern-Classic";
@@ -80,10 +73,7 @@ in {
 
   # hyprlock
   programs.hyprlock = {
-    enable =
-      if isDarwin
-      then true
-      else false;
+    enable = true;
     extraConfig = ''
       $background = rgb(070B11)
       $foreground = rgb(EFF2F5)
@@ -121,10 +111,7 @@ in {
   };
 
   services.hypridle = {
-    enable =
-      if isDarwin
-      then false
-      else true;
+    enable = true;
     settings = {
       general = {
         lock_cmd = "pidof hyprlock || hyprlock"; # runs hyprlock if it is not already running (this is always run when "loginctl lock-session" is called)

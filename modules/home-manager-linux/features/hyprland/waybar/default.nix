@@ -1,16 +1,9 @@
-{
-  pkgs,
-  isDarwin,
-  ...
-}: let
+{pkgs, ...}: let
   waybarConfig = (import ./config.nix).fileText;
   waybarModules = (import ./modules.nix {inherit pkgs;}).fileText;
 in {
   programs.waybar = {
-    enable =
-      if isDarwin
-      then false
-      else true;
+    enable = true;
     package = pkgs.waybar.overrideAttrs (oldAttrs: {
       mesonFlags = oldAttrs.mesonFlags ++ ["-Dexperimental=true"];
     });
