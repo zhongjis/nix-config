@@ -5,7 +5,6 @@ in {
   xdg.configFile."hypr/hyprland.conf".source = ./hyprland.conf;
 
   home.pointerCursor = {
-    enable = true;
     # x11.enable = true;
     package = pkgs.bibata-cursors;
     name = "Bibata-Modern-Classic";
