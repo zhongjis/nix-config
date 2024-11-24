@@ -12,6 +12,7 @@
   myNixOS = {
     bundles.general-desktop.enable = true;
     bundles.hyprland-wm.enable = true;
+    bundles.gaming.enable = true;
     services.nvidia.enable = true;
   };
 

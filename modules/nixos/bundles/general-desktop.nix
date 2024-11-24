@@ -18,6 +18,7 @@
     LC_TIME = "sk_SK.UTF-8";
   };
 
+  # enable sound
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;

@@ -1,9 +1,6 @@
 {pkgs, ...}: {
   myHomeManager.bundles.general.enable = true;
-  myHomeManagerLinux = {
-    bundles.linux.enable = true;
-    bundles.gaming.enable = true;
-  };
+  myHomeManagerLinux.bundles.linux.enable = true;
 
   programs.git.userName = "zhongjis";
   programs.git.userEmail = "zhongjie.x.shen@gmail.com";

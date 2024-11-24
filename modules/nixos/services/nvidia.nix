@@ -1,6 +1,7 @@
 {
   pkgs,
   config,
+  lib,
   ...
 }: {
   services.xserver.videoDrivers = ["nvidia"];
@@ -22,6 +23,18 @@
 
       amdgpuBusId = "PCI:4:0:0";
       nvidiaBusId = "PCI:1:0:0";
+    };
+  };
+
+  specialisation = {
+    gaming-time.configuration = {
+      hardware.nvidia = {
+        prime.sync.enable = lib.mkForce true;
+        prime.offload = {
+          enable = lib.mkForce false;
+          enableOffloadCmd = lib.mkForce false;
+        };
+      };
     };
   };
 
