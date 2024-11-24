@@ -143,8 +143,8 @@ in {
   services.hyprpaper = {
     enable = true;
     settings = {
-      preload = "${config.home.homeDirectory}/.config/wallpapers/1330031.jpg";
-      wallpaper = "monitor, ${config.home.homeDirectory}/.config/wallpapers/1330031.jpg";
+      preload = "${config.home.homeDirectory}/.config/wallpapers/1330031.jpeg";
+      wallpaper = "monitor, ${config.home.homeDirectory}/.config/wallpapers/1330031.jpeg";
     };
   };
 }
