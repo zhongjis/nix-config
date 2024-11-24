@@ -1,50 +1,48 @@
 {
-  pkgs,
   lib,
-  isDarwin,
+  config,
+  myLib,
   ...
-}: {
-  imports = [
-    ./common
-    ./linux
-    ./darwin
-  ];
+}: let
+  cfg = config.myHomeManager;
 
-  common.enable = lib.mkDefault true;
+  # Taking all modules in ./features and adding enables to them
+  features =
+    myLib.extendModules
+    (name: {
+      extraOptions = {
+        myHomeManager.${name}.enable = lib.mkEnableOption "enable my ${name} configuration";
+      };
 
-  linux-hm-modules.enable =
-    if isDarwin
-    then lib.mkDefault false
-    else lib.mkDefault true;
-  darwin-hm-modules.enable =
-    if isDarwin
-    then lib.mkDefault true
-    else lib.mkDefault false;
+      configExtension = config: (lib.mkIf cfg.${name}.enable config);
+    })
+    (myLib.filesIn ./features);
+
+  # Taking all module bundles in ./bundles and adding bundle.enables to them
+  bundles =
+    myLib.extendModules
+    (name: {
+      extraOptions = {
+        myHomeManager.bundles.${name}.enable = lib.mkEnableOption "enable ${name} module bundle";
+      };
+
+      configExtension = config: (lib.mkIf cfg.bundles.${name}.enable config);
+    })
+    (myLib.filesIn ./bundles);
+in {
+  imports =
+    []
+    ++ features
+    ++ bundles;
 
   xdg.enable = true;
 
-  home.packages = with pkgs; [
-    sops
-    obsidian
-
-    awscli2
-
-    gh
-    graphviz
-    wget
-
-    # fonts
-    font-awesome
-    sketchybar-app-font
-    (nerdfonts.override {
-      fonts = [
-        "FiraCode"
-        "DroidSansMono"
-        "Agave"
-        "JetBrainsMono"
-      ];
-    })
-  ];
+  nixpkgs = {
+    config = {
+      allowUnfree = true;
+      experimental-features = "nix-command flakes";
+    };
+  };
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;

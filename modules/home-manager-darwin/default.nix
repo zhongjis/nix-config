@@ -4,14 +4,14 @@
   myLib,
   ...
 }: let
-  cfg = config.myNixDarwin;
+  cfg = config.myHomeManagerDarwin;
 
   # Taking all modules in ./features and adding enables to them
   features =
     myLib.extendModules
     (name: {
       extraOptions = {
-        myNixDarwin.${name}.enable = lib.mkEnableOption "enable my ${name} configuration";
+        myHomeManagerDarwin.${name}.enable = lib.mkEnableOption "enable my ${name} configuration";
       };
 
       configExtension = config: (lib.mkIf cfg.${name}.enable config);
@@ -23,7 +23,7 @@
     myLib.extendModules
     (name: {
       extraOptions = {
-        myNixDarwin.bundles.${name}.enable = lib.mkEnableOption "enable ${name} module bundle";
+        myHomeManagerDarwin.bundles.${name}.enable = lib.mkEnableOption "enable ${name} module bundle";
       };
 
       configExtension = config: (lib.mkIf cfg.bundles.${name}.enable config);
@@ -34,7 +34,16 @@ in {
     []
     ++ features
     ++ bundles;
-  # ++ services;
 
-  nix.settings.experimental-features = "nix-command flakes";
+  xdg.enable = true;
+
+  nixpkgs = {
+    config = {
+      allowUnfree = true;
+      experimental-features = "nix-command flakes";
+    };
+  };
+
+  # Let Home Manager install and manage itself.
+  programs.home-manager.enable = true;
 }
