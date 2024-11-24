@@ -1,3 +1,3 @@
 {lib, ...}: {
-  myHomeManager.aerospace.enable = lib.mkDefault true;
+  myHomeManagerDarwin.aerospace.enable = lib.mkDefault true;
 }
