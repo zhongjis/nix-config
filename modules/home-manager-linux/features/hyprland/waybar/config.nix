@@ -29,7 +29,6 @@
           ],
           "modules-center": [
               "custom/swaync",
-              "custom/cava_mviz",
               "custom/separator#dot-line",
               "clock",
               "custom/separator#line",

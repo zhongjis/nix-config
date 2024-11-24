@@ -22,12 +22,11 @@ in {
   xdg.configFile."waybar/config".text = waybarConfig;
   xdg.configFile."waybar/modules".text = waybarModules;
 
-  home.packages = with pkgs.unstable; [
+  home.packages = with pkgs; [
     jq
     pamixer
     gnome-system-monitor
     playerctl
-    cava
     (writeScriptBin "restart-waybar" ''
       ${builtins.readFile ./restart-waybar.sh}
     '')
