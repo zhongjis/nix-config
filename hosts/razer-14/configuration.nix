@@ -59,7 +59,6 @@
 
   # Enable CUPS to print documents.
   services = {
-    hardware.openrgb.enable = true;
     flatpak.enable = true;
     udisks2.enable = true;
     printing.enable = true;
@@ -68,11 +67,14 @@
   # Enable touchpad support (enabled default in most desktopManager).
   services.libinput.enable = true;
 
+  # Open Razer
+  hardware.openrazer.enable = true;
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.zshen = {
     isNormalUser = true;
     description = "Jason";
-    extraGroups = ["networkmanager" "wheel"];
+    extraGroups = ["networkmanager" "wheel" "openrazer"];
     packages = with pkgs; [
       kdePackages.kate
     ];
@@ -87,10 +89,10 @@
   hardware.cpu.amd.updateMicrocode = true;
 
   environment.systemPackages = with pkgs; [
+    openrazer-daemon
     neovim
     git
     polychromatic
-    firefox
     inputs.zen-browser.packages."${currentSystem}".specific
   ];
 
