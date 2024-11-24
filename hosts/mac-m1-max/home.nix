@@ -3,7 +3,7 @@
   pkgs,
   ...
 }: {
-  myHomeManager. bundles.general.enable = true;
+  myHomeManager.bundles.general.enable = true;
   myHomeManagerDarwin.bundles.darwin.enable = true;
 
   home.username = "zshen";
