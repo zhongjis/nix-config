@@ -7,8 +7,8 @@
     enable = true;
     settings = {
       custom = {
-        start = "${pkgs.libnotify}/bin/notify-send 'GameMode started'";
-        end = "${pkgs.libnotify}/bin/notify-send 'GameMode stopped'";
+        start = "${pkgs.libnotify}/bin/notify-send -h string:x-canonical-private-synchronous:'Game Mode' 'GameMode started'";
+        end = "${pkgs.libnotify}/bin/notify-send -h string:x-canonical-private-synchronous:'Game Mode' 'GameMode stopped'";
       };
     };
   };
@@ -18,7 +18,7 @@
   environment.systemPackages = with pkgs; [
     mangohud
     gamescope
-    protonup
+    protonup-qt
 
     # parsec-bin
     discord
