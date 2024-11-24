@@ -25,6 +25,32 @@ in {
       redis
 
       azure-cli
+      awscli2
+      gh
+
+      # fonts
+      (nerdfonts.override {
+        fonts = [
+          "JetBrainsMono"
+          "Iosevka"
+          "FiraCode"
+          "DroidSansMono"
+          "Agave"
+        ];
+      })
+      font-awesome
+      sketchybar-app-font
+      cm_unicode
+      corefonts
+      noto-fonts
+      noto-fonts-cjk-sans
+      noto-fonts-emoji
+      liberation_ttf
+      mplus-outline-fonts.githubRelease
+      dina-font
+      proggyfonts
+      inter
+      font-awesome
     ]
     ++ unstable_pkgs;
 }

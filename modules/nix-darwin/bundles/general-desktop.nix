@@ -26,30 +26,30 @@
     casks = [
       # productivity
       "bartender"
-      "bitwarden"
       "flux"
-      "github"
-      "spotify"
       "box-drive"
-      "google-chrome"
-      "dash"
+      "bitwarden"
       "alfred"
-      "zen-browser"
       "caffeine"
       "aerospace"
 
+      "google-chrome"
+      "zen-browser"
+
       # dev tools
+      "dash"
       "docker"
-      "sublime-merge"
       "charles"
       "devtoys"
-      "intellij-idea"
       "mongodb-compass"
+      "intellij-idea"
+      "sublime-merge"
       "zed"
 
       # duplicates: already included in full-system. but adding them for alfred app
       "kitty"
       "obsidian"
+      "spotify"
     ];
 
     masApps = {

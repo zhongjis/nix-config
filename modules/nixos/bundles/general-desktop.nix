@@ -28,13 +28,25 @@
   };
 
   fonts.packages = with pkgs; [
+    unzip
+    zip
+    wget
+
+    obsidian
+    spotify
+
+    # fonts
     (nerdfonts.override {
       fonts = [
         "JetBrainsMono"
         "Iosevka"
         "FiraCode"
+        "DroidSansMono"
+        "Agave"
       ];
     })
+    font-awesome
+    sketchybar-app-font
     cm_unicode
     corefonts
     noto-fonts
