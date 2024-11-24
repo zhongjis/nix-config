@@ -1,3 +1,3 @@
 {...}: {
-  xdg.configFile."aerospace.toml".source = ./aerospace.toml;
+  xdg.configFile."aerospace/aerospace.toml".source = ./aerospace.toml;
 }
