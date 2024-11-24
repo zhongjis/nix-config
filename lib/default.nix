@@ -99,24 +99,28 @@ in rec {
         overlays.unstable-packages
       ];
     };
+
+    currentSystem = system;
+    currentSystemName = systemName;
+    isDarwin = darwin;
   in
     inputs.home-manager.lib.homeManagerConfiguration {
       pkgs = pkgsWithOverlay;
-      extraSpecialArgs = {inherit inputs outputs myLib;};
+      extraSpecialArgs = {
+        inherit
+          inputs
+          outputs
+          myLib
+          currentSystem
+          currentSystemName
+          isDarwin
+          ;
+      };
 
       modules = [
         homeConfiguration
         inputs.catppuccin.homeManagerModules.catppuccin
         outputs.homeManagerModules.default
-
-        {
-          config._module.args = {
-            currentSystem = system;
-            currentSystemName = systemName;
-            inputs = inputs;
-            isDarwin = darwin;
-          };
-        }
       ];
     };
 
@@ -134,13 +138,7 @@ in rec {
   # ========================== Extenders =========================== #
 
   # Evaluates nixos/home-manager module and extends it's options / config
-  extendModule = {path, ...} @ args: {
-    pkgs,
-    currentSystem,
-    currentSystemName,
-    isDarwin,
-    ...
-  } @ margs: let
+  extendModule = {path, ...} @ args: {pkgs, ...} @ margs: let
     eval =
       if (builtins.isString path) || (builtins.isPath path)
       then import path margs
