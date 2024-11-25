@@ -24,6 +24,8 @@ in {
     #   {plugin = inputs.minimal-tmux.packages.${pkgs.system}.default;}
     # ];
 
+    sensibleOnTop = false;
+
     extraConfig =
       /*
       bash

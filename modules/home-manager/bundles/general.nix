@@ -35,4 +35,8 @@
   home.sessionVariables = {
     FLAKE = "${config.home.homeDirectory}/personal/nix-config";
   };
+
+  home.packages = with pkgs; [
+    nixd
+  ];
 }

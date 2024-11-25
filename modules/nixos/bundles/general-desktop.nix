@@ -35,7 +35,6 @@
   };
 
   environment.systemPackages = with pkgs; [
-    nixd
     unzip
     zip
     wget

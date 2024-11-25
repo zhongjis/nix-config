@@ -46,8 +46,6 @@ in {
       bash
       */
       ''
-        ${builtins.readFile ./catppuccin_mocha-zsh-syntax-highlighting.zsh}
-
         # PLUGINS (whatever)
         [ -f "$HOME/.local/share/zsh/zsh-vi-mode/zsh-vi-mode.plugin.zsh" ] && \
         source "$HOME/.local/share/zsh/zsh-vi-mode/zsh-vi-mode.plugin.zsh"
@@ -63,7 +61,6 @@ in {
 
         [ -f "$HOME/.local/share/zsh/nix-zsh-completions/nix.plugin.zsh" ] && \
         source "$HOME/.local/share/zsh/nix-zsh-completions/nix.plugin.zsh"
-
       '';
   };
 }
