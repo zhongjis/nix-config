@@ -25,18 +25,14 @@
       tree = "eza --color=auto --tree";
       grep = "grep --color=auto";
     };
-    initExtra =
-      /*
-      bash
-      */
-      ''
-        # PLUGINS (whatever)
-        source "$HOME/.local/share/zsh/zsh-vi-mode/zsh-vi-mode.plugin.zsh"
-        source "$HOME/.local/share/zsh/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
-        source "$HOME/.local/share/zsh/nix-zsh-completions/nix.plugin.zsh"
-        source "$HOME/.local/share/zsh/zsh-autocomple/zsh-autocomplete.plugin.zsh"
+    initExtra = ''
+      # PLUGINS (whatever)
+      source "$HOME/.local/share/zsh/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
+      source "$HOME/.local/share/zsh/zsh-autocomple/zsh-autocomplete.plugin.zsh"
+      source "$HOME/.local/share/zsh/nix-zsh-completions/nix.plugin.zsh"
 
-        zvm_after_init_commands+=('[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh')
-      '';
+      # source "$HOME/.local/share/zsh/zsh-vi-mode/zsh-vi-mode.plugin.zsh"
+      # zvm_after_init_commands+=('[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh')
+    '';
   };
 }
