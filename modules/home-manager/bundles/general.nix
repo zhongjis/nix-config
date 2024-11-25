@@ -15,7 +15,6 @@
   myHomeManager.stylix.enable = lib.mkDefault true;
   myHomeManager.tmux.enable = lib.mkDefault true;
   myHomeManager.zellij.enable = lib.mkDefault false;
-  myHomeManager.zsh.enable = lib.mkDefault true;
   myHomeManager.alacritty.enable = lib.mkDefault false;
   myHomeManager.bat.enable = lib.mkDefault true;
   myHomeManager.carapace.enable = lib.mkDefault true;
@@ -31,6 +30,7 @@
   myHomeManager.thefuck.enable = lib.mkDefault true;
   myHomeManager.yazi.enable = lib.mkDefault true;
   myHomeManager.zoxide.enable = lib.mkDefault true;
+  myHomeManager.zsh.enable = lib.mkDefault true;
 
   home.sessionVariables = {
     FLAKE = "${config.home.homeDirectory}/personal/nix-config";
