@@ -12,10 +12,6 @@
 in {
   programs.tmux = {
     enable = true;
-
-    catppuccin.enable = true;
-    catppuccin.flavor = "mocha";
-
     baseIndex = 1;
     escapeTime = 0;
     keyMode = "vi";

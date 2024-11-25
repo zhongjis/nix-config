@@ -1,9 +1,6 @@
 {pkgs, ...}: {
   programs.rofi = {
     enable = true;
-    catppuccin.enable = true;
-    catppuccin.flavor = "mocha";
-
     package = pkgs.rofi-wayland;
     terminal = "${pkgs.kitty}/bin/kitty";
   };

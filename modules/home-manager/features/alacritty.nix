@@ -11,8 +11,6 @@
 in {
   programs.alacritty = {
     enable = true;
-    catppuccin.enable = true;
-    catppuccin.flavor = "mocha";
 
     settings = {
       live_config_reload = true;

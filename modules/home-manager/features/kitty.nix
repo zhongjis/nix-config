@@ -11,9 +11,6 @@
 in {
   programs.kitty = {
     enable = true;
-    catppuccin.enable = true;
-    catppuccin.flavor = "mocha";
-
     shellIntegration.enableZshIntegration = true;
 
     settings = {
