@@ -4,8 +4,12 @@
   ...
 }: let
   uptime-sh = pkgs.writeShellScript "uptime-nixos" (builtins.readFile ./scripts/uptime-nixos.sh);
+  wallpaper = pkgs.fetchurl {
+    url = "https://i.redd.it/mvev8aelh7zc1.png";
+    hash = "sha256-lJjIq+3140a5OkNy/FAEOCoCcvQqOi73GWJGwR2zT9w";
+  };
 in {
-  import = [./gtk.nix];
+  imports = [./gtk.nix];
 
   myHomeManagerLinux.rofi.enable = true;
   myHomeManagerLinux.swaync.enable = true;
@@ -13,8 +17,12 @@ in {
   myHomeManagerLinux.wlogout.enable = true;
 
   # hyprland
-  xdg.configFile."hypr/hyprland.conf".source = ./hyprland.conf;
-  wayland.windowManager.hyprland.enable = true;
+  wayland.windowManager.hyprland = {
+    enable = true;
+    extraConfig = ''
+      ${builtins.readFile ./hyprland.conf}
+    '';
+  };
 
   home.pointerCursor = {
     # x11.enable = true;
@@ -92,8 +100,14 @@ in {
   services.hyprpaper = {
     enable = true;
     settings = {
-      preload = "${config.home.homeDirectory}/.config/wallpapers/1330031.jpeg";
-      wallpaper = ",${config.home.homeDirectory}/.config/wallpapers/1330031.jpeg";
+      ipc = "on";
+      preload = [
+        (builtins.toString wallpaper)
+      ];
+
+      wallpaper = [
+        ",${builtins.toString wallpaper}"
+      ];
     };
   };
 }
