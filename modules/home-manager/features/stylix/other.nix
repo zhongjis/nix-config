@@ -1,5 +1,5 @@
 {pkgs, ...}: let
 in {
   # placeholder
-  targets.waybar.enable = false;
+  stylix.targets.waybar.enable = false;
 }
