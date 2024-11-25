@@ -34,7 +34,6 @@
 
   # Bootloader.
   boot.loader = {
-    plymouth.enable = true;
     systemd-boot.enable = false;
 
     efi = {
@@ -49,6 +48,7 @@
       useOSProber = true;
     };
   };
+  boot.plymouth.enable = true;
 
   # Network
   networking.hostName = "nixos"; # Define your hostname.
