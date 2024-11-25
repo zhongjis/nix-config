@@ -1,12 +1,12 @@
 {pkgs, ...}: let
 in {
+  imports = [./other.nix];
+
   stylix = {
+    enable = true;
     base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
 
     image = ./gruvbox-mountain-village.png;
-
-    cursor.package = pkgs.bibata-cursors;
-    cursor.name = "Bibata-Modern-Ice";
 
     fonts = {
       monospace = {
