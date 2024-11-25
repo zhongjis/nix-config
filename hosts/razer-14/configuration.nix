@@ -34,6 +34,7 @@
 
   # Bootloader.
   boot.loader = {
+    plymouth.enable = true;
     systemd-boot.enable = false;
 
     efi = {
