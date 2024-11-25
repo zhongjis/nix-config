@@ -1,4 +1,10 @@
-{pkgs, ...}: {
+{pkgs, ...}: let
+  catppuccinRepo = builtins.fetchGit {
+    url = "https://github.com/catppuccin/base16";
+    rev = "main";
+  };
+  mochaTheme = "${catppuccinRepo}/base16/mocha.yaml";
+in {
   stylix = {
     #   base16Scheme = {
     #     base00 = "242424"; # ----
@@ -19,7 +25,7 @@
     #     base0F = "f28534"; # brown
     #   };
 
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
+    base16Scheme = mochaTheme;
 
     image = ./gruvbox-mountain-village.png;
 
