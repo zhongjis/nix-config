@@ -24,6 +24,7 @@ in rec {
     darwin ? false,
   }: let
     isDarwin = darwin;
+
     hostConfiguration = ../hosts/${hostName}/configuration.nix;
     systemFunc =
       if isDarwin
@@ -33,10 +34,10 @@ in rec {
       if hardware != ""
       then inputs.nixos-hardware.nixosModules.${hardware}
       else {};
-    catppuccinModule =
+    stylixModule =
       if !isDarwin
-      then inputs.catppuccin.nixosModules.catppuccin
-      else {};
+      then inputs.stylix.nixosModules.stylix
+      else inputs.stylix.darwinModule.stylix;
     nhDarwinModule =
       if isDarwin
       then inputs.nh_darwin.nixDarwinModules.prebuiltin
@@ -71,7 +72,7 @@ in rec {
           };
         }
 
-        catppuccinModule
+        stylixModule
         nhDarwinModule
 
         {
@@ -90,7 +91,10 @@ in rec {
     system,
     darwin ? false,
   }: let
-    homeConfiguration = ../hosts/${systemName}/home.nix;
+    currentSystem = system;
+    currentSystemName = systemName;
+    isDarwin = darwin;
+
     pkgsWithOverlay = import nixpkgs {
       inherit system;
       overlays = [
@@ -100,10 +104,7 @@ in rec {
       ];
     };
 
-    currentSystem = system;
-    currentSystemName = systemName;
-    isDarwin = darwin;
-
+    homeConfiguration = ../hosts/${systemName}/home.nix;
     systemSpecificHomeManagerModules =
       if isDarwin
       then outputs.homeManagerModules.darwin
@@ -124,14 +125,9 @@ in rec {
 
       modules = [
         homeConfiguration
-        inputs.catppuccin.homeManagerModules.catppuccin
+        inputs.stylix.homeManagerModules.stylix
         outputs.homeManagerModules.default
-        # systemSpecificHomeManagerModules
-        (
-          if isDarwin
-          then outputs.homeManagerModules.darwin
-          else outputs.homeManagerModules.linux
-        )
+        systemSpecificHomeManagerModules
       ];
     };
 
