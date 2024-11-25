@@ -1,19 +1,4 @@
-{
-  pkgs,
-  currentSystemName,
-  ...
-}: let
-  oswitchCMD = "nh os switch . --hostname ${currentSystemName}";
-  otestCMD = "nh os test . --hostname ${currentSystemName}";
-  hswitchCMD =
-    if currentSystemName == "mac-m1-max"
-    then "nh home switch . -c zshen-mac"
-    else "nh home switch . -c zshen-linux";
-  htestCMD =
-    if currentSystemName == "mac-m1-max"
-    then "nh home test . -c zshen-mac"
-    else "nh home test . -c zshen-linux";
-in {
+{pkgs, ...}: {
   home.file = {
     ".local/share/zsh/zsh-autosuggestions".source = "${pkgs.zsh-autosuggestions}/share/zsh-autosuggestions";
     ".local/share/zsh/zsh-fast-syntax-highlighting".source = "${pkgs.zsh-fast-syntax-highlighting}/share/zsh/site-functions";
@@ -35,11 +20,6 @@ in {
       cat = "bat -p";
       tree = "eza --color=auto --tree";
       grep = "grep --color=auto";
-
-      oswitch = oswitchCMD;
-      otest = otestCMD;
-      hswitch = hswitchCMD;
-      htest = htestCMD;
     };
     initExtra =
       /*
