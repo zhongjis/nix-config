@@ -95,8 +95,6 @@ in {
     };
   };
 
-  xdg.configFile."wallpapers".source = ./wallpapers;
-
   services.hyprpaper = {
     enable = true;
     settings = {
