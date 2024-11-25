@@ -1,6 +1,6 @@
 {
   pkgs,
-  config,
+  lib,
   ...
 }: let
 in {
@@ -22,12 +22,5 @@ in {
     extraConfig = ''
       ${builtins.readFile ./hyprland.conf}
     '';
-  };
-
-  home.pointerCursor = {
-    # x11.enable = true;
-    package = pkgs.bibata-cursors;
-    name = "Bibata-Modern-Classic";
-    size = 16;
   };
 }
