@@ -1,4 +1,8 @@
 {pkgs, ...}: let
+  wallpaper = pkgs.fetchurl {
+    url = "https://i.redd.it/mvev8aelh7zc1.png";
+    hash = "sha256-lJjIq+3140a5OkNy/FAEOCoCcvQqOi73GWJGwR2zT9w";
+  };
 in {
   imports = [./other.nix];
 
@@ -6,7 +10,7 @@ in {
     enable = true;
     base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
 
-    image = ./gruvbox-mountain-village.png;
+    image = wallpaper;
 
     fonts = {
       monospace = {
