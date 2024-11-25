@@ -12,6 +12,7 @@
   };
 
   myHomeManager.neovim.enable = lib.mkDefault true;
+  myHomeManager.stylix.enable = lib.mkDefault true;
   myHomeManager.tmux.enable = lib.mkDefault true;
   myHomeManager.zellij.enable = lib.mkDefault false;
   myHomeManager.zsh.enable = lib.mkDefault true;
