@@ -37,7 +37,7 @@ in rec {
     stylixModule =
       if !isDarwin
       then inputs.stylix.nixosModules.stylix
-      else inputs.stylix.darwinModule.stylix;
+      else inputs.stylix.darwinModules.stylix;
     nhDarwinModule =
       if isDarwin
       then inputs.nh_darwin.nixDarwinModules.prebuiltin
