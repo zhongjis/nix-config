@@ -20,9 +20,9 @@ in {
     clock24 = true;
     shell = "${pkgs.zsh}/bin/zsh";
 
-    plugins = [
-      {plugin = inputs.minimal-tmux.packages.${pkgs.system}.default;}
-    ];
+    # plugins = [
+    #   {plugin = inputs.minimal-tmux.packages.${pkgs.system}.default;}
+    # ];
 
     extraConfig =
       /*
