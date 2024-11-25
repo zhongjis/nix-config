@@ -1,6 +1,10 @@
 {pkgs, ...}: let
   toLua = str: "lua << EOF\n${str}\nEOF\n";
   toLuaFile = file: "lua << EOF\n${builtins.readFile file}\nEOF\n";
+
+  extraUnstablePackages = with pkgs.unstable; [
+    nixd
+  ];
 in {
   programs.neovim = {
     enable = true;
@@ -30,7 +34,7 @@ in {
       shfmt
       prettierd
       black
-    ];
+    ] ++ extraUnstablePackages;
 
     plugins = with pkgs.unstable.vimPlugins; [
       # **telescope.nvim**
