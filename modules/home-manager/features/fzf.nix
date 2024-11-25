@@ -1,9 +1,6 @@
 {pkgs, ...}: {
   programs.fzf = {
     enable = true;
-    catppuccin.enable = true;
-    catppuccin.flavor = "mocha";
-
     enableZshIntegration = true;
     changeDirWidgetCommand = "fd --type -d";
     changeDirWidgetOptions = [

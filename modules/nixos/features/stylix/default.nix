@@ -1,0 +1,1 @@
+../../../home-manager/features/stylix/default.nix

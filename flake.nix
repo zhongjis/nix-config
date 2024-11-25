@@ -20,11 +20,10 @@
 
     xremap-flake.url = "github:xremap/nix-flake";
     nixpkgs-terraform.url = "github:stackbuilders/nixpkgs-terraform";
-    # https://github.com/catppuccin/nix/tree/main/modules/home-manager
-    catppuccin.url = "github:catppuccin/nix";
+
+    stylix.url = "github:danth/stylix";
 
     # neovim
-    # neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     trouble-nvim = {
       url = "github:folke/trouble.nvim";
       flake = false;
