@@ -8,13 +8,11 @@ in {
   # hyprlock
   programs.hyprlock = {
     enable = true;
-    extraConfig = with config.stylix.base16Scheme;
+    extraConfig = with config.lib.stylix.colors;
     /*
     hyprlang
     */
       ''
-        # Hyprlock
-        # Original config submitted by https://github.com/SherLock707
         general {
             grace = 1
         }
@@ -38,9 +36,9 @@ in {
             dots_size = 0.33 # Scale of input-field height, 0.2 - 0.8
             dots_spacing = 0.15 # Scale of dots' absolute size, 0.0 - 1.0
             dots_center = true
-            outer_color = ${color05}
-            inner_color = ${color00}
-            font_color = ${color12}
+            outer_color = ${base05}
+            inner_color = ${base00}
+            font_color = ${base12}
             fade_on_empty = true
             placeholder_text = <i>Password...</i> # Text rendered in the input box when it's empty.
             hide_input = false
@@ -52,7 +50,7 @@ in {
         # WEATHER
         label {
             monitor =
-        	    text = cmd[update:3600000] [ -f ~/.cache/.weather_cache ] && cat  ~/.cache/.weather_cache
+            text = cmd[update:3600000] [ -f ~/.cache/.weather_cache ] && cat  ~/.cache/.weather_cache
             color = rgb(184, 192, 224)
             font_size = 10
             font_family = JetBrains Mono Nerd Font Mono ExtraBold
@@ -61,6 +59,7 @@ in {
             valign = center
             zindex = 5
         }
+
         # DATE
         label {
             monitor =
@@ -101,6 +100,7 @@ in {
             valign = top
             zindex = 5
         }
+
         # TIME SEC
         label {
             monitor =
