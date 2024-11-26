@@ -16,15 +16,6 @@
     services.nvidia.enable = true;
   };
 
-  # console
-  console = {
-    earlySetup = true;
-    font = "${pkgs.terminus_font}/share/consolefonts/ter-128n.psf.gz";
-    packages = with pkgs; [terminus_font];
-    keyMap = "us";
-    #   useXkbConfig = true; # use xkb.options in tty.
-  };
-
   # xremap
   hardware.uinput.enable = true;
   users.groups = {

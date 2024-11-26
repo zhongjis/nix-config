@@ -127,7 +127,6 @@ in {
             font_size = 45
             font_family = Inter Display Medium
 
-            position = 40, 100
             halign = center
             valign = bottom
         }
