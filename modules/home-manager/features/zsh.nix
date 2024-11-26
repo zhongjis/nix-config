@@ -27,17 +27,27 @@
     };
     initExtra = ''
       # PLUGINS (whatever)
-      source "$HOME/.local/share/zsh/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
 
-      # zsh-autocomplete
-      source "$HOME/.local/share/zsh/zsh-autocomple/zsh-autocomplete.plugin.zsh"
-      bindkey              '^I'         menu-complete
-      bindkey "$terminfo[kcbt]" reverse-menu-complete
+      source "$HOME/.local/share/zsh/zsh-vi-mode/zsh-vi-mode.plugin.zsh"
 
-      source "$HOME/.local/share/zsh/nix-zsh-completions/nix.plugin.zsh"
+      # The plugin will auto execute this zvm_after_init function
+      function zvm_after_init() {
+        source "$HOME/.local/share/zsh/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
+        source "$HOME/.local/share/zsh/nix-zsh-completions/nix.plugin.zsh"
+        source "$HOME/.local/share/zsh/zsh-autocomple/zsh-autocomplete.plugin.zsh"
 
-      # source "$HOME/.local/share/zsh/zsh-vi-mode/zsh-vi-mode.plugin.zsh"
-      # zvm_after_init_commands+=('[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh')
+        # Enable fzf zsh integration
+        if [[ $options[zle] = on ]]; then
+          eval "$(${pkgs.fzf}/bin/fzf --zsh)"
+        fi
+      }
+
+      # The plugin will auto execute this zvm_after_lazy_keybindings function
+      function zvm_after_lazy_keybindings() {
+        # zsh-autocomplete
+        bindkey              '^I'         menu-complete
+        bindkey "$terminfo[kcbt]" reverse-menu-complete
+      }
     '';
   };
 }
