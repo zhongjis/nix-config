@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  config,
+  ...
+}: {
   services.displayManager.sddm = {
     enable = true;
     package = pkgs.kdePackages.sddm;
@@ -12,6 +16,7 @@
         flavor = "mocha";
         font = "Noto Sans";
         fontSize = "9";
+        background = "${config.stylix.image}";
         loginBackground = true;
       }
     )
