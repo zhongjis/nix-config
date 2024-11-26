@@ -31,15 +31,16 @@ in {
 
         input-field {
             monitor =
-            size = 100, 30
-            outline_thickness = 0
+            size = 180, 40
+            outline_thickness = 3
             dots_size = 0.33 # Scale of input-field height, 0.2 - 0.8
             dots_spacing = 0.15 # Scale of dots' absolute size, 0.0 - 1.0
             dots_center = true
-          # NOTE: following options are overriden by stylix
-          # outer_color = ${base05}
-          # inner_color = ${base00}
-          # font_color = ${base12}
+            check_color=rgb(${base03})
+            fail_color=rgb(${base00})
+            font_color=rgb(${base05})
+            inner_color=rgb(${base08})
+            outer_color=rgb(${base0A})
             fade_on_empty = true
             placeholder_text = <i>Password...</i> # Text rendered in the input box when it's empty.
             hide_input = false

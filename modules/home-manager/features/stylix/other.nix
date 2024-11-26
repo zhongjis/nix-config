@@ -1,7 +1,10 @@
 {pkgs, ...}: let
 in {
   # placeholder
-  stylix.targets.waybar.enable = false;
-  stylix.targets.neovim.enable = false;
-  stylix.targets.swaync.enable = false;
+  stylix.targets = {
+    waybar.enable = false;
+    neovim.enable = false;
+    swaync.enable = false;
+    hyprlock.enable = false;
+  };
 }
