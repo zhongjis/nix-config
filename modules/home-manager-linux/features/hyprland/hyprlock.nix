@@ -36,9 +36,10 @@ in {
             dots_size = 0.33 # Scale of input-field height, 0.2 - 0.8
             dots_spacing = 0.15 # Scale of dots' absolute size, 0.0 - 1.0
             dots_center = true
-            outer_color = ${base05}
-            inner_color = ${base00}
-            font_color = ${base12}
+          # NOTE: following options are overriden by stylix
+          # outer_color = ${base05}
+          # inner_color = ${base00}
+          # font_color = ${base12}
             fade_on_empty = true
             placeholder_text = <i>Password...</i> # Text rendered in the input box when it's empty.
             hide_input = false
