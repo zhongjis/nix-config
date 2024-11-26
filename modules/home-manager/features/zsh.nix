@@ -11,7 +11,7 @@
 
   programs.zsh = {
     enable = true;
-    enableCompletion = false;
+    enableCompletion = true;
     autosuggestion = {
       enable = true;
       highlight = "fg=#${config.lib.stylix.colors.base03},bg=cyan,bold,underline";
@@ -35,7 +35,7 @@
       # The plugin will auto execute this zvm_after_init function
       function zvm_after_init() {
         source "$HOME/.local/share/zsh/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
-        source "$HOME/.local/share/zsh/zsh-autocomple/zsh-autocomplete.plugin.zsh"
+        # source "$HOME/.local/share/zsh/zsh-autocomple/zsh-autocomplete.plugin.zsh"
 
         # Enable fzf zsh integration
         if [[ $options[zle] = on ]]; then
@@ -45,11 +45,11 @@
 
       # The plugin will auto execute this zvm_after_lazy_keybindings function
       function zvm_after_lazy_keybindings() {
-        # zsh-autocomplete Make Tab and ShiftTab change the selection in the menu
-        bindkey -M menuselect              '^I'         menu-complete
-        bindkey -M menuselect "$terminfo[kcbt]" reverse-menu-complete
-        # zsh-autocomplete Make Enter always submit the command line
-        bindkey -M menuselect '^M' .accept-line
+        # # zsh-autocomplete Make Tab and ShiftTab change the selection in the menu
+        # bindkey -M menuselect              '^I'         menu-complete
+        # bindkey -M menuselect "$terminfo[kcbt]" reverse-menu-complete
+        # # zsh-autocomplete Make Enter always submit the command line
+        # bindkey -M menuselect '^M' .accept-line
       }
     '';
   };
