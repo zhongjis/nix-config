@@ -28,7 +28,12 @@
     initExtra = ''
       # PLUGINS (whatever)
       source "$HOME/.local/share/zsh/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
+
+      # zsh-autocomplete
       source "$HOME/.local/share/zsh/zsh-autocomple/zsh-autocomplete.plugin.zsh"
+      bindkey              '^I'         menu-complete
+      bindkey "$terminfo[kcbt]" reverse-menu-complete
+
       source "$HOME/.local/share/zsh/nix-zsh-completions/nix.plugin.zsh"
 
       # source "$HOME/.local/share/zsh/zsh-vi-mode/zsh-vi-mode.plugin.zsh"
