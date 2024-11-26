@@ -18,7 +18,8 @@ in {
   home.packages = with pkgs; [
     jq
     pamixer
-    gnome-system-monitor
+    btop
+    nvtop
     playerctl
     (writeScriptBin "restart-waybar" ''
       ${builtins.readFile ./restart-waybar.sh}

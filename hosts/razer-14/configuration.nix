@@ -95,8 +95,10 @@
   environment.systemPackages = with pkgs; [
     inputs.zen-browser.packages."${currentSystem}".specific
 
-    openrazer-daemon
     polychromatic
+
+    openrazer-daemon # for razer lighting
+    solaar # for logitech
   ];
 
   system.stateVersion = "24.05"; # Did you read the comment?

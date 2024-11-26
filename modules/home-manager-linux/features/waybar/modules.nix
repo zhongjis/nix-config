@@ -275,7 +275,7 @@ in {
                   "▇",
                   "█"
               ],
-              "on-click-right": "gnome-system-monitor",
+              "on-click-right": "kitty --title btop sh -c 'btop'"
           },
           "disk": {
               "interval": 30,
@@ -285,6 +285,7 @@ in {
               "format": "{percentage_used}% 󰋊",
               //"tooltip": true,
               "tooltip-format": "{used} used out of {total} on {path} ({percentage_used}%)",
+              "on-click-right": "kitty --title btop sh -c 'btop'"
           },
           "hyprland/language": {
               "format": "Lang: {}",

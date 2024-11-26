@@ -27,7 +27,6 @@
     };
     initExtra = ''
       # PLUGINS (whatever)
-
       source "$HOME/.local/share/zsh/zsh-vi-mode/zsh-vi-mode.plugin.zsh"
 
       # The plugin will auto execute this zvm_after_init function
