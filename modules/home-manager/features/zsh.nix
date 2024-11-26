@@ -4,8 +4,8 @@
   ...
 }: {
   home.file = {
-    ".local/share/zsh/zsh-fast-syntax-highlighting".source = "${pkgs.unstable.zsh-fast-syntax-highlighting}/share/zsh/site-functions";
-    ".local/share/zsh/zsh-vi-mode".source = "${pkgs.unstable.zsh-vi-mode}/share/zsh-vi-mode";
+    ".local/share/zsh/zsh-fast-syntax-highlighting".source = "${pkgs.zsh-fast-syntax-highlighting}/share/zsh/site-functions";
+    ".local/share/zsh/zsh-vi-mode".source = "${pkgs.zsh-vi-mode}/share/zsh-vi-mode";
     ".local/share/zsh/zsh-autocomple".source = "${pkgs.unstable.zsh-autocomplete}/share/zsh-autocomplete";
   };
 
@@ -14,7 +14,7 @@
     enableCompletion = false;
     autosuggestion = {
       enable = true;
-      highlight = "fg=#${config.lib.stylix.colors},bg=cyan,bold,underline";
+      highlight = "fg=#${config.lib.stylix.colors.base03},bg=cyan,bold,underline";
     };
     dotDir = ".config/zsh";
     history = {
