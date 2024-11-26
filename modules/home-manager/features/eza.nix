@@ -8,6 +8,7 @@
       "--group-directories-first"
       "--long"
       "--no-user"
+      "--all"
     ];
   };
 }
