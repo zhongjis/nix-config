@@ -22,19 +22,21 @@ in {
       with luaPkgs; [
         jsregexp # for luasnip
       ];
-    extraPackages = with pkgs; [
-      cargo # Depdency for Mason Install packages
+    extraPackages = with pkgs;
+      [
+        cargo # Depdency for Mason Install packages
 
-      ripgrep
+        ripgrep
 
-      # Formatters
-      stylua
-      nixpkgs-fmt
-      alejandra
-      shfmt
-      prettierd
-      black
-    ] ++ extraUnstablePackages;
+        # Formatters
+        stylua
+        nixpkgs-fmt
+        alejandra
+        shfmt
+        prettierd
+        black
+      ]
+      ++ extraUnstablePackages;
 
     plugins = with pkgs.unstable.vimPlugins; [
       # **telescope.nvim**
@@ -149,6 +151,7 @@ in {
           p.terraform
           p.kdl
           p.toml
+          p.hyprlang
         ]);
         config = toLuaFile ./plugins/treesitter.lua;
       }
