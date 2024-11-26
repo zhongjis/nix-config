@@ -1,9 +1,12 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  config,
+  ...
+}: {
   home.file = {
-    ".local/share/zsh/zsh-fast-syntax-highlighting".source = "${pkgs.zsh-fast-syntax-highlighting}/share/zsh/site-functions";
-    ".local/share/zsh/zsh-vi-mode".source = "${pkgs.zsh-vi-mode}/share/zsh-vi-mode";
-    ".local/share/zsh/nix-zsh-completions".source = "${pkgs.nix-zsh-completions}/share/zsh/plugins/nix";
-    ".local/share/zsh/zsh-autocomple".source = "${pkgs.zsh-autocomplete}/share/zsh-autocomplete";
+    ".local/share/zsh/zsh-fast-syntax-highlighting".source = "${pkgs.unstable.zsh-fast-syntax-highlighting}/share/zsh/site-functions";
+    ".local/share/zsh/zsh-vi-mode".source = "${pkgs.unstable.zsh-vi-mode}/share/zsh-vi-mode";
+    ".local/share/zsh/zsh-autocomple".source = "${pkgs.unstable.zsh-autocomplete}/share/zsh-autocomplete";
   };
 
   programs.zsh = {
@@ -11,7 +14,7 @@
     enableCompletion = false;
     autosuggestion = {
       enable = true;
-      highlight = "fg=#ff00ff,bg=cyan,bold,underline";
+      highlight = "fg=#${config.lib.stylix.colors},bg=cyan,bold,underline";
     };
     dotDir = ".config/zsh";
     history = {
@@ -32,7 +35,6 @@
       # The plugin will auto execute this zvm_after_init function
       function zvm_after_init() {
         source "$HOME/.local/share/zsh/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
-        source "$HOME/.local/share/zsh/nix-zsh-completions/nix.plugin.zsh"
         source "$HOME/.local/share/zsh/zsh-autocomple/zsh-autocomplete.plugin.zsh"
 
         # Enable fzf zsh integration
