@@ -127,19 +127,9 @@ in {
             font_size = 45
             font_family = Inter Display Medium
 
+            position = 60, 100
             halign = center
             valign = bottom
-        }
-        image {
-            monitor =
-            path = $HOME/.config/hypr/wallpaper_effects/pic.png
-            size = 75
-            rounding = -1
-            border_size = 0
-            border_color = rgb(184, 192, 224)
-            rotate = 0
-            reload_time = -1
-            position = -110, -400
         }
 
         # Uptime
