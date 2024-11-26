@@ -122,25 +122,3 @@ require("mason-lspconfig").setup({
   },
 })
 
--- nixd
-require("lspconfig").nixd.setup({
-  cmd = { "nixd" },
-  settings = {
-    nixd = {
-      nixpkgs = {
-        expr = "import <nixpkgs> { }",
-      },
-      options = {
-        nixos = {
-          expr = '(builtins.getFlake "~/personal/nix-config").nixosConfigurations.razer-14.options',
-        },
-        -- nix_darwin = {
-        --   expr = '(builtins.getFlake "~/personal/nix-config").darwinConfigurations.mac-m1-max.options',
-        -- },
-        home_manager = {
-          expr = '(builtins.getFlake "~/personal/nix-config").homeConfigurations.zshen-razer.options',
-        },
-      },
-    },
-  },
-})

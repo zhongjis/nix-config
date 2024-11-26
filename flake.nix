@@ -75,15 +75,15 @@
       };
 
       homeConfigurations = {
-        zshen-mac = mkHome "mac-m1-max" {
+        mac-m1-max = mkHome "mac-m1-max" {
           system = "aarch64-darwin";
           darwin = true;
         };
-        zshen-linux = mkHome "thinkpad-t480" {
+        thinkpad-t480 = mkHome "thinkpad-t480" {
           system = "x86_64-linux";
           darwin = false;
         };
-        zshen-razer = mkHome "razer-14" {
+        razer-14 = mkHome "razer-14" {
           system = "x86_64-linux";
           darwin = false;
         };

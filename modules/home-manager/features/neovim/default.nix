@@ -1,10 +1,40 @@
-{pkgs, ...}: let
+{
+  pkgs,
+  isDarwin,
+  currentSystemName,
+  ...
+}: let
   toLua = str: "lua << EOF\n${str}\nEOF\n";
   toLuaFile = file: "lua << EOF\n${builtins.readFile file}\nEOF\n";
 
   extraUnstablePackages = with pkgs.unstable; [
     nixd
   ];
+
+  systemOption =
+    if isDarwin
+    then ''
+      nix_darwin = {
+        expr = '(builtins.getFlake "~/personal/nix-config").darwinConfigurations.${currentSystemName}.options',
+      },
+    ''
+    else ''
+      nixos = {
+        expr = '(builtins.getFlake "~/personal/nix-config").nixosConfigurations.${currentSystemName}.options',
+      },
+    '';
+
+  hmConfiguration =
+    if isDarwin
+    then "zshen-mac"
+    else "zshen-razer";
+  nixdOptionsLua =
+    systemOption
+    + ''
+      home_manager = {
+        expr = '(builtins.getFlake "~/personal/nix-config").homeConfigurations.${hmConfiguration}.options',
+      },
+    '';
 in {
   programs.neovim = {
     enable = true;
@@ -188,12 +218,30 @@ in {
       copilot-vim
     ];
 
-    extraLuaConfig = ''
-      ${builtins.readFile ./config/options.lua}
-      ${builtins.readFile ./config/keymaps.lua}
-      ${builtins.readFile ./config/autocmds.lua}
-      vim.cmd.colorscheme "catppuccin-mocha"
-    '';
+    extraLuaConfig =
+      /*
+      lua
+      */
+      ''
+        ${builtins.readFile ./config/options.lua}
+        ${builtins.readFile ./config/keymaps.lua}
+        ${builtins.readFile ./config/autocmds.lua}
+        vim.cmd.colorscheme "catppuccin-mocha"
+
+        -- nixd
+        require("lspconfig").nixd.setup({
+          cmd = { "nixd" },
+          settings = {
+            nixd = {
+              nixpkgs = {
+                expr = "import <nixpkgs> { }",
+              },
+              options = { ${nixdOptionsLua} },
+            },
+          },
+        })
+
+      '';
   };
 
   home.packages = with pkgs; [
