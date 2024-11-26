@@ -43,9 +43,11 @@
 
       # The plugin will auto execute this zvm_after_lazy_keybindings function
       function zvm_after_lazy_keybindings() {
-        # zsh-autocomplete
-        bindkey              '^I'         menu-complete
-        bindkey "$terminfo[kcbt]" reverse-menu-complete
+        # zsh-autocomplete Make Tab and ShiftTab change the selection in the menu
+        bindkey -M menuselect              '^I'         menu-complete
+        bindkey -M menuselect "$terminfo[kcbt]" reverse-menu-complete
+        # zsh-autocomplete Make Enter always submit the command line
+        bindkey -M menuselect '^M' .accept-line
       }
     '';
   };
