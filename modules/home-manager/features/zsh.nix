@@ -1,6 +1,7 @@
 {
   pkgs,
   config,
+  currentSystemName,
   ...
 }: {
   home.file = {
@@ -27,6 +28,16 @@
       cat = "bat -p";
       tree = "eza --color=auto --tree";
       grep = "grep --color=auto";
+
+      ot = "otest";
+      os = "oswitch";
+      ob = "oboot";
+      hs = "hswitch";
+
+      otest = "nh os test --hostname ${currentSystemName}";
+      oswitch = "nh os switch --hostname ${currentSystemName}";
+      oboot = "nh os boot --hostname ${currentSystemName}";
+      hswitch = "nh home switch -c ${currentSystemName}";
     };
     initExtra = ''
       # PLUGINS (whatever)
