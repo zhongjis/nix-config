@@ -152,6 +152,7 @@ in {
           p.kdl
           p.toml
           p.hyprlang
+          p.css
         ]);
         config = toLuaFile ./plugins/treesitter.lua;
       }
