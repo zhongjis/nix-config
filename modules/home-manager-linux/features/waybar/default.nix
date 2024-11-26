@@ -19,7 +19,7 @@ in {
     jq
     pamixer
     btop
-    nvtop
+    nvtopPackages.full
     playerctl
     (writeScriptBin "restart-waybar" ''
       ${builtins.readFile ./restart-waybar.sh}
