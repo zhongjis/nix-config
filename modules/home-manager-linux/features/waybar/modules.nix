@@ -13,127 +13,10 @@ in {
     */
     ''
       {
-          "hyprland/workspaces": {
-              "active-only": false,
-              "all-outputs": true,
-              "format": "{icon}",
-              "show-special": false,
-              "on-click": "activate",
-              "on-scroll-up": "hyprctl dispatch workspace e+1",
-              "on-scroll-down": "hyprctl dispatch workspace e-1",
-              "persistent-workspaces": {
-                  "1": [],
-                  "2": [],
-                  "3": [],
-                  "4": [],
-                  "5": [],
-              },
-              "format-icons": {
-                  "active": "",
-                  "default": "",
-              },
-          },
-          // ROMAN Numerals style
-          "hyprland/workspaces#roman": {
-              "active-only": false,
-              "all-outputs": true,
-              "format": "{icon}",
-              "show-special": false,
-              "on-click": "activate",
-              "on-scroll-up": "hyprctl dispatch workspace e+1",
-              "on-scroll-down": "hyprctl dispatch workspace e-1",
-              "persistent-workspaces": {
-                  "1": [],
-                  "2": [],
-                  "3": [],
-                  "4": [],
-                  "5": [],
-              },
-              "format-icons": {
-                  "1": "I",
-                  "2": "II",
-                  "3": "III",
-                  "4": "IV",
-                  "5": "V",
-                  "6": "VI",
-                  "7": "VII",
-                  "8": "VIII",
-                  "9": "IX",
-                  "10": "X",
-              },
-          },
-          // PACMAN Style
-          "hyprland/workspaces#pacman": {
-              "active-only": false,
-              "all-outputs": true,
-              "format": "{icon}",
-              "on-click": "activate",
-              "on-scroll-up": "hyprctl dispatch workspace e+1",
-              "on-scroll-down": "hyprctl dispatch workspace e-1",
-              "show-special": false,
-              "persistent-workspaces": {
-                  "1": [],
-                  "2": [],
-                  "3": [],
-                  "4": [],
-                  "5": [],
-              },
-              "format": "{icon}",
-              "format-icons": {
-                  "active": " 󰮯 ",
-                  "default": "󰊠",
-                  "persistent": "󰊠",
-              },
-          },
           "hyprland/workspaces#kanji": {
               "disable-scroll": true,
               "all-outputs": true,
               "format": "{icon}",
-              "persistent-workspaces": {
-                  "1": [],
-                  "2": [],
-                  "3": [],
-                  "4": [],
-                  "5": [],
-              },
-              "format-icons": {
-                  "1": "一",
-                  "2": "二",
-                  "3": "三",
-                  "4": "四",
-                  "5": "五",
-                  "6": "六",
-                  "7": "七",
-                  "8": "八",
-                  "9": "九",
-                  "10": "十",
-              }
-          },
-          //  NUMBERS and ICONS style
-          "hyprland/workspaces#4": {
-              "format": "{name}",
-              //"format": " {name} {icon} ",
-              "format": " {icon} ",
-              "show-special": false,
-              "on-click": "activate",
-              "on-scroll-up": "hyprctl dispatch workspace e+1",
-              "on-scroll-down": "hyprctl dispatch workspace e-1",
-              "all-outputs": true,
-              "sort-by-number": true,
-              "format-icons": {
-                  "1": " ",
-                  "2": " ",
-                  "3": " ",
-                  "4": " ",
-                  "5": " ",
-                  "6": " ",
-                  "7": "",
-                  "8": " ",
-                  "9": "",
-                  "10": "10",
-                  "focused": "",
-                  "default": "",
-              },
           },
           // GROUP
           "group/motherboard": {
@@ -412,7 +295,7 @@ in {
           "pulseaudio": {
               "format": "{icon} {volume}%",
               "format-bluetooth": "{icon} 󰂰 {volume}%",
-              "format-muted": "󰖁",
+              "format-muted": "󰖁 MUTE",
               "format-icons": {
                   "headphone": "",
                   "hands-free": "",
@@ -441,7 +324,7 @@ in {
           "pulseaudio#microphone": {
               "format": "{format_source}",
               "format-source": " {volume}%",
-              "format-source-muted": "",
+              "format-source-muted": " MUTE",
               "on-click": "${volume-sh} --toggle-mic",
               "on-click-right": "pavucontrol-qt -t 4",
               "on-scroll-up": "${volume-sh} --mic-inc",

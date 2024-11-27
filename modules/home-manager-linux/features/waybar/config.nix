@@ -30,8 +30,6 @@
               "custom/swaync",
               "custom/separator#dot-line",
               "clock",
-              "custom/separator#line",
-              "hyprland/workspaces#kanji",
               "custom/separator#dot-line",
               "idle_inhibitor",
               "custom/hint",
