@@ -20,7 +20,7 @@
     bundles.hyprland-wm.enable = true;
     bundles.gaming.enable = true;
     services.nvidia.enable = true;
-    services.podman.enable = true;
+    services.virtualization.enable = true;
   };
 
   # xremap
