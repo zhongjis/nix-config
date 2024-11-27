@@ -1,8 +1,4 @@
-{
-  pkgs,
-  lib,
-  ...
-}: let
+{config, ...}: let
 in {
   imports = [
     ./hyprlock.nix
@@ -18,10 +14,10 @@ in {
   # hyprland
   wayland.windowManager.hyprland = {
     enable = true;
-    extraConfig =
-      /*
-      hyprlang
-      */
+    extraConfig = with config.lib.stylix.colors;
+    /*
+    hyprlang
+    */
       ''
         ################
         ### MONITORS ###
@@ -85,8 +81,10 @@ in {
             border_size = 2
 
             # https://wiki.hyprland.org/Configuring/Variables/#variable-types for info about colors
-            col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
-            col.inactive_border = rgba(595959aa)
+          # col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
+          # col.inactive_border = rgba(595959aa)
+            col.active_border = rgba(${base0E}ff) rgba(${base09}ff) 60deg
+            col.inactive_border = rgba(${base00}ff)
 
             # Set to true enable resizing windows by clicking and dragging on borders and gaps
             resize_on_border = false
@@ -128,7 +126,7 @@ in {
 
             # Default animations, see https://wiki.hyprland.org/Configuring/Animations/ for more
 
-            bezier = myBezier, 0.05, 0.9, 0.1, 1.05
+            bezier = myBezier, 0.25, 0.9, 0.1, 1.02
 
             animation = windows, 1, 7, myBezier
             animation = windowsOut, 1, 7, default, popin 80%
@@ -151,8 +149,7 @@ in {
 
         # https://wiki.hyprland.org/Configuring/Variables/#misc
         misc {
-            force_default_wallpaper = 1 # Set to 0 or 1 to disable the anime mascot wallpapers
-            disable_hyprland_logo = true # If true disables the random hyprland logo / anime girl background. :(
+            force_default_wallpaper = 0
         }
 
 
