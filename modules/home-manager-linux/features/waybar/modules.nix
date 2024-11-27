@@ -502,15 +502,6 @@ in {
               "interval": 86400, // once every day
               "tooltip": true,
           },
-          "custom/light_dark": {
-              "format": "{}",
-              "exec": "echo ; echo 󰔎 Dark-Light switcher",
-              "on-click": "~/.config/hypr/scripts/DarkLight.sh",
-              "on-click-right": "~/.config/hypr/scripts/WaybarStyles.sh",
-              "on-click-middle": "~/.config/hypr/scripts/Wallpaper.sh",
-              "interval": 86400, // once every day
-              "tooltip": true
-          },
           "custom/lock": {
               "format": "󰌾{}",
               "exec": "echo ; echo 󰷛  screen lock",
@@ -519,13 +510,11 @@ in {
               "on-click": "hyprlock",
           },
           "custom/menu": {
-              "format": " {}",
+              "format": " {}",
               "exec": "echo ; echo 󱓟 app launcher",
               "interval": 86400, // once every day
               "tooltip": true,
-              "on-click": "pkill rofi || rofi -show drun -modi run,drun,filebrowser,window",
-              "on-click-middle": "~/.config/hypr/scripts/WallpaperSelect.sh",
-              "on-click-right": "~/.config/hypr/scripts/WaybarLayout.sh",
+              "on-click": "toggle-rofi",
           },
           // This is a custom cava visualizer
           "custom/cava_mviz": {
