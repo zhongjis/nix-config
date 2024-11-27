@@ -50,9 +50,8 @@ in {
         # Autostart necessary processes (like notifications daemons, status bars, etc.)
         # Or execute your favorite apps at launch like this:
 
-        # exec-once = $terminal
         # exec-once = nm-applet &
-        exec-once = waybar & $terminal
+        exec-once = waybar
 
 
         #############################
@@ -195,7 +194,7 @@ in {
         $mainMod = ALT
 
         # Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
-        bind = $mainMod, K, exec, $terminal
+        bind = $mainMod, T, exec, $terminal
         bind = SUPER, Q, killactive,
         # bind = $mainMod, M, exit,
         bind = $mainMod, E, exec, $fileManager
@@ -207,8 +206,8 @@ in {
         bind = $mainMod SHIFT, RETURN, fullscreen
 
         # Move focus with mainMod + arrow keys
-        bind = $mainMod, L, movefocus, l
-        bind = $mainMod, H, movefocus, r
+        bind = $mainMod, L, movefocus, r
+        bind = $mainMod, H, movefocus, l
         bind = $mainMod, K, movefocus, u
         bind = $mainMod, J, movefocus, d
 
@@ -220,9 +219,9 @@ in {
         bind = $mainMod, 5, workspace, 5
         bind = $mainMod, 6, workspace, 6
         bind = $mainMod, 7, workspace, 7
-        bind = $mainMod, 8, workspace, 8
-        bind = $mainMod, 9, workspace, 9
-        bind = $mainMod, 0, workspace, 10
+        bind = $mainMod, D, workspace, 8
+        bind = $mainMod, S, workspace, 9
+        bind = $mainMod, Z, workspace, 10
 
         # Move active window to a workspace with mainMod + SHIFT + [0-9]
         bind = $mainMod SHIFT, 1, movetoworkspace, 1
@@ -232,9 +231,9 @@ in {
         bind = $mainMod SHIFT, 5, movetoworkspace, 5
         bind = $mainMod SHIFT, 6, movetoworkspace, 6
         bind = $mainMod SHIFT, 7, movetoworkspace, 7
-        bind = $mainMod SHIFT, 8, movetoworkspace, 8
-        bind = $mainMod SHIFT, 9, movetoworkspace, 9
-        bind = $mainMod SHIFT, 0, movetoworkspace, 10
+        bind = $mainMod SHIFT, D, movetoworkspace, 8
+        bind = $mainMod SHIFT, S, movetoworkspace, 9
+        bind = $mainMod SHIFT, Z, movetoworkspace, 10
 
         # Example special workspace (scratchpad)
         bind = $mainMod, S, togglespecialworkspace, magic
@@ -260,8 +259,10 @@ in {
         # windowrule = float, ^(kitty)$
 
         # Example windowrule v2
-        # windowrulev2 = float,class:^(kitty)$,title:^(kitty)$
-
+        windowrulev2 = workspace 1,class:^(spotify)$
+        windowrulev2 = workspace 8,class:^(discord)$
+        windowrulev2 = workspace 9,class:^(steam)$
+        windowrulev2 = workspace 10,class:^(zen-alpha)$
         windowrulev2 = suppressevent maximize, class:.* # You'll probably like this.
 
         cursor {
