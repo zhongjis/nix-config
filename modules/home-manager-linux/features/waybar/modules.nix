@@ -386,7 +386,7 @@ in {
                   "󰤥",
                   "󰤨"
               ],
-              "on-click": "kitty nmtui"
+              "on-click": "kitty --title nmtui sh -c 'nmtui'"
           },
           "network#speed": {
               "interval": 1,

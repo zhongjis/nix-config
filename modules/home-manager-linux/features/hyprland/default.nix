@@ -5,7 +5,6 @@
 }: let
 in {
   imports = [
-    ./gtk.nix
     ./hyprlock.nix
     ./hypridle.nix
     ./hyprpaper.nix
