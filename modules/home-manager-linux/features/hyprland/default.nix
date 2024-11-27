@@ -43,7 +43,7 @@ in {
 
         # Set programs that you use
         $terminal = kitty
-        $fileManager = kitty yazi
+        $fileManager = kitty --title yazi sh -c 'yazi'
         $menu = rofi-toggle
 
 

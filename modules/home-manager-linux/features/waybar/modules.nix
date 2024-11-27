@@ -7,7 +7,7 @@
   wlogout-sh = pkgs.writeShellScript "waybar-wlogout" (builtins.readFile ./scripts/wlogout.sh);
   weather-py = pkgs.writers.writePython3 "waybar-weather" {libraries = [pkgs.python3Packages.pyquery];} ./scripts/weather.py;
 in {
-  fileText =
+  xdg.configFile."waybar/modules".text =
     /*
     json
     */

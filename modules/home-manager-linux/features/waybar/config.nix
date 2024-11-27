@@ -1,5 +1,5 @@
-{
-  fileText =
+{...}: {
+  xdg.configFile."waybar/config".text =
     /*
     json
     */
