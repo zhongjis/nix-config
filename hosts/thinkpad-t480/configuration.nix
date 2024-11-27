@@ -90,9 +90,7 @@
     shell = pkgs.zsh;
   };
 
-  # better power consumption
-  services.thermald.enable = true;
-  services.tlp.enable = true;
+  services.power-profiles-daemon.enable = true;
 
   environment.systemPackages = with pkgs; [];
 
