@@ -81,13 +81,8 @@
     isNormalUser = true;
     extraGroups = ["wheel" "input"]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
-      discord
-      terraform
-      kubectl
-      kubelogin
       brightnessctl
       obsidian
-      firefox
       font-manager
       kdePackages.dolphin
       evince # pdf viewer
