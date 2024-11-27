@@ -293,7 +293,12 @@
       #pulseaudio.bluetooth {
         color: @pink;
       }
+
       #pulseaudio.muted {
+        color: @red;
+      }
+
+      #pulseaudio.source-muted {
         color: @red;
       }
 
@@ -311,7 +316,7 @@
       #network.disconnected,
       #network.disabled {
         background-color: @surface0;
-        color: @text;
+        color: @red;
       }
       #pulseaudio-slider slider {
         min-width: 0px;

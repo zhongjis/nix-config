@@ -318,7 +318,7 @@ in {
               "on-click-right": "pavucontrol-qt -t 3",
               "on-scroll-up": "${volume-sh} --inc",
               "on-scroll-down": "${volume-sh} --dec",
-              "tooltip-format": "{icon} {desc} | {volume}%",
+              "tooltip-format": "{icon} {desc}",
               "smooth-scrolling-threshold": 1,
           },
           "pulseaudio#microphone": {
@@ -329,7 +329,7 @@ in {
               "on-click-right": "pavucontrol-qt -t 4",
               "on-scroll-up": "${volume-sh} --mic-inc",
               "on-scroll-down": "${volume-sh} --mic-dec",
-              "tooltip-format": "{source_desc} | {source_volume}%",
+              "tooltip-format": "{source_desc}",
               "scroll-step": 5,
           },
           "temperature": {
