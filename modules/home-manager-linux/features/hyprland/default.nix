@@ -192,25 +192,25 @@ in {
         ####################
 
         # See https://wiki.hyprland.org/Configuring/Keywords/
-        $mainMod = SUPER # Sets "Windows" key as main modifier
+        $mainMod = ALT
 
         # Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
-        bind = $mainMod, Q, exec, $terminal
-        bind = $mainMod, C, killactive,
-        bind = $mainMod, M, exit,
+        bind = $mainMod, K, exec, $terminal
+        bind = SUPER, Q, killactive,
+        # bind = $mainMod, M, exit,
         bind = $mainMod, E, exec, $fileManager
         bind = $mainMod, V, togglefloating,
-        bind = $mainMod, Space, exec, $menu
-        bind = $mainMod, P, pseudo, # dwindle
-        bind = $mainMod, J, togglesplit, # dwindle
+        bind = SUPER, Space, exec, $menu
+        # bind = $mainMod, P, pseudo, # dwindle
+        # bind = $mainMod, J, togglesplit, # dwindle
         bind = $mainMod, RETURN, fullscreen, 1
         bind = $mainMod SHIFT, RETURN, fullscreen
 
         # Move focus with mainMod + arrow keys
-        bind = $mainMod, l, movefocus, l
-        bind = $mainMod, h, movefocus, r
-        bind = $mainMod, k, movefocus, u
-        bind = $mainMod, j, movefocus, d
+        bind = $mainMod, L, movefocus, l
+        bind = $mainMod, H, movefocus, r
+        bind = $mainMod, K, movefocus, u
+        bind = $mainMod, J, movefocus, d
 
         # Switch workspaces with mainMod + [0-9]
         bind = $mainMod, 1, workspace, 1
