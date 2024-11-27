@@ -5,7 +5,8 @@ if pgrep -x "rofi" >/dev/null; then
   pkill rofi
 else
   # Rofi not running, launch it
-  rofi -show combi -modes combi -combi-modes "window,drun,run"
+  # rofi -show combi -modes combi -combi-modes "window,drun,run"
+  rofi -show drun -show-icons
   sleep 0.2 # Small delay to let Rofi open
   hyprctl dispatch focuswindow active
 fi
