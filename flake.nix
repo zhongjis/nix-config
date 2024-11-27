@@ -17,22 +17,9 @@
     };
 
     hyprland.url = "github:hyprwm/Hyprland";
-
     xremap-flake.url = "github:xremap/nix-flake";
     nixpkgs-terraform.url = "github:stackbuilders/nixpkgs-terraform";
-
     stylix.url = "github:danth/stylix";
-
-    # neovim
-    trouble-nvim = {
-      url = "github:folke/trouble.nvim";
-      flake = false;
-    };
-    oil-nvim = {
-      url = "github:stevearc/oil.nvim";
-      flake = false;
-    };
-
     nh_darwin.url = "github:ToyVo/nh_darwin";
 
     # secret management

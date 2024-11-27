@@ -1127,22 +1127,6 @@
         "type": "github"
       }
     },
-    "oil-nvim": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1732554633,
-        "narHash": "sha256-Ji76SrTxOzWqfqGlpteuEpoXihJaSrTbDZpkVttXmEs=",
-        "owner": "stevearc",
-        "repo": "oil.nvim",
-        "rev": "3c2de37accead0240fbe812f5ccdedfe0b973557",
-        "type": "github"
-      },
-      "original": {
-        "owner": "stevearc",
-        "repo": "oil.nvim",
-        "type": "github"
-      }
-    },
     "pre-commit-hooks": {
       "inputs": {
         "flake-compat": "flake-compat",
@@ -1178,10 +1162,8 @@
         "nixpkgs": "nixpkgs_3",
         "nixpkgs-terraform": "nixpkgs-terraform",
         "nixpkgs-unstable": "nixpkgs-unstable",
-        "oil-nvim": "oil-nvim",
         "sops-nix": "sops-nix",
         "stylix": "stylix",
-        "trouble-nvim": "trouble-nvim",
         "xremap-flake": "xremap-flake",
         "zen-browser": "zen-browser"
       }
@@ -1361,22 +1343,6 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
-        "type": "github"
-      }
-    },
-    "trouble-nvim": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1732657572,
-        "narHash": "sha256-EzPSGJgloj8lwECet6K28+isgoszM+vZ/xUAjo6bXwA=",
-        "owner": "folke",
-        "repo": "trouble.nvim",
-        "rev": "c633e8559adf529b85167a4cb489d7358e9efb1a",
-        "type": "github"
-      },
-      "original": {
-        "owner": "folke",
-        "repo": "trouble.nvim",
         "type": "github"
       }
     },

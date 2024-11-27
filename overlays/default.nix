@@ -9,22 +9,6 @@
   modifications = final: prev: rec {
     # jdk = prev."jdk${toString 17}";
     # maven = prev.maven.override {inherit jdk;};
-    vimPlugins =
-      prev.vimPlugins
-      // {
-        trouble-nvim =
-          prev.vimUtils.buildVimPlugin
-          {
-            name = "trouble.nvim";
-            src = inputs.trouble-nvim;
-          };
-        oil-nvim =
-          prev.vimUtils.buildVimPlugin
-          {
-            name = "oil.nvim";
-            src = inputs.oil-nvim;
-          };
-      };
   };
 
   # When applied, the unstable nixpkgs set (declared in the flake inputs) will

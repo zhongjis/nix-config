@@ -111,5 +111,37 @@ NOTE: most of the changes (like for neovim) are changed on the way while im usin
 - [-] aerospace and sketchybar integration not working
 
 ## stylix
+
 =======
->>>>>>> Stashed changes
+
+## Notes
+
+### Build directly from repo
+
+adding inputs
+
+```nix
+inputs = {
+    trouble-nvim = {
+      url = "github:folke/trouble.nvim";
+      flake = false;
+    };
+}
+```
+
+override in overlays
+
+```nix
+  modifications = final: prev: rec {
+    vimPlugins =
+      prev.vimPlugins
+      // {
+        trouble-nvim =
+          prev.vimUtils.buildVimPlugin
+          {
+            name = "trouble.nvim";
+            src = inputs.trouble-nvim;
+          };
+      };
+  };
+```
