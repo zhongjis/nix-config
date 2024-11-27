@@ -16,19 +16,21 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix-gaming.url = "github:fufexan/nix-gaming";
+
+    # programs
     hyprland.url = "github:hyprwm/Hyprland";
     xremap-flake.url = "github:xremap/nix-flake";
     nixpkgs-terraform.url = "github:stackbuilders/nixpkgs-terraform";
     stylix.url = "github:danth/stylix";
     nh_darwin.url = "github:ToyVo/nh_darwin";
+    zen-browser.url = "github:0xc000022070/zen-browser-flake";
 
     # secret management
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    zen-browser.url = "github:0xc000022070/zen-browser-flake";
 
     # https://github.com/niksingh710/minimal-tmux-status/
     minimal-tmux = {

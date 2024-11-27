@@ -28,6 +28,7 @@
 
   specialisation = {
     gaming-time.configuration = {
+      # gaming kernel
       hardware.nvidia = {
         prime.sync.enable = lib.mkForce true;
         prime.offload = {

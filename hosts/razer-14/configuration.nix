@@ -2,12 +2,18 @@
   pkgs,
   inputs,
   currentSystem,
+  lib,
   ...
 }: {
   imports = [
     ./hardware-configuration.nix
     ../common.nix
+    inputs.nix-gaming.nixosModules.platformOptimizations
+    inputs.nix-gaming.nixosModules.pipewireLowLatency
   ];
+
+  # gaming kernel. not sure if it is good
+  boot.kernelPackages = pkgs.linuxKernel.packages.linux_xanmod_latest;
 
   myNixOS = {
     bundles.general-desktop.enable = true;
