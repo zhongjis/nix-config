@@ -1,4 +1,4 @@
-{...}: {
+{pkgs, ...}: {
   virtualisation.libvirtd.enable = true;
   virtualisation.podman = {
     enable = true;
@@ -7,4 +7,8 @@
       dns_enabled = true;
     };
   };
+
+  environment.systemPackages = with pkgs; [
+    distrobox
+  ];
 }
