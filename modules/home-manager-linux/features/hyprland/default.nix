@@ -219,8 +219,8 @@ in {
         bind = $mainMod, 5, workspace, 5
         bind = $mainMod, 6, workspace, 6
         bind = $mainMod, 7, workspace, 7
-        bind = $mainMod, D, workspace, 8
-        bind = $mainMod, S, workspace, 9
+        bind = $mainMod, 8, workspace, 8
+        bind = $mainMod, G, workspace, 9
         bind = $mainMod, Z, workspace, 10
 
         # Move active window to a workspace with mainMod + SHIFT + [0-9]
@@ -231,8 +231,8 @@ in {
         bind = $mainMod SHIFT, 5, movetoworkspace, 5
         bind = $mainMod SHIFT, 6, movetoworkspace, 6
         bind = $mainMod SHIFT, 7, movetoworkspace, 7
-        bind = $mainMod SHIFT, D, movetoworkspace, 8
-        bind = $mainMod SHIFT, S, movetoworkspace, 9
+        bind = $mainMod SHIFT, 8, movetoworkspace, 8
+        bind = $mainMod SHIFT, G, movetoworkspace, 9
         bind = $mainMod SHIFT, Z, movetoworkspace, 10
 
         # Example special workspace (scratchpad)
@@ -260,10 +260,15 @@ in {
 
         # Example windowrule v2
         windowrulev2 = workspace 1,class:^(spotify)$
-        windowrulev2 = workspace 8,class:^(discord)$
+        windowrulev2 = workspace special:magic,class:^(discord)$
         windowrulev2 = workspace 9,class:^(steam)$
         windowrulev2 = workspace 10,class:^(zen-alpha)$
+        windowrulev2 = float,title:Volume Control
+        windowrulev2 = float,class:kitty,title:btop
+        windowrulev2 = float,class:kitty,title:nvtop
+        windowrulev2 = float,class:kitty,title:nmtui
         windowrulev2 = suppressevent maximize, class:.* # You'll probably like this.
+
 
         cursor {
             no_hardware_cursors = true
