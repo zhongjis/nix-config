@@ -4,7 +4,7 @@
   currentSystemUser,
   ...
 }: let
-  unstable_pkgs = with pkgs.unstable; [
+  stable_pkgs = with pkgs.stable; [
     # placeholder
   ];
 in {
@@ -18,7 +18,7 @@ in {
     shell = pkgs.zsh;
   };
 
-  environment.systemPackages = with pkgs; [] ++ unstable_pkgs;
+  environment.systemPackages = with pkgs; [] ++ stable_pkgs;
 
   services.nix-daemon.enable = true;
 

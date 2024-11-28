@@ -7,7 +7,8 @@
   toLua = str: "lua << EOF\n${str}\nEOF\n";
   toLuaFile = file: "lua << EOF\n${builtins.readFile file}\nEOF\n";
 
-  extraUnstablePackages = with pkgs.unstable; [
+  extraUnstablePackages = with pkgs; [
+    # lsp
     nixd
   ];
 
@@ -39,7 +40,7 @@ in {
   programs.neovim = {
     enable = true;
     # package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
-    package = pkgs.unstable.neovim-unwrapped;
+    package = pkgs.stable.neovim-unwrapped;
 
     viAlias = true;
     vimAlias = true;
@@ -52,7 +53,7 @@ in {
       with luaPkgs; [
         jsregexp # for luasnip
       ];
-    extraPackages = with pkgs;
+    extraPackages = with pkgs.stable;
       [
         cargo # Depdency for Mason Install packages
 
@@ -68,7 +69,7 @@ in {
       ]
       ++ extraUnstablePackages;
 
-    plugins = with pkgs.unstable.vimPlugins; [
+    plugins = with pkgs.stable.vimPlugins; [
       # **telescope.nvim**
       nvim-web-devicons
       plenary-nvim

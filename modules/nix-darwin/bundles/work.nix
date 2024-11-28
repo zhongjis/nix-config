@@ -1,5 +1,5 @@
 {pkgs, ...}: let
-  unstable_pkgs = with pkgs.unstable; [
+  stable_pkgs = with pkgs.stable; [
     # placeholder
   ];
 in {
