@@ -1,4 +1,5 @@
 {...}: {
+  # better power consumption
   boot.kernelParams = ["amd_pstate=guided"];
 
   # powerManagement = {
@@ -18,7 +19,6 @@
   #   };
   # };
 
-  # better power consumption
   services.thermald.enable = true;
   services.tlp = {
     enable = true;
