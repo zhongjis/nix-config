@@ -525,11 +525,11 @@
         "xdph": "xdph"
       },
       "locked": {
-        "lastModified": 1732737540,
-        "narHash": "sha256-ORogf5yeqxar+fMJek+rpUgfnCOYcoeomvczo/tYOcE=",
+        "lastModified": 1732808926,
+        "narHash": "sha256-//MlFWIxY/HSfFhPr92yFAHZpZOdcMKU9MdIo7Tti9Q=",
         "owner": "hyprwm",
         "repo": "Hyprland",
-        "rev": "5329298b522e3cc1201894909443775b00aeb336",
+        "rev": "22bf2853e6271932f073961f3dbeb0f9ff48493e",
         "type": "github"
       },
       "original": {
@@ -928,17 +928,17 @@
     },
     "nixpkgs-1_9": {
       "locked": {
-        "lastModified": 1726871744,
-        "narHash": "sha256-V5LpfdHyQkUF7RfOaDPrZDP+oqz88lTJrMT1+stXNwo=",
+        "lastModified": 1732617236,
+        "narHash": "sha256-PYkz6U0bSEaEB1al7O1XsqVNeSNS+s3NVclJw7YC43w=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "a1d92660c6b3b7c26fb883500a80ea9d33321be2",
+        "rev": "af51545ec9a44eadf3fe3547610a5cdd882bc34e",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "a1d92660c6b3b7c26fb883500a80ea9d33321be2",
+        "rev": "af51545ec9a44eadf3fe3547610a5cdd882bc34e",
         "type": "github"
       }
     },
@@ -1004,11 +1004,11 @@
         "systems": "systems_2"
       },
       "locked": {
-        "lastModified": 1729156928,
-        "narHash": "sha256-+D0R2rH2pEhzJ3zZGc5Oj5KGtnkO43sCWYNbq0ptuao=",
+        "lastModified": 1732822534,
+        "narHash": "sha256-sVELiskid1pvOUDvQ9bQNQvjUIbwGXGKM7uM2TsLq8s=",
         "owner": "stackbuilders",
         "repo": "nixpkgs-terraform",
-        "rev": "db8dc49e397acf87d5b542755717bae368d32f3c",
+        "rev": "a83ca9540d602dcaad8fcc0f774cec93c1c935c9",
         "type": "github"
       },
       "original": {
@@ -1559,11 +1559,11 @@
         "nixpkgs": "nixpkgs_11"
       },
       "locked": {
-        "lastModified": 1732757169,
-        "narHash": "sha256-CzpXDxU9Oq6STK3QYdme6l8QTRcOIcOQ/U08NrKt8D0=",
+        "lastModified": 1732785687,
+        "narHash": "sha256-dkh/Ff2nxZvMdRnkUq+mo8I1IOk/ASjBM7HEanKV290=",
         "owner": "0xc000022070",
         "repo": "zen-browser-flake",
-        "rev": "7ea856ec3fb1dc50dd6fc9c9cb9d46b46691fda7",
+        "rev": "a1c38bb83c32339b1b0ee6a3f740c0dd677d43be",
         "type": "github"
       },
       "original": {
