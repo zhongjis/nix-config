@@ -89,8 +89,10 @@
   };
 
   hardware.cpu.amd.updateMicrocode = true;
-  hardware.logitech.enable = true;
-  hardware.logitech.enableGraphical = true; # for solaar to be included
+
+  # Logitech Blutooth Devices
+  hardware.logitech.wireless.enable = true;
+  hardware.logitech.wireless.enableGraphical = true; # for solaar to be included
 
   environment.systemPackages = with pkgs; [
     inputs.zen-browser.packages."${currentSystem}".specific

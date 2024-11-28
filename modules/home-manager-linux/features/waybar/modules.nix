@@ -352,20 +352,6 @@ in {
               "icon-size": 15,
               "spacing": 8,
           },
-          "wireplumber": {
-              "format": "{icon} {volume} %",
-              "format-muted": " Mute",
-              "on-click": "${volume-sh} --toggle",
-              "on-click-right": "pavucontrol-qt -t 3",
-              "on-scroll-up": "${volume-sh} --inc",
-              "on-scroll-down": "${volume-sh} --dec",
-              "format-icons": [
-                  "",
-                  "",
-                  "󰕾",
-                  ""
-              ],
-          },
           "wlr/taskbar": {
               "format": "{icon} {name} ",
               "icon-size": 15,
