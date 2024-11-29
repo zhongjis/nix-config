@@ -63,7 +63,7 @@ in rec {
             overlays = [
               inputs.nixpkgs-terraform.overlays.default
               overlays.modifications
-              overlays.unstable-packages
+              overlays.stable-packages
             ];
             config = {
               allowUnfree = true;
@@ -100,7 +100,7 @@ in rec {
       overlays = [
         inputs.nixpkgs-terraform.overlays.default
         overlays.modifications
-        overlays.unstable-packages
+        overlays.stable-packages
       ];
     };
 
