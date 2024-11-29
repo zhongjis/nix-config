@@ -267,7 +267,7 @@ in {
         windowrulev2 = float,class:kitty,title:btop
         windowrulev2 = float,class:kitty,title:nvtop
         windowrulev2 = float,class:kitty,title:nmtui
-        windowrulev2 = suppressevent maximize, class:.* # You'll probably like this.
+        # windowrulev2 = suppressevent maximize, class:.* # You'll probably like this.
 
 
         cursor {
