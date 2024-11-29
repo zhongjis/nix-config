@@ -17,7 +17,6 @@
   myHomeManager.zellij.enable = lib.mkDefault false;
   myHomeManager.alacritty.enable = lib.mkDefault false;
   myHomeManager.bat.enable = lib.mkDefault true;
-  myHomeManager.carapace.enable = lib.mkDefault true;
   myHomeManager.eza.enable = lib.mkDefault true;
   myHomeManager.fastfetch.enable = lib.mkDefault true;
   myHomeManager.fzf.enable = lib.mkDefault true;
