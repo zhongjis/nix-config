@@ -1,12 +1,12 @@
 {pkgs, ...}: let
-  stable_pkgs = with pkgs.stable; [
+  unstable_pkgs = with pkgs; [
     # placeholder
   ];
 in {
-  environment.systemPackages = with pkgs;
+  environment.systemPackages = with pkgs.stable;
     [
       mongosh
-      terraform-versions."1.9.8"
+      terraform
 
       # **java**
       maven
