@@ -28,7 +28,6 @@
   myHomeManager.starship.enable = lib.mkDefault true;
   myHomeManager.thefuck.enable = lib.mkDefault true;
   myHomeManager.yazi.enable = lib.mkDefault true;
-  myHomeManager.zoxide.enable = lib.mkDefault true;
   myHomeManager.zsh.enable = lib.mkDefault true;
 
   home.sessionVariables = {
