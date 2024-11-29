@@ -2,6 +2,8 @@
   # better power consumption
   boot.kernelParams = ["amd_pstate=guided"];
 
+  # services.power-profiles-daemon.enable = true;
+
   # powerManagement = {
   #   enable = true;
   #   cpuFreqGovernor = "schedutil";
@@ -19,7 +21,7 @@
   #   };
   # };
 
-  services.thermald.enable = true;
+  # services.thermald.enable = true;
   services.tlp = {
     enable = true;
     settings = {
@@ -31,7 +33,7 @@
 
       CPU_MIN_PERF_ON_AC = 0;
       CPU_MAX_PERF_ON_AC = 100;
-      CPU_MIN_PERF_ON_BAT = 0;
+      CPU_MIN_PERF_ON_BAT = 10;
       CPU_MAX_PERF_ON_BAT = 30;
 
       #Optional helps save long term battery health
