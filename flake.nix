@@ -19,7 +19,6 @@
     nix-gaming.url = "github:fufexan/nix-gaming";
 
     # programs
-    hyprland.url = "github:hyprwm/Hyprland";
     xremap-flake.url = "github:xremap/nix-flake";
     nixpkgs-terraform.url = "github:stackbuilders/nixpkgs-terraform";
     stylix.url = "github:danth/stylix";
