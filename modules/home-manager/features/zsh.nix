@@ -9,6 +9,13 @@
     ".local/share/zsh/zsh-fzf-tab".source = "${pkgs.zsh-fzf-tab}/share/fzf-tab";
   };
 
+  home.packages = with pkgs; [
+    bat
+    carapace
+    thefuck
+    zoxide
+  ];
+
   programs.zsh = {
     enable = true;
     autosuggestion = {
@@ -35,9 +42,20 @@
     };
     initExtra = ''
       source "$HOME/.local/share/zsh/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
-
-      autoload -U compinit; compinit
       source "$HOME/.local/share/zsh/zsh-fzf-tab/fzf-tab.plugin.zsh"
     '';
+  };
+
+  programs.eza = {
+    enable = true;
+    enableZshIntegration = true;
+    git = true;
+    icons = "auto";
+    extraOptions = [
+      "--group-directories-first"
+      "--long"
+      "--no-user"
+      "--all"
+    ];
   };
 }
