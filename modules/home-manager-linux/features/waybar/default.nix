@@ -14,8 +14,6 @@
   home.packages = with pkgs; [
     jq
     pamixer
-    btop
-    nvtopPackages.full
     playerctl
     (writeScriptBin "restart-waybar" ''
       ${builtins.readFile ./restart-waybar.sh}
