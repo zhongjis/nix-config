@@ -2,7 +2,6 @@
   pkgs,
   isDarwin,
   config,
-  inputs,
   ...
 }: let
   keyboardCmd =
@@ -62,8 +61,9 @@ in {
       '';
   };
 
-  home.packages = [
-    (pkgs.writeScriptBin "tmux-sessionizer" ''
+  home.packages = with pkgs; [
+    fastfetch
+    (writeScriptBin "tmux-sessionizer" ''
       ${builtins.readFile ./tmux-sessionizer.sh}
     '')
   ];
