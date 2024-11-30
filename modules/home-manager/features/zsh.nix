@@ -59,7 +59,7 @@
 
   programs.eza = {
     enable = true;
-    enableZshIntegration = false;
+    enableZshIntegration = true;
     git = true;
     icons = "auto";
     extraOptions = [
