@@ -43,6 +43,6 @@
 
   environment.systemPackages = with pkgs; [
     pciutils
-    gwe
+    # gwe # not supported for wayland yet
   ];
 }
