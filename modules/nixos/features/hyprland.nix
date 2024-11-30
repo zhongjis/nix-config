@@ -4,6 +4,7 @@
   ...
 }: {
   services.xserver.enable = true;
+  services.xserver.displayManager.defaultSession = "hyprland";
 
   programs.uwsm.enable = true;
   programs.hyprland = {
