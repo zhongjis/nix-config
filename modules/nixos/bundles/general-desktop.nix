@@ -65,15 +65,11 @@
 
   fonts.packages = with pkgs; [
     # fonts
-    (nerdfonts.override {
-      fonts = [
-        "JetBrainsMono"
-        "Iosevka"
-        "FiraCode"
-        "DroidSansMono"
-        "Agave"
-      ];
-    })
+    nerd-fonts.jetbrains-mono
+    nerd-fonts.iosevka
+    nerd-fonts.fira-code
+    nerd-fonts.droid-sans-mono
+    nerd-fonts.agave
     font-awesome
     sketchybar-app-font
     cm_unicode
