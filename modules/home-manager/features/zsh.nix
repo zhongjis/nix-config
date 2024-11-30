@@ -8,6 +8,7 @@
     ".local/share/zsh/zsh-autosuggestions".source = "${pkgs.zsh-autosuggestions}/share/zsh-autosuggestions";
     ".local/share/zsh/zsh-fast-syntax-highlighting".source = "${pkgs.zsh-fast-syntax-highlighting}/share/zsh/site-functions";
     ".local/share/zsh/zsh-vi-mode".source = "${pkgs.zsh-vi-mode}/share/zsh-vi-mode";
+    # ".local/share/zsh/zsh-fzf-tab".source = "${pkgs.zsh-fzf-tab}/share/fzf-tab";
   };
 
   programs.zsh = {
@@ -46,6 +47,8 @@
         export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
         zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
         source <(carapace _carapace)
+
+        # source "$HOME/.local/share/zsh/zsh-fzf-tab/fzf-tab.plugin.zsh"
       '';
   };
 
