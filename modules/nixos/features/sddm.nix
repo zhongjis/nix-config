@@ -7,7 +7,7 @@
   services.displayManager.sddm = {
     enable = true;
     package = lib.mkForce pkgs.kdePackages.sddm;
-    wayland.enable = lib.mkForce true;
+    # wayland.enable = lib.mkForce true;
     theme = lib.mkForce "catppuccin-mocha";
   };
 
