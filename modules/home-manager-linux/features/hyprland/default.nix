@@ -64,8 +64,12 @@ in {
         env = XCURSOR_SIZE,24
         env = HYPRCURSOR_SIZE,24
 
+        env = GBM_BACKEND,nvidia-drm
         env = LIBVA_DRIVER_NAME,nvidia
+
         env = __GLX_VENDOR_LIBRARY_NAME,nvidia
+        env = __GL_GSYNC_ALLOWED,1
+        env = __GL_VRR_ALLOWED,0
 
         #####################
         ### LOOK AND FEEL ###
