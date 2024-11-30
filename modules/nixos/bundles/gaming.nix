@@ -16,6 +16,8 @@
   programs.steam.gamescopeSession.enable = true;
 
   environment.systemPackages = with pkgs; [
+    nvtopPackages.full # graphic monitoring
+
     mangohud
     gamescope
     protonup-qt
