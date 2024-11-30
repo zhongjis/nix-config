@@ -1,13 +1,14 @@
 {
   pkgs,
   config,
+  lib,
   ...
 }: {
   services.displayManager.sddm = {
     enable = true;
-    package = pkgs.kdePackages.sddm;
-    wayland.enable = true;
-    theme = "catppuccin-mocha";
+    package = lib.mkForce pkgs.kdePackages.sddm;
+    wayland.enable = lib.mkForce true;
+    theme = lib.mkForce "catppuccin-mocha";
   };
 
   environment.systemPackages = [

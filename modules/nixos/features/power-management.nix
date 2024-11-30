@@ -2,14 +2,15 @@
   # better power consumption
   boot.kernelParams = ["amd_pstate=guided"];
 
-  # services.power-profiles-daemon.enable = true;
+  services.power-profiles-daemon.enable = true;
 
   powerManagement = {
     enable = true;
+    powertop.enable = true;
     cpuFreqGovernor = "schedutil";
   };
 
-  services.auto-cpufreq.enable = true;
+  # services.auto-cpufreq.enable = true;
   # services.auto-cpufreq.settings = {
   #   battery = {
   #     governor = "powersave";
