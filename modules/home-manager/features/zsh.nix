@@ -7,9 +7,7 @@
   home.file = {
     ".local/share/zsh/zsh-autosuggestions".source = "${pkgs.zsh-autosuggestions}/share/zsh-autosuggestions";
     ".local/share/zsh/zsh-fast-syntax-highlighting".source = "${pkgs.zsh-fast-syntax-highlighting}/share/zsh/site-functions";
-    ".local/share/zsh/nix-zsh-completions".source = "${pkgs.nix-zsh-completions}/share/zsh/plugins/nix";
     ".local/share/zsh/zsh-vi-mode".source = "${pkgs.zsh-vi-mode}/share/zsh-vi-mode";
-    ".local/share/zsh/zsh-fzf-tab".source = "${pkgs.zsh-fzf-tab}/share/fzf-tab";
   };
 
   programs.zsh = {
@@ -44,10 +42,6 @@
         ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#${config.lib.stylix.colors.base03},bg=cyan,bold,underline"
         bindkey '^ ' autosuggest-accept
         source "$HOME/.local/share/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
-
-        source "$HOME/.local/share/zsh/zsh-fzf-tab/fzf-tab.plugin.zsh"
-
-        source "$HOME/.local/share/zsh/nix-zsh-completions/nix.plugin.zsh"
 
         export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
         zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
