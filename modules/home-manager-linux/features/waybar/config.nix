@@ -18,9 +18,6 @@
           "margin-right": 8,
           "modules-left": [
               "custom/menu",
-              "custom/separator#dot-line",
-              "power-profiles-daemon",
-              "group/mobo_drawer",
               "custom/separator#blank",
               "group/laptop",
               "custom/separator#line",
