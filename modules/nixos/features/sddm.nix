@@ -15,7 +15,7 @@
       pkgs.catppuccin-sddm.override {
         flavor = "mocha";
         font = "Noto Sans";
-        fontSize = "9";
+        fontSize = "12";
         background = "${config.stylix.image}";
         loginBackground = true;
       }
