@@ -223,8 +223,8 @@ in {
         bind = $mainMod, 4, workspace, 4
         bind = $mainMod, 5, workspace, 5
         bind = $mainMod, 6, workspace, 6
-        bind = $mainMod, 7, workspace, 7
-        bind = $mainMod, 8, workspace, 8
+        bind = $mainMod, O, workspace, 7
+        bind = $mainMod, P, workspace, 8
         bind = $mainMod, G, workspace, 9
         bind = $mainMod, Z, workspace, 10
 
@@ -235,8 +235,8 @@ in {
         bind = $mainMod SHIFT, 4, movetoworkspace, 4
         bind = $mainMod SHIFT, 5, movetoworkspace, 5
         bind = $mainMod SHIFT, 6, movetoworkspace, 6
-        bind = $mainMod SHIFT, 7, movetoworkspace, 7
-        bind = $mainMod SHIFT, 8, movetoworkspace, 8
+        bind = $mainMod SHIFT, O, movetoworkspace, 7
+        bind = $mainMod SHIFT, P, movetoworkspace, 8
         bind = $mainMod SHIFT, G, movetoworkspace, 9
         bind = $mainMod SHIFT, Z, movetoworkspace, 10
 
@@ -266,6 +266,7 @@ in {
         # Example windowrule v2
         windowrulev2 = workspace 1,class:^(spotify)$
         windowrulev2 = workspace special:magic,class:^(discord)$
+        windowrulev2 = workspace 7,class:^(obsidian)$
         windowrulev2 = workspace 9,class:^(steam)$
         windowrulev2 = workspace 10,class:^(zen-alpha)$
         windowrulev2 = float,center,size 40% 60%,title:Volume Control
