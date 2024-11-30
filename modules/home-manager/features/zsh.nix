@@ -48,6 +48,10 @@
         source "$HOME/.local/share/zsh/zsh-fzf-tab/fzf-tab.plugin.zsh"
 
         source "$HOME/.local/share/zsh/nix-zsh-completions/nix.plugin.zsh"
+
+        export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
+        zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
+        source <(carapace _carapace)
       '';
   };
 
