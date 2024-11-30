@@ -25,15 +25,11 @@
       },
     '';
 
-  hmConfiguration =
-    if isDarwin
-    then "zshen-mac"
-    else "zshen-razer";
   nixdOptionsLua =
     systemOption
     + ''
       home_manager = {
-        expr = '(builtins.getFlake "~/personal/nix-config").homeConfigurations.${hmConfiguration}.options',
+        expr = '(builtins.getFlake "~/personal/nix-config").homeConfigurations.${currentSystemName}.options',
       },
     '';
 in {
