@@ -241,8 +241,8 @@ in {
         bind = $mainMod SHIFT, S, movetoworkspace, special:magic
 
         # Scroll through existing workspaces with mainMod + scroll
-        bind = $mainMod, mouse_down, workspace, e+1
-        bind = $mainMod, mouse_up, workspace, e-1
+        # bind = $mainMod, mouse_down, workspace, e+1
+        # bind = $mainMod, mouse_up, workspace, e-1
 
         # Move/resize windows with mainMod + LMB/RMB and dragging
         bindm = $mainMod SHIFT, mouse:272, movewindow
@@ -264,10 +264,10 @@ in {
         windowrulev2 = workspace special:magic,class:^(discord)$
         windowrulev2 = workspace 9,class:^(steam)$
         windowrulev2 = workspace 10,class:^(zen-alpha)$
-        windowrulev2 = float,title:Volume Control
-        windowrulev2 = float,class:kitty,title:btop
-        windowrulev2 = float,class:kitty,title:nvtop
-        windowrulev2 = float,class:kitty,title:nmtui
+        windowrulev2 = float,center,size 40% 60%,pseudo,title:Volume Control
+        windowrulev2 = float,center,size 40% 60%,pseudo,class:kitty,title:btop
+        windowrulev2 = float,center,size 40% 60%,pseudo,class:kitty,title:nvtop
+        windowrulev2 = float,center,size 40% 60%,pseudo,class:kitty,title:nmtui
         # windowrulev2 = suppressevent maximize, class:.* # You'll probably like this.
 
 
