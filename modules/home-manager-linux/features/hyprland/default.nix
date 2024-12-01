@@ -72,6 +72,8 @@ in {
         env = __GL_GSYNC_ALLOWED,1
         env = __GL_VRR_ALLOWED,0
 
+        env = GDK_SCALE,1
+
         #####################
         ### LOOK AND FEEL ###
         #####################
