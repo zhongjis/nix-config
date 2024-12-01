@@ -18,7 +18,7 @@
   myNixOS = {
     bundles.general-desktop.enable = true;
     bundles.hyprland.enable = true;
-    bundles.kde.enable = true;
+    bundles.gnome.enable = true;
     bundles.gaming.enable = true;
     services.nvidia.enable = true;
     services.virtualization.enable = true;

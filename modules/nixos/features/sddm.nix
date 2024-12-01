@@ -6,9 +6,9 @@
 }: {
   services.displayManager.sddm = {
     enable = true;
-    # package = lib.mkForce pkgs.kdePackages.sddm;
+    package = lib.mkForce pkgs.kdePackages.sddm;
     wayland.enable = true;
-    # theme = lib.mkForce "catppuccin-mocha";
+    theme = lib.mkForce "catppuccin-mocha";
   };
 
   environment.systemPackages = [
