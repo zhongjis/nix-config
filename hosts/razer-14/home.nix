@@ -1,6 +1,7 @@
 {pkgs, ...}: {
   myHomeManager.bundles.general.enable = true;
   myHomeManagerLinux.bundles.linux.enable = true;
+  myHomeManagerLinux.bundles.hyprland.enable = true;
 
   programs.git.userName = "zhongjis";
   programs.git.userEmail = "zhongjie.x.shen@gmail.com";
