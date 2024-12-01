@@ -1,4 +1,4 @@
-{lib, ...}: {
+{...}: {
   myHomeManagerLinux.hyprland.enable = true;
   myHomeManagerLinux.rofi.enable = true;
   myHomeManagerLinux.swaync.enable = true;
