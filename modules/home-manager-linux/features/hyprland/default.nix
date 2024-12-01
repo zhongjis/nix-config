@@ -270,10 +270,10 @@ in {
         windowrulev2 = workspace 7,class:^(obsidian)$
         windowrulev2 = workspace 9,class:^(steam)$
         windowrulev2 = workspace 10,class:^(zen-alpha)$
-        windowrulev2 = float,center,size 40% 60%,title:Volume Control
-        windowrulev2 = float,center,size 40% 60%,class:kitty,title:btop
-        windowrulev2 = float,center,size 40% 60%,class:kitty,title:nvtop
-        windowrulev2 = float,center,size 40% 60%,class:kitty,title:nmtui
+        # windowrulev2 = float,center,size 40% 60%,title:Volume Control
+        # windowrulev2 = float,center,size 40% 60%,class:kitty,title:btop
+        # windowrulev2 = float,center,size 40% 60%,class:kitty,title:nvtop
+        # windowrulev2 = float,center,size 40% 60%,class:kitty,title:nmtui
         # windowrulev2 = suppressevent maximize, class:.* # You'll probably like this.
 
 
