@@ -53,6 +53,7 @@ in {
         # exec-once = nm-applet &
         exec-once = waybar
         exec-once = dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+        exec-once = solaar --window=hide
 
 
         #############################
