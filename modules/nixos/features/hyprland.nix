@@ -15,8 +15,7 @@
 
   environment.systemPackages = with pkgs; [
     brightnessctl # brightness control
-    lxqt.lxqt-policykit
-    lxqt.pavucontrol-qt # volume control
+    pavucontrol # volume control
 
     wl-clipboard
     cliphist
