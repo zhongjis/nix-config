@@ -277,6 +277,14 @@ in {
         # windowrulev2 = suppressevent maximize, class:.* # You'll probably like this.
 
 
+        # hide xwaylandvideobridge, more detial see
+        # https://wiki.hyprland.org/Useful-Utilities/Screen-Sharing/#xwayland
+        windowrulev2 = opacity 0.0 override, class:^(xwaylandvideobridge)$
+        windowrulev2 = noanim, class:^(xwaylandvideobridge)$
+        windowrulev2 = noinitialfocus, class:^(xwaylandvideobridge)$
+        windowrulev2 = maxsize 1 1, class:^(xwaylandvideobridge)$
+        windowrulev2 = noblur, class:^(xwaylandvideobridge)$
+        windowrulev2 = nofocus, class:^(xwaylandvideobridge)$
         cursor {
             no_hardware_cursors = true
         }
