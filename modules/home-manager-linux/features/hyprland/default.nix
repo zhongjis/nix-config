@@ -37,17 +37,6 @@ in {
     hyprlang
     */
       ''
-        ###################
-        ### MY PROGRAMS ###
-        ###################
-
-        # See https://wiki.hyprland.org/Configuring/Keywords/
-
-        # Set programs that you use
-        $terminal = kitty
-        $fileManager = kitty --title yazi sh -c 'yazi'
-        $menu = rofi-toggle
-
         #####################
         ### LOOK AND FEEL ###
         #####################

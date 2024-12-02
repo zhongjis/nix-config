@@ -3,6 +3,17 @@
   ### KEYBINDINGSS ###
   ####################
   wayland.windowManager.hyprland.settings = {
+    ###################
+    ### MY PROGRAMS ###
+    ###################
+
+    # See https://wiki.hyprland.org/Configuring/Keywords/
+
+    # Set programs that you use
+    "$terminal" = "kitty";
+    "$fileManager" = "kitty --title yazi sh -c 'yazi'";
+    "$menu" = "rofi-toggle";
+
     # See https://wiki.hyprland.org/Configuring/Keywords/
     "$mainMod" = "ALT";
     bind = [
