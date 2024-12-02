@@ -70,16 +70,6 @@ in {
             inactive_opacity = 1.0
             fullscreen_opacity = 1.0
 
-            blur {
-                enabled = true
-                size = 6
-                passes = 2
-                new_optimizations = on
-                ignore_opacity = true
-                xray = true
-                # blurls = waybar
-            }
-
             shadow {
                 enabled = true
                 range = 30
