@@ -61,10 +61,16 @@ in {
       '';
   };
 
+  xdg.configFile."tmux/.tmux-cht-command".source = ./scripts/.tmux-cht-command;
+  xdg.configFile."tmux/.tmux-cht-languages".source = ./scripts/.tmux-cht-languages;
+
   home.packages = with pkgs; [
     fastfetch
-    (writeScriptBin "tmux-sessionizer" ''
-      ${builtins.readFile ./tmux-sessionizer.sh}
+    (writeScriptBin "sessionizer" ''
+      ${builtins.readFile ./scripts/tmux-sessionizer.sh}
+    '')
+    (writeScriptBin "cht" ''
+      ${builtins.readFile ./scripts/tmux-cht.sh}
     '')
   ];
 }

@@ -1,13 +1,14 @@
 {
   pkgs,
   config,
+  lib,
   ...
 }: {
   services.displayManager.sddm = {
     enable = true;
-    package = pkgs.kdePackages.sddm;
+    package = lib.mkForce pkgs.kdePackages.sddm;
     wayland.enable = true;
-    theme = "catppuccin-mocha";
+    theme = lib.mkForce "catppuccin-mocha";
   };
 
   environment.systemPackages = [
@@ -15,7 +16,7 @@
       pkgs.catppuccin-sddm.override {
         flavor = "mocha";
         font = "Noto Sans";
-        fontSize = "9";
+        fontSize = "12";
         background = "${config.stylix.image}";
         loginBackground = true;
       }

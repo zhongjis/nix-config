@@ -4,6 +4,7 @@
   ...
 }: {
   services.xserver.enable = true;
+  services.displayManager.defaultSession = "hyprland-uwsm";
 
   programs.uwsm.enable = true;
   programs.hyprland = {
@@ -14,8 +15,7 @@
 
   environment.systemPackages = with pkgs; [
     brightnessctl # brightness control
-    lxqt.lxqt-policykit
-    lxqt.pavucontrol-qt # volume control
+    pavucontrol # volume control
 
     wl-clipboard
     cliphist

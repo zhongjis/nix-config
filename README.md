@@ -67,7 +67,6 @@ nix run nixpkgs#sops -- secrets.yaml # view secrets
 ```
 
 more about sops see https://github.com/getsops/sops#2usage
-<<<<<<< Updated upstream
 
 # TODOs
 

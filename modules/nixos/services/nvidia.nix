@@ -10,7 +10,9 @@
     modesetting.enable = true;
     open = false;
     nvidiaSettings = true;
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    # NOTE: check version on https://github.com/NixOS/nixpkgs/blob/nixos-unstable/pkgs/os-specific/linux/nvidia-x11/default.nix
+    # package = config.boot.kernelPackages.nvidiaPackages.stable;
+    package = config.boot.kernelPackages.nvidiaPackages.beta;
 
     powerManagement.enable = false;
     powerManagement.finegrained = false;
@@ -41,5 +43,6 @@
 
   environment.systemPackages = with pkgs; [
     pciutils
+    # gwe # not supported for wayland yet
   ];
 }
