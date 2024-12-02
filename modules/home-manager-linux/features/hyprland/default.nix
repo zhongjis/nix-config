@@ -130,42 +130,43 @@ in {
         # https://wiki.hyprland.org/Configuring/Variables/#decoration
         decoration {
             rounding = 10
-
-            # Change transparency of focused and unfocused windows
             active_opacity = 1.0
-            inactive_opacity = 1.0
+            inactive_opacity = 0.8
+            fullscreen_opacity = 1.0
+
+            blur {
+                enabled = true
+                size = 6
+                passes = 2
+                new_optimizations = on
+                ignore_opacity = true
+                xray = true
+                # blurls = waybar
+            }
 
             shadow {
                 enabled = true
-                range = 4
+                range = 30
                 render_power = 3
-                color = rgba(1a1a1aee)
-            }
-
-            # https://wiki.hyprland.org/Configuring/Variables/#blur
-            blur {
-                enabled = true
-                size = 3
-                passes = 1
-
-                vibrancy = 0.1696
+              # color = 0x66000000 # managed by stylix
             }
         }
 
         # https://wiki.hyprland.org/Configuring/Variables/#animations
         animations {
             enabled = true
-
-            # Default animations, see https://wiki.hyprland.org/Configuring/Animations/ for more
-
-            bezier = myBezier, 0.25, 0.9, 0.1, 1.02
-
-            animation = windows, 1, 7, myBezier
-            animation = windowsOut, 1, 7, default, popin 80%
-            animation = border, 1, 10, default
-            animation = borderangle, 1, 8, default
-            animation = fade, 1, 7, default
-            animation = workspaces, 1, 6, default
+            bezier = wind, 0.05, 0.9, 0.1, 1.05
+            bezier = winIn, 0.1, 1.1, 0.1, 1.1
+            bezier = winOut, 0.3, -0.3, 0, 1
+            bezier = liner, 1, 1, 1, 1
+            animation = windows, 1, 6, wind, slide
+            animation = windowsIn, 1, 6, winIn, slide
+            animation = windowsOut, 1, 5, winOut, slide
+            animation = windowsMove, 1, 5, wind, slide
+            animation = border, 1, 1, liner
+            animation = borderangle, 1, 30, liner, loop
+            animation = fade, 1, 10, default
+            animation = workspaces, 1, 5, wind
         }
 
         # See https://wiki.hyprland.org/Configuring/Dwindle-Layout/ for more
@@ -291,18 +292,21 @@ in {
         # Example windowrule v1
         # windowrule = float, ^(kitty)$
 
-        # Example windowrule v2
         windowrulev2 = workspace 1,class:^(spotify)$
         windowrulev2 = workspace special:magic,class:^(discord)$
         windowrulev2 = workspace 7,class:^(obsidian)$
         windowrulev2 = workspace 9,class:^(steam)$
         windowrulev2 = workspace 10,class:^(zen-alpha)$
-        # windowrulev2 = float,center,size 40% 60%,title:Volume Control
         # windowrulev2 = float,center,size 40% 60%,class:kitty,title:btop
         # windowrulev2 = float,center,size 40% 60%,class:kitty,title:nvtop
         # windowrulev2 = float,center,size 40% 60%,class:kitty,title:nmtui
         # windowrulev2 = suppressevent maximize, class:.* # You'll probably like this.
 
+        # Pavucontrol floating
+        windowrulev2 = float,class:(.*org.pulseaudio.pavucontrol.*)
+        windowrulev2 = size 700 600,class:(.*org.pulseaudio.pavucontrol.*)
+        windowrulev2 = center,class:(.*org.pulseaudio.pavucontrol.*)
+        windowrulev2 = pin,class:(.*org.pulseaudio.pavucontrol.*)
 
         # hide xwaylandvideobridge, more detial see
         # https://wiki.hyprland.org/Useful-Utilities/Screen-Sharing/#xwayland
