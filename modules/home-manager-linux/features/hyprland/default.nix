@@ -51,8 +51,8 @@ in {
             border_size = 2
 
             # https://wiki.hyprland.org/Configuring/Variables/#variable-types for info about colors
-          # col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
-          # col.inactive_border = rgba(595959aa)
+            # col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
+            # col.inactive_border = rgba(595959aa)
             col.active_border = rgba(${base0E}ff) rgba(${base09}ff) 60deg
             col.inactive_border = rgba(${base00}ff)
 
