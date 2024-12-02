@@ -48,7 +48,10 @@
         zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
         source <(carapace _carapace)
 
-        # source "$HOME/.local/share/zsh/zsh-fzf-tab/fzf-tab.plugin.zsh"
+        function zvm_after_lazy_keybindings() {
+          # In normal mode, press Ctrl-R to invoke this widget
+          zvm_bindkey vicmd '^R' fzf-history-widget
+        }
       '';
   };
 
