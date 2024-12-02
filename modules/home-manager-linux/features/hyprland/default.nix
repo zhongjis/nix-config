@@ -91,18 +91,14 @@ in {
         # https://wiki.hyprland.org/Configuring/Variables/#animations
         animations {
             enabled = true
-            bezier = wind, 0.05, 0.9, 0.1, 1.05
-            bezier = winIn, 0.1, 1.1, 0.1, 1.1
-            bezier = winOut, 0.3, -0.3, 0, 1
-            bezier = liner, 1, 1, 1, 1
-            animation = windows, 1, 6, wind, slide
-            animation = windowsIn, 1, 6, winIn, slide
-            animation = windowsOut, 1, 5, winOut, slide
-            animation = windowsMove, 1, 5, wind, slide
-            animation = border, 1, 1, liner
-            animation = borderangle, 1, 30, liner, loop
-            animation = fade, 1, 10, default
-            animation = workspaces, 1, 5, wind
+            # Default animations, see https://wiki.hyprland.org/Configuring/Animations/ for more
+            bezier = myBezier, 0.25, 0.9, 0.1, 1.02
+            animation = windows, 1, 7, myBezier
+            animation = windowsOut, 1, 7, default, popin 80%
+            animation = border, 1, 10, default
+            animation = borderangle, 1, 8, default
+            animation = fade, 1, 7, default
+            animation = workspaces, 1, 6, default
         }
 
         # See https://wiki.hyprland.org/Configuring/Dwindle-Layout/ for more
@@ -240,7 +236,7 @@ in {
 
         # Pavucontrol floating
         windowrulev2 = float,class:(.*org.pulseaudio.pavucontrol.*)
-        windowrulev2 = size 700 600,class:(.*org.pulseaudio.pavucontrol.*)
+        windowrulev2 = size 900 800,class:(.*org.pulseaudio.pavucontrol.*)
         windowrulev2 = center,class:(.*org.pulseaudio.pavucontrol.*)
         windowrulev2 = pin,class:(.*org.pulseaudio.pavucontrol.*)
 
