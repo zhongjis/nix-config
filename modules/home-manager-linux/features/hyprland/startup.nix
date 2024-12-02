@@ -53,7 +53,8 @@ in {
       [
         (lib.getExe monitorScript)
 
-        "waybar"
+        "waybar &"
+        "swaync &"
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
       ]
       ++ autostarts
