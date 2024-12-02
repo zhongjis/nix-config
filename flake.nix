@@ -22,7 +22,6 @@
     xremap-flake.url = "github:xremap/nix-flake";
     nixpkgs-terraform.url = "github:stackbuilders/nixpkgs-terraform";
     stylix.url = "github:danth/stylix";
-    nh_darwin.url = "github:ToyVo/nh_darwin";
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
 
     # secret management

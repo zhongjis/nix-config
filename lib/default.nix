@@ -38,10 +38,6 @@ in rec {
       if !isDarwin
       then inputs.stylix.nixosModules.stylix
       else inputs.stylix.darwinModules.stylix;
-    nhDarwinModule =
-      if isDarwin
-      then inputs.nh_darwin.nixDarwinModules.prebuiltin
-      else {};
     systemModules =
       if isDarwin
       then outputs.nixDarwinModules.default
@@ -73,7 +69,6 @@ in rec {
         }
 
         stylixModule
-        nhDarwinModule
 
         {
           config._module.args = {

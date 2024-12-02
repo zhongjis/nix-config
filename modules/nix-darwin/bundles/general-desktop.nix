@@ -9,6 +9,31 @@
   # for zsh auto completion
   environment.pathsToLink = ["/share/zsh"];
 
+  # packages
+  environment.systemPackages = with pkgs; [
+    nh
+
+    # fonts
+    nerd-fonts.jetbrains-mono
+    nerd-fonts.iosevka
+    nerd-fonts.fira-code
+    nerd-fonts.droid-sans-mono
+    nerd-fonts.agave
+    font-awesome
+    sketchybar-app-font
+    cm_unicode
+    corefonts
+    noto-fonts
+    noto-fonts-cjk-sans
+    noto-fonts-emoji
+    liberation_ttf
+    mplus-outline-fonts.githubRelease
+    dina-font
+    proggyfonts
+    inter
+    font-awesome
+  ];
+
   homebrew = {
     enable = true;
     onActivation = {
