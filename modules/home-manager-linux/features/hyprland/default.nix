@@ -1,29 +1,42 @@
-{config, ...}: let
+{
+  config,
+  lib,
+  ...
+}: let
 in {
   imports = [
-    ./autostart.nix
+    ./startup.nix
+    ./monitors.nix
     ./env.nix
+    ./keymaps.nix
   ];
   # hyprland
   wayland.windowManager.hyprland = {
     enable = true;
+    # See https://wiki.hyprland.org/Configuring/Monitors/
+    settings.monitor =
+      lib.mapAttrsToList
+      (
+        name: m: let
+          resolution = "${toString m.width}x${toString m.height}@${toString m.refreshRate}";
+          position = "${toString m.x}x${toString m.y}";
+          scale = "${toString m.scale}";
+          transform =
+            if m.rotate == 0
+            then ""
+            else "transform,${toString m.rotate}";
+        in "${name},${
+          if m.enabled
+          then "${resolution},${position},${scale},${transform}"
+          else "disable"
+        }"
+      )
+      (config.myHomeManager.hyprland.monitors);
     extraConfig = with config.lib.stylix.colors;
     /*
     hyprlang
     */
       ''
-        ################
-        ### MONITORS ###
-        ################
-
-        # See https://wiki.hyprland.org/Configuring/Monitors/
-        monitor=,preffered,auto,auto
-        monitor=desc:Thermotrex Corporation TL140BDXP02-0,2560x1440@165.00Hz,0x0,1.25
-        # monitor=desc:Thermotrex Corporation TL140BDXP02-0, disable
-        monitor=desc:LG Electronics LG ULTRAGEAR 009NTDV4B698,3440x1440@143.92Hz,2560x0,1.0
-        monitor=desc:Dell Inc. DELL P2419H 78NFR63,1920x1080@60Hz,6000x0,1.0,transform,1
-        # monitor=desc:Dell Inc. DELL P2419H 78NFR63, disable
-
         ###################
         ### MY PROGRAMS ###
         ###################
@@ -140,69 +153,6 @@ in {
             name = epic-mouse-v1
             sensitivity = -0.5
         }
-
-
-        ####################
-        ### KEYBINDINGSS ###
-        ####################
-
-        # See https://wiki.hyprland.org/Configuring/Keywords/
-        $mainMod = ALT
-
-        # Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
-        bind = $mainMod, T, exec, $terminal
-        bind = SUPER, Q, killactive,
-        # bind = $mainMod, M, exit,
-        bind = $mainMod, E, exec, $fileManager
-        bind = $mainMod, V, togglefloating,
-        bind = SUPER, Space, exec, $menu
-        # bind = $mainMod, P, pseudo, # dwindle
-        # bind = $mainMod, J, togglesplit, # dwindle
-        bind = $mainMod, RETURN, fullscreen, 1
-        bind = $mainMod SHIFT, RETURN, fullscreen
-
-        # Move focus with mainMod + arrow keys
-        bind = $mainMod, L, movefocus, r
-        bind = $mainMod, H, movefocus, l
-        bind = $mainMod, K, movefocus, u
-        bind = $mainMod, J, movefocus, d
-
-        # Switch workspaces with mainMod + [0-9]
-        bind = $mainMod, 1, workspace, 1
-        bind = $mainMod, 2, workspace, 2
-        bind = $mainMod, 3, workspace, 3
-        bind = $mainMod, 4, workspace, 4
-        bind = $mainMod, 5, workspace, 5
-        bind = $mainMod, 6, workspace, 6
-        bind = $mainMod, O, workspace, 7
-        bind = $mainMod, P, workspace, 8
-        bind = $mainMod, G, workspace, 9
-        bind = $mainMod, Z, workspace, 10
-
-        # Move active window to a workspace with mainMod + SHIFT + [0-9]
-        bind = $mainMod SHIFT, 1, movetoworkspace, 1
-        bind = $mainMod SHIFT, 2, movetoworkspace, 2
-        bind = $mainMod SHIFT, 3, movetoworkspace, 3
-        bind = $mainMod SHIFT, 4, movetoworkspace, 4
-        bind = $mainMod SHIFT, 5, movetoworkspace, 5
-        bind = $mainMod SHIFT, 6, movetoworkspace, 6
-        bind = $mainMod SHIFT, O, movetoworkspace, 7
-        bind = $mainMod SHIFT, P, movetoworkspace, 8
-        bind = $mainMod SHIFT, G, movetoworkspace, 9
-        bind = $mainMod SHIFT, Z, movetoworkspace, 10
-
-        # Example special workspace (scratchpad)
-        bind = $mainMod, S, togglespecialworkspace, magic
-        bind = $mainMod SHIFT, S, movetoworkspace, special:magic
-
-        # Scroll through existing workspaces with mainMod + scroll
-        # bind = $mainMod, mouse_down, workspace, e+1
-        # bind = $mainMod, mouse_up, workspace, e-1
-
-        # Move/resize windows with mainMod + LMB/RMB and dragging
-        bindm = $mainMod SHIFT, mouse:272, movewindow
-        bindm = $mainMod SHIFT, mouse:273, resizewindow
-
 
         ##############################
         ### WINDOWS AND WORKSPACES ###
