@@ -1,5 +1,9 @@
 {config, ...}: let
 in {
+  imports = [
+    ./autostart.nix
+    ./env.nix
+  ];
   # hyprland
   wayland.windowManager.hyprland = {
     enable = true;
@@ -30,74 +34,6 @@ in {
         $terminal = kitty
         $fileManager = kitty --title yazi sh -c 'yazi'
         $menu = rofi-toggle
-
-
-        #################
-        ### AUTOSTART ###
-        #################
-
-        # Autostart necessary processes (like notifications daemons, status bars, etc.)
-        # Or execute your favorite apps at launch like this:
-
-        # exec-once = nm-applet &
-        exec-once = waybar
-        exec-once = dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
-        exec-once = solaar --window=hide
-
-
-        #############################
-        ### ENVIRONMENT VARIABLES ###
-        #############################
-
-        # See https://wiki.hyprland.org/Configuring/Environment-variables/
-
-        env = XCURSOR_SIZE,24
-        env = HYPRCURSOR_SIZE,24
-
-        # GSYNC
-        env = __GL_GSYNC_ALLOWED,1
-        env = __GL_VRR_ALLOWED,0
-
-        # NVIDIA https://wiki.hyprland.org/Nvidia/
-        env = GBM_BACKEND,nvidia-drm
-        env = LIBVA_DRIVER_NAME,nvidia
-        env = SDL_VIDEODRIVER,wayland
-        env = WLR_DRM_NO_ATOMIC,1
-        # env = __GL_VRR_ALLOWED,1
-        env = __GLX_VENDOR_LIBRARY_NAME,nvidia
-        env = __NV_PRIME_RENDER_OFFLOAD,1
-        env = __VK_LAYER_NV_optimus,NVIDIA_only
-
-        # FOR VM and POSSIBLY NVIDIA
-        env = WLR_RENDERER_ALLOW_SOFTWARE,1
-
-        # nvidia firefox (for hardware acceleration on FF)?
-        # check this post https://github.com/elFarto/nvidia-vaapi-driver#configuration
-        env = MOZ_DISABLE_RDD_SANDBOX,1
-        env = EGL_PLATFORM,wayland
-
-        # XDG Desktop Portal
-        env = XDG_CURRENT_DESKTOP,Hyprland
-        env = XDG_SESSION_TYPE,wayland
-        env = XDG_SESSION_DESKTOP,Hyprland
-
-        # QT
-        env = QT_QPA_PLATFORM,wayland;xcb
-        env = QT_QPA_PLATFORMTHEME,qt6ct
-        env = QT_QPA_PLATFORMTHEME,qt5ct
-        env = QT_WAYLAND_DISABLE_WINDOWDECORATION,1
-        env = QT_AUTO_SCREEN_SCALE_FACTOR,1
-
-        # GDK
-        env = GDK_SCALE,1
-
-        # Toolkit Backend
-        env = GDK_BACKEND,wayland,x11,*
-        env = CLUTTER_BACKEND,wayland
-
-        # Toolkit Backend
-        env = GDK_BACKEND,wayland,x11,*
-        env = CLUTTER_BACKEND,wayland
 
         #####################
         ### LOOK AND FEEL ###
