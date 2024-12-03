@@ -28,6 +28,7 @@
 
   myHomeManagerLinux.bundles.linux.enable = true;
   myHomeManagerLinux.bundles.hyprland.enable = true;
+  myHomeManagerLinux.pipewire-noise-cancling-input.enable = false;
 
   programs.git.userName = "zhongjis";
   programs.git.userEmail = "zhongjie.x.shen@gmail.com";
