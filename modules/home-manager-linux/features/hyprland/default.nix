@@ -72,8 +72,12 @@ in {
             inactive_opacity = 1.0
             fullscreen_opacity = 1.0
 
+            blur {
+                enabled = false # for laptop battery
+            }
+
             shadow {
-                enabled = true
+                enabled = false # for laptop battery
                 range = 30
                 render_power = 3
               # color = 0x66000000 # managed by stylix
@@ -107,6 +111,7 @@ in {
         # https://wiki.hyprland.org/Configuring/Variables/#misc
         misc {
             force_default_wallpaper = 0
+            vfr = true # for laptop battery
         }
 
 
