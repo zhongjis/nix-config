@@ -7,6 +7,13 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 })
 
 vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
+  desc = "Set file type for JenkinsFile",
+  group = vim.api.nvim_create_augroup("JenkinsFileFix", { clear = true }),
+  pattern = "Jenkinsfile*",
+  command = "set filetype=groovy",
+})
+
+vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
   desc = "Set file type for terraform",
   group = vim.api.nvim_create_augroup("TerraformFix", { clear = true }),
   pattern = "*.tf,*.tfvars",
@@ -44,7 +51,12 @@ vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost" }, {
     local buftype = vim.bo.buftype
 
     -- If the file type is not 'oil' and the buffer is not a 'nofile' buffer, save the file
-    if filetype ~= "oil" and buftype ~= "nofile" and filetype ~= "harpoon" and filetype ~= "trouble" then
+    if
+      filetype ~= "oil"
+      and buftype ~= "nofile"
+      and filetype ~= "harpoon"
+      and filetype ~= "trouble"
+    then
       vim.cmd("silent wa")
     end
   end,
