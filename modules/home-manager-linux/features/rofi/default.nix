@@ -7,6 +7,9 @@
     (writeScriptBin "rofi-toggle" ''
       ${builtins.readFile ./rofi-toggle.sh}
     '')
+    (writeScriptBin "rofi-toggle-cliphist" ''
+      ${builtins.readFile ./rofi-toggle-cliphist.sh}
+    '')
   ];
 
   programs.rofi = {

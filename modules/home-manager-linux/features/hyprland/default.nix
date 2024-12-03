@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }: let
 in {
@@ -10,6 +11,7 @@ in {
     ./env.nix
     ./keymaps.nix
   ];
+
   # hyprland
   wayland.windowManager.hyprland = {
     enable = true;
@@ -60,9 +62,9 @@ in {
             resize_on_border = false
 
             # Please see https://wiki.hyprland.org/Configuring/Tearing/ before you turn this on
-            allow_tearing = false
+            allow_tearing = true
 
-            layout = dwindle
+            layout = maste
         }
 
         # https://wiki.hyprland.org/Configuring/Variables/#decoration
@@ -182,6 +184,7 @@ in {
         windowrulev2 = maxsize 1 1, class:^(xwaylandvideobridge)$
         windowrulev2 = noblur, class:^(xwaylandvideobridge)$
         windowrulev2 = nofocus, class:^(xwaylandvideobridge)$
+
         cursor {
             no_hardware_cursors = true
         }
