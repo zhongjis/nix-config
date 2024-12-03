@@ -2,6 +2,7 @@
   pkgs,
   isDarwin,
   config,
+  inputs,
   ...
 }: let
   keyboardCmd =
@@ -20,11 +21,9 @@ in {
     shell = "${pkgs.zsh}/bin/zsh";
 
     # NOTE: waiting on fix from https://github.com/tmux-plugins/tmux-sensible/pull/75
-    # plugins = [
-    #   {plugin = inputs.minimal-tmux.packages.${pkgs.system}.default;}
-    # ];
-
-    sensibleOnTop = false;
+    plugins = [
+      {plugin = inputs.minimal-tmux.packages.${pkgs.system}.default;}
+    ];
 
     extraConfig =
       /*
