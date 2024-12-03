@@ -92,11 +92,11 @@
 
   security.polkit.enable = true;
 
-  hardware = {
-    enableAllFirmware = true;
+  hardware.enableAllFirmware = true;
 
-    bluetooth.enable = true;
-    bluetooth.powerOnBoot = true;
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
   };
   services.blueman.enable = true;
 
