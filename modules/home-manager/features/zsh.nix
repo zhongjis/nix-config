@@ -41,7 +41,6 @@
         source "$HOME/.local/share/zsh/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
 
         ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#${config.lib.stylix.colors.base03},bg=cyan,bold,underline"
-        bindkey '^ ' autosuggest-accept
         source "$HOME/.local/share/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
 
         export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
@@ -50,7 +49,7 @@
 
         function zvm_after_lazy_keybindings() {
           # In normal mode, press Ctrl-R to invoke this widget
-          zvm_bindkey vicmd '^R' fzf-history-widget
+          bindkey '^R' fzf-history-widget
         }
       '';
   };
