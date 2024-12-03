@@ -8,7 +8,6 @@
     ".local/share/zsh/zsh-autosuggestions".source = "${pkgs.zsh-autosuggestions}/share/zsh-autosuggestions";
     ".local/share/zsh/zsh-fast-syntax-highlighting".source = "${pkgs.zsh-fast-syntax-highlighting}/share/zsh/site-functions";
     ".local/share/zsh/zsh-vi-mode".source = "${pkgs.zsh-vi-mode}/share/zsh-vi-mode";
-    # ".local/share/zsh/zsh-fzf-tab".source = "${pkgs.zsh-fzf-tab}/share/fzf-tab";
   };
 
   programs.zsh = {
@@ -43,10 +42,6 @@
         ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#${config.lib.stylix.colors.base03},bg=cyan,bold,underline"
         source "$HOME/.local/share/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
 
-        export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' # optional
-        zstyle ':completion:*' format $'\e[2;37mCompleting %d\e[m'
-        source <(carapace _carapace)
-
         function zvm_after_lazy_keybindings() {
           # In normal mode, press Ctrl-R to invoke this widget
           bindkey '^R' fzf-history-widget
@@ -56,9 +51,13 @@
 
   home.packages = with pkgs; [
     bat
-    carapace
     # zoxide
   ];
+
+  programs.bat.enable = true;
+
+  programs.carapace.enable = true;
+  programs.carapace.enableZshIntegration = true;
 
   programs.eza = {
     enable = true;
