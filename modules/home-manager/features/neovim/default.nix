@@ -181,6 +181,8 @@ in {
           p.hyprlang
           p.css
           p.bash
+          p.groovy
+          p.xml
         ]);
         config = toLuaFile ./plugins/treesitter.lua;
       }
