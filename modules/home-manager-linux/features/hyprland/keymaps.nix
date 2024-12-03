@@ -24,7 +24,7 @@
       "$mainMod, E, exec, $fileManager"
       "$mainMod, V, togglefloating,"
       "SUPER, Space, exec, $menu"
-      "$mainMod, $mainMod, exec, rofi-toggle-cliphist"
+      "$mainMod, Space, exec, rofi-toggle-cliphist"
       # "$mainMod, P, pseudo," # dwindle
       # "$mainMod, J, togglesplit," # dwindle
       "$mainMod, RETURN, fullscreen, 1"
