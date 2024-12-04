@@ -5,6 +5,8 @@
   ...
 }: {
   services.xserver.videoDrivers = ["nvidia"];
+  # https://wiki.hyprland.org/Nvidia/#suspendwakeup-issues
+  boot.kernelParams = ["nvidia.NVreg_PreserveVideoMemoryAlliocations=1"];
 
   hardware.nvidia = {
     modesetting.enable = true;
@@ -14,7 +16,7 @@
     # package = config.boot.kernelPackages.nvidiaPackages.stable;
     package = config.boot.kernelPackages.nvidiaPackages.beta;
 
-    powerManagement.enable = false;
+    powerManagement.enable = true;
     powerManagement.finegrained = false;
 
     prime = {

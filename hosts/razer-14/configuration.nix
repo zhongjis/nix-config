@@ -22,6 +22,7 @@
     bundles.gaming.enable = true;
     services.nvidia.enable = true;
     services.virtualization.enable = true;
+    power-management.enable = true;
   };
 
   # xremap
