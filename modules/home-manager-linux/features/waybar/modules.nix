@@ -82,7 +82,7 @@ in {
                   "critical": 15
               },
               "format": "{icon} {capacity}%",
-              "format-charging": "{capacity}%",
+              "format-charging": " {capacity}%",
               "format-plugged": "󱘖 {capacity}%",
               "format-alt-click": "click",
               "format-full": "{icon} Full",
@@ -119,8 +119,8 @@ in {
           "clock": {
               "interval": 1,
               // "format": " {:%I:%M %p}", // AM PM format
-              "format": " {:%H:%M:%S}",
-              "format-alt": " {:%H:%M   %Y, %d %B, %A}",
+              "format": "{:%H:%M:%S}",
+              "format-alt": "{%F}",
               "tooltip-format": "<tt><small>{calendar}</small></tt>",
               "calendar": {
                   "mode": "year",
@@ -380,10 +380,9 @@ in {
           },
           "custom/menu": {
               "format": " {}",
-              "exec": "echo ; echo 󱓟 app launcher",
               "interval": 86400, // once every day
               "tooltip": true,
-              "on-click": "toggle-rofi",
+              "on-click": "rofi-toggle",
           },
           // This is a custom cava visualizer
           "custom/cava_mviz": {
