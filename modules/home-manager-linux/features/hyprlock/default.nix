@@ -49,19 +49,6 @@ in {
             valign = bottom
         }
 
-        # WEATHER
-        label {
-            monitor =
-            text = cmd[update:3600000] [ -f ~/.cache/.weather_cache ] && cat  ~/.cache/.weather_cache
-            color = rgb(184, 192, 224)
-            font_size = 10
-            font_family = JetBrains Mono Nerd Font Mono ExtraBold
-            position = 800, 490
-            halign = center
-            valign = center
-            zindex = 5
-        }
-
         # DATE
         label {
             monitor =

@@ -20,8 +20,6 @@
               "custom/menu",
               "custom/separator#blank",
               "group/laptop",
-              "custom/separator#line",
-              "custom/weather",
           ],
           "modules-center": [
               "custom/swaync",
