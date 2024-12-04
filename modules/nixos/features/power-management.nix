@@ -2,25 +2,26 @@
   # better power consumption
   boot.kernelParams = ["amd_pstate=guided"];
 
-  services.power-profiles-daemon.enable = true;
-
   powerManagement = {
     enable = true;
     powertop.enable = true;
-    cpuFreqGovernor = "schedutil";
+    # cpuFreqGovernor = "schedutil";
+    # cpuFreqGovernor = "powersave";
   };
 
-  # services.auto-cpufreq.enable = true;
-  # services.auto-cpufreq.settings = {
-  #   battery = {
-  #     governor = "powersave";
-  #     turbo = "never";
-  #   };
-  #   charger = {
-  #     governor = "performance";
-  #     turbo = "auto";
-  #   };
-  # };
+  services.power-profiles-daemon.enable = false;
+
+  services.auto-cpufreq.enable = true;
+  services.auto-cpufreq.settings = {
+    battery = {
+      governor = "powersave";
+      turbo = "never";
+    };
+    charger = {
+      governor = "performance";
+      turbo = "auto";
+    };
+  };
 
   # services.thermald.enable = true;
   # services.tlp = {
