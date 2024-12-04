@@ -90,6 +90,7 @@ require("mason-lspconfig").setup({
     "jdtls",
     "pyright",
     "bashls",
+    "groovyls",
   },
 
   handlers = {
@@ -121,4 +122,3 @@ require("mason-lspconfig").setup({
     end,
   },
 })
-
