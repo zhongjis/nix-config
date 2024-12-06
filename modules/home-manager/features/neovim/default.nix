@@ -7,11 +7,6 @@
   toLua = str: "lua << EOF\n${str}\nEOF\n";
   toLuaFile = file: "lua << EOF\n${builtins.readFile file}\nEOF\n";
 
-  extraUnstablePackages = with pkgs; [
-    # lsp
-    nixd
-  ];
-
   systemOption =
     if isDarwin
     then ''
@@ -49,21 +44,24 @@ in {
       with luaPkgs; [
         jsregexp # for luasnip
       ];
-    extraPackages = with pkgs.stable;
-      [
-        cargo # Depdency for Mason Install packages
+    extraPackages = with pkgs; [
+      # Mason lspconfig build dependencies
+      cargo
 
-        ripgrep
+      # telecope grep
+      ripgrep
 
-        # Formatters
-        stylua
-        nixpkgs-fmt
-        alejandra
-        shfmt
-        prettierd
-        black
-      ]
-      ++ extraUnstablePackages;
+      # LSP
+      nixd
+
+      # Formatters
+      stylua
+      nixpkgs-fmt
+      alejandra
+      shfmt
+      prettierd
+      black
+    ];
 
     plugins = with pkgs.stable.vimPlugins; [
       # **telescope.nvim**
