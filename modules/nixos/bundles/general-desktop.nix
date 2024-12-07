@@ -4,13 +4,6 @@
   myNixOS.cachix.enable = true;
   myNixOS.stylix.enable = true;
 
-  # gc
-  nix.gc = {
-    automatic = true;
-    randomizedDelaySec = "14m";
-    options = "--delete-older-than 14d";
-  };
-
   # for zsh auto completion
   environment.pathsToLink = ["/share/zsh"];
 
