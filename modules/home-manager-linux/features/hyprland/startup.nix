@@ -15,6 +15,7 @@
   };
   startScriptList = builtins.attrValues startScripts;
 in {
+  home.packages = with pkgs; [hyprpolkitagent];
   #################
   ### AUTOSTART ###
   #################
@@ -57,6 +58,7 @@ in {
         "swaync &"
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "wl-paste --type text --watch cliphist store" # Stores only text data
+        "systemctl --user start hyprpolkitagent"
       ]
       ++ autostarts
       ++ map (s: lib.getExe s) startScriptList;

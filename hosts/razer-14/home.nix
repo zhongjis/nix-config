@@ -1,5 +1,6 @@
 {pkgs, ...}: {
   myHomeManager.bundles.general.enable = true;
+  myHomeManager.direnv.enable = true;
   myHomeManager.hyprland.monitors = {
     "desc:Thermotrex Corporation TL140BDXP02-0" = {
       width = 2560;
