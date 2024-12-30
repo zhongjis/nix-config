@@ -100,7 +100,7 @@
   hardware.logitech.wireless.enableGraphical = true; # for solaar to be included
 
   environment.systemPackages = with pkgs; [
-    inputs.zen-browser.packages."${currentSystem}".specific
+    inputs.zen-browser.packages."${currentSystem}".default
 
     polychromatic
 
