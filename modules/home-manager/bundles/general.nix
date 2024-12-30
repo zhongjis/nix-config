@@ -17,6 +17,7 @@
   myHomeManager.zellij.enable = lib.mkDefault false;
   myHomeManager.alacritty.enable = lib.mkDefault false;
   myHomeManager.fzf.enable = lib.mkDefault true;
+  myHomeManager.ghostty.enable = lib.mkDefault true;
   myHomeManager.git.enable = lib.mkDefault true;
   myHomeManager.k9s.enable = lib.mkDefault true;
   myHomeManager.kitty.enable = lib.mkDefault true;
