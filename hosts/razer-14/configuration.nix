@@ -101,6 +101,7 @@
 
   environment.systemPackages = with pkgs; [
     inputs.zen-browser.packages."${currentSystem}".default
+    firefox
 
     polychromatic
 

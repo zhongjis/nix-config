@@ -13,7 +13,8 @@
     "desc:LG Electronics LG ULTRAGEAR 009NTDV4B698" = {
       width = 3440;
       height = 1440;
-      refreshRate = 143.92;
+      # refreshRate = 143.92;
+      refreshRate = 59.9;
       x = 2560;
       y = 0;
     };
