@@ -14,9 +14,6 @@ vim.keymap.set("x", "p", [["_dP]])
 -- diagnostic
 map("<leader>e", vim.diagnostic.open_float, "Show diagnostic [E]rror messages")
 
--- **file explorer**
-map("<leader>o", "<cmd>Oil<cr>", "[O]il: Open parent directory")
-
 -- **telescope**
 local builtin = require("telescope.builtin")
 map("<leader>sh", builtin.help_tags, "[S]earch [H]elp")
