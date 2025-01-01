@@ -2,11 +2,9 @@
   pkgs,
   isDarwin,
   currentSystemName,
+  config,
   ...
 }: let
-  toLua = str: "lua << EOF\n${str}\nEOF\n";
-  toLuaFile = file: "lua << EOF\n${builtins.readFile file}\nEOF\n";
-
   systemOption =
     if isDarwin
     then ''
@@ -68,10 +66,7 @@ in {
       nvim-web-devicons
       plenary-nvim
       telescope-fzf-native-nvim
-      {
-        plugin = telescope-nvim;
-        config = toLuaFile ./plugins/telescope.lua;
-      }
+      telescope-nvim
 
       # **lsp**
       neodev-nvim
@@ -79,17 +74,11 @@ in {
 
       mason-nvim
       mason-lspconfig-nvim
-      {
-        plugin = nvim-lspconfig;
-        config = toLuaFile ./plugins/lsp.lua;
-      }
+      nvim-lspconfig
 
       # **cmp**
       lspkind-nvim
-      {
-        plugin = nvim-cmp;
-        config = toLuaFile ./plugins/cmp.lua;
-      }
+      nvim-cmp
       cmp-buffer
       cmp-path
       cmp_luasnip
@@ -102,62 +91,35 @@ in {
       luasnip
 
       # **trouble.nvim**
-      {
-        plugin = trouble-nvim;
-        config = toLuaFile ./plugins/trouble.lua;
-      }
+      trouble-nvim
 
       # **sleuth**
       vim-sleuth
 
       # **coment.nvim**
-      {
-        plugin = comment-nvim;
-        config = toLua "require(\"Comment\").setup()";
-      }
+      comment-nvim
 
       # **gitsigns.nvim**
-      {
-        plugin = gitsigns-nvim;
-        config = toLuaFile ./plugins/gitsigns.lua;
-      }
+      gitsigns-nvim
 
       # **harpoon**
-      {
-        plugin = harpoon2;
-        config = toLua "require(\"harpoon\"):setup()";
-      }
+      harpoon2
 
       # **conform**
-      {
-        plugin = conform-nvim;
-        config = toLuaFile ./plugins/conform.lua;
-      }
+      conform-nvim
 
       # **theme**
-      {
-        plugin = catppuccin-nvim;
-        config = toLuaFile ./plugins/themes/catppuccin.lua;
-      }
+      catppuccin-nvim
 
       # **lualine.nvim**
-      {
-        plugin = lualine-nvim;
-        config = toLuaFile ./plugins/lualine.lua;
-      }
+      lualine-nvim
 
       # **todo-comments.nvim**
       # plenary-nvim
-      {
-        plugin = todo-comments-nvim;
-        config = toLua "require('todo-comments').setup{ signs = false }";
-      }
+      todo-comments-nvim
 
       # **mini.nvim**
-      {
-        plugin = mini-nvim;
-        config = toLuaFile ./plugins/mini.lua;
-      }
+      mini-nvim
 
       # **nvim-treesitter**
       {
@@ -182,25 +144,10 @@ in {
           p.groovy
           p.xml
         ]);
-        config = toLuaFile ./plugins/treesitter.lua;
       }
 
       # **oil.nvim**
-      {
-        plugin = oil-nvim;
-        config = toLua "require('oil').setup()";
-      }
-
-      # **noice.nvim**
-      # nui-nvim
-      # {
-      #   plugin = nvim-notify;
-      #   config = toLuaFile ./plugins/notify.lua;
-      # }
-      # {
-      #   plugin = noice-nvim;
-      #   config = toLuaFile ./plugins/noice.lua;
-      # }
+      oil-nvim
 
       # **lazygit.nvim**
       # plenary-nvim
@@ -214,32 +161,43 @@ in {
 
       # **copilot.vim**
       copilot-vim
+
+      # **lazy.nvim**
+      lazy-nvim
+
+      # **which-key**
+      which-key-nvim
     ];
 
-    extraLuaConfig =
-      /*
-      lua
-      */
-      ''
-        ${builtins.readFile ./config/options.lua}
-        ${builtins.readFile ./config/keymaps.lua}
-        ${builtins.readFile ./config/autocmds.lua}
-        vim.cmd.colorscheme "catppuccin-mocha"
+    # ${builtins.readFile ./lua/init.lua}
+    extraLuaConfig = ''
+      vim.g.mapleader = " "
 
-        -- nixd
-        require("lspconfig").nixd.setup({
-          cmd = { "nixd" },
-          settings = {
-            nixd = {
-              nixpkgs = {
-                expr = "import <nixpkgs> { }",
-              },
-              options = { ${nixdOptionsLua} },
-            },
+      require("lazy").setup({
+        performance = {
+          reset_packpath = false,
+          rtp = {
+              reset = false,
+            }
           },
-        })
+        dev = {
+          path = "${pkgs.vimUtils.packDir config.programs.neovim.finalPackage.passthru.packpathDirs}/pack/myNeovimPackages/start",
+          patterns = {""},
+        },
+        install = {
+          -- Safeguard in case we forget to install a plugin with Nix
+          missing = false,
+        },
+        spec = {
+          { import = "plugins" },
+        },
+      })
+    '';
+  };
 
-      '';
+  xdg.configFile."nvim/lua" = {
+    recursive = true;
+    source = ./lua;
   };
 
   home.packages = with pkgs; [
