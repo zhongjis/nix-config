@@ -169,9 +169,8 @@ in {
       which-key-nvim
     ];
 
-    # ${builtins.readFile ./lua/init.lua}
     extraLuaConfig = ''
-      vim.g.mapleader = " "
+      ${builtins.readFile ./init.lua}
 
       require("lazy").setup({
         performance = {
