@@ -1,10 +1,12 @@
 {
   pkgs,
   config,
+  inputs,
+  currentSystem,
   ...
 }: {
   home.packages = with pkgs; [
-    ghostty
+    inputs.ghostty.packages.${currentSystem}.default
   ];
 
   home.file."${config.xdg.configHome}/ghostty/config" = {

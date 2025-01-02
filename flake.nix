@@ -24,6 +24,7 @@
     stylix.url = "github:danth/stylix";
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
+    ghostty.url = "github:ghostty-org/ghostty";
 
     # secret management
     sops-nix = {
