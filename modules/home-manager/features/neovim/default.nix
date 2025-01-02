@@ -3,6 +3,7 @@
   isDarwin,
   currentSystemName,
   config,
+  inputs,
   ...
 }: let
   systemOption =
@@ -29,7 +30,7 @@ in {
   programs.neovim = {
     enable = true;
     # package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
-    package = pkgs.stable.neovim-unwrapped;
+    package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
 
     viAlias = true;
     vimAlias = true;
