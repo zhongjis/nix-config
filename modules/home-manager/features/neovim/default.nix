@@ -192,8 +192,6 @@ in {
           { import = "plugins" },
         },
       })
-
-      vim.cmd.colorscheme "catppuccin"
     '';
   };
 
