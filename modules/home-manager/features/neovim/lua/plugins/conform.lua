@@ -36,8 +36,10 @@ return {
       function()
         if vim.b.disable_autoformat or vim.g.disable_autoformat then
           vim.cmd("FormatEnable")
+          vim.notify("AutoFormt Enabled")
         else
           vim.cmd("FormatDisable")
+          vim.notify("AutoFormt Disabled")
         end
       end,
       mode = "n",
