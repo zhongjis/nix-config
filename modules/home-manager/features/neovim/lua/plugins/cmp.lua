@@ -1,3 +1,31 @@
+local kind_icons = {
+  Text = "",
+  Method = "󰆧",
+  Function = "󰊕",
+  Constructor = "",
+  Field = "󰇽",
+  Variable = "󰂡",
+  Class = "󰠱",
+  Interface = "",
+  Module = "",
+  Property = "󰜢",
+  Unit = "",
+  Value = "󰎠",
+  Enum = "",
+  Keyword = "󰌋",
+  Snippet = "",
+  Color = "󰏘",
+  File = "󰈙",
+  Reference = "",
+  Folder = "󰉋",
+  EnumMember = "",
+  Constant = "󰏿",
+  Struct = "",
+  Event = "",
+  Operator = "󰆕",
+  TypeParameter = "󰅲",
+}
+
 return {
   "hrsh7th/nvim-cmp",
   event = "InsertEnter",
@@ -68,20 +96,24 @@ return {
 
       formatting = {
         format = function(entry, vim_item)
-          if vim.tbl_contains({ "path" }, entry.source.name) then
-            local icon, hl_group = require("nvim-web-devicons").get_icon(
-              entry:get_completion_item().label
-            )
-            if icon then
-              vim_item.kind = icon
-              vim_item.kind_hl_group = hl_group
-              return vim_item
-            end
+          local lspkind_ok, lspkind = pcall(require, "lspkind")
+          if not lspkind_ok then
+            -- From kind_icons array
+            vim_item.kind =
+              string.format("%s %s", kind_icons[vim_item.kind], vim_item.kind) -- This concatenates the icons with the name of the item kind
+            -- Source
+            vim_item.menu = ({
+              buffer = "[Buffer]",
+              nvim_lsp = "[LSP]",
+              luasnip = "[LuaSnip]",
+              nvim_lua = "[Lua]",
+              latex_symbols = "[LaTeX]",
+            })[entry.source.name]
+            return vim_item
+          else
+            -- From lspkind
+            return lspkind.cmp_format()(entry, vim_item)
           end
-          return require("lspkind").cmp_format({ with_text = false })(
-            entry,
-            vim_item
-          )
         end,
       },
     })
