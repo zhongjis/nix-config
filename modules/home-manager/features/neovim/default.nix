@@ -132,29 +132,7 @@ in {
       mini-nvim
 
       # **nvim-treesitter**
-      {
-        plugin = nvim-treesitter.withPlugins (p: [
-          p.c
-          p.java
-          p.nix
-          p.python
-          p.yaml
-          p.json
-          p.javascript
-          p.typescript
-          p.markdown
-          p.markdown_inline
-          p.hcl
-          p.terraform
-          p.kdl
-          p.toml
-          p.hyprlang
-          p.css
-          p.bash
-          p.groovy
-          p.xml
-        ]);
-      }
+      nvim-treesitter
 
       # **oil.nvim**
       oil-nvim
