@@ -49,8 +49,16 @@ in {
       # telecope grep
       ripgrep
 
-      # LSP
+      # LSP for nvim-lspconfig
       nixd
+      vscode-langservers-extracted
+      yaml-language-server
+      terraform-ls
+      tflint
+      typescript-language-server
+      jdt-language-server
+      pyright
+      bash-language-server
 
       # Formatters
       stylua

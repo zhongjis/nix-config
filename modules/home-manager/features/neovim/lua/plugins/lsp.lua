@@ -1,11 +1,38 @@
+local servers = {
+  lua_ls = {
+    settings = {
+      Lua = {
+        completion = {
+          callSnippet = "Replace",
+        },
+        runtime = {
+          version = "LuaJIT",
+        },
+        diagnostics = {
+          globals = {
+            "vim",
+          },
+        },
+        telemetry = {
+          enable = false,
+        },
+      },
+    },
+  },
+  jsonls = {},
+  yamlls = {},
+  terraformls = {},
+  tflint = {},
+  ts_ls = {},
+  jdtls = {},
+  pyright = {},
+  bashls = {},
+}
+
 return {
   -- Main LSP Configuration
   "neovim/nvim-lspconfig",
   dependencies = {
-    -- Automatically install LSPs and related tools to stdpath for Neovim
-    { "williamboman/mason.nvim", config = true }, -- NOTE: Must be loaded before dependants
-    "williamboman/mason-lspconfig.nvim",
-
     { "j-hui/fidget.nvim", opts = {} },
 
     -- Allows extra capabilities provided by nvim-cmp
@@ -95,38 +122,6 @@ return {
       capabilities,
       require("cmp_nvim_lsp").default_capabilities()
     )
-
-    local servers = {
-      lua_ls = {
-        settings = {
-          Lua = {
-            completion = {
-              callSnippet = "Replace",
-            },
-            runtime = {
-              version = "LuaJIT",
-            },
-            diagnostics = {
-              globals = {
-                "vim",
-              },
-            },
-            telemetry = {
-              enable = false,
-            },
-          },
-        },
-      },
-      jsonls = {},
-      yamlls = {},
-      terraformls = {},
-      tflint = {},
-      ts_ls = {},
-      jdtls = {},
-      pyright = {},
-      bashls = {},
-      groovyls = {},
-    }
 
     for server, config in pairs(servers) do
       config.capabilities =
