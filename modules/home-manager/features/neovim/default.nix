@@ -177,12 +177,12 @@ in {
         performance = {
           reset_packpath = false,
           rtp = {
-              reset = false,
-            }
+            reset = false,
           },
+        },
         dev = {
           path = "${pkgs.vimUtils.packDir config.programs.neovim.finalPackage.passthru.packpathDirs}/pack/myNeovimPackages/start",
-          patterns = {""},
+          patterns = { "" },
         },
         install = {
           -- Safeguard in case we forget to install a plugin with Nix

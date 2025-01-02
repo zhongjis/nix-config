@@ -5,10 +5,7 @@ return {
     -- Automatically install LSPs and related tools to stdpath for Neovim
     { "williamboman/mason.nvim", config = true }, -- NOTE: Must be loaded before dependants
     "williamboman/mason-lspconfig.nvim",
-    "WhoIsSethDaniel/mason-tool-installer.nvim",
 
-    -- Useful status updates for LSP.
-    -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
     { "j-hui/fidget.nvim", opts = {} },
 
     -- Allows extra capabilities provided by nvim-cmp
@@ -92,10 +89,6 @@ return {
     end
     vim.diagnostic.config({ signs = { text = diagnostic_signs } })
 
-    -- LSP servers and clients are able to communicate to each other what features they support.
-    --  By default, Neovim doesn't support everything that is in the LSP specification.
-    --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
-    --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
     local capabilities = vim.lsp.protocol.make_client_capabilities()
     capabilities = vim.tbl_deep_extend(
       "force",
@@ -135,27 +128,10 @@ return {
       groovyls = {},
     }
 
-    require("mason").setup()
-
-    -- You can add other tools here that you want Mason to install
-    -- for you, so that they are available from within Neovim.
-    local ensure_installed = vim.tbl_keys(servers or {})
-    vim.list_extend(ensure_installed, {
-      "stylua", -- Used to format Lua code
-    })
-
-    require("mason-lspconfig").setup({
-      handlers = {
-        function(server_name)
-          local server = servers[server_name] or {}
-          -- This handles overriding only values explicitly passed
-          -- by the server configuration above. Useful when disabling
-          -- certain features of an LSP (for example, turning off formatting for ts_ls)
-          server.capabilities =
-            vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
-          require("lspconfig")[server_name].setup(server)
-        end,
-      },
-    })
+    for server, config in pairs(servers) do
+      config.capabilities =
+        vim.tbl_deep_extend("force", config.capabilities or {}, capabilities)
+      require("lspconfig")[server].setup(config)
+    end
   end,
 }
