@@ -69,7 +69,8 @@ in {
       telescope-nvim
 
       # **lsp**
-      neodev-nvim
+      lazydev-nvim
+      luvit-meta
       fidget-nvim
 
       mason-nvim
