@@ -73,6 +73,7 @@
       "intellij-idea"
       "sublime-merge"
       "zed"
+      "ghostty"
 
       # duplicates: already included in full-system. but adding them for alfred app
       "kitty"
