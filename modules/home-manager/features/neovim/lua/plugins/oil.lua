@@ -1,5 +1,6 @@
 return {
   "stevearc/oil.nvim",
+  event = "VimEnter",
   ---@module 'oil'
   ---@type oil.SetupOpts
   opts = {},
