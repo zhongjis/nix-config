@@ -3,11 +3,15 @@
   config,
   inputs,
   currentSystem,
+  isDarwin,
   ...
 }: {
-  home.packages = with pkgs; [
-    inputs.ghostty.packages.${currentSystem}.default
-  ];
+  home.packages =
+    if isDarwin
+    then []
+    else [
+      inputs.ghostty.packages.${currentSystem}.default
+    ];
 
   home.file."${config.xdg.configHome}/ghostty/config" = {
     text =
