@@ -1,3 +1,4 @@
+-- TODO: update format buffer toggle key
 vim.api.nvim_create_user_command("FormatDisable", function(args)
   if args.bang then
     -- FormatDisable! will disable formatting just for this buffer
