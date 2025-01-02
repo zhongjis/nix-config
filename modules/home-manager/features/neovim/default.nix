@@ -43,8 +43,8 @@ in {
         jsregexp # for luasnip
       ];
     extraPackages = with pkgs; [
-      # Mason lspconfig build dependencies
-      cargo
+      # treesitter dep
+      gcc
 
       # telecope grep
       ripgrep
