@@ -50,6 +50,7 @@ in {
       ripgrep
 
       # LSP for nvim-lspconfig
+      lua-language-server
       nixd
       vscode-langservers-extracted
       yaml-language-server
