@@ -31,6 +31,18 @@ return {
       mode = "",
       desc = "[F]ormat buffer",
     },
+    {
+      "<leader>F",
+      function()
+        if vim.b.disable_autoformat or vim.g.disable_autoformat then
+          vim.cmd("FormatEnable")
+        else
+          vim.cmd("FormatDisable")
+        end
+      end,
+      mode = "n",
+      desc = "Toggle [F]ormat",
+    },
   },
   opts = {
     notify_on_error = false,

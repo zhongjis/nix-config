@@ -192,6 +192,19 @@ in {
           { import = "plugins" },
         },
       })
+
+      -- nixd
+      require("lspconfig").nixd.setup({
+        cmd = { "nixd" },
+        settings = {
+          nixd = {
+            nixpkgs = {
+              expr = "import <nixpkgs> { }",
+            },
+            options = { ${nixdOptionsLua} },
+          },
+        },
+      })
     '';
   };
 
