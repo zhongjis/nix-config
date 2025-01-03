@@ -8,11 +8,12 @@ This is my nix-config for my personal use. It is a work in progress and will be 
 
 ## System Status
 
-| host          | profile     | system         |
-| ------------- | ----------- | -------------- |
-| thinkpad-t480 | zshen-linux | x86_64-linux   |
-| razer-14      | zshen-razer | x86_64-linux   |
-| mac-m1-max    | zshen-mac   | aarch64-darwin |
+| host          | profile      | system         |
+| ------------- | ------------ | -------------- |
+| thinkpad-t480 | zshen-linux  | x86_64-linux   |
+| razer-14      | zshen-razer  | x86_64-linux   |
+| framework-16  | framework-16 | x86_64-linux   |
+| mac-m1-max    | zshen-mac    | aarch64-darwin |
 
 ## Get Started
 
