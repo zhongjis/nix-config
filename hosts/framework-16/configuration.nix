@@ -102,7 +102,6 @@
     inputs.zen-browser.packages."${currentSystem}".default
     firefox
     neovim
-    kitty
   ];
 
   system.stateVersion = "24.05"; # Did you read the comment?
