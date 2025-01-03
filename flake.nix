@@ -55,7 +55,7 @@
         };
         framework-16 = mkSystem "framework-16" {
           system = "x86_64-linux";
-	  hardware = "Framework 16 AMD Ryzen 7040 Series";
+	  hardware = "framework-16-7040-amd";
           user = "zshen";
         };
       };

@@ -14,7 +14,7 @@
       width = 3440;
       height = 1440;
       # refreshRate = 143.92;
-      refreshRate = 59.9;
+      refreshRate = 165.;
       x = 2560;
       y = 0;
     };
