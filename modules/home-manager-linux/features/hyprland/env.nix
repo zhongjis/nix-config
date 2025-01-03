@@ -14,10 +14,10 @@
     "__GL_VRR_ALLOWED,0"
 
     # NVIDIA https://wiki.hyprland.org/Nvidia/
-    "LIBVA_DRIVER_NAME,nvidia"
-    "__GLX_VENDOR_LIBRARY_NAME,nvidia"
-    "__GL_VRR_ALLOWED,1"
-    "WLR_DRM_NO_ATOMIC,1"
+    # "LIBVA_DRIVER_NAME,nvidia"
+    # "__GLX_VENDOR_LIBRARY_NAME,nvidia"
+    # "__GL_VRR_ALLOWED,1"
+    # "WLR_DRM_NO_ATOMIC,1"
 
     # XDG Desktop Portal
     "XDG_CURRENT_DESKTOP,Hyprland"
