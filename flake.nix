@@ -46,11 +46,16 @@
       nixosConfigurations = {
         thinkpad-t480 = mkSystem "thinkpad-t480" {
           system = "x86_64-linux";
-          user = "zshen";
           hardware = "lenovo-thinkpad-t480";
+          user = "zshen";
         };
         razer-14 = mkSystem "razer-14" {
           system = "x86_64-linux";
+          user = "zshen";
+        };
+        framework-16 = mkSystem "framework-16" {
+          system = "x86_64-linux";
+	  hardware = "Framework 16 AMD Ryzen 7040 Series";
           user = "zshen";
         };
       };
@@ -75,6 +80,10 @@
         razer-14 = mkHome "razer-14" {
           system = "x86_64-linux";
           darwin = false;
+        };
+        framework-16 = mkHome "framework-16" {
+          system = "x86_64-linux";
+          darwin = false; # TODO: make false default
         };
       };
 
