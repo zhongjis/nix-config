@@ -1,6 +1,6 @@
 # zshen's nix-config
 
-This is my nix-config for my personal use. It is a work in progress and will be updated as I continue to use it.
+This is my personal nix-config. It is always a work in progress as I love tweaking.
 
 ## Special Thanks
 
