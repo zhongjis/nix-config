@@ -9,12 +9,13 @@
       x = 0;
       y = 0;
       scale = 1.25;
+      scale = 1.;
     };
     "desc:LG Electronics LG ULTRAGEAR 009NTDV4B698" = {
       width = 3440;
       height = 1440;
-      # refreshRate = 143.92;
-      refreshRate = 165.;
+      refreshRate = 143.92;
+      # refreshRate = 60.;
       x = 2560;
       y = 0;
     };
@@ -37,7 +38,7 @@
 
   home.username = "zshen";
   home.homeDirectory = "/home/zshen";
-  home.stateVersion = "23.11"; # Please read the comment before changing.
+  home.stateVersion = "23.11";
   home.packages = with pkgs; [];
   home.file = {};
 }
