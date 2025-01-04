@@ -35,6 +35,7 @@
               "group/audio",
               "custom/keyboard",
               "backlight",
+              "hyprland/language",
               "clock",
               "custom/power",
           ],
