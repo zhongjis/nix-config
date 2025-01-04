@@ -17,5 +17,5 @@
 
   # fix Fcitx5 Doesn't Start When Using WM
   # reference: https://nixos.wiki/wiki/Fcitx5
-  services.xserver.desktopManager.runXdgAutostartIfNone = config.program.hyprland.enable;
+  services.xserver.desktopManager.runXdgAutostartIfNone = config.programs.hyprland.enable;
 }
