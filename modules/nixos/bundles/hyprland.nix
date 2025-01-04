@@ -1,4 +1,4 @@
 {...}: {
   myNixOS.hyprland.enable = true;
-  myNixOS.sddm.enable = true;
+  myNixOS.gdm.enable = true;
 }
