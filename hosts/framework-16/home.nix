@@ -2,10 +2,10 @@
   myHomeManager.bundles.general.enable = true;
   myHomeManager.direnv.enable = true;
   myHomeManager.hyprland.monitors = {
-    "desc:Thermotrex Corporation TL140BDXP02-0" = {
+    "desc:BOE 0x0BC9" = {
       width = 2560;
-      height = 1440;
-      refreshRate = 60.;
+      height = 1600;
+      refreshRate = 165.;
       x = 0;
       y = 0;
       scale = 1.25;
