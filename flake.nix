@@ -55,7 +55,7 @@
         };
         framework-16 = mkSystem "framework-16" {
           system = "x86_64-linux";
-	  hardware = "framework-16-7040-amd";
+          hardware = "framework-16-7040-amd";
           user = "zshen";
         };
       };
@@ -75,15 +75,12 @@
         };
         thinkpad-t480 = mkHome "thinkpad-t480" {
           system = "x86_64-linux";
-          darwin = false;
         };
         razer-14 = mkHome "razer-14" {
           system = "x86_64-linux";
-          darwin = false;
         };
         framework-16 = mkHome "framework-16" {
           system = "x86_64-linux";
-          darwin = false; # TODO: make false default
         };
       };
 

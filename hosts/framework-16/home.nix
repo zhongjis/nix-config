@@ -8,7 +8,7 @@
       refreshRate = 165.;
       x = 0;
       y = 0;
-      scale = 1.25;
+      # scale = 1.25;
       scale = 1.;
     };
     "desc:LG Electronics LG ULTRAGEAR 009NTDV4B698" = {
