@@ -75,8 +75,6 @@ NOTE: most of the changes (like for neovim) are changed on the way while im usin
 
 see [here](https://github.com/users/zhongjis/projects/5)
 
-=======
-
 ## Notes
 
 ### Build directly from repo
