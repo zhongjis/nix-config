@@ -73,44 +73,7 @@ more about sops see https://github.com/getsops/sops#2usage
 
 NOTE: most of the changes (like for neovim) are changed on the way while im using it. this list just for later in case I have nothing to do.
 
-### Global
-
-- [x] set global packages
-
-### starship
-
-- [ ] parent path not shown when in git worktree dir
-
-### bat
-
-- [x] syntax highlighting error when apply home-manager config
-- [ ] make it simple with just syntax highlighting
-
-### zsh
-
-- [ ] bat syntax highlighting
-
-### neovim
-
-- [-] markdown lint
-- [ ] verify luasnippet is working correctly
-
-## nixos
-
-### waybar
-
-- [-] copy sketchybar style to waybar
-
-### gaming
-
-- [x] create/copy a nvidia module setup
-
-## nix-darwin
-
-- [x] docker is not working directly downloaded from nixpkgs. seems relate to docker-daemon is not running. right now is using brew to manage it
-- [-] aerospace and sketchybar integration not working
-
-## stylix
+see [here](https://github.com/users/zhongjis/projects/5)
 
 =======
 
