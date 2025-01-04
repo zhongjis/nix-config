@@ -123,7 +123,7 @@ in {
 
         # https://wiki.hyprland.org/Configuring/Variables/#input
         input {
-            kb_layout = us
+            kb_layout = us,cn
             kb_variant =
             kb_model =
             kb_options =
@@ -184,6 +184,12 @@ in {
         windowrulev2 = maxsize 1 1, class:^(xwaylandvideobridge)$
         windowrulev2 = noblur, class:^(xwaylandvideobridge)$
         windowrulev2 = nofocus, class:^(xwaylandvideobridge)$
+
+        # for fcitx5
+        # reference: https://discourse.nixos.org/t/pinyin-input-method-in-hyprland-wayland-for-simplified-chinese/49186
+        windowrule = pseudo, fcitx
+        exec-once=fcitx5 -d -r
+        exec-once=fcitx5-remote -r
 
         cursor {
             no_hardware_cursors = true

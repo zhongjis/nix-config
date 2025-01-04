@@ -171,9 +171,9 @@ in {
               "on-click-right": "kitty --title btop sh -c 'btop'"
           },
           "hyprland/language": {
-              "format": "Lang: {}",
+              "format": "{}",
               "format-en": "US",
-              "format-tr": "Korea",
+              "format-cn": "Chinese",
               "keyboard-name": "at-translated-set-2-keyboard",
               "on-click": "hyprctl switchxkblayout $SET_KB next"
           },

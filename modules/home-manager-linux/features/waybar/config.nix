@@ -33,7 +33,6 @@
               "tray",
               "network",
               "group/audio",
-              "custom/keyboard",
               "backlight",
               "clock",
               "custom/power",

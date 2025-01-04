@@ -25,6 +25,7 @@
     services.amd.enable = true;
     services.virtualization.enable = true;
     power-management-framework.enable = true;
+    multi-lang-input-layout.enable = true;
   };
 
   # xremap
