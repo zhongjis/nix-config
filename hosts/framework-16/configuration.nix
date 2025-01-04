@@ -24,7 +24,7 @@
     bundles.gaming.enable = true;
     services.amd.enable = true;
     services.virtualization.enable = true;
-    power-management.enable = true;
+    power-management-framework.enable = true;
   };
 
   # xremap
