@@ -20,6 +20,7 @@
 
   myNixOS = {
     bundles.general-desktop.enable = true;
+    bundles.gnome.enable = true;
     bundles.hyprland.enable = true;
     bundles.gaming.enable = true;
     services.amd.enable = true;
