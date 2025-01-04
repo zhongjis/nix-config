@@ -4,6 +4,9 @@
   myNixOS.cachix.enable = true;
   myNixOS.stylix.enable = true;
 
+  # fwupd - firmware update
+  services.fwupd.enable = true;
+
   # for zsh auto completion
   environment.pathsToLink = ["/share/zsh"];
 

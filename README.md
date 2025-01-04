@@ -61,7 +61,7 @@ hswitch # home-manager switch
 
 ## Secret Management
 
-I am using [sops-nix](https://github.com/Mic92/sops-nix)'s home-manager module.
+I use [sops-nix](https://github.com/Mic92/sops-nix)'s home-manager module.
 
 ```bash
 nix run nixpkgs#sops -- secrets.yaml # view secrets

@@ -5,8 +5,9 @@
   ...
 }: {
   # https://nixos.wiki/wiki/AMD_GPU
-  boot.initrd.kernelModules = [ "amdgpu" ];
-  services.xserver.videoDrivers = ["amdgpu"];
+  boot.initrd.kernelModules = ["amdgpu"];
+  # someone is saying this is no longer needed
+  # services.xserver.videoDrivers = ["amdgpu"];
 
   environment.systemPackages = with pkgs; [
     pciutils
