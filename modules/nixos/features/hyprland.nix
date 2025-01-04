@@ -24,8 +24,4 @@
   ];
 
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
-
-  # fix Fcitx5 Doesn't Start When Using WM
-  # reference: https://nixos.wiki/wiki/Fcitx5
-  services.xserver.desktopManager.runXdgAutostartIfNone = true;
 }
