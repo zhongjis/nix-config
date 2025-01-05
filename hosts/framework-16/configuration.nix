@@ -23,7 +23,8 @@
     bundles.gnome.enable = true;
     bundles.hyprland.enable = true;
     bundles.gaming.enable = true;
-    services.amd.enable = true;
+    services.amdcpu.enable = true;
+    services.amdgpu.enable = true;
     services.virtualization.enable = true;
     power-management-framework.enable = true;
     multi-lang-input-layout.enable = true;
