@@ -26,7 +26,7 @@
     services.amdcpu.enable = true;
     services.amdgpu.enable = true;
     services.virtualization.enable = true;
-    power-management-framework.enable = true;
+    power-management-framework.enable = false;
     multi-lang-input-layout.enable = true;
   };
 

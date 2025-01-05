@@ -14,7 +14,7 @@
   };
 
   hardware.amdgpu = {
-    opencl.enable = true;
+    opencl.enable = false; # FIXME: this one was broken
     initrd.enable = true;
     amdvlk = {
       enable = true;
@@ -27,20 +27,6 @@
     enable = true;
     videoDrivers = ["amdgpu"];
   };
-
-  # Workaround for HIP GPU acceleration on AMD APUs
-  systemd.tmpfiles.rules = let
-    rocmEnv = pkgs.symlinkJoin {
-      name = "rocm-combined";
-      paths = with pkgs.rocmPackages; [
-        rocblas
-        hipblas
-        clr
-      ];
-    };
-  in [
-    "L+    /opt/rocm   -    -    -     -    ${rocmEnv}"
-  ];
 
   environment.systemPackages = with pkgs; [
     nvtopPackages.amd
