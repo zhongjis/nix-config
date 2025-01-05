@@ -55,7 +55,11 @@ in {
         (lib.getExe monitorScript)
 
         "waybar &"
-        "swaync &"
+        "${
+          if config.services.swaync.enable
+          then "swaync"
+          else "dunst"
+        } &"
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "wl-paste --type text --watch cliphist store" # Stores only text data
         "systemctl --user start hyprpolkitagent"
