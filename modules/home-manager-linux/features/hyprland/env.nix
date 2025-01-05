@@ -1,48 +1,58 @@
-{...}: {
+{pkgs, ...}: {
   #############################
   ### ENVIRONMENT VARIABLES ###
   #############################
 
-  # See https://wiki.hyprland.org/Configuring/Environment-variables/
-  wayland.windowManager.hyprland.settings.env = [
+  # for theming
+  xdg.configFile."uwsm/env".text = ''
     # CURSOR
-    "XCURSOR_SIZE,24"
-    "HYPRCURSOR_SIZE,24"
-
-    # GSYNC
-    "__GL_GSYNC_ALLOWED,1"
-    "__GL_VRR_ALLOWED,0"
-
-    # NVIDIA https://wiki.hyprland.org/Nvidia/
-    # "LIBVA_DRIVER_NAME,nvidia"
-    # "__GLX_VENDOR_LIBRARY_NAME,nvidia"
-    # "__GL_VRR_ALLOWED,1"
-    # "WLR_DRM_NO_ATOMIC,1"
+    export XCURSOR_SIZE = 24
+    export HYPRCURSOR_THEME = catppuccin-cursors-mochaDark
+    export HYPRCURSOR_SIZE = 24
 
     # XDG Desktop Portal
-    "XDG_CURRENT_DESKTOP,Hyprland"
-    "XDG_SESSION_TYPE,wayland"
-    "XDG_SESSION_DESKTOP,Hyprland"
+    export XDG_CURRENT_DESKTOP = Hyprland
+    export XDG_SESSION_TYPE = wayland
+    export XDG_SESSION_DESKTOP = Hyprland
+
+    # GSYNC
+    export __GL_GSYNC_ALLOWED = 1
+    export __GL_VRR_ALLOWED = 0
+
+    # NVIDIA https://wiki.hyprland.org/Nvidia/
+    # export LIBVA_DRIVER_NAME = nvidia
+    # export __GLX_VENDOR_LIBRARY_NAME = nvidia
+    # export __GL_VRR_ALLOWED = 1
+    # export WLR_DRM_NO_ATOMIC = 1
 
     # QT
-    "QT_QPA_PLATFORM,wayland;xcb"
-    "QT_QPA_PLATFORMTHEME,qt6ct"
-    "QT_QPA_PLATFORMTHEME,qt5ct"
-    "QT_WAYLAND_DISABLE_WINDOWDECORATION,1"
-    "QT_AUTO_SCREEN_SCALE_FACTOR,1"
+    export QT_QPA_PLATFORM = wayland;xcb
+    export QT_QPA_PLATFORMTHEME = qt6ct
+    export QT_QPA_PLATFORMTHEME = qt5ct
+    export QT_WAYLAND_DISABLE_WINDOWDECORATION = 1
+    export QT_AUTO_SCREEN_SCALE_FACTOR = 1
 
-    # ?
-    "MOZ_ENABLE_WAYLAND,1"
+    # Mozilla
+    export MOZ_ENABLE_WAYLAND = 1
 
     # GDK
-    "GDK_SCALE,1"
+    export GDK_SCALE = 1
 
     # Toolkit Backend
-    "GDK_BACKEND,wayland,x11,*"
-    "CLUTTER_BACKEND,wayland"
+    export GDK_BACKEND = wayland,x11,*
+    export CLUTTER_BACKEND = wayland
 
     # Toolkit Backend
-    "GDK_BACKEND,wayland,x11,*"
-    "CLUTTER_BACKEND,wayland"
-  ];
+    export GDK_BACKEND = wayland,x11,*
+    export CLUTTER_BACKEND = wayland
+  '';
+
+  # others?
+  xdg.configFile."uwsm/env-hyprland".text = ''
+    # Hyprland-specific variables
+    # (Add any HYPR* or AQ_* variables here when needed)
+  '';
+
+  # See https://wiki.hyprland.org/Configuring/Environment-variables/
+  wayland.windowManager.hyprland.settings.env = [];
 }
