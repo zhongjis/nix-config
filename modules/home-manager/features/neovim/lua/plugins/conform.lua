@@ -66,34 +66,28 @@ return {
     end,
     formatters = {
       stylua = {
-        prepend_args = function(self, ctx)
-          return {
-            "--indent-type",
-            "Spaces",
-            "--indent-width",
-            2,
-            "--column-width",
-            85,
-            "--sort-requires",
-          }
-        end,
+        args = {
+          "--indent-type",
+          "Spaces",
+          "--indent-width",
+          2,
+          "--column-width",
+          85,
+          "--sort-requires",
+        },
       },
       black = {
-        prepend_args = function(self, ctx)
-          return {
-            "--line-length",
-            79,
-          }
-        end,
+        args = {
+          "--line-length",
+          79,
+        },
       },
       shfmt = {
-        prepend_args = function(self, ctx)
-          return {
-            "-i",
-            2,
-            "-ci",
-          }
-        end,
+        args = {
+          "-i",
+          2,
+          "-ci",
+        },
       },
     },
     formatters_by_ft = {
