@@ -22,10 +22,6 @@
               "group/motherboard",
           ],
           "modules-center": [
-              "custom/swaync",
-              "custom/separator#dot-line",
-              "mpris",
-              "custom/separator#dot-line",
               "idle_inhibitor",
               "custom/hint",
           ],
