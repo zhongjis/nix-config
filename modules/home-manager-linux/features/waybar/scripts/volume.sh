@@ -1,7 +1,7 @@
 # Scripts for volume controls for audio and mic
 
 # Get Volume
-get_volume() {
+get_output_vol() {
   volume=$(pamixer --get-volume)
   if [[ "$volume" -eq "0" ]]; then
     echo "Muted"
@@ -10,44 +10,50 @@ get_volume() {
   fi
 }
 
+# Notify
+notify_output_vol() {
+  volume=$(get_output_vol)
+  notify-send -e -h int:value:"$volume" -h "string:x-canonical-private-synchronous:volume_notif" -u low "Speaker-Level: $volume"
+}
+
 # Increase Volume
-inc_volume() {
+inc_output_vol() {
   if [ "$(pamixer --get-mute)" == "true" ]; then
-    toggle_mute
+    toggle_output
   else
-    pamixer -i 5 --allow-boost --set-limit 150
+    pamixer -i 5 --allow-boost --set-limit 150 && notify_output_vol
   fi
 }
 
 # Decrease Volume
-dec_volume() {
+dec_output_vol() {
   if [ "$(pamixer --get-mute)" == "true" ]; then
-    toggle_mute
+    toggle_output
   else
-    pamixer -d 5
+    pamixer -d 5 && notify_output_vol
   fi
 }
 
 # Toggle Mute
-toggle_mute() {
+toggle_output() {
   if [ "$(pamixer --get-mute)" == "false" ]; then
-    pamixer -m
+    pamixer -m && notify-send -e -h int:value:"0" -h "string:x-canonical-private-synchronous:volume_notif" -u low "Speaker-Level: MUTED"
   elif [ "$(pamixer --get-mute)" == "true" ]; then
-    pamixer -u
+    pamixer -u && notify_output_vol
   fi
 }
 
 # Toggle Mic
-toggle_mic() {
+toggle_input() {
   if [ "$(pamixer --default-source --get-mute)" == "false" ]; then
-    pamixer --default-source -m
+    pamixer --default-source -m && notify-send -e -h int:value:"0" -h "string:x-canonical-private-synchronous:volume_notif" -u low "Mic-Level: MUTED"
   elif [ "$(pamixer --default-source --get-mute)" == "true" ]; then
-    pamixer -u --default-source u
+    pamixer -u --default-source u && notify_input_vol
   fi
 }
 
 # Get Microphone Volume
-get_mic_volume() {
+get_input_vol() {
   volume=$(pamixer --default-source --get-volume)
   if [[ "$volume" -eq "0" ]]; then
     echo "Muted"
@@ -57,45 +63,44 @@ get_mic_volume() {
 }
 
 # Notify for Microphone
-notify_mic_user() {
-  volume=$(get_mic_volume)
-  icon=$(get_mic_icon)
+notify_input_vol() {
+  volume=$(get_input_vol)
   notify-send -e -h int:value:"$volume" -h "string:x-canonical-private-synchronous:volume_notif" -u low "Mic-Level: $volume"
 }
 
 # Increase MIC Volume
-inc_mic_volume() {
+increase_input_vol() {
   if [ "$(pamixer --default-source --get-mute)" == "true" ]; then
-    toggle_mic
+    toggle_input
   else
-    pamixer --default-source -i 5 && notify_mic_user
+    pamixer --default-source -i 5 && notify_input_vol
   fi
 }
 
 # Decrease MIC Volume
-dec_mic_volume() {
+decrease_input_vol() {
   if [ "$(pamixer --default-source --get-mute)" == "true" ]; then
     toggle-mic
   else
-    pamixer --default-source -d 5 && notify_mic_user
+    pamixer --default-source -d 5 && notify_input_vol
   fi
 }
 
 # Execute accordingly
 if [[ "$1" == "--get" ]]; then
-  get_volume
+  get_output_vol
 elif [[ "$1" == "--inc" ]]; then
-  inc_volume
+  inc_output_vol
 elif [[ "$1" == "--dec" ]]; then
-  dec_volume
+  dec_output_vol
 elif [[ "$1" == "--toggle" ]]; then
-  toggle_mute
+  toggle_output
 elif [[ "$1" == "--toggle-mic" ]]; then
-  toggle_mic
+  toggle_input
 elif [[ "$1" == "--mic-inc" ]]; then
-  inc_mic_volume
+  increase_input_vol
 elif [[ "$1" == "--mic-dec" ]]; then
-  dec_mic_volume
+  decrease_input_vol
 else
-  get_volume
+  get_output_vol
 fi

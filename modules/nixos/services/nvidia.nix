@@ -67,7 +67,6 @@
   };
 
   environment.systemPackages = with pkgs; [
-    pciutils
-    # gwe # not supported for wayland yet
+    nvtopPackages.nvidia
   ];
 }

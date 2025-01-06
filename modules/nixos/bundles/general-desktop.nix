@@ -50,9 +50,6 @@
     jack.enable = true;
   };
 
-  # noisetorch - better noise cancelling input
-  programs.noisetorch.enable = true;
-
   hardware.graphics = {
     enable = true;
     enable32Bit = true;

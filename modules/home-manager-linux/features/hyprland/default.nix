@@ -161,7 +161,7 @@ in {
         # windowrule = float, ^(kitty)$
 
         windowrulev2 = workspace 1,class:^(spotify)$
-        windowrulev2 = workspace special:magic,class:^(discord)$
+        windowrulev2 = workspace special:magic,class:^(WebCord)$
         windowrulev2 = workspace 7,class:^(obsidian)$
         windowrulev2 = workspace 9,class:^(steam)$
         windowrulev2 = workspace 10,class:^(zen-beta)$

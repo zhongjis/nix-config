@@ -10,9 +10,6 @@
     ../common.nix
     inputs.nix-gaming.nixosModules.platformOptimizations
     inputs.nix-gaming.nixosModules.pipewireLowLatency
-    inputs.nixos-hardware.nixosModules.common-pc-ssd
-    inputs.nixos-hardware.nixosModules.common-cpu-amd-pstate
-    inputs.nixos-hardware.nixosModules.common-cpu-amd-zenpower
   ];
 
   # gaming kernel. not sure if it is good
@@ -20,12 +17,12 @@
 
   myNixOS = {
     bundles.general-desktop.enable = true;
-    bundles.gnome.enable = true;
     bundles.hyprland.enable = true;
     bundles.gaming.enable = true;
-    services.amd.enable = true;
+    services.amdcpu.enable = false;
+    services.amdgpu.enable = false;
     services.virtualization.enable = true;
-    power-management-framework.enable = true;
+    power-management-framework.enable = false;
     multi-lang-input-layout.enable = true;
   };
 
@@ -55,14 +52,11 @@
   boot.plymouth.enable = true;
 
   # Network
-  networking.hostName = "nixos"; # Define your hostname.
+  networking.hostName = "zshen-framework"; # Define your hostname.
   networking.networkmanager.enable = true;
 
   # ZRAM
-  zramSwap = {
-    enable = true;
-    memoryPercent = 50;
-  };
+  zramSwap.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -79,9 +73,6 @@
 
   # Enable touchpad support (enabled default in most desktopManager).
   services.libinput.enable = true;
-
-  # Open Razer
-  hardware.openrazer.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.zshen = {
@@ -102,7 +93,7 @@
 
   environment.systemPackages = with pkgs; [
     inputs.zen-browser.packages."${currentSystem}".default
-    firefox
+    firefox # in case zen broke
     neovim
   ];
 
