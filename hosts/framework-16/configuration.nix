@@ -17,7 +17,6 @@
 
   myNixOS = {
     bundles.general-desktop.enable = true;
-    bundles.gnome.enable = true;
     bundles.hyprland.enable = true;
     bundles.gaming.enable = true;
     services.amdcpu.enable = false;
@@ -53,14 +52,11 @@
   boot.plymouth.enable = true;
 
   # Network
-  networking.hostName = "nixos"; # Define your hostname.
+  networking.hostName = "zshen-framework"; # Define your hostname.
   networking.networkmanager.enable = true;
 
   # ZRAM
-  zramSwap = {
-    enable = true;
-    memoryPercent = 50;
-  };
+  zramSwap.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -77,9 +73,6 @@
 
   # Enable touchpad support (enabled default in most desktopManager).
   services.libinput.enable = true;
-
-  # Open Razer
-  hardware.openrazer.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.zshen = {
@@ -100,7 +93,7 @@
 
   environment.systemPackages = with pkgs; [
     inputs.zen-browser.packages."${currentSystem}".default
-    firefox
+    firefox # in case zen broke
     neovim
   ];
 
