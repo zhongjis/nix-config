@@ -46,9 +46,9 @@ toggle_mute() {
 # Toggle Mic
 toggle_mic() {
   if [ "$(pamixer --default-source --get-mute)" == "false" ]; then
-    pamixer --default-source -m
+    pamixer --default-source -m && notify-send -e -h int:value:"0" -h "string:x-canonical-private-synchronous:volume_notif" -u low "Mic-Level: MUTED"
   elif [ "$(pamixer --default-source --get-mute)" == "true" ]; then
-    pamixer -u --default-source u
+    pamixer -u --default-source u && notify_mic_user
   fi
 }
 
