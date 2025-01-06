@@ -10,9 +10,6 @@
     ../common.nix
     inputs.nix-gaming.nixosModules.platformOptimizations
     inputs.nix-gaming.nixosModules.pipewireLowLatency
-    inputs.nixos-hardware.nixosModules.common-pc-ssd
-    inputs.nixos-hardware.nixosModules.common-cpu-amd-pstate
-    inputs.nixos-hardware.nixosModules.common-cpu-amd-zenpower
   ];
 
   # gaming kernel. not sure if it is good
@@ -23,8 +20,8 @@
     bundles.gnome.enable = true;
     bundles.hyprland.enable = true;
     bundles.gaming.enable = true;
-    services.amdcpu.enable = true;
-    services.amdgpu.enable = true;
+    services.amdcpu.enable = false;
+    services.amdgpu.enable = false;
     services.virtualization.enable = true;
     power-management-framework.enable = false;
     multi-lang-input-layout.enable = true;
