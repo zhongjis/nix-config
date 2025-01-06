@@ -78,7 +78,7 @@
   users.users.zshen = {
     isNormalUser = true;
     description = "Jason";
-    extraGroups = ["networkmanager" "wheel" "openrazer" "audio" "docker"];
+    extraGroups = ["networkmanager" "wheel" "audio"];
     packages = with pkgs; [
       kdePackages.kate
     ];
