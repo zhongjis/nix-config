@@ -10,12 +10,18 @@ get_volume() {
   fi
 }
 
+# Notify
+notify_output() {
+  volume=$(get_volume)
+  notify-send -e -h int:value:"$volume" -h "string:x-canonical-private-synchronous:volume_notif" -u low "Speaker-Level: $volume"
+}
+
 # Increase Volume
 inc_volume() {
   if [ "$(pamixer --get-mute)" == "true" ]; then
     toggle_mute
   else
-    pamixer -i 5 --allow-boost --set-limit 150
+    pamixer -i 5 --allow-boost --set-limit 150 && notify_output
   fi
 }
 
@@ -24,16 +30,16 @@ dec_volume() {
   if [ "$(pamixer --get-mute)" == "true" ]; then
     toggle_mute
   else
-    pamixer -d 5
+    pamixer -d 5 && notify_output
   fi
 }
 
 # Toggle Mute
 toggle_mute() {
   if [ "$(pamixer --get-mute)" == "false" ]; then
-    pamixer -m
+    pamixer -m && notify-send -e -h int:value:"0" -h "string:x-canonical-private-synchronous:volume_notif" -u low "Speaker-Level: MUTED"
   elif [ "$(pamixer --get-mute)" == "true" ]; then
-    pamixer -u
+    pamixer -u && notify_output
   fi
 }
 
@@ -59,7 +65,6 @@ get_mic_volume() {
 # Notify for Microphone
 notify_mic_user() {
   volume=$(get_mic_volume)
-  icon=$(get_mic_icon)
   notify-send -e -h int:value:"$volume" -h "string:x-canonical-private-synchronous:volume_notif" -u low "Mic-Level: $volume"
 }
 
