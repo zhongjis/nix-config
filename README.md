@@ -11,7 +11,6 @@ This is my personal nix-config. It is always a work in progress as I love tweaki
 | host          | profile      | system         |
 | ------------- | ------------ | -------------- |
 | thinkpad-t480 | zshen-linux  | x86_64-linux   |
-| razer-14      | zshen-razer  | x86_64-linux   |
 | framework-16  | framework-16 | x86_64-linux   |
 | mac-m1-max    | zshen-mac    | aarch64-darwin |
 

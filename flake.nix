@@ -54,10 +54,6 @@
           hardware = "lenovo-thinkpad-t480";
           user = "zshen";
         };
-        razer-14 = mkSystem "razer-14" {
-          system = "x86_64-linux";
-          user = "zshen";
-        };
         framework-16 = mkSystem "framework-16" {
           system = "x86_64-linux";
           hardware = "framework-16-7040-amd";
@@ -79,9 +75,6 @@
           darwin = true;
         };
         thinkpad-t480 = mkHome "thinkpad-t480" {
-          system = "x86_64-linux";
-        };
-        razer-14 = mkHome "razer-14" {
           system = "x86_64-linux";
         };
         framework-16 = mkHome "framework-16" {
