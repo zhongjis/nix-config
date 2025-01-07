@@ -19,8 +19,8 @@
     bundles.general-desktop.enable = true;
     bundles.hyprland.enable = true;
     bundles.gaming.enable = true;
-    services.amdcpu.enable = false;
-    services.amdgpu.enable = false;
+    services.amdcpu.enable = true;
+    services.amdgpu.enable = true;
     multi-lang-input-layout.enable = true;
     docker.enable = true;
   };
@@ -74,8 +74,6 @@
     packages = with pkgs; [];
     shell = pkgs.zsh;
   };
-
-  hardware.cpu.amd.updateMicrocode = true;
 
   # Logitech Blutooth Devices
   hardware.logitech.wireless.enable = true;
