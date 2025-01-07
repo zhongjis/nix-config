@@ -21,9 +21,8 @@
     bundles.gaming.enable = true;
     services.amdcpu.enable = false;
     services.amdgpu.enable = false;
-    services.virtualization.enable = true;
-    power-management-framework.enable = false;
     multi-lang-input-layout.enable = true;
+    docker.enable = true;
   };
 
   # xremap
@@ -64,13 +63,6 @@
     variant = "";
   };
 
-  # Enable CUPS to print documents.
-  services = {
-    flatpak.enable = true;
-    udisks2.enable = true;
-    printing.enable = true;
-  };
-
   # Enable touchpad support (enabled default in most desktopManager).
   services.libinput.enable = true;
 
@@ -78,10 +70,8 @@
   users.users.zshen = {
     isNormalUser = true;
     description = "Jason";
-    extraGroups = ["networkmanager" "wheel" "audio"];
-    packages = with pkgs; [
-      kdePackages.kate
-    ];
+    extraGroups = ["networkmanager" "wheel" "audio" "docker"];
+    packages = with pkgs; [];
     shell = pkgs.zsh;
   };
 

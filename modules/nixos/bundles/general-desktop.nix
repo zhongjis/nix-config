@@ -7,6 +7,20 @@
   # fwupd - firmware update
   services.fwupd.enable = true;
 
+  # Enable CUPS to print documents.
+  services = {
+    printing.enable = true;
+  };
+
+  # Enable flatpak
+  services.flatpak.enable = true;
+
+  # Enable USB auto mounting
+  services = {
+    udisks2.enable = true;
+    gvfs.enable = true;
+  };
+
   # for zsh auto completion
   environment.pathsToLink = ["/share/zsh"];
 
