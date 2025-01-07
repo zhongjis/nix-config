@@ -26,6 +26,11 @@
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     ghostty.url = "github:ghostty-org/ghostty";
 
+    fw-fanctrl = {
+      url = "github:TamtamHero/fw-fanctrl/packaging/nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # secret management
     sops-nix = {
       url = "github:Mic92/sops-nix";

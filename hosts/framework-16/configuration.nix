@@ -2,12 +2,12 @@
   pkgs,
   inputs,
   currentSystem,
-  lib,
   ...
 }: {
   imports = [
     ./hardware-configuration.nix
     ../common.nix
+    ./fw-fanctrl.nix
     inputs.nix-gaming.nixosModules.platformOptimizations
     inputs.nix-gaming.nixosModules.pipewireLowLatency
   ];
