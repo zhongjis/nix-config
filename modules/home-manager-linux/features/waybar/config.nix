@@ -22,14 +22,13 @@
               "group/motherboard",
           ],
           "modules-center": [
-              "idle_inhibitor",
-              "custom/hint",
           ],
           "modules-right": [
               "tray",
               "network",
               "group/audio",
               "backlight",
+              "idle_inhibitor",
               "clock",
               "custom/power",
           ],
