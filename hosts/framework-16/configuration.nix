@@ -26,6 +26,14 @@
     ollama.enable = true;
   };
 
+  # for radeon 7700s
+  services.ollama = {
+    environmentVariables = {
+      HCC_AMDGPU_TARGET = "gfx1102"; # used to be necessary, but doesn't seem to anymore
+    };
+    rocmOverrideGfx = "11.0.2";
+  };
+
   # xremap
   hardware.uinput.enable = true;
   users.groups = {
