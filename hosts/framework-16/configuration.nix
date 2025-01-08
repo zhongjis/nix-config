@@ -23,6 +23,7 @@
     services.amdgpu.enable = true;
     multi-lang-input-layout.enable = true;
     docker.enable = true;
+    ollama.enable = true;
   };
 
   # xremap
