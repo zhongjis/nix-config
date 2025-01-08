@@ -71,6 +71,7 @@
       "devtoys"
       "mongodb-compass"
       "intellij-idea"
+      "visual-studio-code"
       "sublime-merge"
       "zed"
       "ghostty"
