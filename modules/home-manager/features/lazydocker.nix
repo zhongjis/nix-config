@@ -1,5 +1,5 @@
-{...}: {
-  programs.lazydocker = {
-    enable = true;
-  };
+{pkgs, ...}: {
+  home.packages = with pkgs; [
+    lazydocker
+  ];
 }
