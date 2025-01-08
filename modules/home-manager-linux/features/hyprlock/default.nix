@@ -17,6 +17,10 @@ in {
             grace = 1
         }
 
+        fingerprint {
+          enabled = true
+        }
+
         background {
             monitor =
             path = ${config.stylix.image}
@@ -31,104 +35,59 @@ in {
 
         input-field {
             monitor =
-            size = 180, 40
+            size = 200, 50
             outline_thickness = 3
             dots_size = 0.33 # Scale of input-field height, 0.2 - 0.8
             dots_spacing = 0.15 # Scale of dots' absolute size, 0.0 - 1.0
             dots_center = true
+            dots_rounding = -1 # -1 default circle, -2 follow input-field rounding
+            outer_color=rgb(${base0A})
+            inner_color=rgb(${base08})
+            font_color=rgb(${base05})
+            fade_on_empty = true
+            fade_timeout = 1000 # Milliseconds before fade_on_empty is triggered.
+            placeholder_text = <i>Input Password...</i> # Text rendered in the input box when it's empty.
+            hide_input = false
+            rounding = -1 # -1 means complete rounding (circle/oval)
             check_color=rgb(${base03})
             fail_color=rgb(${base00})
-            font_color=rgb(${base05})
-            inner_color=rgb(${base08})
-            outer_color=rgb(${base0A})
-            fade_on_empty = true
-            placeholder_text = <i>Password...</i> # Text rendered in the input box when it's empty.
-            hide_input = false
-            position = 0, 230
+            fail_text = <i>$FAIL <b>($ATTEMPTS)</b></i> # can be set to empty
+            fail_transition = 300 # transition time in ms between normal outer_color and fail_color
+            capslock_color = -1
+            numlock_color = -1
+            bothlock_color = -1 # when both locks are active. -1 means don't change outer color (same for above)
+            invert_numlock = false # change color if numlock is off
+            swap_font_color = false # see below
+            position = 0, -20
             halign = center
+            valign = center
+        }
+
+        label {
+            monitor =
+            #clock
+            text = cmd[update:1000] echo "$TIME"
+            color = rgba(200, 200, 200, 1.0)
+            font_size = 55
+            font_family = Fira Semibold
+            position = -100, 70
+            halign = right
             valign = bottom
+            shadow_passes = 5
+            shadow_size = 10
         }
 
-        # DATE
         label {
             monitor =
-            text = cmd[update:18000000] echo "<b> "$(date +'%A, %-d %B %Y')" </b>"
-            color = rgb(184, 192, 224)
-            font_size = 14
-            font_family = Noto Nastaliq Urdu
-            position = 0, -250
-            halign = center
-            valign = top
-        }
-
-        # TIME HR
-        label {
-            monitor =
-            text = cmd[update:1000] echo -e "$(date +"%I")"
-            color = rgb(245, 189, 230)
-            shadow_size = 3
-            shadow_color = rgb(0,0,0)
-            shadow_boost = 1.2
-            font_size = 180
-            font_family = JetBrains Mono Nerd Font 10
-            position = 0, -255
-            halign = center
-            valign = top
-            zindex = 5
-        }
-
-        # TIME MIN
-        label {
-            monitor =
-            text = cmd[update:1000] echo -e "$(date +"%M")"
-            color = rgb(145, 215, 227)
-            font_size = 180
-            font_family = JetBrains Mono Nerd Font 10
-            position = 0, -450
-            halign = center
-            valign = top
-            zindex = 5
-        }
-
-        # TIME SEC
-        label {
-            monitor =
-            text = cmd[update:1000] echo -e "$(date +"%S")"
-            color = rgb(184, 192, 224)
-            shadow_size = 3
-            shadow_color = rgb(0,0,0)
-            shadow_boost = 1.2
+            text = $USER
+            color = rgba(200, 200, 200, 1.0)
             font_size = 20
-            font_family = JetBrains Mono Nerd Font 10
-            position = 150, -660
-            halign = center
-            valign = top
-            zindex = 5
-        }
-
-        # User
-        label {
-            monitor =
-            text =$USER
-            color = rgb(184, 192, 224)
-            font_size = 45
-            font_family = Inter Display Medium
-
-            position = 60, 100
-            halign = center
+            font_family = Fira Semibold
+            position = -100, 160
+            halign = right
             valign = bottom
-        }
-
-        # Uptime
-        label {
-            monitor =
-            text = cmd[update:60000] echo "<b> "$(uptime -p || ${uptime-sh})" </b>"
-            color = rgb(184, 192, 224)
-            font_size = 11
-            font_family = JetBrains Mono Nerd Font 10
-            position = 0, -1000
-            halign = center
-            valign = top
+            shadow_passes = 5
+            shadow_size = 10
         }
       '';
   };
