@@ -1,1 +1,1 @@
-./modules/home-manager/features/stylix/common.nix
+../../../home-manager/features/stylix/common.nix
