@@ -34,10 +34,6 @@ in rec {
       if hardware != ""
       then inputs.nixos-hardware.nixosModules.${hardware}
       else {};
-    stylixModule =
-      if !isDarwin
-      then inputs.stylix.nixosModules.stylix
-      else inputs.stylix.darwinModules.stylix;
     systemModules =
       if isDarwin
       then outputs.nixDarwinModules.default
@@ -55,20 +51,16 @@ in rec {
         systemModules
 
         {
-          nixpkgs = {
-            overlays = [
-              inputs.nixpkgs-terraform.overlays.default
-              overlays.modifications
-              overlays.stable-packages
-            ];
-            config = {
-              allowUnfree = true;
-              allowUnfreePredicate = _: true;
-            };
+          nixpkgs.overlays = [
+            inputs.nixpkgs-terraform.overlays.default
+            overlays.modifications
+            overlays.stable-packages
+          ];
+          nixpkgs.config = {
+            allowUnfree = true;
+            allowUnfreePredicate = _: true;
           };
         }
-
-        stylixModule
 
         {
           config._module.args = {
@@ -90,15 +82,6 @@ in rec {
     currentSystemName = systemName;
     isDarwin = darwin;
 
-    pkgsWithOverlay = import nixpkgs {
-      inherit system;
-      overlays = [
-        inputs.nixpkgs-terraform.overlays.default
-        overlays.modifications
-        overlays.stable-packages
-      ];
-    };
-
     homeConfiguration = ../hosts/${systemName}/home.nix;
     systemSpecificHomeManagerModules =
       if isDarwin
@@ -106,7 +89,15 @@ in rec {
       else outputs.homeManagerModules.linux;
   in
     inputs.home-manager.lib.homeManagerConfiguration {
-      pkgs = pkgsWithOverlay;
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [
+          inputs.nixpkgs-terraform.overlays.default
+          overlays.modifications
+          overlays.stable-packages
+        ];
+      };
+
       extraSpecialArgs = {
         inherit
           inputs
@@ -120,7 +111,6 @@ in rec {
 
       modules = [
         homeConfiguration
-        inputs.stylix.homeManagerModules.stylix
         outputs.homeManagerModules.default
         systemSpecificHomeManagerModules
       ];

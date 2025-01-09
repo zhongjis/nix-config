@@ -54,13 +54,10 @@ in {
       [
         (lib.getExe monitorScript)
 
-        "waybar &"
-        "${
-          if config.services.swaync.enable
-          then "swaync"
-          else "dunst"
-        } &"
-        "noisetorch -i"
+        # disable the following for hyprpanel
+        # "waybar &"
+        # "swaync &"
+        # "dunst &"
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "wl-paste --type text --watch cliphist store" # Stores only text data
         "systemctl --user start hyprpolkitagent"

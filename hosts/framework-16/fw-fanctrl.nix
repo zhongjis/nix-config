@@ -1,7 +1,5 @@
 {inputs, ...}: {
-  imports = [
-    inputs.fw-fanctrl.nixosModules.default
-  ];
+  imports = [inputs.fw-fanctrl.nixosModules.default];
 
   programs.fw-fanctrl.enable = true;
   programs.fw-fanctrl.config = {

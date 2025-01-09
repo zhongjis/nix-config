@@ -25,6 +25,10 @@
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     ghostty.url = "github:ghostty-org/ghostty";
+    hyprpanel = {
+      url = "github:Jas-SinghFSU/HyprPanel";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     fw-fanctrl = {
       url = "github:TamtamHero/fw-fanctrl/packaging/nix";

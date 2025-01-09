@@ -1,1 +1,7 @@
-../../../home-manager/features/stylix/default.nix
+{inputs, ...}: {
+  imports = [
+    ./common.nix
+    ./other.nix
+    inputs.stylix.nixosModules.stylix
+  ];
+}

@@ -5,6 +5,7 @@
 }: {
   myNixDarwin.aerospace.enable = lib.mkDefault false;
   myNixDarwin.nh.enable = lib.mkDefault true;
+  myNixDarwin.stylix.enable = lib.mkDefault true;
 
   # for zsh auto completion
   environment.pathsToLink = ["/share/zsh"];
