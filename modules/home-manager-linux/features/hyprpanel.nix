@@ -31,9 +31,9 @@
     # Override the final config with an arbitrary set.
     # Useful for overriding colors in your selected theme.
     # Default: {}
-    override = {
-      theme.bar.menus.text = "#123ABC";
-    };
+    # override = {
+    #   theme.bar.menus.text = "#123ABC";
+    # };
 
     # Configure bar layouts for monitors.
     # See 'https://hyprpanel.com/configuration/panel.html'.
@@ -67,6 +67,10 @@
 
       menus.dashboard.directories.enabled = false;
       menus.dashboard.stats.enable_gpu = true;
+      menus.dashboard.shortcuts.left = {
+        shortcut1.command = "zen";
+        shortcut3.command = "webcord";
+      };
 
       theme.bar.transparent = true;
 
