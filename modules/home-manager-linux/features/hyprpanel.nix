@@ -41,9 +41,14 @@
     layout = {
       "bar.layouts" = {
         "*" = {
-          left = ["dashboard" "battery"];
+          left = ["dashboard" "battery" "storage" "ram" "netstat"];
           middle = ["media"];
-          right = ["systray" "network" "bluetooth" "brightness" "volume" "notifications"];
+          right = ["systray" "network" "bluetooth" "brightness" "volume" "notifications" "power"];
+        };
+        "2" = {
+          left = ["cputemp" "netstat" "ram"];
+          middle = [];
+          right = [];
         };
       };
     };
