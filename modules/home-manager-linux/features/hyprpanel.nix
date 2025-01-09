@@ -46,7 +46,7 @@
           right = ["systray" "network" "bluetooth" "brightness" "volume" "notifications" "power"];
         };
         "2" = {
-          left = ["cputemp" "netstat" "ram"];
+          left = ["netstat" "ram"];
           middle = [];
           right = [];
         };
@@ -71,7 +71,7 @@
       };
 
       menus.dashboard.directories.enabled = false;
-      menus.dashboard.stats.enable_gpu = true;
+      menus.dashboard.stats.enable_gpu = false; # not working for amd rn
       menus.dashboard.shortcuts.left = {
         shortcut1.command = "zen";
         shortcut3.command = "webcord";
