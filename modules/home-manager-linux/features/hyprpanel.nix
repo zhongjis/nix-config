@@ -43,12 +43,12 @@
         "*" = {
           left = ["dashboard" "battery" "storage" "ram" "netstat"];
           middle = ["media"];
-          right = ["systray" "network" "bluetooth" "brightness" "volume" "notifications" "power"];
+          right = ["systray" "network" "bluetooth" "brightness" "volume" "notifications" "clock" "power"];
         };
         "2" = {
           left = ["netstat" "ram"];
           middle = [];
-          right = [];
+          right = ["clock"];
         };
       };
     };
