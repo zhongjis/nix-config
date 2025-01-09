@@ -66,7 +66,7 @@ return {
     end,
     formatters = {
       stylua = {
-        args = {
+        prepend_args = {
           "--indent-type",
           "Spaces",
           "--indent-width",
@@ -77,9 +77,9 @@ return {
         },
       },
       black = {
-        args = {
+        prepend_args = {
           "--line-length",
-          79,
+          85,
         },
       },
       shfmt = {
