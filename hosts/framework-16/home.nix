@@ -8,22 +8,24 @@
       refreshRate = 165.;
       x = 0;
       y = 0;
-      # scale = 1.25;
-      scale = 1.;
+      scale = 1.25;
+      # scale = 1.;
     };
     "desc:LG Electronics LG ULTRAGEAR 009NTDV4B698" = {
       width = 3440;
       height = 1440;
       refreshRate = 143.92;
       # refreshRate = 60.;
-      x = 2560;
+      # x = 2560
+      x = 2048;
       y = 0;
     };
     "desc:Dell Inc. DELL P2419H 78NFR63" = {
       width = 1920;
       height = 1080;
       refreshRate = 60.;
-      x = 6000;
+      # x = 6000;
+      x = 5488;
       y = 0;
       rotate = 1;
     };
