@@ -18,6 +18,7 @@
           "margin-right": 8,
           "modules-left": [
               "custom/menu",
+              "custom/separator#blank",
               "battery",
               "group/motherboard",
           ],
