@@ -1,5 +1,5 @@
 {pkgs, ...}: let
-  unstable_pkgs = with pkgs; [];
+  stable_pkgs = with pkgs.stable; [];
 in {
   environment.systemPackages = with pkgs;
     [
@@ -26,5 +26,5 @@ in {
       awscli2
       gh
     ]
-    ++ unstable_pkgs;
+    ++ stable_pkgs;
 }

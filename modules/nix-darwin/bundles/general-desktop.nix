@@ -66,7 +66,7 @@
 
       # dev tools
       "dash"
-      "docker"
+      # "docker"
       "charles"
       "devtoys"
       "mongodb-compass"
