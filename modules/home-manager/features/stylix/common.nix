@@ -26,6 +26,12 @@ in {
     };
   };
 
+  stylix.cursor = {
+    name = "catppuccin-mocha-light-cursors";
+    package = pkgs.catppuccin-cursors.mochaLight;
+    size = 32;
+  };
+
   stylix.opacity = {
     applications = 1.0;
     terminal = 0.85;
