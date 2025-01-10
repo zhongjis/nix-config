@@ -100,6 +100,7 @@ return {
       markdown = { "prettierd" },
       python = { "black" },
       css = { "prettierd" },
+      terraform = { "terraform_fmt" },
     },
   },
 }
