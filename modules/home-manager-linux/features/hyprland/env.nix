@@ -6,9 +6,9 @@
   # for theming
   xdg.configFile."uwsm/env".text = ''
     # CURSOR
-    export XCURSOR_SIZE = 24
-    export HYPRCURSOR_THEME = catppuccin-cursors-mochaDark
-    export HYPRCURSOR_SIZE = 24
+    export XCURSOR_SIZE = 32
+    export HYPRCURSOR_THEME = catppuccin-mocha-light-cursors
+    export HYPRCURSOR_SIZE = 32
 
     # XDG Desktop Portal
     export XDG_CURRENT_DESKTOP = Hyprland
