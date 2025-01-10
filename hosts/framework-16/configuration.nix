@@ -8,8 +8,6 @@
     ./hardware-configuration.nix
     ../common.nix
     ./fw-fanctrl.nix
-    inputs.nix-gaming.nixosModules.platformOptimizations
-    inputs.nix-gaming.nixosModules.pipewireLowLatency
   ];
 
   # gaming kernel. not sure if it is good
