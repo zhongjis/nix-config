@@ -55,8 +55,8 @@ in {
         (lib.getExe monitorScript)
 
         # disable the following for hyprpanel
-        # "waybar &"
-        # "dunst &"
+        "waybar &"
+        "dunst &"
         # "swaync &"
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "wl-paste --type text --watch cliphist store" # Stores only text data

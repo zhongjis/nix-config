@@ -1,9 +1,11 @@
-{inputs, ...}: {
-  imports = [
-    inputs.catppuccin.homeManagerModules.catppuccin
-  ];
-
+{
+  lib,
+  pkgs,
+  ...
+}: {
   gtk.enable = true;
-  catppuccin.gtk.enable = true;
-  catppuccin.gtk.flavor = "mocha";
+  gtk.iconTheme.name = "Dracula";
+  gtk.iconTheme.package = pkgs.dracula-icon-theme;
+  gtk.theme.name = lib.mkForce "Dracula";
+  gtk.theme.package = lib.mkForce pkgs.dracula-theme;
 }

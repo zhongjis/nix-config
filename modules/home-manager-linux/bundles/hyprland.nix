@@ -7,8 +7,10 @@
   myHomeManagerLinux.hypridle.enable = true;
 
   # myHomeManagerLinux.swaync.enable = true;
-  # myHomeManagerLinux.dunst.enable = true;
-  # myHomeManagerLinux.waybar.enable = true;
+  myHomeManagerLinux.dunst.enable = true;
+  myHomeManagerLinux.waybar.enable = true;
 
-  myHomeManagerLinux.hyprpanel.enable = true;
+  # myHomeManagerLinux.hyprpanel.enable = true;
+
+  myHomeManagerLinux.gtk.enable = true;
 }
