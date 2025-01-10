@@ -45,7 +45,7 @@
           middle = ["media"];
           right = ["systray" "network" "bluetooth" "brightness" "volume" "notifications" "clock" "power"];
         };
-        "2" = {
+        "0" = {
           left = ["netstat" "ram"];
           middle = [];
           right = ["clock"];
