@@ -22,9 +22,9 @@
   myHomeManager.k9s.enable = lib.mkDefault true;
   myHomeManager.kitty.enable = lib.mkDefault true;
   myHomeManager.lazygit.enable = lib.mkDefault true;
-  myHomeManager.ssh.enable = lib.mkDefault true;
   myHomeManager.lazydocker.enable = lib.mkDefault true;
   myHomeManager.sops.enable = lib.mkDefault true;
+  myHomeManager.ssh.enable = lib.mkDefault true;
   myHomeManager.starship.enable = lib.mkDefault true;
   myHomeManager.yazi.enable = lib.mkDefault true;
   myHomeManager.zsh.enable = lib.mkDefault true;
