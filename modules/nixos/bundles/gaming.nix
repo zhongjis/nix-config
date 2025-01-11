@@ -30,9 +30,11 @@
   };
 
   environment.systemPackages = with pkgs; [
+    bottles
     mangohud
     gamescope
     protonup-qt
+    dxvk
 
     # parsec-bin
     webcord
