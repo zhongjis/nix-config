@@ -35,6 +35,7 @@
     gamescope
     protonup-qt
     dxvk
+    heroic
 
     # parsec-bin
     webcord
