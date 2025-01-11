@@ -1,5 +1,5 @@
 {pkgs, ...}: {
   stylix.targets = {
-    # placeholder
+    plymouth.enable = false;
   };
 }

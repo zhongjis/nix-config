@@ -55,7 +55,6 @@
       useOSProber = true;
     };
   };
-  boot.plymouth.enable = true;
 
   # Network
   networking.hostName = "zshen-framework"; # Define your hostname.
