@@ -61,6 +61,7 @@ in {
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "wl-paste --type text --watch cliphist store" # Stores only text data
         "systemctl --user start hyprpolkitagent"
+        "hyprswitch init --show-title &"
       ]
       ++ autostarts
       ++ map (s: lib.getExe s) startScriptList;

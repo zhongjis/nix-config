@@ -16,6 +16,10 @@
 
     # See https://wiki.hyprland.org/Configuring/Keywords/
     "$mainMod" = "ALT";
+    "$key" = "tab";
+    "$mod" = "alt";
+    "$reverse" = "grave";
+
     bind = [
       # Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
       "$mainMod, T, exec, $terminal"
@@ -63,6 +67,10 @@
       # Example special workspace (scratchpad)
       "$mainMod, S, togglespecialworkspace, magic"
       "$mainMod SHIFT, S, movetoworkspace, special:magic"
+
+      # Hyprswitch
+      "$mod, $key, exec, hyprswitch gui --mod-key $mod --key $key --close mod-key-release --reverse-key=key=$reverse && hyprswitch dispatch"
+      "$mod $reverse, $key, exec, hyprswitch gui --mod-key $mod --key $key --close mod-key-release --reverse-key=key=$reverse && hyprswitch dispatch -r"
     ];
     bindm = [
       # Move/resize windows with mainMod + LMB/RMB and dragging
