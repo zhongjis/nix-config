@@ -2,7 +2,14 @@
   pkgs,
   config,
   ...
-}: {
+}: let
+  darwinKeychainOption =
+    if pkgs.stdenv.isDarwin
+    then {
+      UseKeychain = "yes";
+    }
+    else {};
+in {
   programs.ssh.enable = true;
   programs.ssh.matchBlocks = {
     "github-com" = {
@@ -13,14 +20,8 @@
           PreferredAuthentications = "publickey";
           AddKeysToAgent = "yes";
         };
-        conditionalOptions =
-          if pkgs.stdenv.isLinux
-          then {}
-          else {
-            UseKeychain = "yes";
-          };
       in
-        baseOptions // conditionalOptions;
+        baseOptions // darwinKeychainOption;
     };
   };
 }
