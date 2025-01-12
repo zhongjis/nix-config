@@ -45,7 +45,6 @@ in {
               "interval": 2,
               "align": 0,
               "rotate": 0,
-              //"format": "{icon} {percent}%",
               "format-icons": [
                   " ",
                   " ",
@@ -56,7 +55,6 @@ in {
                   "󰃠 "
               ],
               "format": "{icon}",
-              //"format-icons": ["","","","","","","","","","","","","","",""],
               "tooltip-format": "backlight {percent}%",
               "icon-size": 10,
               "on-click": "",

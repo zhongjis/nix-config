@@ -115,8 +115,6 @@
       #custom-light_dark,
       #custom-lock,
       #custom-menu,
-      #custom-power_vertical,
-      #custom-power,
       {
         padding-top: 3px;
         padding-bottom: 3px;
