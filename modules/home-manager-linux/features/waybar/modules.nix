@@ -402,8 +402,8 @@ in {
           "custom/power": {
               "format": "⏻ ",
               "exec": "echo ; echo 󰟡 power // blur",
-              "on-click": "${wlogout-sh}",
-              "on-click-right": "${change-blur-sh}",
+              "on-click": "rofi-toggle-power-menu",
+              "on-click-right": "",
               "interval": 86400, // once every day
               "tooltip": true,
           },
