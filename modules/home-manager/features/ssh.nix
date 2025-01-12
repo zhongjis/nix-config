@@ -23,5 +23,16 @@ in {
       in
         baseOptions // darwinKeychainOption;
     };
+    "git-corp-adobe-com" = {
+      host = "github.com";
+      identityFile = "${config.home.homeDirectory}/.ssh/github_adobe_zshen";
+      extraOptions = let
+        baseOptions = {
+          PreferredAuthentications = "publickey";
+          AddKeysToAgent = "yes";
+        };
+      in
+        baseOptions // darwinKeychainOption;
+    };
   };
 }
