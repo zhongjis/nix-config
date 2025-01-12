@@ -2,6 +2,8 @@
   config,
   lib,
   pkgs,
+  inputs,
+  currentSystem,
   ...
 }: let
 in {
@@ -10,6 +12,10 @@ in {
     ./monitors.nix
     ./env.nix
     ./keymaps.nix
+  ];
+
+  home.packages = with pkgs; [
+    inputs.hyprswitch.packages.${currentSystem}.default
   ];
 
   # hyprland

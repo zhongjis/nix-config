@@ -1,6 +1,8 @@
 {
   pkgs,
   config,
+  inputs,
+  currentSystem,
   ...
 }: {
   home.packages = with pkgs; [
@@ -10,12 +12,16 @@
     (writeScriptBin "rofi-toggle-cliphist" ''
       ${builtins.readFile ./rofi-toggle-cliphist.sh}
     '')
+    (writeScriptBin "rofi-toggle-power-menu" ''
+      ${builtins.readFile ./rofi-toggle-power-menu.sh}
+    '')
+    rofi-power-menu
+    rofi-calc
   ];
 
   programs.rofi = {
     enable = true;
     package = pkgs.rofi-wayland;
-    terminal = "${pkgs.kitty}/bin/kitty";
   };
 
   xdg.configFile."rofi/config.rasi".text = with config.lib.stylix.colors; ''

@@ -30,6 +30,7 @@
       url = "github:Jas-SinghFSU/HyprPanel";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    hyprswitch.url = "github:h3rmt/hyprswitch/release";
     fw-fanctrl = {
       url = "github:TamtamHero/fw-fanctrl/packaging/nix";
       inputs.nixpkgs.follows = "nixpkgs";
