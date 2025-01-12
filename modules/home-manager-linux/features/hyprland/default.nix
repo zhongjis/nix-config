@@ -163,7 +163,10 @@ in {
         windowrulev2 = workspace 1,class:^(spotify)$
         windowrulev2 = workspace special:magic,class:^(WebCord)$
         windowrulev2 = workspace 7,class:^(obsidian)$
+
         windowrulev2 = workspace 9,class:^(steam)$
+        windowrulev2 = workspace 9,class:^(heroic)$
+
         windowrulev2 = workspace 10,class:^(zen-beta)$
         # windowrulev2 = float,center,size 40% 60%,class:kitty,title:btop
         # windowrulev2 = float,center,size 40% 60%,class:kitty,title:nvtop
