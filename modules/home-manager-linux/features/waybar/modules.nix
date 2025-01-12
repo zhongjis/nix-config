@@ -5,7 +5,6 @@
   volume-sh = pkgs.writeShellScript "waybar-volume" (builtins.readFile ./scripts/volume.sh);
   keyhints-sh = pkgs.writeShellScript "waybar-keyhints" (builtins.readFile ./scripts/key_hints.sh);
   wlogout-sh = pkgs.writeShellScript "waybar-wlogout" (builtins.readFile ./scripts/wlogout.sh);
-  weather-py = pkgs.writers.writePython3 "waybar-weather" {libraries = [pkgs.python3Packages.pyquery];} ./scripts/weather.py;
 in {
   xdg.configFile."waybar/modules".text =
     /*
@@ -408,36 +407,6 @@ in {
               "on-click": "${wlogout-sh}",
               "on-click-right": "${change-blur-sh}",
               "interval": 86400, // once every day
-              "tooltip": true,
-          },
-          "custom/swaync": {
-              "tooltip": true,
-              "format": "{icon} {}",
-              "format-icons": {
-                  "notification": "<span foreground='red'><sup></sup></span>",
-                  "none": "",
-                  "dnd-notification": "<span foreground='red'><sup></sup></span>",
-                  "dnd-none": "",
-                  "inhibited-notification": "<span foreground='red'><sup></sup></span>",
-                  "inhibited-none": "",
-                  "dnd-inhibited-notification": "<span foreground='red'><sup></sup></span>",
-                  "dnd-inhibited-none": ""
-              },
-              "return-type": "json",
-              "exec-if": "which swaync-client",
-              "exec": "swaync-client -swb",
-              "on-click": "sleep 0.1 && swaync-client -t -sw",
-              "on-click-right": "swaync-client -d -sw",
-              "escape": true,
-          },
-          "custom/weather": {
-              "format": "{}",
-              "format-alt": "{alt}: {}",
-              "format-alt-click": "click",
-              "interval": 3600,
-              "return-type": "json",
-              "exec": "${weather-py}",
-              "exec-if": "ping wttr.in -c1",
               "tooltip": true,
           },
           // Separators

@@ -117,19 +117,7 @@
       #custom-menu,
       #custom-power_vertical,
       #custom-power,
-      #custom-swaync,
-      #custom-updater,
-      #custom-weather,
-      #custom-weather.clearNight,
-      #custom-weather.cloudyFoggyDay,
-      #custom-weather.cloudyFoggyNight,
-      #custom-weather.default,
-      #custom-weather.rainyDay,
-      #custom-weather.rainyNight,
-      #custom-weather.severe,
-      #custom-weather.showyIcyDay,
-      #custom-weather.snowyIcyNight,
-      #custom-weather.sunnyDay {
+      {
         padding-top: 3px;
         padding-bottom: 3px;
         padding-right: 6px;
