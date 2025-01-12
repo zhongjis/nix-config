@@ -24,7 +24,7 @@ in {
         baseOptions // darwinKeychainOption;
     };
     "git-corp-adobe-com" = {
-      host = "github.com";
+      host = "git.corp.adobe.com";
       identityFile = "${config.home.homeDirectory}/.ssh/github_adobe_zshen";
       extraOptions = let
         baseOptions = {
