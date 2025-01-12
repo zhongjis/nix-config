@@ -66,7 +66,7 @@
 
       /* This section can be use if you want to separate waybar modules */
       .modules-left,
-      .modules-center,
+      /* .modules-center, */
       .modules-right {
         background: #000000;
         border: 0px solid @overlay0;
