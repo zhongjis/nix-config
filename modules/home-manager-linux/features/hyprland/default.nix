@@ -173,7 +173,7 @@ in {
         windowrulev2 = workspace 9,class:^(steam)$
         windowrulev2 = workspace 9,class:^(heroic)$
 
-        windowrulev2 = workspace 10,class:^(zen-beta)$
+        windowrulev2 = workspace 10,class:^(zen)$
         # windowrulev2 = float,center,size 40% 60%,class:kitty,title:btop
         # windowrulev2 = float,center,size 40% 60%,class:kitty,title:nvtop
         # windowrulev2 = float,center,size 40% 60%,class:kitty,title:nmtui
