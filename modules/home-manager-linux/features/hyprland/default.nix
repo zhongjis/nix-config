@@ -16,6 +16,7 @@ in {
 
   home.packages = with pkgs; [
     inputs.hyprswitch.packages.${currentSystem}.default
+    xdg-desktop-portal-gtk
   ];
 
   # hyprland
