@@ -56,11 +56,15 @@ in {
       vscode-langservers-extracted
       yaml-language-server
       terraform-ls
-      tflint
       typescript-language-server
       jdt-language-server
       pyright
       bash-language-server
+
+      # Linters
+      tflint
+      tfsec
+      markdownlint-cli
 
       # Formatters
       stylua
@@ -86,6 +90,8 @@ in {
       mason-nvim
       mason-lspconfig-nvim
       nvim-lspconfig
+
+      nvim-lint
 
       # **cmp**
       lspkind-nvim

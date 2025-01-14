@@ -22,7 +22,6 @@ local servers = {
   jsonls = {},
   yamlls = {},
   terraformls = {},
-  tflint = {},
   ts_ls = {},
   jdtls = {},
   pyright = {},
