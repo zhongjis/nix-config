@@ -22,6 +22,7 @@ in {
   # hyprland
   wayland.windowManager.hyprland = {
     enable = true;
+    xwayland.enable = true;
     # See https://wiki.hyprland.org/Configuring/Monitors/
     settings.monitor =
       lib.mapAttrsToList
