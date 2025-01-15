@@ -87,8 +87,8 @@ in {
       luvit-meta
       fidget-nvim
 
-      mason-nvim
-      mason-lspconfig-nvim
+      # mason-nvim
+      # mason-lspconfig-nvim
       nvim-lspconfig
 
       nvim-lint
