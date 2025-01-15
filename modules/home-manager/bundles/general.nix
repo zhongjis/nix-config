@@ -16,6 +16,7 @@
   myHomeManager.tmux.enable = lib.mkDefault true;
   myHomeManager.zellij.enable = lib.mkDefault false;
   myHomeManager.alacritty.enable = lib.mkDefault false;
+  myHomeManager.direnv.enable = lib.mkDefault true;
   myHomeManager.fzf.enable = lib.mkDefault true;
   myHomeManager.ghostty.enable = lib.mkDefault true;
   myHomeManager.git.enable = lib.mkDefault true;
