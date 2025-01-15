@@ -9,6 +9,8 @@
     then 18
     else 13;
 in {
+  myHomeManager.fastfetch.enable = lib.mkForce true;
+
   programs.kitty = {
     enable = true;
     shellIntegration.enableZshIntegration = true;

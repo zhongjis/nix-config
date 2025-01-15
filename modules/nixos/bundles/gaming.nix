@@ -44,6 +44,6 @@
     steamtinkerlaunch
   ];
 
-  # dota 2: LD_PRELOAD="" gamescope -W 3440 -H 1440 -r 90 --hdr-enabled --force-grab-cursor --expose-wayland --mangoapp -f -- gamemoderun %command%
+  # dota 2: LD_PRELOAD= gamescope -W 3440 -H 1440 --force-grab-cursor --mangoapp -f -- env LD_PRELOAD="$LD_PRELOAD" gamemoderun %command%
   # frost punk 2: gamemoderun PROTON_ENABLE_NVAPI=1 PROTON_HIDE_NVIDIA_GPU=0 %command%
 }

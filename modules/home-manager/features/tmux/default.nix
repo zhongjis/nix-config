@@ -64,7 +64,6 @@ in {
   xdg.configFile."tmux/.tmux-cht-languages".source = ./scripts/.tmux-cht-languages;
 
   home.packages = with pkgs; [
-    fastfetch
     (writeScriptBin "sessionizer" ''
       ${builtins.readFile ./scripts/tmux-sessionizer.sh}
     '')
