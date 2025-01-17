@@ -53,6 +53,8 @@ vim.api.nvim_create_autocmd({ "BufLeave", "FocusLost" }, {
     -- If the file type is not 'oil' and the buffer is not a 'nofile' buffer, save the file
     if
       filetype ~= "oil"
+      and buftype ~= nil
+      and buftype ~= ""
       and buftype ~= "nofile"
       and filetype ~= "harpoon"
       and filetype ~= "trouble"
