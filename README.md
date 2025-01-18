@@ -50,7 +50,7 @@ darwin-rebuild switch --switch-generation 41
 
 ```bash
 # useful nix cmds
-nix run github:vimjoyer/nix-update-input # upgrade specific input
+nix run github:zhongjis/nix-update-input # upgrade specific input
 nix search nixpkgs <package-name> # search nixpkgs
 
 # rebuild system use nix-helper
