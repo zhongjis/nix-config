@@ -85,6 +85,7 @@
     packages = with pkgs; [];
     shell = pkgs.zsh;
   };
+  programs.zsh.enable = true;
 
   # Logitech Blutooth Devices
   hardware.logitech.wireless.enable = true;
