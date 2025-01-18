@@ -27,7 +27,11 @@ local servers = {
   pyright = {},
   bashls = {},
   cssls = {},
-  nixd = {},
+  nixd = {
+    nixpkgs = {
+      expr = 'import (builtins.getFlake "~/personal/nix-config").inputs.nixpkgs { }',
+    },
+  },
 }
 
 return {
