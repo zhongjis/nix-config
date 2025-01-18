@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  config,
+  ...
+}: {
   home.packages = with pkgs; [
     nerd-fonts.mononoki
     font-awesome_6
@@ -6,11 +10,35 @@
     font-awesome_4
   ];
 
-  programs.waybar.style =
-    /*
-    css
-    */
+  programs.waybar.style = with config.lib.stylix.colors;
+  /*
+  css
+  */
     ''
+      /*
+      *
+      * Catppuccin Mocha palette
+      * Maintainer: rubyowo
+      *
+      */
+
+      @define-color background #${base00};
+      @define-color color1 #${base01};
+      @define-color color2 #${base02};
+      @define-color color3 #${base03};
+      @define-color color4 #${base04};
+      @define-color color5 #${base05};
+      @define-color color6 #${base06};
+      @define-color color7 #${base07};
+      @define-color color8 #${base08};
+      @define-color color9 #${base09};
+      @define-color color10 #${base0A};
+      @define-color color11 #${base0B};
+      @define-color color12 #${base0C};
+      @define-color color13 #${base0D};
+      @define-color color14 #${base0E};
+      @define-color color15 #${base0F};
+
       * {
         font-family: Mononoki, "Font Awesome 6 Free", "Font Awesome 6 Brands";
         font-size: 14px;
