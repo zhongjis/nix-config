@@ -60,6 +60,7 @@ in {
       jdt-language-server
       pyright
       bash-language-server
+      vscode-langservers-extracted
 
       # Linters
       tflint

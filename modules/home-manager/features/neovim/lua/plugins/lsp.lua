@@ -26,6 +26,7 @@ local servers = {
   jdtls = {},
   pyright = {},
   bashls = {},
+  cssls = {},
 }
 
 return {
