@@ -6,16 +6,7 @@
     ''
       {
           "include": "~/.config/waybar/modules",
-          "layer": "top",
-          "exclusive": true,
-          "passthrough": false,
-          "position": "top",
-          "spacing": 3,
-          "fixed-center": true,
-          "ipc": true,
-          "margin-top": 3,
-          "margin-left": 8,
-          "margin-right": 8,
+          "spacing": 4,
           "modules-left": [
               "custom/menu",
               "custom/separator#blank",
