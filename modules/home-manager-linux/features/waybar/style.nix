@@ -15,13 +15,6 @@
   css
   */
     ''
-      /*
-      *
-      * Catppuccin Mocha palette
-      * Maintainer: rubyowo
-      *
-      */
-
       @define-color background #${base00};
       @define-color color1 #${base01};
       @define-color color2 #${base02};
@@ -40,8 +33,8 @@
       @define-color color15 #${base0F};
 
       * {
-        font-family: Mononoki, "Font Awesome 6 Free", "Font Awesome 6 Brands";
-        font-size: 14px;
+        font-family: "JetBrainsMono Nerd Font", "Font Awesome 6 Free", "Font Awesome 6 Brands";
+        font-size: 18px;
         font-weight: bold;
       }
 
