@@ -105,54 +105,11 @@ in {
               "on-click-middle": "${change-blur-sh}",
               "on-click-right": "${wlogout-sh}",
           },
-          "mpd": {
-            "format": "{stateIcon} {consumeIcon}{randomIcon}{repeatIcon}{singleIcon}{artist} - {album} - {title} ({elapsedTime:%M:%S}/{totalTime:%M:%S}) ⸨{songPosition}|{queueLength}⸩ {volume}% ",
-            "format-disconnected": "Disconnected ",
-            "format-stopped": "{consumeIcon}{randomIcon}{repeatIcon}{singleIcon}Stopped ",
-            "unknown-tag": "N/A",
-            "interval": 5,
-            "consume-icons": {
-              "on": " "
-            },
-            "random-icons": {
-              "off": "<span color=\"#f53c3c\"></span> ",
-              "on": " "
-            },
-            "repeat-icons": {
-              "on": " "
-            },
-            "single-icons": {
-              "on": "1 "
-            },
-            "state-icons": {
-              "paused": "",
-              "playing": ""
-            },
-            "tooltip-format": "MPD (connected)",
-            "tooltip-format-disconnected": "MPD (disconnected)"
-          },
-          "bluetooth": {
-              "format": "",
-              "format-disabled": "󰂳",
-              "format-connected": "󰂱 {num_connections}",
-              "tooltip-format": " {device_alias}",
-              "tooltip-format-connected": "{device_enumerate}",
-              "tooltip-format-enumerate-connected": " {device_alias} 󰂄{device_battery_percentage}%",
-              "tooltip": true,
-              "on-click": "blueman-manager",
-          },
           "clock": {
             "format": "{:%R}",
             // "timezone": "America/New_York",
             "tooltip-format": "<big>{:%Y %B}</big>\n<tt><big>{calendar}</big></tt>",
             "format-alt": "{:%Y-%m-%d}"
-          },
-          "actions": {
-              "on-click-right": "mode",
-              "on-click-forward": "tz_up",
-              "on-click-backward": "tz_down",
-              "on-scroll-up": "shift_up",
-              "on-scroll-down": "shift_down"
           },
           "cpu": {
               "format": "{usage}% 󰍛",
