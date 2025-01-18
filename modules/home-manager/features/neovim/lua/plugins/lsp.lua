@@ -27,6 +27,7 @@ local servers = {
   pyright = {},
   bashls = {},
   cssls = {},
+  nixd = {},
 }
 
 return {
