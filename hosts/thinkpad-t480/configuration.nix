@@ -8,9 +8,11 @@
 }: {
   imports = [
     ./hardware-configuration.nix
-    ../common.nix
     ./gaming.nix
   ];
+
+  # set global nix path
+  nix.nixPath = ["nixpkgs=${inputs.nixpkgs}"];
 
   # xremap
   hardware.uinput.enable = true;
@@ -86,9 +88,11 @@
       font-manager
       kdePackages.dolphin
       evince # pdf viewer
+      unzip
     ];
     shell = pkgs.zsh;
   };
+  programs.zsh.enable = true;
 
   services.power-profiles-daemon.enable = true;
 

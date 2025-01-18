@@ -8,6 +8,9 @@
     # placeholder
   ];
 in {
+  # set global nixpkgs input
+  nix.nixPath = ["nixpkgs=${inputs.nixpkgs}"];
+
   myNixDarwin = {
     bundles.general-desktop.enable = true;
     bundles.work.enable = true;

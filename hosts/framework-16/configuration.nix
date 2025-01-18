@@ -6,9 +6,11 @@
 }: {
   imports = [
     ./hardware-configuration.nix
-    ../common.nix
     ./fw-fanctrl.nix
   ];
+
+  # set global nixpkgs input
+  nix.nixPath = ["nixpkgs=${inputs.nixpkgs}"];
 
   # gaming kernel. not sure if it is good
   boot.kernelPackages = pkgs.linuxPackages_zen;
@@ -83,6 +85,7 @@
     packages = with pkgs; [];
     shell = pkgs.zsh;
   };
+  programs.zsh.enable = true;
 
   # Logitech Blutooth Devices
   hardware.logitech.wireless.enable = true;
@@ -92,6 +95,7 @@
     inputs.zen-browser.packages."${currentSystem}".default
     firefox # in case zen broke
     neovim
+    unzip
   ];
 
   system.stateVersion = "24.05"; # Did you read the comment?

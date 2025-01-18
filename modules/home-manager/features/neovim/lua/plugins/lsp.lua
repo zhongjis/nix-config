@@ -27,6 +27,23 @@ local servers = {
   pyright = {},
   bashls = {},
   cssls = {},
+  nixd = {
+    settings = {
+      nixd = {
+        options = {
+          nixos = {
+            expr = '(builtins.getFlake "~/personal/nix-config").nixosConfigurations.framework-16.options',
+          },
+          nix_darwin = {
+            expr = '(builtins.getFlake "~/personal/nix-config").darwinConfigurations.mac-m1-max.options',
+          },
+          home_manager = {
+            expr = '(builtins.getFlake "~/personal/nix-config").homeConfigurations."zshen@framework-16".options',
+          },
+        },
+      },
+    },
+  },
 }
 
 return {

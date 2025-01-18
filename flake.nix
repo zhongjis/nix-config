@@ -75,14 +75,14 @@
       };
 
       homeConfigurations = {
-        mac-m1-max = mkHome "mac-m1-max" {
+        "zshen@mac-m1-max" = mkHome "mac-m1-max" {
           system = "aarch64-darwin";
           darwin = true;
         };
-        thinkpad-t480 = mkHome "thinkpad-t480" {
+        "zshen@thinkpad-t480" = mkHome "thinkpad-t480" {
           system = "x86_64-linux";
         };
-        framework-16 = mkHome "framework-16" {
+        "zshen@framework-16" = mkHome "framework-16" {
           system = "x86_64-linux";
         };
       };

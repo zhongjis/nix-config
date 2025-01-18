@@ -1,31 +1,8 @@
 {
   pkgs,
-  isDarwin,
-  currentSystemName,
   config,
-  inputs,
   ...
 }: let
-  systemOption =
-    if isDarwin
-    then ''
-      nix_darwin = {
-        expr = '(builtins.getFlake "~/personal/nix-config").darwinConfigurations.${currentSystemName}.options',
-      },
-    ''
-    else ''
-      nixos = {
-        expr = '(builtins.getFlake "~/personal/nix-config").nixosConfigurations.${currentSystemName}.options',
-      },
-    '';
-
-  nixdOptionsLua =
-    systemOption
-    + ''
-      home_manager = {
-        expr = '(builtins.getFlake "~/personal/nix-config").homeConfigurations.${currentSystemName}.options',
-      },
-    '';
 in {
   programs.neovim = {
     enable = true;
@@ -185,19 +162,6 @@ in {
         },
         spec = {
           { import = "plugins" },
-        },
-      })
-
-      -- nixd
-      require("lspconfig").nixd.setup({
-        cmd = { "nixd" },
-        settings = {
-          nixd = {
-            nixpkgs = {
-              expr = "import <nixpkgs> { }",
-            },
-            options = { ${nixdOptionsLua} },
-          },
         },
       })
     '';
