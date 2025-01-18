@@ -16,6 +16,7 @@
   */
     ''
       @define-color background #${base00};
+      @define-color foreground #${base05};
       @define-color color1 #${base01};
       @define-color color2 #${base02};
       @define-color color3 #${base03};
@@ -99,7 +100,7 @@
       #scratchpad,
       #power-profiles-daemon,
       #mpd {
-        padding: 0 10px;
+        padding: 0 8px;
         color: @foreground;
       }
 
@@ -118,32 +119,10 @@
         margin-right: 0;
       }
 
-      #custom-os_button {
-        color: @background;
-        font-size: 1.2rem;
-        padding: 0 12px 0 8px;
-        margin-left: 4px;
-        margin-top: 4px;
-        margin-bottom: 4px;
-        border-radius: 100px;
-        background-color: @color4;
-      }
-
-      #custom-power {
-        color: @background;
-        padding: 0 10px 0 10px;
-        margin-left: 2px;
-        margin-right: 4px;
-        margin-top: 4px;
-        margin-bottom: 4px;
-        border-radius: 100px;
-        background-color: @color5;
-      }
-
       #custom-power:hover {
         transition: ease 0.2s all;
         color: @color5;
-        background-color: @background;
+        background-color: @color5;
       }
 
       #clock {
@@ -223,12 +202,12 @@
       }
 
       #idle_inhibitor {
-        background-color: #2d3436;
+        background-color: @background;
       }
 
       #idle_inhibitor.activated {
-        background-color: #ecf0f1;
-        color: #2d3436;
+        background-color: @background;
+        color: @color6;
       }
 
       #scratchpad {

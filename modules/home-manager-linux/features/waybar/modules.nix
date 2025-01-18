@@ -1,5 +1,4 @@
 {pkgs, ...}: let
-  cava-sh = pkgs.writeShellScript "waybar-cava" (builtins.readFile ./scripts/cava_viz.sh);
   brightness-sh = pkgs.writeShellScript "waybar-brightness" (builtins.readFile ./scripts/brightness.sh);
   change-blur-sh = pkgs.writeShellScript "waybar-change-blur" (builtins.readFile ./scripts/change_blur.sh);
   volume-sh = pkgs.writeShellScript "waybar-volume" (builtins.readFile ./scripts/volume.sh);
@@ -48,13 +47,13 @@ in {
               "rotate": 0,
               //"format": "{icon} {percent}%",
               "format-icons": [
-                  " ",
-                  " ",
-                  " ",
-                  "󰃝 ",
-                  "󰃞 ",
-                  "󰃟 ",
-                  "󰃠 "
+                  "",
+                  "",
+                  "",
+                  "󰃝",
+                  "󰃞",
+                  "󰃟",
+                  "󰃠"
               ],
               "format": "{icon}",
               //"format-icons": ["","","","","","","","","","","","","","",""],
@@ -106,6 +105,32 @@ in {
               "on-click-middle": "${change-blur-sh}",
               "on-click-right": "${wlogout-sh}",
           },
+          "mpd": {
+            "format": "{stateIcon} {consumeIcon}{randomIcon}{repeatIcon}{singleIcon}{artist} - {album} - {title} ({elapsedTime:%M:%S}/{totalTime:%M:%S}) ⸨{songPosition}|{queueLength}⸩ {volume}% ",
+            "format-disconnected": "Disconnected ",
+            "format-stopped": "{consumeIcon}{randomIcon}{repeatIcon}{singleIcon}Stopped ",
+            "unknown-tag": "N/A",
+            "interval": 5,
+            "consume-icons": {
+              "on": " "
+            },
+            "random-icons": {
+              "off": "<span color=\"#f53c3c\"></span> ",
+              "on": " "
+            },
+            "repeat-icons": {
+              "on": " "
+            },
+            "single-icons": {
+              "on": "1 "
+            },
+            "state-icons": {
+              "paused": "",
+              "playing": ""
+            },
+            "tooltip-format": "MPD (connected)",
+            "tooltip-format-disconnected": "MPD (disconnected)"
+          },
           "bluetooth": {
               "format": "",
               "format-disabled": "󰂳",
@@ -117,24 +142,10 @@ in {
               "on-click": "blueman-manager",
           },
           "clock": {
-              "interval": 1,
-              // "format": " {:%I:%M %p}", // AM PM format
-              "format": "{:%H:%M:%S}",
-              "format-alt": "{%F}",
-              "tooltip-format": "<tt><small>{calendar}</small></tt>",
-              "calendar": {
-                  "mode": "year",
-                  "mode-mon-col": 3,
-                  "weeks-pos": "right",
-                  "on-scroll": 1,
-                  "format": {
-                      "months": "<span color='#ffead3'><b>{}</b></span>",
-                      "days": "<span color='#ecc6d9'><b>{}</b></span>",
-                      "weeks": "<span color='#99ffdd'><b>W{}</b></span>",
-                      "weekdays": "<span color='#ffcc66'><b>{}</b></span>",
-                      "today": "<span color='#ff6699'><b><u>{}</u></b></span>"
-                  }
-              }
+            "format": "{:%R}",
+            // "timezone": "America/New_York",
+            "tooltip-format": "<big>{:%Y %B}</big>\n<tt><big>{calendar}</big></tt>",
+            "format-alt": "{:%Y-%m-%d}"
           },
           "actions": {
               "on-click-right": "mode",
@@ -195,11 +206,11 @@ in {
               },
           },
           "idle_inhibitor": {
-              "format": "{icon}",
-              "format-icons": {
-                  "activated": " ",
-                  "deactivated": " ",
-              }
+            "format": "{icon}",
+            "format-icons": {
+              "activated": "",
+              "deactivated": ""
+            }
           },
           "keyboard-state": {
               //"numlock": true,
@@ -349,20 +360,7 @@ in {
               "on-click-right": "kitty --title nvtop sh -c 'nvtop'"
           },
           "tray": {
-              "icon-size": 15,
-              "spacing": 8,
-          },
-          "wlr/taskbar": {
-              "format": "{icon} {name} ",
-              "icon-size": 15,
-              "all-outputs": false,
-              "tooltip-format": "{title}",
-              "on-click": "activate",
-              "on-click-middle": "close",
-              "ignore-list": [
-                  "wofi",
-                  "rofi",
-              ]
+              "spacing": 10,
           },
           "custom/keybinds": {
               "format": "󰺁 HINT!",
@@ -379,35 +377,14 @@ in {
               "on-click": "hyprlock",
           },
           "custom/menu": {
-              "format": " {}",
-              "interval": 86400, // once every day
+              "format": "  ",
               "tooltip": true,
               "on-click": "rofi-toggle",
           },
-          // This is a custom cava visualizer
-          "custom/cava_mviz": {
-              "exec": "${cava-sh}",
-              "format": "{}"
-          },
-          "custom/playerctl": {
-              "format": "<span>{}</span>",
-              "return-type": "json",
-              "max-length": 35,
-              "exec": "playerctl -a metadata --format '{\"text\": \"{{artist}} ~ {{markup_escape(title)}}\", \"tooltip\": \"{{playerName}} : {{markup_escape(title)}}\", \"alt\": \"{{status}}\", \"class\": \"{{status}}\"}' -F",
-              "on-click-middle": "playerctl play-pause",
-              "on-click": "playerctl previous",
-              "on-click-right": "playerctl next",
-              "scroll-step": 5.0,
-              "on-scroll-up": "${volume-sh} --inc",
-              "on-scroll-down": "${volume-sh} --dec",
-              "smooth-scrolling-threshold": 1,
-          },
           "custom/power": {
-              "format": "⏻ ",
-              "exec": "echo ; echo 󰟡 power // blur",
+              "format": "  ",
               "on-click": "rofi-toggle-power-menu",
-              "interval": 86400, // once every day
-              "tooltip": true,
+              "tooltip": false,
           },
           "custom/swaync": {
               "tooltip": true,
