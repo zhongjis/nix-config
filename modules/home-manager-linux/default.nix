@@ -34,16 +34,4 @@ in {
     []
     ++ features
     ++ bundles;
-
-  xdg.enable = true;
-
-  nixpkgs = {
-    config = {
-      allowUnfree = true;
-      experimental-features = "nix-command flakes";
-    };
-  };
-
-  # Let Home Manager install and manage itself.
-  programs.home-manager.enable = true;
 }
