@@ -38,7 +38,7 @@
     heroic
 
     # parsec-bin
-    webcord
+    vesktop # discord client
 
     # steamtinkerlaunch %command%
     steamtinkerlaunch
