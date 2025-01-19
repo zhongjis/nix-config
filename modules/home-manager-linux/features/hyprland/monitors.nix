@@ -58,7 +58,7 @@ in {
     default = {};
   };
 
-  options.myHomeManager.workspaces = mkOption {
+  options.myHomeManager.hyprland.workspaces = mkOption {
     type = types.attrsOf (types.submodule {
       options = {
         monitorId = mkOption {

@@ -21,7 +21,6 @@
 in {
   home.packages = with pkgs; [
     hyprpolkitagent
-    socat
   ];
 
   #################
@@ -34,7 +33,7 @@ in {
     moveToMonitor =
       lib.mapAttrsToList
       (id: workspace: "hyprctl dispatch moveworkspacetomonitor ${id} ${toString workspace.monitorId}")
-      config.myHomeManager.workspaces;
+      config.myHomeManager.hyprland.workspaces;
 
     moveToMonitorScript = pkgs.writeShellScriptBin "script" ''
       ${lib.concatLines moveToMonitor}
@@ -46,7 +45,7 @@ in {
         (
           id: workspace: (map (startentry: "[workspace ${id} silent] ${startentry}") workspace.autostart)
         )
-        config.myHomeManager.workspaces);
+        config.myHomeManager.hyprland.workspaces);
 
     monitorScript = pkgs.writeShellScriptBin "script" ''
       handle() {

@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{pkgs,inputs, currentSystem,...}: {
   myHomeManager.bundles.general.enable = true;
   myHomeManager.direnv.enable = true;
   myHomeManager.hyprland.monitors = {
@@ -29,6 +29,26 @@
       y = 0;
       rotate = 1;
     };
+  };
+  myHomeManager.hyprland.workspaces = {   
+      "1" = {
+        monitorId = 0;
+        autostart = with pkgs; [];
+      };
+      # game
+      "9" = {
+        monitorId = 1;
+        autostart =  with pkgs; [];
+      };
+      # zen
+      "10" = {
+        monitorId = 1;
+        autostart =  with pkgs; [
+          (lib.getExe vesktop) 
+        ] ++ [
+          (lib.getExe inputs.zen-browser.packages."${currentSystem}".default)
+        ];
+      };
   };
 
   myHomeManagerLinux.bundles.linux.enable = true;
