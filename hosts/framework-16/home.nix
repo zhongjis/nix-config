@@ -43,11 +43,7 @@
       # zen
       "10" = {
         monitorId = 1;
-        autostart =  with pkgs; [
-          (lib.getExe vesktop) 
-        ] ++ [
-          (lib.getExe inputs.zen-browser.packages."${currentSystem}".default)
-        ];
+        autostart =  with pkgs; [];
       };
   };
 
