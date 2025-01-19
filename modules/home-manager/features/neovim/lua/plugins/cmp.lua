@@ -1,6 +1,6 @@
 return { -- Autocompletion
   "hrsh7th/nvim-cmp",
-  event = "InsertEnter",
+  event = { "InsertEnter", "CmdlineEnter" },
   dependencies = {
     {
       "L3MON4D3/LuaSnip",
@@ -81,9 +81,13 @@ return { -- Autocompletion
       sources = cmp.config.sources({
         { name = "path" },
       }, {
-        { name = "cmdline" },
+        {
+          name = "cmdline",
+          option = {
+            ignore_cmds = { "Man", "!" },
+          },
+        },
       }),
-      matching = { disallow_symbol_nonprefix_matching = false },
     })
   end,
 }
