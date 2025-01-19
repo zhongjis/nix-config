@@ -11,11 +11,19 @@
     '';
     applications = pkgs.writeShellScriptBin "applications" ''
       solaar --window=hide&
+      waybar &
+      dunst &
+      # swaync &
+      hyprswitch init --show-title &
     '';
   };
   startScriptList = builtins.attrValues startScripts;
 in {
-  home.packages = with pkgs; [hyprpolkitagent];
+  home.packages = with pkgs; [
+    hyprpolkitagent
+    socat
+  ];
+
   #################
   ### AUTOSTART ###
   #################
@@ -54,11 +62,6 @@ in {
       [
         (lib.getExe monitorScript)
 
-        # disable the following for hyprpanel
-        "waybar &"
-        "dunst &"
-        # "swaync &"
-        "hyprswitch init --show-title &"
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "wl-paste --type text --watch cliphist store" # Stores only text data
         "systemctl --user start hyprpolkitagent"
