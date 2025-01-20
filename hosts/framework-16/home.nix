@@ -37,12 +37,12 @@
       };
       # game
       "9" = {
-        monitorId = 1;
+        monitorId = 2;
         autostart =  with pkgs; [];
       };
       # zen
       "10" = {
-        monitorId = 1;
+        monitorId = 2;
         autostart =  with pkgs; [];
       };
   };
