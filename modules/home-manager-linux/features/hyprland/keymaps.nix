@@ -1,5 +1,5 @@
 {pkgs, ...}: let
-  closeApplicationScript =
+  close-application-sh =
     pkgs.writeShellScript "hyprland-close-application"
     (builtins.readFile ./scripts/close-application.sh);
 in {
@@ -27,7 +27,7 @@ in {
     bind = [
       # Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
       "$mainMod, T, exec, $terminal"
-      "SUPER, Q, ${closeApplicationScript},"
+      "SUPER, Q, exec, ${close-application-sh}"
       # bind = $mainMod, M, exit,
       "$mainMod, E, exec, $fileManager"
       "$mainMod, V, togglefloating,"
