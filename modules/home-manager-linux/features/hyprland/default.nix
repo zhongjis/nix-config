@@ -2,8 +2,6 @@
   config,
   lib,
   pkgs,
-  inputs,
-  currentSystem,
   ...
 }: let
 in {
@@ -15,7 +13,6 @@ in {
   ];
 
   home.packages = with pkgs; [
-    inputs.hyprswitch.packages.${currentSystem}.default
     xdg-desktop-portal-gtk
   ];
 
