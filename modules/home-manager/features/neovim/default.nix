@@ -140,6 +140,9 @@ in {
 
       # **which-key**
       which-key-nvim
+
+      # **indent-blankline-nvim**
+      indent-blankline-nvim
     ];
 
     extraLuaConfig = ''
