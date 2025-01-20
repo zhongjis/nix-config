@@ -121,7 +121,7 @@ in {
         # https://wiki.hyprland.org/Configuring/Variables/#misc
         misc {
             force_default_wallpaper = 0
-            vfr = true # for laptop battery
+            focus_on_activate = false
         }
 
 
