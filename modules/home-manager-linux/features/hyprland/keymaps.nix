@@ -58,11 +58,10 @@ in {
       "$wmMod, 3, workspace, 3"
       "$wmMod, 4, workspace, 4"
       "$wmMod, 5, workspace, 5"
-      "$wmMod, 6, workspace, 6"
-      "$wmMod, O, workspace, 7"
-      "$wmMod, P, workspace, 8"
-      "$wmMod, G, workspace, 9"
-      "$wmMod, Z, workspace, 10"
+
+      "$wmMod, O, workspace, name:obsidian"
+      "$wmMod, G, workspace, name:gaming"
+      "$wmMod, Z, workspace, name:zen"
 
       # Move active window to a workspace with wmMod + SHIFT + [0-9]
       "$wmMod SHIFT, 1, movetoworkspace, 1"
@@ -70,15 +69,14 @@ in {
       "$wmMod SHIFT, 3, movetoworkspace, 3"
       "$wmMod SHIFT, 4, movetoworkspace, 4"
       "$wmMod SHIFT, 5, movetoworkspace, 5"
-      "$wmMod SHIFT, 6, movetoworkspace, 6"
-      "$wmMod SHIFT, O, movetoworkspace, 7"
-      "$wmMod SHIFT, P, movetoworkspace, 8"
-      "$wmMod SHIFT, G, movetoworkspace, 9"
-      "$wmMod SHIFT, Z, movetoworkspace, 10"
+
+      "$wmMod SHIFT, O, movetoworkspace, name:obsidian"
+      "$wmMod SHIFT, G, movetoworkspace, name:gaming"
+      "$wmMod SHIFT, Z, movetoworkspace, name:zen"
 
       # Example special workspace (scratchpad)
-      "$wmMod, S, togglespecialworkspace, magic"
-      "$wmMod SHIFT, S, movetoworkspace, special:magic"
+      "$wmMod, S, togglespecialworkspace, default"
+      "$wmMod SHIFT, S, movetoworkspace, special:default"
 
       # Hyprswitch
       "$wmMod, $key, exec, hyprswitch gui --mod-key $mod --key $key --close mod-key-release --reverse-key=key=$reverse && hyprswitch dispatch"

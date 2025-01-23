@@ -183,24 +183,16 @@ in {
         ### WINDOWS AND WORKSPACES ###
         ##############################
 
-        # See https://wiki.hyprland.org/Configuring/Window-Rules/ for more
-        # See https://wiki.hyprland.org/Configuring/Workspace-Rules/ for workspace rules
+        windowrulev2 = workspace special:default,class:^(vesktop)$
 
-        # Example windowrule v1
-        # windowrule = float, ^(kitty)$
+        windowrulev2 = workspace name:spotify,class:^(spotify)$
 
-        windowrulev2 = workspace 1,class:^(spotify)$
-        windowrulev2 = workspace special:magic,class:^(vesktop)$
-        windowrulev2 = workspace 7,class:^(obsidian)$
+        windowrulev2 = workspace name:obsidian,class:^(obsidian)$
 
-        windowrulev2 = workspace 9,class:^(steam)$
-        windowrulev2 = workspace 9,class:^(heroic)$
+        windowrulev2 = workspace name:gaming,class:^(steam)$
+        windowrulev2 = workspace name:gaming,class:^(heroic)$
 
-        windowrulev2 = workspace 10,class:^(zen)$
-        # windowrulev2 = float,center,size 40% 60%,class:kitty,title:btop
-        # windowrulev2 = float,center,size 40% 60%,class:kitty,title:nvtop
-        # windowrulev2 = float,center,size 40% 60%,class:kitty,title:nmtui
-        # windowrulev2 = suppressevent maximize, class:.* # You'll probably like this.
+        windowrulev2 = workspace name:zen,class:^(zen)$
 
         # Pavucontrol floating
         windowrulev2 = float,class:(.*org.pulseaudio.pavucontrol.*)

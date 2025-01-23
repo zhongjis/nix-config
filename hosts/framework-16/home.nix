@@ -35,17 +35,17 @@ in {
     };
   };
   myHomeManager.hyprland.workspaces = {   
-      "1" = {
+      "name:spotify" = {
         monitorId = internalMonitor;
         autostart = with pkgs; [];
       };
       # game
-      "9" = {
+      "name:gaming" = {
         monitorId = lgUntraWideMonitor;
         autostart =  with pkgs; [];
       };
       # zen
-      "10" = {
+      "name:zen" = {
         monitorId = lgUntraWideMonitor;
         autostart =  with pkgs; [];
       };
