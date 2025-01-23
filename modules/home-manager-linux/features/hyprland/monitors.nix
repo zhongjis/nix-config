@@ -62,8 +62,8 @@ in {
     type = types.attrsOf (types.submodule {
       options = {
         monitorId = mkOption {
-          type = types.int;
-          default = false;
+          type = types.str;
+          default = "0"; # default index
         };
         autostart = mkOption {
           type = types.listOf types.str;

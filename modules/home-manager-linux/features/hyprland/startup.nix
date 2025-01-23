@@ -32,7 +32,7 @@ in {
   wayland.windowManager.hyprland.settings = let
     moveToMonitor =
       lib.mapAttrsToList
-      (id: workspace: "hyprctl dispatch moveworkspacetomonitor ${id} ${toString workspace.monitorId}")
+      (id: workspace: "hyprctl dispatch moveworkspacetomonitor ${id} ${workspace.monitorId}")
       config.myHomeManager.hyprland.workspaces;
 
     moveToMonitorScript = pkgs.writeShellScriptBin "script" ''

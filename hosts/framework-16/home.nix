@@ -1,4 +1,8 @@
-{pkgs,inputs, currentSystem,...}: {
+{pkgs,inputs, currentSystem,...}: let 
+  internalMonitor = "desc:BOE 0x0BC9";
+  lgUntraWideMonitor = "desc:LG Electronics LG ULTRAGEAR 009NTDV4B698";
+  dellMonitor = "desc:Dell Inc. DELL P2419H 78NFR63";
+in {
   myHomeManager.bundles.general.enable = true;
   myHomeManager.direnv.enable = true;
   myHomeManager.hyprland.monitors = {
@@ -32,17 +36,17 @@
   };
   myHomeManager.hyprland.workspaces = {   
       "1" = {
-        monitorId = 0;
+        monitorId = internalMonitor;
         autostart = with pkgs; [];
       };
       # game
       "9" = {
-        monitorId = 1;
+        monitorId = lgUntraWideMonitor;
         autostart =  with pkgs; [];
       };
       # zen
       "10" = {
-        monitorId = 1;
+        monitorId = lgUntraWideMonitor;
         autostart =  with pkgs; [];
       };
   };
