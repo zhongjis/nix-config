@@ -51,6 +51,7 @@ in {
       shfmt
       prettierd
       black
+      google-java-format
     ];
 
     plugins = with pkgs.stable.vimPlugins; [

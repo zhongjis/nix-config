@@ -101,6 +101,7 @@ return {
       python = { "black" },
       css = { "prettierd" },
       terraform = { "terraform_fmt" },
+      java = { "google-java-format" },
     },
   },
 }
