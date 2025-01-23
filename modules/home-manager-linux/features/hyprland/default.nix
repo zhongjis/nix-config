@@ -4,6 +4,10 @@
   pkgs,
   ...
 }: let
+  workspaceToMonitorSetup =
+    lib.mapAttrsToList
+    (id: workspace: "workspace = ${id},monitor:${workspace.monitorId}")
+    config.myHomeManager.hyprland.workspaces;
 in {
   imports = [
     ./startup.nix
@@ -181,6 +185,8 @@ in {
         ##############################
         ### WINDOWS AND WORKSPACES ###
         ##############################
+
+        ${lib.concatLines workspaceToMonitorSetup}
 
         windowrulev2 = workspace special:default,class:^(vesktop)$
 

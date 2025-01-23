@@ -39,12 +39,10 @@ in {
         monitorId = internalMonitor;
         autostart = with pkgs; [];
       };
-      # game
       "name:gaming" = {
         monitorId = lgUntraWideMonitor;
         autostart =  with pkgs; [];
       };
-      # zen
       "name:zen" = {
         monitorId = lgUntraWideMonitor;
         autostart =  with pkgs; [];
