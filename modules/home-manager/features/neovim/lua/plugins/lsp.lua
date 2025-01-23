@@ -47,18 +47,16 @@ local servers = {
 }
 
 return {
-  -- Main LSP Configuration
   "neovim/nvim-lspconfig",
   dependencies = {
     { "j-hui/fidget.nvim", opts = {} },
-
-    -- Allows extra capabilities provided by nvim-cmp
     "hrsh7th/cmp-nvim-lsp",
   },
   config = function()
     vim.api.nvim_create_autocmd("LspAttach", {
       group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
       callback = function(event)
+
         -- stylua: ignore start
         local map = function(keys, func, desc)
           vim.keymap.set("n", keys, func, { buffer = bufnr, desc = "LSP: " .. desc })

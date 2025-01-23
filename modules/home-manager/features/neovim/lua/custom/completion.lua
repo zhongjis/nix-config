@@ -1,7 +1,7 @@
+-- See `:help cmp`
 local cmp = require("cmp")
 local luasnip = require("luasnip")
-luasnip.config.setup()
-require("luasnip.loaders.from_vscode").lazy_load()
+luasnip.config.setup({})
 
 cmp.setup({
   snippet = {
@@ -9,11 +9,7 @@ cmp.setup({
       luasnip.lsp_expand(args.body)
     end,
   },
-
-  -- completion = {
-  --   completeopt = "menu,menuone,noinsert",
-  -- },
-
+  completion = { completeopt = "menu,menuone,noinsert" },
   mapping = cmp.mapping.preset.insert({
     ["<C-n>"] = cmp.mapping.select_next_item({
       behavior = cmp.SelectBehavior.Insert,
@@ -30,40 +26,27 @@ cmp.setup({
     ),
     ["<C-Space>"] = cmp.mapping.complete({}),
   }),
-
-  sources = cmp.config.sources({
+  sources = {
+    {
+      name = "lazydev",
+      group_index = 0,
+    },
+    { name = "buffer" },
     { name = "nvim_lsp" },
     { name = "luasnip" },
     { name = "path" },
-  }, {
-    { name = "buffer" },
-  }),
-
-  formatting = {
-    format = function(entry, vim_item)
-      if vim.tbl_contains({ "path" }, entry.source.name) then
-        local icon, hl_group =
-          require("nvim-web-devicons").get_icon(entry:get_completion_item().label)
-        if icon then
-          vim_item.kind = icon
-          vim_item.kind_hl_group = hl_group
-          return vim_item
-        end
-      end
-      return require("lspkind").cmp_format({ with_text = false })(entry, vim_item)
-    end,
   },
 })
 
--- `/` cmdline setup.
-cmp.setup.cmdline("/", {
+-- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
+cmp.setup.cmdline({ "/", "?" }, {
   mapping = cmp.mapping.preset.cmdline(),
   sources = {
     { name = "buffer" },
   },
 })
 
--- `:` cmdline setup.
+-- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
 cmp.setup.cmdline(":", {
   mapping = cmp.mapping.preset.cmdline(),
   sources = cmp.config.sources({

@@ -1,4 +1,17 @@
-{...}: {
+{
+  pkgs,
+  inputs,
+  currentSystem,
+  ...
+}: let
+  close-application-sh =
+    pkgs.writeShellScript "hyprland-close-application"
+    (builtins.readFile ./scripts/close-application.sh);
+in {
+  home.packages = [
+    inputs.hyprswitch.packages.${currentSystem}.default
+  ];
+
   ####################
   ### KEYBINDINGSS ###
   ####################
@@ -15,67 +28,66 @@
     "$menu" = "rofi-toggle";
 
     # See https://wiki.hyprland.org/Configuring/Keywords/
-    "$mainMod" = "ALT";
+    "$wmMod" = "ALT";
+    "$ctrlMod" = "SUPER";
     "$key" = "tab";
-    "$mod" = "alt";
     "$reverse" = "grave";
 
     bind = [
       # Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
-      "$mainMod, T, exec, $terminal"
-      "SUPER, Q, killactive,"
-      # bind = $mainMod, M, exit,
-      "$mainMod, E, exec, $fileManager"
-      "$mainMod, V, togglefloating,"
-      "SUPER, Space, exec, $menu"
-      "$mainMod, Space, exec, rofi-toggle-cliphist"
-      # "$mainMod, P, pseudo," # dwindle
-      # "$mainMod, J, togglesplit," # dwindle
-      "$mainMod, RETURN, fullscreen, 1"
-      "$mainMod SHIFT, RETURN, fullscreen"
+      "$wmMod, T, exec, $terminal"
+      "$ctrlMod, Q, exec, ${close-application-sh}"
+      "$wmMod, E, exec, $fileManager"
+      "$wmMod, V, togglefloating,"
+      "$ctrlMod, Space, exec, $menu"
+      "$wmMod, Space, exec, rofi-toggle-cliphist"
+      # "$wmMod, P, pseudo," # dwindle
+      # "$wmMod, J, togglesplit," # dwindle
+      "$wmMod, RETURN, fullscreen, 1"
+      "$wmMod SHIFT, RETURN, fullscreen"
 
-      # Move focus with mainMod + arrow keys
-      "$mainMod, L, movefocus, r"
-      "$mainMod, H, movefocus, l"
-      "$mainMod, K, movefocus, u"
-      "$mainMod, J, movefocus, d"
+      # Move focus with wmMod + arrow keys
+      "$wmMod, L, movefocus, r"
+      "$wmMod, H, movefocus, l"
+      "$wmMod, K, movefocus, u"
+      "$wmMod, J, movefocus, d"
 
-      # Switch workspaces with mainMod + [0-9]
-      "$mainMod, 1, workspace, 1"
-      "$mainMod, 2, workspace, 2"
-      "$mainMod, 3, workspace, 3"
-      "$mainMod, 4, workspace, 4"
-      "$mainMod, 5, workspace, 5"
-      "$mainMod, 6, workspace, 6"
-      "$mainMod, O, workspace, 7"
-      "$mainMod, P, workspace, 8"
-      "$mainMod, G, workspace, 9"
-      "$mainMod, Z, workspace, 10"
+      # Switch workspaces with wmMod + [0-9]
+      "$wmMod, 1, workspace, 1"
+      "$wmMod, 2, workspace, 2"
+      "$wmMod, 3, workspace, 3"
+      "$wmMod, 4, workspace, 4"
+      "$wmMod, 5, workspace, 5"
+      "$wmMod, 6, workspace, 6"
+      "$wmMod, O, workspace, 7"
+      "$wmMod, P, workspace, 8"
+      "$wmMod, G, workspace, 9"
+      "$wmMod, Z, workspace, 10"
 
-      # Move active window to a workspace with mainMod + SHIFT + [0-9]
-      "$mainMod SHIFT, 1, movetoworkspace, 1"
-      "$mainMod SHIFT, 2, movetoworkspace, 2"
-      "$mainMod SHIFT, 3, movetoworkspace, 3"
-      "$mainMod SHIFT, 4, movetoworkspace, 4"
-      "$mainMod SHIFT, 5, movetoworkspace, 5"
-      "$mainMod SHIFT, 6, movetoworkspace, 6"
-      "$mainMod SHIFT, O, movetoworkspace, 7"
-      "$mainMod SHIFT, P, movetoworkspace, 8"
-      "$mainMod SHIFT, G, movetoworkspace, 9"
-      "$mainMod SHIFT, Z, movetoworkspace, 10"
+      # Move active window to a workspace with wmMod + SHIFT + [0-9]
+      "$wmMod SHIFT, 1, movetoworkspace, 1"
+      "$wmMod SHIFT, 2, movetoworkspace, 2"
+      "$wmMod SHIFT, 3, movetoworkspace, 3"
+      "$wmMod SHIFT, 4, movetoworkspace, 4"
+      "$wmMod SHIFT, 5, movetoworkspace, 5"
+      "$wmMod SHIFT, 6, movetoworkspace, 6"
+      "$wmMod SHIFT, O, movetoworkspace, 7"
+      "$wmMod SHIFT, P, movetoworkspace, 8"
+      "$wmMod SHIFT, G, movetoworkspace, 9"
+      "$wmMod SHIFT, Z, movetoworkspace, 10"
 
       # Example special workspace (scratchpad)
-      "$mainMod, S, togglespecialworkspace, magic"
-      "$mainMod SHIFT, S, movetoworkspace, special:magic"
+      "$wmMod, S, togglespecialworkspace, magic"
+      "$wmMod SHIFT, S, movetoworkspace, special:magic"
 
       # Hyprswitch
-      "$mod, $key, exec, hyprswitch gui --mod-key $mod --key $key --close mod-key-release --reverse-key=key=$reverse && hyprswitch dispatch"
-      "$mod $reverse, $key, exec, hyprswitch gui --mod-key $mod --key $key --close mod-key-release --reverse-key=key=$reverse && hyprswitch dispatch -r"
+      "$wmMod, $key, exec, hyprswitch gui --mod-key $mod --key $key --close mod-key-release --reverse-key=key=$reverse && hyprswitch dispatch"
+      "$wmMod $reverse, $key, exec, hyprswitch gui --mod-key $mod --key $key --close mod-key-release --reverse-key=key=$reverse && hyprswitch dispatch -r"
     ];
     bindm = [
-      # Move/resize windows with mainMod + LMB/RMB and dragging
-      "$mainMod SHIFT, mouse:272, movewindow"
-      "$mainMod SHIFT, mouse:273, resizewindow"
+      # Move/resize windows with wmMod + LMB/RMB and dragging
+      "$wmMod SHIFT, mouse:272, movewindow"
+      "$wmMod SHIFT, mouse:273, resizewindow"
     ];
   };
 }

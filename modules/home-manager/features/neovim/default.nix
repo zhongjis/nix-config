@@ -140,10 +140,15 @@ in {
 
       # **which-key**
       which-key-nvim
+
+      # **indent-blankline-nvim**
+      indent-blankline-nvim
     ];
 
     extraLuaConfig = ''
-      ${builtins.readFile ./init.lua}
+      require("config.options")
+      require("config.keymaps")
+      require("config.autocmds")
 
       require("lazy").setup({
         performance = {
