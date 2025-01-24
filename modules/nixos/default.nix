@@ -53,4 +53,11 @@ in {
     programs.nix-ld.enable = true;
     nixpkgs.config.allowUnfree = true;
   };
+
+  nix.gc = {
+    automatic = true;
+    dates = "daily";
+    options = "--delete-older-than 14";
+  };
+  nix.optimise.automatic = true;
 }
