@@ -23,16 +23,16 @@
     services.amdgpu.enable = true;
     multi-lang-input-layout.enable = true;
     docker.enable = true;
-    ollama.enable = true;
+    ollama.enable = false; # failing build
   };
 
   # for radeon 7700s
-  services.ollama = {
-    environmentVariables = {
-      HCC_AMDGPU_TARGET = "gfx1102"; # used to be necessary, but doesn't seem to anymore
-    };
-    rocmOverrideGfx = "11.0.2";
-  };
+  # services.ollama = {
+  #   environmentVariables = {
+  #     HCC_AMDGPU_TARGET = "gfx1102"; # used to be necessary, but doesn't seem to anymore
+  #   };
+  #   rocmOverrideGfx = "11.0.2";
+  # };
 
   # xremap
   hardware.uinput.enable = true;

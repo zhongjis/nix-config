@@ -58,6 +58,8 @@ in {
   home.username = "zshen";
   home.homeDirectory = "/home/zshen";
   home.stateVersion = "23.11";
-  home.packages = with pkgs; [];
+  home.packages = with pkgs; [
+    google-chrome
+  ];
   home.file = {};
 }
