@@ -11,12 +11,32 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix-gaming.url = "github:fufexan/nix-gaming";
+
+    # darwin
     nix-darwin = {
       url = "github:LnL7/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nix-gaming.url = "github:fufexan/nix-gaming";
+    ## nix-homebrew
+    nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
+    homebrew-core = {
+      url = "github:homebrew/homebrew-core";
+      flake = false;
+    };
+    homebrew-cask = {
+      url = "github:homebrew/homebrew-cask";
+      flake = false;
+    };
+    homebrew-bundle = {
+      url = "github:homebrew/homebrew-bundle";
+      flake = false;
+    };
+    aerospace-tap = {
+      url = "github:nikitabobko/homebrew-tap";
+      flake = false;
+    };
 
     # programs
     xremap-flake.url = "github:xremap/nix-flake";
@@ -26,11 +46,14 @@
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     ghostty.url = "github:ghostty-org/ghostty";
 
+    ## hyprland
     hyprpanel = {
       url = "github:Jas-SinghFSU/HyprPanel";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hyprswitch.url = "github:h3rmt/hyprswitch/release";
+
+    ## framework laptop
     fw-fanctrl = {
       url = "github:TamtamHero/fw-fanctrl/packaging/nix";
       inputs.nixpkgs.follows = "nixpkgs";

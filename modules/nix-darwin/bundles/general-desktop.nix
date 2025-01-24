@@ -1,8 +1,13 @@
 {
   pkgs,
   lib,
+  inputs,
   ...
 }: {
+  imports = [
+    inputs.nix-homebrew.darwinModules.nix-homebrew
+  ];
+
   myNixDarwin.aerospace.enable = lib.mkDefault false;
   myNixDarwin.nh.enable = lib.mkDefault true;
 
@@ -34,6 +39,21 @@
     font-awesome
   ];
 
+  nix-homebrew = {
+    enable = true;
+    enableRosetta = true;
+    user = "zshen";
+    autoMigrate = true;
+
+    taps = {
+      "homebrew/core" = inputs.homebrew-core;
+      "homebrew/cask" = inputs.homebrew-cask;
+      "homebrew/bundle" = inputs.homebrew-bundle;
+      "nikitabobko/tap" = inputs.aerospace-tap;
+    };
+    mutableTaps = false;
+  };
+
   homebrew = {
     enable = true;
     onActivation = {
@@ -41,10 +61,6 @@
       upgrade = true;
       cleanup = "zap";
     };
-
-    taps = [
-      "nikitabobko/tap"
-    ];
 
     brews = [
       "bitwarden-cli"
