@@ -54,7 +54,7 @@ in {
     nixpkgs.config.allowUnfree = true;
 
     nix.gc = {
-      automatic = true;
+      automatic = false; # conflict with programs.nh.clean.enable
       dates = "daily";
       options = "--delete-older-than 14d";
     };
