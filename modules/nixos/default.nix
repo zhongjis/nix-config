@@ -52,12 +52,12 @@ in {
     nix.settings.experimental-features = ["nix-command" "flakes"];
     programs.nix-ld.enable = true;
     nixpkgs.config.allowUnfree = true;
-  };
 
-  nix.gc = {
-    automatic = true;
-    dates = "daily";
-    options = "--delete-older-than 14";
+    nix.gc = {
+      automatic = true;
+      dates = "daily";
+      options = "--delete-older-than 14d";
+    };
+    nix.optimise.automatic = true;
   };
-  nix.optimise.automatic = true;
 }
