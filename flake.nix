@@ -110,7 +110,6 @@
         };
       };
 
-      nixosModules.default = ./modules/nixos;
       nixDarwinModules.default = ./modules/darwin;
       homeManagerModules.default = ./modules/shared/home-manager;
       homeManagerModules.linux = ./modules/nixos/home-manager;

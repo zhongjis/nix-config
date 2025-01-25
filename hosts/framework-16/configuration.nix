@@ -7,6 +7,7 @@
   imports = [
     ./hardware-configuration.nix
     ./fw-fanctrl.nix
+    ../../modules/nixos
   ];
 
   # set global nixpkgs input

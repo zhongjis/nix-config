@@ -3,6 +3,10 @@
   lgUntraWideMonitor = "desc:LG Electronics LG ULTRAGEAR 009NTDV4B698";
   dellMonitor = "desc:Dell Inc. DELL P2419H 78NFR63";
 in {
+  imports = [
+    ../../modules/shared/home-manager
+    ../../modules/nixos/home-manager
+  ];
   myHomeManager.bundles.general.enable = true;
   myHomeManager.direnv.enable = true;
   myHomeManager.hyprland.monitors = {
@@ -49,8 +53,8 @@ in {
       };
   };
 
-  myHomeManagerLinux.bundles.linux.enable = true;
-  myHomeManagerLinux.bundles.hyprland.enable = true;
+  myHomeManager.bundles.linux.enable = true;
+  myHomeManager.bundles.hyprland.enable = true;
 
   programs.git.userName = "zhongjis";
   programs.git.userEmail = "zhongjie.x.shen@gmail.com";

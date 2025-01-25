@@ -1,3 +1,3 @@
-{lib, ...}: {
-  myHomeManagerDarwin.aerospace.enable = true;
+{...}: {
+  myHomeManager.aerospace.enable = true;
 }

@@ -4,14 +4,14 @@
   myLib,
   ...
 }: let
-  cfg = config.myHomeManagerLinux;
+  cfg = config.myHomeManager;
 
   # Taking all modules in ./features and adding enables to them
   features =
     myLib.extendModules
     (name: {
       extraOptions = {
-        myHomeManagerLinux.${name}.enable = lib.mkEnableOption "enable my ${name} configuration";
+        myHomeManager.${name}.enable = lib.mkEnableOption "enable my ${name} configuration";
       };
 
       configExtension = config: (lib.mkIf cfg.${name}.enable config);
@@ -23,7 +23,7 @@
     myLib.extendModules
     (name: {
       extraOptions = {
-        myHomeManagerLinux.bundles.${name}.enable = lib.mkEnableOption "enable ${name} module bundle";
+        myHomeManager.bundles.${name}.enable = lib.mkEnableOption "enable ${name} module bundle";
       };
 
       configExtension = config: (lib.mkIf cfg.bundles.${name}.enable config);

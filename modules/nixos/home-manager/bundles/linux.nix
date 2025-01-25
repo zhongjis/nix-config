@@ -1,4 +1,4 @@
 {...}: {
-  myHomeManagerLinux.xremap.enable = true;
-  myHomeManagerLinux.pipewire-noise-cancling-input.enable = true;
+  myHomeManager.xremap.enable = true;
+  myHomeManager.pipewire-noise-cancling-input.enable = true;
 }
