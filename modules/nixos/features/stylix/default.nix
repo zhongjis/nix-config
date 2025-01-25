@@ -1,7 +1,7 @@
 {inputs, ...}: {
   imports = [
-    ./common.nix
     ./other.nix
+    ../../../shared/stylix/common.nix
     inputs.stylix.nixosModules.stylix
   ];
 }
