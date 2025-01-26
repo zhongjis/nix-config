@@ -11,9 +11,6 @@
     ./fw-fanctrl.nix
   ];
 
-  # set global nixpkgs input
-  nix.nixPath = ["nixpkgs=${inputs.nixpkgs}"];
-
   # gaming kernel. not sure if it is good
   boot.kernelPackages = pkgs.linuxPackages_zen;
 

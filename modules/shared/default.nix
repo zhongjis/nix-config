@@ -1,4 +1,11 @@
-{pkgs, ...}: {
+{
+  inputs,
+  pkgs,
+  ...
+}: {
+  # set global nix path
+  nix.nixPath = ["nixpkgs=${inputs.nixpkgs}"];
+
   # caches
   nix.settings = {
     substituters = [

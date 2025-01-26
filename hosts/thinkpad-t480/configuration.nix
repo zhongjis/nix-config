@@ -12,9 +12,6 @@
     ./hardware-configuration.nix
   ];
 
-  # set global nix path
-  nix.nixPath = ["nixpkgs=${inputs.nixpkgs}"];
-
   # gaming kernel. not sure if it is good
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
