@@ -61,7 +61,7 @@
   };
 
   # Network
-  networking.hostName = "zshen-framework"; # Define your hostname.
+  networking.hostName = "framework-16"; # Define your hostname.
   networking.networkmanager.enable = true;
 
   # ZRAM
