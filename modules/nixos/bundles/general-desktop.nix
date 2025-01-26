@@ -50,10 +50,6 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  # cooler
-  programs.coolercontrol.enable = true;
-  programs.coolercontrol.nvidiaSupport = true;
-
   # enable sound
   security.rtkit.enable = true;
 
