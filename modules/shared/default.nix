@@ -1,4 +1,5 @@
-{...}: {
+{pkgs, ...}: {
+  # caches
   nix.settings = {
     substituters = [
       "https://cuda-maintainers.cachix.org"
@@ -14,4 +15,9 @@
       "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4="
     ];
   };
+
+  nix.package = pkgs.nix;
+  nix.extraOptions = ''
+    experimental-features = nix-command flakes
+  '';
 }

@@ -5,9 +5,10 @@
   ...
 }: {
   imports = [
+    ../../modules/shared
+    ../../modules/nixos
     ./hardware-configuration.nix
     ./fw-fanctrl.nix
-    ../../modules/nixos
   ];
 
   # set global nixpkgs input
