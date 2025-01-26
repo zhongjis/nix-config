@@ -1,7 +1,6 @@
 {pkgs, ...}: {
   myNixOS.nh.enable = true;
   myNixOS.power-management.enable = true;
-  myNixOS.cachix.enable = true;
   myNixOS.stylix.enable = true;
   myNixOS.plymouth.enable = true;
 
