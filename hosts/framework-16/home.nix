@@ -54,6 +54,7 @@ in {
 
   myHomeManager.bundles.linux.enable = true;
   myHomeManager.bundles.hyprland.enable = true;
+  myHomeManager.bundles.office.enable = true;
 
   programs.git.userName = "zhongjis";
   programs.git.userEmail = "zhongjie.x.shen@gmail.com";
