@@ -38,7 +38,7 @@
   };
 
   networking = {
-    hostName = "nixos"; # Define your hostname.
+    hostName = "thinkpad-t480"; # Define your hostname.
     networkmanager.enable = true; # Easiest to use and most distros use this by default.
   };
 
