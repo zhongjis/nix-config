@@ -8,7 +8,6 @@ in {
     ../../modules/nixos/home-manager
   ];
   myHomeManager.bundles.general.enable = true;
-  myHomeManager.direnv.enable = true;
   myHomeManager.hyprland.monitors = {
     "desc:BOE 0x0BC9" = {
       width = 2560;
