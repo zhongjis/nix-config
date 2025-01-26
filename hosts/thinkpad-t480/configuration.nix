@@ -7,6 +7,8 @@
   ...
 }: {
   imports = [
+    ../../modules/shared
+    ../../modules/nixos
     ./hardware-configuration.nix
     ./gaming.nix
   ];
@@ -90,8 +92,8 @@
     ];
     shell = pkgs.zsh;
   };
-  programs.zsh.enable = true;
 
+  programs.zsh.enable = true;
   services.power-profiles-daemon.enable = true;
 
   environment.systemPackages = with pkgs; [];
