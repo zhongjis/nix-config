@@ -19,12 +19,13 @@ return { -- Autocompletion
         },
       },
     },
-    "saadparwaiz1/cmp_luasnip",
 
-    "hrsh7th/cmp-nvim-lsp",
-    "hrsh7th/cmp-path",
-    "hrsh7th/cmp-buffer",
-    "hrsh7th/cmp-cmdline",
+    -- NOTE: disabled these lines. for some reason they are showing up two times in cmp source
+    -- "saadparwaiz1/cmp_luasnip",
+    -- "hrsh7th/cmp-nvim-lsp",
+    -- "hrsh7th/cmp-path",
+    -- "hrsh7th/cmp-buffer",
+    -- "hrsh7th/cmp-cmdline",
   },
   config = function()
     -- See `:help cmp`
