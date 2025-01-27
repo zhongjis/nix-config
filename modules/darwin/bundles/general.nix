@@ -83,6 +83,7 @@
       "appcleaner"
 
       # duplicates: already included in full-system. but adding them for alfred app
+      # FIXME: migrate to use https://gist.github.com/elliottminns/211ef645ebd484eb9a5228570bb60ec3
       "ghostty"
       "obsidian"
       "spotify"
