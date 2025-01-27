@@ -1,15 +1,13 @@
 # Edit this configuration file to define what should be installed on
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
-{
-  pkgs,
-  inputs,
-  ...
-}: {
+{pkgs, ...}: {
   imports = [
     ../../modules/shared
     ../../modules/nixos
     ./hardware-configuration.nix
+    "${builtins.fetchTarball "https://github.com/nix-community/disko/archive/master.tar.gz"}/module.nix"
+    ./disko.nix
   ];
 
   # gaming kernel. not sure if it is good
@@ -41,8 +39,8 @@
     };
     grub = {
       enable = true;
-      devices = ["nodev"];
       efiSupport = true;
+      efiInstallAsRemovable = true;
       useOSProber = true;
     };
   };
