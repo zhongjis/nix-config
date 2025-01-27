@@ -30,6 +30,7 @@ local servers = {
   nixd = {
     settings = {
       nixd = {
+        formatting = {},
         options = {
           nixos = {
             expr = '(builtins.getFlake "~/personal/nix-config").nixosConfigurations.framework-16.options',

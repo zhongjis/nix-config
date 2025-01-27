@@ -1,10 +1,13 @@
-{pkgs,inputs, currentSystem,...}: let 
+{
+  pkgs,
+  ...
+}: 
+let 
   internalMonitor = "desc:BOE 0x0BC9";
   lgUntraWideMonitor = "desc:LG Electronics LG ULTRAGEAR 009NTDV4B698";
   dellMonitor = "desc:Dell Inc. DELL P2419H 78NFR63";
 in {
   imports = [
-    ../../modules/shared
     ../../modules/shared/home-manager
     ../../modules/nixos/home-manager
   ];
@@ -66,5 +69,4 @@ in {
   home.packages = with pkgs; [
     google-chrome
   ];
-  home.file = {};
 }

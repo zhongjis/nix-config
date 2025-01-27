@@ -4,7 +4,6 @@
   ...
 }: {
   imports = [
-    ../../modules/shared
     ../../modules/shared/home-manager
     ../../modules/darwin/home-manager
   ];

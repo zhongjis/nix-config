@@ -15,6 +15,7 @@
     # ./disko.nix
   ];
 
+
   # gaming kernel. not sure if it is good
   boot.kernelPackages = pkgs.linuxPackages_latest;
 

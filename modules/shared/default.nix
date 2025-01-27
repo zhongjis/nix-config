@@ -8,6 +8,7 @@
 
   # caches
   nix.settings = {
+    trusted-users = ["root" "@wheel" "zshen"];
     substituters = [
       "https://cuda-maintainers.cachix.org"
       "https://cache.nixos.org/"
