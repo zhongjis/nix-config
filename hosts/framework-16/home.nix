@@ -4,6 +4,7 @@
   dellMonitor = "desc:Dell Inc. DELL P2419H 78NFR63";
 in {
   imports = [
+    ../../modules/shared
     ../../modules/shared/home-manager
     ../../modules/nixos/home-manager
   ];
