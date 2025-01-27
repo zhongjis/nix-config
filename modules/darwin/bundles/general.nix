@@ -80,6 +80,8 @@
       "google-chrome"
       "zen-browser"
 
+      "appcleaner"
+
       # duplicates: already included in full-system. but adding them for alfred app
       "ghostty"
       "obsidian"

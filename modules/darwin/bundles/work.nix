@@ -29,12 +29,16 @@ in {
     ++ stable_pkgs;
 
   homebrew = {
+    brews = [
+      "podman"
+      "podman-compose"
+    ];
+
     casks = [
       # dev tools
       "dash"
 
       # "docker"
-      "podman"
 
       "charles"
       "devtoys"
