@@ -10,7 +10,7 @@
   ];
 
   myNixDarwin = {
-    bundles.general-desktop.enable = true;
+    bundles.general.enable = true;
     bundles.work.enable = true;
   };
 

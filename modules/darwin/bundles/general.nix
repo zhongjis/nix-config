@@ -80,20 +80,8 @@
       "google-chrome"
       "zen-browser"
 
-      # dev tools
-      "dash"
-      # "docker"
-      "charles"
-      "devtoys"
-      "mongodb-compass"
-      "intellij-idea"
-      "visual-studio-code"
-      "sublime-merge"
-      "zed"
-      "ghostty"
-
       # duplicates: already included in full-system. but adding them for alfred app
-      "kitty"
+      "ghostty"
       "obsidian"
       "spotify"
     ];

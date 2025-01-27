@@ -27,4 +27,22 @@ in {
       gh
     ]
     ++ stable_pkgs;
+
+  homebrew = {
+    casks = [
+      # dev tools
+      "dash"
+
+      # "docker"
+      "podman"
+
+      "charles"
+      "devtoys"
+      "mongodb-compass"
+      "intellij-idea"
+      "visual-studio-code"
+      "sublime-merge"
+      "zed"
+    ];
+  };
 }
