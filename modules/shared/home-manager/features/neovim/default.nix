@@ -1,13 +1,14 @@
 {
   pkgs,
   config,
+  inputs,
   ...
 }: let
 in {
   programs.neovim = {
     enable = true;
-    # package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
-    package = pkgs.stable.neovim-unwrapped;
+    package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
+    # package = pkgs.stable.neovim-unwrapped;
 
     viAlias = true;
     vimAlias = true;
