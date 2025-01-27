@@ -9,6 +9,10 @@
     ../../modules/nixos
     ./hardware-configuration.nix
     ./fw-fanctrl.nix
+
+    # disk placeholder
+    # inputs.disko.nixosModules.default
+    # ./disko.nix
   ];
 
   # gaming kernel. not sure if it is good
