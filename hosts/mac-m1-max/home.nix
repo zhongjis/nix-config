@@ -3,8 +3,13 @@
   pkgs,
   ...
 }: {
+  imports = [
+    ../../modules/shared/home-manager
+    ../../modules/darwin/home-manager
+  ];
+
   myHomeManager.bundles.general.enable = true;
-  myHomeManagerDarwin.bundles.darwin.enable = true;
+  myHomeManager.bundles.darwin.enable = true;
 
   programs.git.userName = "zshen";
   programs.git.userEmail = "zshen@adobe.com";

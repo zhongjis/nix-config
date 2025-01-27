@@ -3,13 +3,11 @@
   pkgs,
   currentSystemUser,
   ...
-}: let
-  stable_pkgs = with pkgs.stable; [
-    # placeholder
+}: {
+  imports = [
+    ../../modules/shared
+    ../../modules/darwin
   ];
-in {
-  # set global nixpkgs input
-  nix.nixPath = ["nixpkgs=${inputs.nixpkgs}"];
 
   myNixDarwin = {
     bundles.general-desktop.enable = true;
@@ -21,7 +19,7 @@ in {
     shell = pkgs.zsh;
   };
 
-  environment.systemPackages = with pkgs; [] ++ stable_pkgs;
+  environment.systemPackages = with pkgs; [];
 
   services.nix-daemon.enable = true;
 

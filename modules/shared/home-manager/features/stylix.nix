@@ -1,5 +1,9 @@
-{pkgs, ...}: let
-in {
+{inputs, ...}: {
+  imports = [
+    ../../stylix_common.nix
+    inputs.stylix.homeManagerModules.stylix
+  ];
+
   stylix.targets = {
     waybar.enable = false;
     neovim.enable = false;

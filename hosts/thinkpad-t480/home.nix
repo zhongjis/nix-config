@@ -6,19 +6,23 @@
   ...
 }: {
   imports = [
-    ../../modules/home-manager
+    ../../modules/shared/home-manager
+    ../../modules/nixos/home-manager
   ];
 
-  # override common module options
-  git.enable = true;
+  myHomeManager.bundles.general.enable = true;
+  myHomeManager.bundles.linux.enable = true;
+  myHomeManager.bundles.hyprland.enable = true;
+  myHomeManager.ghostty.enable = false;
 
-  # Home Manager needs a bit of information about you and the paths it should
-  # manage.
+  programs.git.userName = "zhongjis";
+  programs.git.userEmail = "zhongjie.x.shen@gmail.com";
+
   home.username = "zshen";
   home.homeDirectory = "/home/zshen";
-  home.stateVersion = "23.11"; # Please read the comment before changing.
-
+  home.stateVersion = "23.11";
   home.packages = with pkgs; [
-    bitwarden
+    google-chrome
   ];
+  home.file = {};
 }

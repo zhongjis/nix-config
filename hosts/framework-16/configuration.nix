@@ -5,15 +5,18 @@
   ...
 }: {
   imports = [
+    ../../modules/shared
+    ../../modules/nixos
     ./hardware-configuration.nix
     ./fw-fanctrl.nix
+
+    # disk placeholder
+    # inputs.disko.nixosModules.default
+    # ./disko.nix
   ];
 
-  # set global nixpkgs input
-  nix.nixPath = ["nixpkgs=${inputs.nixpkgs}"];
-
   # gaming kernel. not sure if it is good
-  boot.kernelPackages = pkgs.linuxPackages_zen;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   myNixOS = {
     bundles.general-desktop.enable = true;
@@ -59,7 +62,7 @@
   };
 
   # Network
-  networking.hostName = "zshen-framework"; # Define your hostname.
+  networking.hostName = "framework-16"; # Define your hostname.
   networking.networkmanager.enable = true;
 
   # ZRAM

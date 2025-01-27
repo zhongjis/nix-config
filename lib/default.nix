@@ -34,10 +34,6 @@ in rec {
       if hardware != ""
       then inputs.nixos-hardware.nixosModules.${hardware}
       else {};
-    systemModules =
-      if isDarwin
-      then outputs.nixDarwinModules.default
-      else outputs.nixosModules.default;
   in
     systemFunc {
       system = system;
@@ -48,13 +44,13 @@ in rec {
       modules = [
         hostConfiguration
         hardwareConfiguration
-        systemModules
 
         {
           nixpkgs.overlays = [
             inputs.nixpkgs-terraform.overlays.default
             overlays.modifications
             overlays.stable-packages
+            inputs.nh-4-beta.overlays.default
           ];
           nixpkgs.config = {
             allowUnfree = true;
@@ -83,10 +79,6 @@ in rec {
     isDarwin = darwin;
 
     homeConfiguration = ../hosts/${systemName}/home.nix;
-    systemSpecificHomeManagerModules =
-      if isDarwin
-      then outputs.homeManagerModules.darwin
-      else outputs.homeManagerModules.linux;
   in
     inputs.home-manager.lib.homeManagerConfiguration {
       pkgs = import nixpkgs {
@@ -111,8 +103,6 @@ in rec {
 
       modules = [
         homeConfiguration
-        outputs.homeManagerModules.default
-        systemSpecificHomeManagerModules
       ];
     };
 

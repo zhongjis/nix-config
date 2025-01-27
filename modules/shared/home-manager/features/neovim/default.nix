@@ -63,11 +63,8 @@ in {
 
       # **lsp**
       lazydev-nvim
-      luvit-meta
       fidget-nvim
 
-      # mason-nvim
-      # mason-lspconfig-nvim
       nvim-lspconfig
 
       nvim-lint

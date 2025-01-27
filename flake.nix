@@ -11,6 +11,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nix-gaming.url = "github:fufexan/nix-gaming";
 
     # darwin
@@ -45,6 +50,7 @@
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     ghostty.url = "github:ghostty-org/ghostty";
+    nh-4-beta.url = "github:viperML/nh";
 
     ## hyprland
     hyprpanel = {
@@ -90,7 +96,7 @@
       };
 
       darwinConfigurations = {
-        mac-m1-max = mkSystem "mac-m1-max" {
+        Zhongjies-MacBook-Pro = mkSystem "mac-m1-max" {
           system = "aarch64-darwin";
           user = "zshen";
           darwin = true;
@@ -98,7 +104,7 @@
       };
 
       homeConfigurations = {
-        "zshen@mac-m1-max" = mkHome "mac-m1-max" {
+        "zshen@Zhongjies-MacBook-Pro.local" = mkHome "mac-m1-max" {
           system = "aarch64-darwin";
           darwin = true;
         };
@@ -110,10 +116,9 @@
         };
       };
 
-      nixosModules.default = ./modules/nixos;
-      nixDarwinModules.default = ./modules/nix-darwin;
-      homeManagerModules.default = ./modules/home-manager;
-      homeManagerModules.linux = ./modules/home-manager-linux;
-      homeManagerModules.darwin = ./modules/home-manager-darwin;
+      nixDarwinModules.default = ./modules/darwin;
+      homeManagerModules.default = ./modules/shared/home-manager;
+      homeManagerModules.linux = ./modules/nixos/home-manager;
+      homeManagerModules.darwin = ./modules/darwin/home-manager;
     };
 }

@@ -1,0 +1,3 @@
+{...}: {
+  myHomeManager.aerospace.enable = true;
+}

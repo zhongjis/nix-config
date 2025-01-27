@@ -1,7 +1,6 @@
 {pkgs, ...}: {
   myNixOS.nh.enable = true;
   myNixOS.power-management.enable = true;
-  myNixOS.cachix.enable = true;
   myNixOS.stylix.enable = true;
   myNixOS.plymouth.enable = true;
 
@@ -50,10 +49,6 @@
     LC_TELEPHONE = "en_US.UTF-8";
     LC_TIME = "en_US.UTF-8";
   };
-
-  # cooler
-  programs.coolercontrol.enable = true;
-  programs.coolercontrol.nvidiaSupport = true;
 
   # enable sound
   security.rtkit.enable = true;

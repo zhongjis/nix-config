@@ -7,12 +7,26 @@
   ...
 }: {
   imports = [
+    ../../modules/shared
+    ../../modules/nixos
     ./hardware-configuration.nix
-    ./gaming.nix
+
+    # disk
+    inputs.disko.nixosModules.default
+    ./disko.nix
   ];
 
-  # set global nix path
-  nix.nixPath = ["nixpkgs=${inputs.nixpkgs}"];
+  # gaming kernel. not sure if it is good
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+
+  myNixOS = {
+    bundles.general-desktop.enable = true;
+    bundles.hyprland.enable = true;
+    bundles.gaming.enable = false;
+    multi-lang-input-layout.enable = true;
+    docker.enable = false;
+    ollama.enable = false; # failing build
+  };
 
   # xremap
   hardware.uinput.enable = true;
@@ -25,36 +39,18 @@
   boot.loader = {
     systemd-boot.enable = false;
 
-    efi = {
-      canTouchEfiVariables = true;
-      efiSysMountPoint = "/boot";
-    };
     grub = {
       enable = true;
-      devices = ["nodev"];
       efiSupport = true;
+      efiInstallAsRemovable = true;
       useOSProber = true;
     };
   };
 
-  nix.settings.experimental-features = ["nix-command" "flakes"];
-
+  # Network
   networking = {
-    hostName = "nixos"; # Define your hostname.
+    hostName = "thinkpad-t480"; # Define your hostname.
     networkmanager.enable = true; # Easiest to use and most distros use this by default.
-  };
-
-  # Set your time zone.
-  services.automatic-timezoned.enable = true;
-
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
-  console = {
-    earlySetup = true;
-    font = "${pkgs.terminus_font}/share/consolefonts/ter-128n.psf.gz";
-    packages = with pkgs; [terminus_font];
-    keyMap = "us";
-    #   useXkbConfig = true; # use xkb.options in tty.
   };
 
   # ZRAM
@@ -63,38 +59,26 @@
     memoryPercent = 50;
   };
 
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
-
-  # Enable sound.
-  sound.enable = true;
-  security.rtkit.enable = true;
-  # Enable pipewire for screen sharing sound
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-    jack.enable = true;
-  };
+  # Enable touchpad support (enabled default in most desktopManager).
+  services.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.zshen = {
     isNormalUser = true;
-    extraGroups = ["wheel" "input"]; # Enable ‘sudo’ for the user.
-    packages = with pkgs; [
-      brightnessctl
-      obsidian
-      font-manager
-      kdePackages.dolphin
-      evince # pdf viewer
-      unzip
-    ];
+    extraGroups = ["wheel" "input" "networkmanager" "audio"]; # Enable ‘sudo’ for the user.
+    packages = with pkgs; [];
     shell = pkgs.zsh;
   };
   programs.zsh.enable = true;
 
-  services.power-profiles-daemon.enable = true;
+  # Select internationalisation properties.
+  console = {
+    earlySetup = true;
+    font = "${pkgs.terminus_font}/share/consolefonts/ter-128n.psf.gz";
+    packages = with pkgs; [terminus_font];
+    keyMap = "us";
+    #   useXkbConfig = true; # use xkb.options in tty.
+  };
 
   environment.systemPackages = with pkgs; [];
 
