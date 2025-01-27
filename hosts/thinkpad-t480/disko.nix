@@ -3,7 +3,7 @@
     disk = {
       main = {
         type = "disk";
-        device = "/dev/disk/by-id/ata-Samsung_SSD_850_EVO_250GB_S21PNXAGB12345";
+        device = "/dev/disk/by-id/nvme-INTEL_SSDPEKKF512G8L_BTHH824402VH512D";
         content = {
           type = "gpt";
           partitions = {
@@ -12,13 +12,13 @@
               type = "EF02"; # for grub MBR
             };
             ESP = {
-              size = "512M";
+              size = "1024M";
               type = "EF00";
               content = {
                 type = "filesystem";
                 format = "vfat";
                 mountpoint = "/boot";
-                mountOptions = ["umask=0077"];
+                mountOptions = [ "umask=0077" ];
               };
             };
             root = {
