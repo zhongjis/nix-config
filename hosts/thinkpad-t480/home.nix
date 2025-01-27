@@ -13,6 +13,7 @@
   myHomeManager.bundles.general.enable = true;
   myHomeManager.bundles.linux.enable = true;
   myHomeManager.bundles.hyprland.enable = true;
+  myHomeManager.ghostty.enable = false;
 
   programs.git.userName = "zhongjis";
   programs.git.userEmail = "zhongjie.x.shen@gmail.com";
