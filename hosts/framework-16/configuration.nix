@@ -33,7 +33,7 @@
   services.ollama = {
     package = pkgs.stable.ollama;
     acceleration = "rocm";
-    rocmOverrideGfx = "11.0.2"; # NOTE: failing build
+    rocmOverrideGfx = "11.0.2"; # NOTE: failing build on unstalbe as of 01.27.2024
   };
 
   # xremap
