@@ -11,7 +11,7 @@
   myHomeManager.bundles.general.enable = true;
   myHomeManager.bundles.darwin.enable = true;
 
-  myHomeManager.podman-containers.enable = true;
+  # myHomeManager.podman-containers.enable = true;
 
   programs.git.userName = "zshen";
   programs.git.userEmail = "zshen@adobe.com";
