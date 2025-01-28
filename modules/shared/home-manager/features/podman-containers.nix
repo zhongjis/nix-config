@@ -1,8 +1,9 @@
 {...}: {
   services.podman = {
     enable = true;
+    enableTypeChecks = true;
     autoUpdate.enable = true;
-    podman.containers = {
+    containers = {
       "openwebui" = {
         image = "ghcr.io/open-webui/open-webui:main";
         autoStart = true;
