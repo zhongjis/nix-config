@@ -13,5 +13,8 @@
 
   environment.systemPackages = with pkgs; [
     docker-compose
+    lazydocker
   ];
+
+  virtualisation.oci-containers.backend = "docker";
 }
