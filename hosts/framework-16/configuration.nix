@@ -26,7 +26,7 @@
     services.amdgpu.enable = true;
     multi-lang-input-layout.enable = true;
     podman.enable = true;
-    ollama.enable = false;
+    ollama.enable = true;
   };
 
   # for radeon 7700s
@@ -34,7 +34,6 @@
   #   acceleration = "rocm";
   #   rocmOverrideGfx = "11.0.2"; # NOTE: failing build
   # };
-  # nixpkgs.config.rocmSupport = true;
 
   # xremap
   hardware.uinput.enable = true;
