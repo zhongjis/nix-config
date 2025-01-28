@@ -83,7 +83,7 @@
   users.users.zshen = {
     isNormalUser = true;
     description = "Jason";
-    extraGroups = ["networkmanager" "wheel" "audio" "docker"];
+    extraGroups = ["networkmanager" "wheel" "audio"];
     packages = with pkgs; [];
     shell = pkgs.zsh;
   };
