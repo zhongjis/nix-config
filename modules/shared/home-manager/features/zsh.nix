@@ -24,7 +24,6 @@
       cat = "bat -p";
       tree = "eza --color=auto --tree";
       grep = "grep --color=auto";
-      docker = "podman";
 
       otest = "nh os test --hostname ${currentSystemName}";
       oswitch = "nh os switch --hostname ${currentSystemName}";
