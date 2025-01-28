@@ -30,10 +30,11 @@
   };
 
   # for radeon 7700s
-  # services.ollama = {
-  #   acceleration = "rocm";
-  #   rocmOverrideGfx = "11.0.2"; # NOTE: failing build
-  # };
+  services.ollama = {
+    package = pkgs.stable.ollama;
+    acceleration = "rocm";
+    rocmOverrideGfx = "11.0.2"; # NOTE: failing build
+  };
 
   # xremap
   hardware.uinput.enable = true;
