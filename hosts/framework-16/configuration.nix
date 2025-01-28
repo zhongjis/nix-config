@@ -15,7 +15,6 @@
     # ./disko.nix
   ];
 
-
   # gaming kernel. not sure if it is good
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
@@ -26,17 +25,16 @@
     services.amdcpu.enable = true;
     services.amdgpu.enable = true;
     multi-lang-input-layout.enable = true;
-    docker.enable = true;
-    ollama.enable = false; # failing build
+    podman.enable = true;
+    ollama.enable = false;
   };
 
   # for radeon 7700s
   # services.ollama = {
-  #   environmentVariables = {
-  #     HCC_AMDGPU_TARGET = "gfx1102"; # used to be necessary, but doesn't seem to anymore
-  #   };
-  #   rocmOverrideGfx = "11.0.2";
+  #   acceleration = "rocm";
+  #   rocmOverrideGfx = "11.0.2"; # NOTE: failing build
   # };
+  # nixpkgs.config.rocmSupport = true;
 
   # xremap
   hardware.uinput.enable = true;
