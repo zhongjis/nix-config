@@ -53,6 +53,7 @@ in {
       prettierd
       black
       google-java-format
+      xmlstarlet
     ];
 
     plugins = with pkgs.stable.vimPlugins; [

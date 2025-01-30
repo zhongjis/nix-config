@@ -102,6 +102,7 @@ return {
       css = { "prettierd" },
       terraform = { "terraform_fmt" },
       java = { "google-java-format" },
+      xml = { "xmlstarlet" },
     },
   },
 }
