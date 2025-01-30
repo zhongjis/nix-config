@@ -7,6 +7,18 @@
     enable = true;
     enableTypeChecks = true;
     autoUpdate.enable = true;
+    networks.shared = {
+      autoStart = true;
+      description = "Default network to be shared";
+      subnet = "192.168.20.0/24";
+      gateway = "192.168.20.1";
+      driver = "bridge";
+      internal = false;
+      extraPodmanArgs = [
+        "--ipam-driver host-local"
+      ];
+    };
+
     # NOTE: the following command only work for linux
     containers = {
       "open-webui" = {
@@ -31,6 +43,7 @@
         extraPodmanArgs = [
           "--network=slirp4netns:allow_host_loopback=true"
         ];
+        network = ["shared"];
         autoStart = true;
         autoUpdate = "registry";
       };
@@ -42,6 +55,7 @@
         environment = {
           PIPELINES_URLS = "https://github.com/open-webui/pipelines/blob/main/examples/pipelines/providers/anthropic_manifold_pipeline.py";
         };
+        network = ["shared"];
         autoStart = true;
         autoUpdate = "registry";
       };
@@ -50,6 +64,7 @@
         image = "searxng/searxng:latest";
         volumes = ["searxng:/etc/searxng"];
         ports = ["8081:8080"];
+        network = ["shared"];
         autoStart = true;
         autoUpdate = "registry";
       };
