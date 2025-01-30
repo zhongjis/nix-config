@@ -1,37 +1,47 @@
-{pkgs, ...}: let
+{
+  pkgs,
+  inputs,
+  ...
+}: let
   stable_pkgs = with pkgs.stable; [];
 in {
   environment.systemPackages = with pkgs;
     [
       mongosh
-      terraform
+
+      php
 
       # **java**
       maven
       jdk
 
-      php
-
+      # kube
       kubectl
       kubelogin
 
+      # Hashicorp
+      terraform
       vault
 
+      # python
       python312
       python312Packages.pip
 
       redis
 
+      # azure
       azure-cli
+      azure-functions-core-tools
+
+      # aws
       awscli2
+
       gh
     ]
     ++ stable_pkgs;
 
   homebrew = {
     brews = [
-      "podman"
-      "podman-compose"
     ];
 
     casks = [

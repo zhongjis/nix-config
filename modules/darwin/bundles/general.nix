@@ -65,6 +65,9 @@
     brews = [
       "bitwarden-cli"
       "jq"
+
+      "podman"
+      "podman-compose"
     ];
 
     casks = [
