@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  config,
+  ...
+}: {
   home.packages = with pkgs; [
     passt
   ];
@@ -29,8 +33,8 @@
           # basic
           WEBUI_SECRET_KEY = "";
           WEBUI_AUTH = "False";
-          # openai
-          OPENAI_API_KEY = "";
+          # openai # moved to env file
+          # OPENAI_API_KEY = "";
           # ollama
           OLLAMA_BASE_URL = "http://host.docker.internal:11434";
           # searxng
@@ -43,6 +47,7 @@
         extraPodmanArgs = [
           "--network=slirp4netns:allow_host_loopback=true"
         ];
+        environmentFiles = [config.sops.secrets."api_keys_for_ai".path];
         network = ["shared"];
         autoStart = true;
         autoUpdate = "registry";
