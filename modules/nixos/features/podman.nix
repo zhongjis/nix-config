@@ -17,6 +17,8 @@
 
   # Useful other development tools
   environment.systemPackages = [
+    pkgs.passt
+
     pkgs.podman-compose
     pkgs.stable.podman-desktop
   ];
