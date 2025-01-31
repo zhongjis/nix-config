@@ -3,6 +3,7 @@
   config,
   ...
 }: {
+  # FIXME: broken
   home.packages = with pkgs; [
     passt
   ];
