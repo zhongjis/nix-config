@@ -214,6 +214,11 @@ in {
         windowrulev2 = noblur, class:^(xwaylandvideobridge)$
         windowrulev2 = nofocus, class:^(xwaylandvideobridge)$
 
+        # hope to fix some steam focus issue
+        # NOTE: https://www.reddit.com/r/hyprland/comments/19c53ub/steam_on_hyprland_is_extremely_wonky/
+        windowrulev2 = stayfocused, title:^()$,class:^(steam)$
+        windowrulev2 = minsize 1 1, title:^()$,class:^(steam)$
+
         # for fcitx5
         # reference: https://discourse.nixos.org/t/pinyin-input-method-in-hyprland-wayland-for-simplified-chinese/49186
         windowrule = pseudo, fcitx
