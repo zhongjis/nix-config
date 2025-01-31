@@ -45,7 +45,7 @@
           SEARXNG_QUERY_URL = "http://host.docker.internal:8081/search?q=<query>";
         };
         extraPodmanArgs = [
-          "--network=slirp4netns:allow_host_loopback=true"
+          "--network=pasta:--map-gw"
         ];
         environmentFile = [config.sops.secrets."api_keys_for_ai".path];
         network = ["shared"];
