@@ -16,7 +16,8 @@
   };
 
   # Useful other development tools
-  environment.systemPackages = with pkgs; [
-    podman-compose
+  environment.systemPackages = [
+    pkgs.podman-compose
+    pkgs.stable.podman-desktop
   ];
 }
