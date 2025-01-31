@@ -47,7 +47,7 @@
         extraPodmanArgs = [
           "--network=slirp4netns:allow_host_loopback=true"
         ];
-        environmentFiles = [config.sops.secrets."api_keys_for_ai".path];
+        environmentFile = [config.sops.secrets."api_keys_for_ai".path];
         network = ["shared"];
         autoStart = true;
         autoUpdate = "registry";
