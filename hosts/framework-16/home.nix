@@ -60,6 +60,8 @@ in {
   myHomeManager.bundles.hyprland.enable = true;
   myHomeManager.bundles.office.enable = true;
 
+  myHomeManager.podman.enable = false;
+
   programs.git.userName = "zhongjis";
   programs.git.userEmail = "zhongjie.x.shen@gmail.com";
 

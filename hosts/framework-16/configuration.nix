@@ -63,6 +63,7 @@
   # Network
   networking.hostName = "framework-16"; # Define your hostname.
   networking.networkmanager.enable = true;
+  networking.firewall.enable = true;
 
   # ZRAM
   zramSwap.enable = true;
