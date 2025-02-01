@@ -27,6 +27,7 @@
     multi-lang-input-layout.enable = true;
     podman.enable = true;
     ollama.enable = true;
+    open-webui.enable = true;
   };
 
   # for radeon 7700s

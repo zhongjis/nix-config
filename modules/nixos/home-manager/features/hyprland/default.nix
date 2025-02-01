@@ -196,6 +196,9 @@ in {
 
         windowrulev2 = workspace name:gaming,class:^(steam)$
         windowrulev2 = workspace name:gaming,class:^(heroic)$
+        windowrulev2 = workspace name:gaming,class:^(com.usebottles.bottles)$
+        windowrulev2 = workspace name:gaming,class:^(steam_proton)$
+        windowrulev2 = workspace name:gaming,class:^(gamescope)$
 
         windowrulev2 = workspace name:zen,class:^(zen)$
 

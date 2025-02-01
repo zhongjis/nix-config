@@ -30,6 +30,7 @@
   };
 
   environment.systemPackages = with pkgs; [
+    wineWayland
     bottles
     mangohud
     gamescope
