@@ -10,6 +10,6 @@
       OLLAMA_BASE_URL = "http://localhost:11434";
       ANONYMIZED_TELEMETRY = "False";
     };
-    # environmentFile = [config.sops.secrets."api_keys_for_ai".path];
+    environmentFile = config.sops.secrets."api_keys_for_ai".path;
   };
 }
