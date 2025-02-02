@@ -28,6 +28,7 @@
     podman.enable = true;
     ollama.enable = true;
     open-webui.enable = true;
+    sops.enable = true;
   };
 
   # for radeon 7700s
