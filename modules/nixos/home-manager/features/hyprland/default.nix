@@ -16,14 +16,11 @@ in {
     ./keymaps.nix
   ];
 
-  home.packages = with pkgs; [
-    xdg-desktop-portal-gtk
-  ];
-
   # hyprland
   wayland.windowManager.hyprland = {
     enable = true;
     xwayland.enable = true;
+    portalPackage = pkgs.xdg-desktop-portal-hyprland;
     # See https://wiki.hyprland.org/Configuring/Monitors/
     settings.monitor =
       lib.mapAttrsToList
