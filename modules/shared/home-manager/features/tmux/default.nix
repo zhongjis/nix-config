@@ -30,6 +30,8 @@ in {
       bash
       */
       ''
+        set-option -g status-position top
+
         unbind r
         bind r source-file ${config.home.homeDirectory}/.config/tmux/tmux.conf
 
