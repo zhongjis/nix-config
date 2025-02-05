@@ -49,7 +49,6 @@
       url = "github:Jas-SinghFSU/HyprPanel";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    hyprswitch.url = "github:h3rmt/hyprswitch/release";
 
     ## framework laptop
     fw-fanctrl = {

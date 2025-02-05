@@ -8,9 +8,7 @@
     pkgs.writeShellScript "hyprland-close-application"
     (builtins.readFile ./scripts/close-application.sh);
 in {
-  home.packages = [
-    inputs.hyprswitch.packages.${currentSystem}.default
-  ];
+  home.packages = [];
 
   ####################
   ### KEYBINDINGSS ###
@@ -30,8 +28,6 @@ in {
     # See https://wiki.hyprland.org/Configuring/Keywords/
     "$wmMod" = "ALT";
     "$ctrlMod" = "SUPER";
-    "$key" = "tab";
-    "$reverse" = "grave";
 
     bind = [
       # Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
@@ -78,9 +74,9 @@ in {
       "$wmMod, S, togglespecialworkspace, default"
       "$wmMod SHIFT, S, movetoworkspace, special:default"
 
-      # Hyprswitch
-      "$wmMod, $key, exec, hyprswitch gui --mod-key $mod --key $key --close mod-key-release --reverse-key=key=$reverse && hyprswitch dispatch"
-      "$wmMod $reverse, $key, exec, hyprswitch gui --mod-key $mod --key $key --close mod-key-release --reverse-key=key=$reverse && hyprswitch dispatch -r"
+      # ALT TAB
+      "ALT, Tab, cyclenext"
+      "ALT, Tab, bringactivetotop"
     ];
     bindm = [
       # Move/resize windows with wmMod + LMB/RMB and dragging
