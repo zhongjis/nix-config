@@ -57,6 +57,7 @@ in {
       "visual-studio-code"
       "sublime-merge"
       "zed"
+      "cursor"
     ];
   };
 }
