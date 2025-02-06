@@ -19,8 +19,12 @@ in {
       kubectl
       kubelogin
 
+      # git
+      pre-commit
+
       # Hashicorp
       terraform
+      terraform-docs
       vault
 
       # python
