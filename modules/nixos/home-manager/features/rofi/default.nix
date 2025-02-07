@@ -37,4 +37,16 @@
       + "/files";
     recursive = true;
   };
+
+  home.file.".local/share/rofi/themes" = {
+    source =
+      pkgs.fetchFromGitHub {
+        owner = "newmanls";
+        repo = "rofi-themes-collection";
+        rev = "master";
+        sha256 = "sha256-pHPhqbRFNhs1Se2x/EhVe8Ggegt7/r9UZRocHlIUZKY=";
+      }
+      + "/themes";
+    recursive = true;
+  };
 }
