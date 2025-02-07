@@ -1,10 +1,4 @@
-{
-  pkgs,
-  config,
-  inputs,
-  currentSystem,
-  ...
-}: {
+{pkgs, ...}: {
   home.packages = with pkgs; [
     (writeScriptBin "rofi-toggle" ''
       ${builtins.readFile ./rofi-toggle.sh}
@@ -15,6 +9,12 @@
     (writeScriptBin "rofi-toggle-power-menu" ''
       ${builtins.readFile ./rofi-toggle-power-menu.sh}
     '')
+
+    # fonts
+    icomoon-feather
+    nerd-fonts.iosevka
+    nerd-fonts.jetbrains-mono
+    dejavu_fonts
   ];
 
   programs.rofi = {
@@ -29,10 +29,10 @@
   home.file.".config/rofi" = {
     source =
       pkgs.fetchFromGitHub {
-        owner = "adi1090x";
+        owner = "zhongjis";
         repo = "rofi";
         rev = "master";
-        sha256 = "sha256-TVZ7oTdgZ6d9JaGGa6kVkK7FMjNeuhVTPNj2d7zRWzM=";
+        sha256 = "sha256-0yJdXP61HmQJz6QTxeJlHNVMtI1Wy+yVMLcGny7P9VU=";
       }
       + "/files";
     recursive = true;
