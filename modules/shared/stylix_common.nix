@@ -5,7 +5,7 @@
   };
 in {
   stylix = {
-    enable = true;
+    enable = false;
     base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
 
     image = astronaunt;
