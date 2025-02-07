@@ -10,5 +10,6 @@
     swaync.enable = false;
     hyprlock.enable = false;
     kde.enable = false;
+    rofi.enable = false;
   };
 }

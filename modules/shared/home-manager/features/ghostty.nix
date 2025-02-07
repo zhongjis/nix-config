@@ -9,8 +9,11 @@
 }: {
   home.packages =
     if isDarwin
-    then []
+    then [
+      pkgs.nerd-fonts.jetbrains-mono
+    ]
     else [
+      pkgs.nerd-fonts.jetbrains-mono
       inputs.ghostty.packages.${currentSystem}.default
     ];
 
