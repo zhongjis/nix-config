@@ -23,7 +23,7 @@ in {
     # Set programs that you use
     "$terminal" = "kitty";
     "$fileManager" = "kitty --title yazi sh -c 'yazi'";
-    "$menu" = "rofi-toggle";
+    "$menu" = "~/.config/rofi/scripts/launcher_t7";
 
     # See https://wiki.hyprland.org/Configuring/Keywords/
     "$wmMod" = "ALT";

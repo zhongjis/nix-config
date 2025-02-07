@@ -340,7 +340,7 @@ in {
           },
           "custom/power": {
               "format": "  ",
-              "on-click": "rofi-toggle-power-menu",
+              "on-click": "~/.config/rofi/scripts/powermenu_t5",
               "tooltip": false,
           },
           "custom/swaync": {

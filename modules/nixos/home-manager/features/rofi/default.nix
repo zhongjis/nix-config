@@ -32,7 +32,7 @@
         owner = "zhongjis";
         repo = "rofi";
         rev = "master";
-        sha256 = "sha256-0yJdXP61HmQJz6QTxeJlHNVMtI1Wy+yVMLcGny7P9VU=";
+        sha256 = "sha256-e2G3iw4w1KCBbCvzKIomQWfJFGm7fRzfTILz5at9bv4=";
       }
       + "/files";
     recursive = true;
