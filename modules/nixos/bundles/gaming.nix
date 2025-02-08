@@ -25,8 +25,8 @@
   };
   programs.steam = {
     enable = true;
-    gamescopeSession.enable = true;
-    platformOptimizations.enable = true;
+    gamescopeSession.enable = false;
+    platformOptimizations.enable = false;
   };
 
   environment.systemPackages = with pkgs; [
