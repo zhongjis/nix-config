@@ -187,6 +187,10 @@ in {
     recursive = true;
     source = ./lua;
   };
+  xdg.configFile."nvim/ftplugin" = {
+    recursive = true;
+    source = ./ftplugin;
+  };
 
   home.packages = with pkgs; [
     lazygit
