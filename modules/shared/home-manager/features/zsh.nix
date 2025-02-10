@@ -41,12 +41,18 @@
 
         ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#${config.lib.stylix.colors.base03},bg=cyan,bold,underline"
         source "$HOME/.local/share/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
-
-        function zvm_after_lazy_keybindings() {
-          # In normal mode, press Ctrl-R to invoke this widget
-          bindkey '^R' fzf-history-widget
-        }
       '';
+
+    localVariables = {
+      ZVM_INIT_MODE = "sourcing";
+    };
+    # Load before fzf to resolve conflicting shortcuts
+    initExtraBeforeCompInit = ''
+      source ${pkgs.zsh-vi-mode}/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+
+      # Re-add keybind for partially accepting suggestion from zsh-autosuggestions
+      bindkey '^[f' forward-word
+    '';
   };
 
   programs.bat.enable = true;
