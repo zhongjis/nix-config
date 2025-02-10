@@ -49,12 +49,11 @@
       '';
   };
 
-  home.packages = with pkgs; [
-    bat
-    # zoxide
-  ];
-
   programs.bat.enable = true;
+  programs.zoxide = {
+    enable = true;
+    enableZshIntegration = true;
+  };
 
   programs.carapace.enable = true;
   programs.carapace.enableZshIntegration = true;
