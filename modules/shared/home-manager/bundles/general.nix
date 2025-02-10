@@ -29,8 +29,8 @@
   myHomeManager.yazi.enable = lib.mkDefault true;
   myHomeManager.zsh.enable = lib.mkDefault true;
 
-  # myHomeManager.starship.enable = lib.mkDefault true;
-  myHomeManager.oh-my-posh.enable = lib.mkDefault true;
+  myHomeManager.starship.enable = lib.mkDefault true;
+  # myHomeManager.oh-my-posh.enable = lib.mkDefault true;
 
   programs.btop.enable = true;
 
