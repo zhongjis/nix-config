@@ -8,12 +8,6 @@
 
     overlay.enable = true;
 
-    # Automatically restart HyprPanel with systemd.
-    # Useful when updating your config so that you
-    # don't need to manually restart it.
-    # Default: false
-    systemd.enable = true;
-
     # Add '/nix/store/.../hyprpanel' to your
     # Hyprland config 'exec-once'.
     # Default: false
@@ -45,7 +39,7 @@
           middle = ["media"];
           right = ["systray" "network" "bluetooth" "brightness" "volume" "notifications" "clock" "power"];
         };
-        "0" = {
+        "2" = {
           left = ["netstat" "ram"];
           middle = [];
           right = ["clock"];
@@ -74,7 +68,7 @@
       menus.dashboard.stats.enable_gpu = false; # not working for amd rn
       menus.dashboard.shortcuts.left = {
         shortcut1.command = "zen";
-        shortcut3.command = "webcord";
+        shortcut3.command = "vesktop";
       };
 
       theme.bar.transparent = true;
