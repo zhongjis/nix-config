@@ -5,6 +5,10 @@
   ...
 }: let
 in {
+  home.sessionVariables = {
+    JDTLS_PATH = "${pkgs.jdt-language-server}/bin/jdtls";
+  };
+
   programs.neovim = {
     enable = true;
     package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
@@ -80,6 +84,8 @@ in {
       cmp-cmdline
       cmp-nvim-lsp
       cmp-nvim-lua
+
+      nvim-jdtls
 
       # **snippets**
       friendly-snippets
