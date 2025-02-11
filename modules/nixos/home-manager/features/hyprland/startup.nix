@@ -11,8 +11,8 @@
     '';
     applications = pkgs.writeShellScriptBin "applications" ''
       solaar --window=hide&
-      # waybar &
-      # dunst &
+      waybar &
+      dunst &
       # swaync &
       # hyprswitch init --show-title &
     '';
