@@ -7,8 +7,13 @@
   close-application-sh =
     pkgs.writeShellScript "hyprland-close-application"
     (builtins.readFile ./scripts/close-application.sh);
+  screenshot-sh =
+    pkgs.writeShellScript "hyprland-screenshot"
+    (builtins.readFile ./scripts/screenshot.sh);
 in {
-  home.packages = [];
+  home.packages = with pkgs; [
+    grimblast
+  ];
 
   ####################
   ### KEYBINDINGSS ###
@@ -41,6 +46,9 @@ in {
       # "$wmMod, J, togglesplit," # dwindle
       "$wmMod, RETURN, fullscreen, 1"
       "$wmMod SHIFT, RETURN, fullscreen"
+
+      # screenshot
+      "$ctrlMod, SHIFT, 4, exec, ${screenshot-sh}"
 
       # Move focus with wmMod + arrow keys
       "$wmMod, L, movefocus, r"

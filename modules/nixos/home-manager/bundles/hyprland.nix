@@ -8,9 +8,9 @@
 
   # myHomeManager.swaync.enable = true;
   myHomeManager.dunst.enable = true;
-  # myHomeManager.waybar.enable = true;
+  myHomeManager.waybar.enable = true;
 
-  myHomeManager.hyprpanel.enable = true;
+  myHomeManager.hyprpanel.enable = false;
 
   myHomeManager.gtk.enable = true;
 }
