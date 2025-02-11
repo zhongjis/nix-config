@@ -32,15 +32,15 @@ in {
 
     # See https://wiki.hyprland.org/Configuring/Keywords/
     "$wmMod" = "ALT";
-    "$ctrlMod" = "SUPER";
+    "$cmdMod" = "SUPER";
 
     bind = [
       # Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
       "$wmMod, T, exec, $terminal"
-      "$ctrlMod, Q, exec, ${close-application-sh}"
+      "$cmdMod, Q, exec, ${close-application-sh}"
       "$wmMod, E, exec, $fileManager"
       "$wmMod, V, togglefloating,"
-      "$ctrlMod, Space, exec, $menu"
+      "$cmdMod, Space, exec, $menu"
       "$wmMod, Space, exec, rofi-toggle-cliphist"
       # "$wmMod, P, pseudo," # dwindle
       # "$wmMod, J, togglesplit," # dwindle
@@ -48,7 +48,7 @@ in {
       "$wmMod SHIFT, RETURN, fullscreen"
 
       # screenshot
-      "$ctrlMod, SHIFT, 4, exec, ${screenshot-sh}"
+      "$cmdMod SHIFT, 4, exec, ${screenshot-sh}"
 
       # Move focus with wmMod + arrow keys
       "$wmMod, L, movefocus, r"
