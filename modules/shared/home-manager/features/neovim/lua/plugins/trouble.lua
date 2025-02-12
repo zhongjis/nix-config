@@ -14,24 +14,34 @@ return {
       desc = "Buffer Diagnostics (Trouble)",
     },
     {
-      "<leader>cs",
+      "<leader>tX",
       "<cmd>Trouble symbols toggle focus=false<cr>",
-      desc = "Symbols (Trouble)",
+      desc = "[T]oggle Trouble Symbols",
     },
     {
-      "<leader>cl",
+      "<leader>xL",
       "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
       desc = "LSP Definitions / references / ... (Trouble)",
     },
     {
-      "<leader>xL",
+      "<leader>xl",
       "<cmd>Trouble loclist toggle<cr>",
       desc = "Location List (Trouble)",
     },
     {
-      "<leader>xQ",
+      "<leader>xq",
       "<cmd>Trouble qflist toggle<cr>",
       desc = "Quickfix List (Trouble)",
+    },
+    {
+      "]x",
+      require("trouble").next({ skip_groups = true, jump = true }),
+      desc = "[T]rouble Next)",
+    },
+    {
+      "[x",
+      require("trouble").prev({ skip_groups = true, jump = true }),
+      desc = "[T]rouble Next)",
     },
   },
 }
