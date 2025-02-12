@@ -52,6 +52,11 @@ return {
   dependencies = {
     { "j-hui/fidget.nvim", opts = {} },
     "hrsh7th/cmp-nvim-lsp",
+    {
+      "Chaitanyabsprip/fastaction.nvim",
+      ---@type FastActionConfig
+      opts = {},
+    },
   },
   config = function()
     vim.api.nvim_create_autocmd("LspAttach", {
@@ -78,7 +83,7 @@ return {
         map("]d", "<cmd>Trouble diagnostics next<cr>", "Go to next [D]iagnostic message")
 
         map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
-        map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
+        map("<leader>ca", "<cmd> lua require(\"fastaction\").code_action()<cr>", "[C]ode [A]ction")
         map("K", vim.lsp.buf.hover, "Hover Documentation")
         -- stylua: ignore end
 

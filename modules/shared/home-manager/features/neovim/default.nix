@@ -87,6 +87,8 @@ in {
 
       nvim-jdtls
 
+      fastaction-nvim
+
       # **snippets**
       friendly-snippets
       luasnip
