@@ -35,12 +35,12 @@ return {
     },
     {
       "]x",
-      require("trouble").next({ skip_groups = true, jump = true }),
+      '<cmd> lua require("trouble").next({ skip_groups = true, jump = true }) <cr>',
       desc = "[T]rouble Next)",
     },
     {
       "[x",
-      require("trouble").prev({ skip_groups = true, jump = true }),
+      '<cmd> lua require("trouble").prev({ skip_groups = true, jump = true }) <cr>',
       desc = "[T]rouble Next)",
     },
   },

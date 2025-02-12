@@ -134,6 +134,9 @@ in {
       # plenary-nvim
       lazygit-nvim
 
+      # **git-blame.nvim**
+      git-blame-nvim
+
       # **undotree**
       undotree
 
