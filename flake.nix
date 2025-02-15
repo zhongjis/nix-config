@@ -39,7 +39,6 @@
     xremap-flake.url = "github:xremap/nix-flake";
     nixpkgs-terraform.url = "github:stackbuilders/nixpkgs-terraform";
     stylix.url = "github:danth/stylix";
-    zen-browser.url = "github:0xc000022070/zen-browser-flake";
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     ghostty.url = "github:ghostty-org/ghostty";
     nh-4-beta.url = "github:viperML/nh";

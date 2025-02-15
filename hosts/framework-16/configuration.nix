@@ -97,8 +97,7 @@
   hardware.logitech.wireless.enableGraphical = true; # for solaar to be included
 
   environment.systemPackages = with pkgs; [
-    inputs.zen-browser.packages."${currentSystem}".default
-    firefox # in case zen broke
+    vivaldi
     neovim
     unzip
   ];
