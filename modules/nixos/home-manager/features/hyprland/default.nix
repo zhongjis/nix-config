@@ -181,7 +181,7 @@ in {
         windowrulev2 = workspace name:gaming,class:^(steam_proton)$
         windowrulev2 = workspace name:gaming,class:^(gamescope)$
 
-        windowrulev2 = workspace name:zen,class:^(zen)$
+        windowrulev2 = workspace name:zen,class:^(vivaldi-stable)$
 
         # Pavucontrol floating
         windowrulev2 = float,class:(.*org.pulseaudio.pavucontrol.*)
