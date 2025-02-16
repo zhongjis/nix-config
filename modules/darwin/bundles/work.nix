@@ -41,27 +41,25 @@ in {
       awscli2
 
       gh
+
+      charles
+
+      code-cursor
     ]
     ++ stable_pkgs;
 
   homebrew = {
     brews = [
+      "bitwarden-cli"
     ];
 
     casks = [
-      # dev tools
       "dash"
-
       # "docker"
-
-      "charles"
       "devtoys"
-      "mongodb-compass"
       "intellij-idea"
-      "visual-studio-code"
-      "sublime-merge"
-      "zed"
-      "cursor"
+      "mongodb-compass"
+      "sublime-merge@dev"
     ];
   };
 }

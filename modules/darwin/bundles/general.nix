@@ -38,8 +38,15 @@
   # packages
   environment.systemPackages = with pkgs; [
     nh
+    jq
+
+    podman
+    podman-compose
+    docker-compose
 
     google-chrome
+    obsidian
+    spotify
 
     # fonts
     nerd-fonts.jetbrains-mono
@@ -85,32 +92,19 @@
       cleanup = "zap";
     };
 
-    brews = [
-      "bitwarden-cli"
-      "jq"
-
-      "podman"
-      "podman-compose"
-    ];
+    brews = [];
 
     casks = [
-      # productivity
       "flux"
       "box-drive"
-      "bitwarden"
-      "alfred"
       "caffeine"
       "aerospace"
-
-      "zen-browser"
-
+      "vivaldi"
       "appcleaner"
-
-      # duplicates: already included in full-system. but adding them for alfred app
-      # FIXME: migrate to use https://gist.github.com/elliottminns/211ef645ebd484eb9a5228570bb60ec3
+      "quicksilver"
+      "podman-desktop"
+      "bitwarden"
       "ghostty"
-      "obsidian"
-      "spotify"
     ];
 
     masApps = {
