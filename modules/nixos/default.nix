@@ -57,6 +57,5 @@ in {
       dates = "daily";
       options = "--delete-older-than 14d";
     };
-    nix.optimise.automatic = true;
   };
 }

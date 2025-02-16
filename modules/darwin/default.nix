@@ -45,6 +45,4 @@ in {
     };
     options = "--delete-older-than 14";
   };
-
-  nix.optimise.automatic = true;
 }
