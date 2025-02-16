@@ -42,7 +42,6 @@
 
     podman
     podman-compose
-    docker-compose
 
     google-chrome
     obsidian
