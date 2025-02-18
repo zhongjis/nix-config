@@ -49,11 +49,10 @@ in {
     ++ stable_pkgs;
 
   homebrew = {
-    brews = [
-      "bitwarden-cli"
-    ];
+    brews = [];
 
     casks = [
+      "docker"
       "dash"
       "devtoys"
       "intellij-idea"
