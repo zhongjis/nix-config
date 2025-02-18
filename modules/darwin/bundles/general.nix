@@ -40,9 +40,6 @@
     nh
     jq
 
-    podman
-    podman-compose
-
     google-chrome
     obsidian
     spotify
@@ -75,10 +72,10 @@
     autoMigrate = true;
 
     taps = {
-      "homebrew/core" = inputs.homebrew-core;
-      "homebrew/cask" = inputs.homebrew-cask;
-      "homebrew/bundle" = inputs.homebrew-bundle;
-      "nikitabobko/tap" = inputs.aerospace-tap;
+      "homebrew/homebrew-core" = inputs.homebrew-core;
+      "homebrew/homebrew-cask" = inputs.homebrew-cask;
+      "homebrew/homebrew-bundle" = inputs.homebrew-bundle;
+      "nikitabobko/homebrew-tap" = inputs.aerospace-tap;
     };
     mutableTaps = false;
   };
@@ -94,6 +91,7 @@
     brews = [];
 
     casks = [
+      "docker"
       "flux"
       "box-drive"
       "caffeine"
@@ -101,7 +99,6 @@
       "vivaldi"
       "appcleaner"
       "quicksilver"
-      "podman-desktop"
       "bitwarden"
       "ghostty"
     ];

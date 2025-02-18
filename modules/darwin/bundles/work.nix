@@ -55,7 +55,6 @@ in {
 
     casks = [
       "dash"
-      # "docker"
       "devtoys"
       "intellij-idea"
       "mongodb-compass"
