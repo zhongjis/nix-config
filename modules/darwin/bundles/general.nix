@@ -69,7 +69,6 @@
     enable = true;
     enableRosetta = true;
     user = "zshen";
-    autoMigrate = true;
 
     taps = {
       "homebrew/homebrew-core" = inputs.homebrew-core;
@@ -77,7 +76,9 @@
       "homebrew/homebrew-bundle" = inputs.homebrew-bundle;
       "nikitabobko/homebrew-tap" = inputs.aerospace-tap;
     };
+
     mutableTaps = false;
+    autoMigrate = true;
   };
 
   homebrew = {
@@ -88,10 +89,11 @@
       cleanup = "zap";
     };
 
+    taps = builtins.attrNames config.nix-homebrew.taps;
+
     brews = [];
 
     casks = [
-      "docker"
       "flux"
       "box-drive"
       "caffeine"
