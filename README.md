@@ -36,14 +36,19 @@ age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
 nix run nix-darwin --extra-experimental-features 'nix-command flakes' -- switch --flake .#mac-m1-max
 
 # switch
-darwin-rebuild switch --flake .#mac-m1-max
+nh darwin switch .
 darwin-rebuild --list-generations
 darwin-rebuild switch --switch-generation 41
 ```
 
 ### NixOS
 
-- switch NixOS (TBD)
+- switch NixOS
+
+```bash
+nh os switch .
+```
+
 - test NixOS (TBD)
 
 ## Useful cmds
@@ -51,11 +56,7 @@ darwin-rebuild switch --switch-generation 41
 ```bash
 # useful nix cmds
 nix run github:zhongjis/nix-update-input # upgrade specific input
-nix search nixpkgs <package-name> # search nixpkgs
-
-# rebuild system use nix-helper
-oswitch # os switch
-hswitch # home-manager switch
+nh search <query> # search nixpkgs
 ```
 
 ## Secret Management
