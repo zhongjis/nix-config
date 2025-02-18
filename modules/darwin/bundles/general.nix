@@ -76,6 +76,7 @@
       "homebrew/homebrew-bundle" = inputs.homebrew-bundle;
       "nikitabobko/homebrew-tap" = inputs.aerospace-tap;
     };
+
     mutableTaps = false;
     autoMigrate = true;
   };
@@ -87,6 +88,8 @@
       upgrade = true;
       cleanup = "zap";
     };
+
+    taps = builtins.attrNames config.nix-homebrew.taps;
 
     brews = [];
 
