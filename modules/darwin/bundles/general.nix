@@ -40,6 +40,8 @@
     nh
     jq
 
+    docker-compose
+
     google-chrome
     obsidian
     spotify
