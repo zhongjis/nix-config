@@ -22,8 +22,6 @@
   # https://github.com/NixOS/nixpkgs/issues/226365
   networking.firewall.interfaces."podman+".allowedUDPPorts = [53];
 
-  virtualisation.oci-containers.backend = "podman";
-
   # Useful other development tools
   environment.systemPackages = with pkgs; [
     passt
@@ -31,4 +29,6 @@
     podman-compose
     stable.podman-desktop
   ];
+
+  virtualisation.oci-containers.backend = "podman";
 }
