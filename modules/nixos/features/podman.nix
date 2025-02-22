@@ -12,14 +12,23 @@
         "--filter=label!=important"
       ];
     };
-    defaultNetwork.settings.dns_enabled = true;
+    defaultNetwork.settings = {
+      # Required for container networking to be able to use names.
+      dns_enabled = true;
+    };
   };
 
-  # Useful other development tools
-  environment.systemPackages = [
-    pkgs.passt
+  # Enable container name DNS for non-default Podman networks.
+  # https://github.com/NixOS/nixpkgs/issues/226365
+  networking.firewall.interfaces."podman+".allowedUDPPorts = [53];
 
-    pkgs.podman-compose
-    pkgs.stable.podman-desktop
+  virtualisation.oci-containers.backend = "podman";
+
+  # Useful other development tools
+  environment.systemPackages = with pkgs; [
+    passt
+
+    podman-compose
+    stable.podman-desktop
   ];
 }
