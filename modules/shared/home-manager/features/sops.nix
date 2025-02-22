@@ -44,6 +44,14 @@
       path = "${config.home.homeDirectory}/.ssh/liveaccess_adobe_zshen.pub";
     };
 
+    # liveaccess - adobe
+    "vultr_com/private_key" = {
+      path = "${config.home.homeDirectory}/.ssh/vultr_com";
+    };
+    "vultr_com/public_key" = {
+      path = "${config.home.homeDirectory}/.ssh/vultr_com.pub";
+    };
+
     "api_keys_for_ai" = {};
   };
 
