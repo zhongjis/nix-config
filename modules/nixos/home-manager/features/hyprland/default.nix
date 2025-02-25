@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }: let
   workspaceToMonitorSetup =
@@ -20,7 +21,10 @@ in {
   wayland.windowManager.hyprland = {
     enable = true;
     xwayland.enable = true;
-    portalPackage = pkgs.xdg-desktop-portal-hyprland;
+
+    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+    portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+
     # See https://wiki.hyprland.org/Configuring/Monitors/
     settings.monitor =
       lib.mapAttrsToList
