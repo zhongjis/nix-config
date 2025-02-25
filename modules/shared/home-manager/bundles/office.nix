@@ -6,6 +6,6 @@
     hunspellDicts.en_US-large
 
     # pdf reader
-    okular
+    kdePackages.okular
   ];
 }
