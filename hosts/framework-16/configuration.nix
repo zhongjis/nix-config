@@ -27,7 +27,7 @@
     multi-lang-input-layout.enable = true;
     podman.enable = true;
     ollama.enable = true;
-    open-webui.enable = true;
+    open-webui.enable = false;
     sops.enable = true;
   };
 
