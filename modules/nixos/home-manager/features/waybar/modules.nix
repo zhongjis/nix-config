@@ -66,7 +66,7 @@ in {
           },
           "backlight": {
               // "device": "acpi_video1",
-              "format": "<span color='#202020' bgcolor='#f6c657' > {} </span> {percent}%",
+              "format": "<span color='#202020' bgcolor='#f6c657' > 󰞏 </span> {percent}%",
               "tooltip": false,
               "on-scroll-up": "${brightness-sh} --inc",
               "on-scroll-down": "${brightness-sh} --dec",
@@ -88,8 +88,19 @@ in {
               "on-click-right": "pavucontrol -t 3",
               "on-scroll-up": "${volume-sh} --inc",
               "on-scroll-down": "${volume-sh} --dec",
-              "tooltip": false,
+              "tooltip-format": "{desc}",
               "max-volume": 130
+          },
+          "pulseaudio#microphone": {
+              "format": "{format_source}",
+              "format-source": "<span color='#202020' bgcolor='#83a598' >  </span> {volume}%",
+              "format-source-muted": "<span color='#202020' bgcolor='#ea6962' >  </span> {volume}%",
+              "on-click": "${volume-sh} --toggle-mic",
+              "on-click-right": "pavucontrol -t 4",
+              "on-scroll-up": "${volume-sh} --mic-inc",
+              "on-scroll-down": "${volume-sh} --mic-dec",
+              "tooltip-format": "{source_desc}",
+              "scroll-step": 5,
           },
           "battery#bat2": {
               "bat": "BAT2"
