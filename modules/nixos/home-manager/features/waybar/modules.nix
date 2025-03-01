@@ -50,7 +50,7 @@ in {
               "interval": 20
           },
           "cpu": {
-              "format": "<span color='#202020' bgcolor='#e78a4e' >  </span> {usage}%",
+              "format": "<span color='#202020' bgcolor='#e78a4e' >  </span> {usage}%",
               "tooltip": false,
               "interval": 1,
               "on-click-right": "kitty --title btop sh -c 'btop'"
@@ -60,13 +60,13 @@ in {
               "thermal-zone": 2,
               "hwmon-path": "/sys/class/hwmon/hwmon1/temp1_input",
               "critical-threshold": 70,
-              "format": "<span color='#202020' bgcolor='#d8a657' >  </span> {temperatureC}°C",
+              "format": "<span color='#202020' bgcolor='#d8a657' >  </span> {temperatureC}°C",
               "format-critical": "<span color='#202020' bgcolor='#cc241d' >  </span> {temperatureC}°C",
               "on-click-right": "${pkgs.kitty}/bin/kitty --title nvtop sh -c 'nvtop'"
           },
           "backlight": {
               // "device": "acpi_video1",
-              "format": "<span color='#202020' bgcolor='#f6c657' > 󰞏 </span> {percent}%",
+              "format": "<span color='#202020' bgcolor='#f6c657' > {} </span> {percent}%",
               "tooltip": false,
               "on-scroll-up": "${brightness-sh} --inc",
               "on-scroll-down": "${brightness-sh} --dec",
