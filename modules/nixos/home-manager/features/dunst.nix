@@ -139,7 +139,7 @@
 
         ### Text ###
 
-        font = "Fira Sans Semibold" 9
+        font = "FiraCode Nerd Font 10"
 
         # The spacing between lines.  If the height is smaller than the
         # font height, it will get raised to the font height.
