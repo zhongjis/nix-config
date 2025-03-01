@@ -20,29 +20,6 @@ in {
               "escape": true,
               "tooltip": false
           },
-          // Modules configuration
-          "sway/workspaces": {
-              "disable-scroll": true,
-              "active-only": false,
-              "all-outputs": true,
-              "warp-on-scroll": false,
-              "format": "{icon}",
-              "format-icons": {
-                  "1": "<span >󰧨</span>",
-                  "2": "<span >󰈹</span>",
-                  "3": "<span ></span>",
-                  "4": "<span ></span>",
-                  "5": "<span ></span>",
-                  "6": "<span >󰭛</span>",
-                  "7": "<span >󱓷</span>",
-                  "8": "<span >󰚀</span>"
-              }
-          },
-          "sway/window": {
-              "format": "<span color='#202020' bgcolor='#d3869b' > 󰣆 </span> {app_id}",
-              "separate-outputs": true,
-              "tooltip": false,
-          },
           "hyprland/workspaces": {
               "disable-scroll": true,
               "active-only": false,
@@ -50,14 +27,15 @@ in {
               "warp-on-scroll": false,
               "format": "{icon}",
               "format-icons": {
-                  "1": "<span >󰧨</span>",
-                  "2": "<span >󰈹</span>",
-                  "3": "<span ></span>",
-                  "4": "<span ></span>",
+                  "1": "<span ></span>",
+                  "3": "<span >󰧨</span>",
                   "5": "<span ></span>",
                   "6": "<span >󰭛</span>",
                   "7": "<span >󱓷</span>",
-                  "8": "<span >󰚀</span>"
+                  "8": "<span >󰚀</span>",
+                  "zen": "<span ></span>",
+                  "gaming": "<span ></span>",
+                  "obsidian": "<span >󰠮</span>",
               }
           },
           "hyprland/window": {

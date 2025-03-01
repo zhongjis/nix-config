@@ -16,8 +16,6 @@
 
         "modules-left": [
           "custom/rofi",
-          "sway/workspaces",
-          "sway/window",
           "hyprland/workspaces",
           "hyprland/window",
           "tray",
