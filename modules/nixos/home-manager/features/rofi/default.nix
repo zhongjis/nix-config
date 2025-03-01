@@ -24,29 +24,18 @@
       rofi-power-menu
       rofi-calc
     ];
+    theme = "~/.config/rofi/themes/bibjaw_mini.rasi";
   };
 
-  home.file.".config/rofi" = {
+  home.file.".config/rofi/themes" = {
     source =
       pkgs.fetchFromGitHub {
-        owner = "zhongjis";
-        repo = "rofi";
+        owner = "bibjaw99";
+        repo = "workstation";
         rev = "master";
-        sha256 = "sha256-e2G3iw4w1KCBbCvzKIomQWfJFGm7fRzfTILz5at9bv4=";
+        sha256 = "sha256-T43T13vQBHNgEonGN+nodN8Bi1+dEaiGLgYnGJZDnyM=";
       }
-      + "/files";
-    recursive = true;
-  };
-
-  home.file.".local/share/rofi/themes" = {
-    source =
-      pkgs.fetchFromGitHub {
-        owner = "newmanls";
-        repo = "rofi-themes-collection";
-        rev = "master";
-        sha256 = "sha256-pHPhqbRFNhs1Se2x/EhVe8Ggegt7/r9UZRocHlIUZKY=";
-      }
-      + "/themes";
+      + "/.config/rofi/themes";
     recursive = true;
   };
 }
