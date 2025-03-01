@@ -5,25 +5,37 @@
     */
     ''
       {
-          "include": "~/.config/waybar/modules",
-          "spacing": 4,
-          "modules-left": [
-              "custom/menu",
-              "custom/separator#blank",
-              "battery",
-              "group/motherboard",
-          ],
-          "modules-center": [
-          ],
-          "modules-right": [
-              "tray",
-              "network",
-              "group/audio",
-              "backlight",
-              "idle_inhibitor",
-              "clock",
-              "custom/power",
-          ],
+        "include": "~/.config/waybar/modules",
+        "layer": "top",
+        "mode":"dock",
+        "height": 20,
+        "spacing": 5,
+        "margin-top" :5,
+        "margin-left" :5,
+        "margin-right" :5,
+
+        "modules-left": [
+          "custom/rofi",
+          "sway/workspaces",
+          "sway/window",
+          "hyprland/workspaces",
+          "hyprland/window",
+          "tray",
+        ],
+
+        "modules-center": [
+          "clock"
+        ],
+
+        "modules-right": [
+          "disk",
+          "cpu",
+          "temperature",
+          "backlight",
+          "custom/memory",
+          "pulseaudio",
+          "battery",
+        ],
       }
     '';
 }
