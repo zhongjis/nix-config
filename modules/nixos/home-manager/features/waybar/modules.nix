@@ -16,7 +16,7 @@ in {
           "custom/rofi": {
               "format": "<span ></span>",
               "on-click": "rofi -show drun -disable-history -show-icons",
-              "on-click-right": "~/.config/custom_scripts/power.sh",
+              "on-click-right": "rofi-toggle-power-menu",
               "escape": true,
               "tooltip": false
           },

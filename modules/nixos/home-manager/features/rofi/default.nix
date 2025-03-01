@@ -21,7 +21,6 @@
     enable = true;
     package = pkgs.rofi-wayland;
     plugins = with pkgs; [
-      rofi-power-menu
       rofi-calc
     ];
     theme = "~/.config/rofi/themes/bibjaw_mini.rasi";
@@ -36,6 +35,18 @@
         sha256 = "sha256-T43T13vQBHNgEonGN+nodN8Bi1+dEaiGLgYnGJZDnyM=";
       }
       + "/.config/rofi/themes";
+    recursive = true;
+  };
+
+  home.file.".config/rofi/powermenu.rasi" = {
+    source =
+      pkgs.fetchFromGitHub {
+        owner = "bibjaw99";
+        repo = "workstation";
+        rev = "master";
+        sha256 = "sha256-T43T13vQBHNgEonGN+nodN8Bi1+dEaiGLgYnGJZDnyM=";
+      }
+      + "/.config/rofi/powermenu.rasi";
     recursive = true;
   };
 }
