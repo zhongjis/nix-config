@@ -76,7 +76,8 @@ in {
           "cpu": {
               "format": "<span color='#202020' bgcolor='#e78a4e' >  </span> {usage}%",
               "tooltip": false,
-              "interval": 1
+              "interval": 1,
+              "on-click-right": "kitty --title btop sh -c 'btop'"
           },
           "temperature": {
               "tooltip": false,
@@ -85,11 +86,14 @@ in {
               "critical-threshold": 70,
               "format": "<span color='#202020' bgcolor='#d8a657' >  </span> {temperatureC}°C",
               "format-critical": "<span color='#202020' bgcolor='#cc241d' >  </span> {temperatureC}°C",
+              "on-click-right": "${pkgs.kitty}/bin/kitty --title nvtop sh -c 'nvtop'"
           },
           "backlight": {
               // "device": "acpi_video1",
               "format": "<span color='#202020' bgcolor='#f6c657' > 󰞏 </span> {percent}%",
-              "tooltip": false
+              "tooltip": false,
+              "on-scroll-up": "${brightness-sh} --inc",
+              "on-scroll-down": "${brightness-sh} --dec",
           },
           "custom/memory": {
               "exec": "${memory-usage-sh}",
@@ -104,7 +108,10 @@ in {
               "format-bluetooth": "<span color='#202020' bgcolor='#83a598' > 󰂰 </span> {volume}%",
               "format-bluetooth-muted": "<span color='#202020' bgcolor='#ea6962' > 󰂲 </span> {volume}%",
               "format-source": "{volume}% ",
-              "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
+              "on-click": "${volume-sh} --toggle",
+              "on-click-right": "pavucontrol -t 3",
+              "on-scroll-up": "${volume-sh} --inc",
+              "on-scroll-down": "${volume-sh} --dec",
               "tooltip": false,
               "max-volume": 130
           },
