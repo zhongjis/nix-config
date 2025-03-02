@@ -66,16 +66,36 @@ in {
           },
           "backlight": {
               // "device": "acpi_video1",
-              "format": "<span color='#202020' bgcolor='#f6c657' > 󰞏 </span> {percent}%",
+              "format": "<span color='#202020' bgcolor='#458588' > 󰞏 </span> {percent}%",
               "tooltip": false,
               "on-scroll-up": "${brightness-sh} --inc",
               "on-scroll-down": "${brightness-sh} --dec",
+          },
+          "network": {
+              "format": "{ifname}",
+              "format-wifi": "<span color='#202020' bgcolor='#7c80b2' > {icon} </span> WIFI",
+              "format-ethernet": "<span color='#202020' bgcolor='#7c80b2' > 󰌘 </span> ETH",
+              "format-disconnected": "<span color='#202020' bgcolor='#7c80b2' > 󰌙 </span> DISCONNECTED",
+              "format-linked": "<span color='#202020' bgcolor='#7c80b2' > 󰈁 </span> {ifname} (No IP)",
+              "tooltip-format": "{ipaddr}  {bandwidthUpBytes}  {bandwidthDownBytes}",
+              "tooltip-format-wifi": "{essid} {icon} {signalStrength}%",
+              "tooltip-format-ethernet": "{ifname}",
+              "tooltip-format-disconnected": "Disconnected",
+              "max-length": 50,
+              "format-icons": [
+                  "󰤯",
+                  "󰤟",
+                  "󰤢",
+                  "󰤥",
+                  "󰤨"
+              ],
+              "on-click": "kitty --title nmtui sh -c 'nmtui'"
           },
           "custom/memory": {
               "exec": "${memory-usage-sh}",
               "interval": 2,
               "return-type": "json",
-              "format": "<span color='#202020' bgcolor='#458588' >  </span> {}"
+              "format": "<span color='#202020' bgcolor='#f6c657' >  </span> {}"
           },
           "pulseaudio": {
               // "scroll-step": 1, // %, can be a float

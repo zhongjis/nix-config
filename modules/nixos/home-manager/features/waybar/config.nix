@@ -30,6 +30,7 @@
           "cpu",
           "temperature",
           "custom/memory",
+          "network",
           "backlight",
           "pulseaudio",
           "battery",

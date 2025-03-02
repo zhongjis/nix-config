@@ -16,7 +16,6 @@
   css
   */
     ''
-      /* ================================ */
       /*            Common CSS            */
       /* ================================ */
       * {
@@ -62,6 +61,7 @@
       #battery,
       #battery.critical,
       #battery.warning,
+      #network,
       #clock {
         font-family: JetBrainsMono Nerd Font Propo;
         font-size: 16px;
@@ -85,6 +85,7 @@
       #battery,
       #battery.critical,
       #battery.warning,
+      #network,
       #clock {
         padding-right: 4px;
       }
@@ -178,14 +179,21 @@
       /*            backlight             */
       /* ================================ */
       #backlight {
-        color: #f6c657;
+        color: #458588;
+      }
+
+      /* ================================== */
+      /*            network                 */
+      /* ================================== */
+      #network {
+        color: #7c80b2;
       }
 
       /* ================================ */
       /*            memory                */
       /* ================================ */
       #custom-memory {
-        color: #458588;
+        color: #f6c657;
       }
 
       /* ================================ */
