@@ -20,6 +20,7 @@ in {
   wayland.windowManager.hyprland = {
     enable = true;
     xwayland.enable = true;
+    systemd.enable = false;
     portalPackage = pkgs.xdg-desktop-portal-hyprland;
     # See https://wiki.hyprland.org/Configuring/Monitors/
     settings.monitor =
