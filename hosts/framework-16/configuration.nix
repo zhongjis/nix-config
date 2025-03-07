@@ -29,6 +29,7 @@
     ollama.enable = true;
     open-webui.enable = false;
     sops.enable = true;
+    vm.enable = true;
   };
 
   # for radeon 7700s
