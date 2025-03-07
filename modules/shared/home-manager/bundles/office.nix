@@ -4,8 +4,5 @@
     libreoffice
     hunspell
     hunspellDicts.en_US-large
-
-    # pdf reader
-    kdePackages.okular
   ];
 }
