@@ -9,13 +9,13 @@
   modifications = final: prev: rec {
     # jdk = prev."jdk${toString 17}";
     # maven = prev.maven.override {inherit jdk;};
-    xwayland = prev.xwayland.overrideAttrs (oldAttrs: {
-      version = "24.1.4";
-      src = prev.fetchurl {
-        url = "mirror://xorg/individual/xserver/xwayland-24.1.4.tar.xz";
-        hash = "sha256-2Wp426uBn1V1AXNERESZW1Ax69zBW3ev672NvAKvNPQ=";
-      };
-    });
+    # xwayland = prev.xwayland.overrideAttrs (oldAttrs: {
+    #   version = "24.1.4";
+    #   src = prev.fetchurl {
+    #     url = "mirror://xorg/individual/xserver/xwayland-24.1.4.tar.xz";
+    #     hash = "sha256-2Wp426uBn1V1AXNERESZW1Ax69zBW3ev672NvAKvNPQ=";
+    #   };
+    # });
   };
 
   # When applied, the unstable nixpkgs set (declared in the flake inputs) will
