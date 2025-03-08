@@ -3,6 +3,7 @@
   myNixOS.power-management.enable = true;
   myNixOS.stylix.enable = true;
   myNixOS.plymouth.enable = true;
+  myNixOS.flatpak.enable = true;
 
   # fwupd - firmware update
   services.fwupd.enable = true;
@@ -11,9 +12,6 @@
   services = {
     printing.enable = true;
   };
-
-  # Enable flatpak
-  services.flatpak.enable = true;
 
   # Enable USB auto mounting
   services = {
@@ -104,20 +102,51 @@
   # battery
   services.upower.enable = true;
 
-  security.polkit.enable = true;
+  security.polkit = {
+    enable = true;
+    extraConfig = ''
+      polkit.addRule(function(action, subject) {
+        if (
+          subject.isInGroup("users")
+            && (
+              action.id == "org.freedesktop.login1.reboot" ||
+              action.id == "org.freedesktop.login1.reboot-multiple-sessions" ||
+              action.id == "org.freedesktop.login1.power-off" ||
+              action.id == "org.freedesktop.login1.power-off-multiple-sessions"
+            )
+          )
+        {
+          return polkit.Result.YES;
+        }
+      })
+    '';
+  };
 
   hardware.enableAllFirmware = true;
 
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
+    settings = {
+      General = {
+        Enable = "Source,Sink,Media,Socket";
+        Experimental = true;
+      };
+    };
   };
   services.blueman.enable = true;
 
   programs.dconf.enable = true;
 
-  xdg.portal.enable = true;
-  xdg.portal.extraPortals = [
-    pkgs.xdg-desktop-portal-gtk
-  ];
+  xdg.portal = {
+    enable = true;
+    wlr.enable = false;
+    extraPortals = [
+      pkgs.xdg-desktop-portal-gtk
+    ];
+    configPackages = [
+      pkgs.xdg-desktop-portal-gtk
+      pkgs.xdg-desktop-portal
+    ];
+  };
 }
