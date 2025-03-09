@@ -97,7 +97,7 @@
         vultr-lab = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
-            disko.nixosModules.disko
+            inputs.disko.nixosModules.disko
             ./hosts/vultr-lab/configuration.nix
             ./hosts/vultr-lab/hardware-configuration.nix
           ];
