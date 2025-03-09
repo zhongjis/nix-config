@@ -24,6 +24,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    ## nix-flatpak
+    nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
+
     ## nix-homebrew
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
     homebrew-bundle = {

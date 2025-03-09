@@ -1,11 +1,31 @@
-{pkgs, ...}: {
-  # Enable flatpak
-  services.flatpak.enable = true;
+{inputs, ...}: {
+  imports = [
+    inputs.nix-flatpak.nixosModules.nix-flatpak
+  ];
 
-  systemd.services.flatpak-repo = {
-    path = [pkgs.flatpak];
-    script = ''
-      flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-    '';
+  # Enable flatpak
+  services.flatpak = {
+    enable = true;
+    uninstallUnmanaged = true;
+    update.auto = {
+      enable = true;
+      onCalendar = "weekly"; # Default value
+    };
+    packages = [
+      "com.spotify.Client"
+    ];
+
+    overrides.global = {
+      # Force Wayland by default
+      Context.sockets = ["wayland" "!x11" "!fallback-x11"];
+
+      Environment = {
+        # Fix un-themed cursor in some Wayland apps
+        XCURSOR_PATH = "/run/host/user-share/icons:/run/host/share/icons";
+
+        # Force correct theme for some GTK apps
+        GTK_THEME = "Adwaita:dark";
+      };
+    };
   };
 }
