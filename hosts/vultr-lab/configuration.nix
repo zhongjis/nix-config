@@ -2,6 +2,7 @@
   modulesPath,
   lib,
   pkgs,
+  inputs,
   ...
 }: {
   imports = [
@@ -9,6 +10,8 @@
     (modulesPath + "/profiles/qemu-guest.nix")
     ../../modules/shared
     ../../modules/nixos
+
+    inputs.disko.nixosModules.disko
     ./disk-config.nix
   ];
 
