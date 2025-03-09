@@ -17,6 +17,7 @@
 
   myNixOS.sops.enable = true;
   myNixOS.nh.enable = true;
+  myNixOS.docker.enable = true;
 
   boot.loader.grub = {
     # no need to set devices, disko will add all devices that have a EF02 partition to the list already
@@ -30,12 +31,22 @@
     pkgs.curl
     pkgs.git
     pkgs.neovim
+    pkgs.unzip
   ];
 
   users.users.root.openssh.authorizedKeys.keys = [
     # change this to your ssh key
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHzczNq8Vc/nrjB1pzIhE2+N/O9kEu+naEhD4BAEjokg zhongjie.x.shen@gmail.com"
   ];
+
+  users.users.zshen = {
+    isNormalUser = true;
+    description = "Jason";
+    extraGroups = ["networkmanager" "wheel" "docker"];
+    packages = with pkgs; [];
+    shell = pkgs.zsh;
+  };
+  programs.zsh.enable = true;
 
   system.stateVersion = "24.05";
 }
