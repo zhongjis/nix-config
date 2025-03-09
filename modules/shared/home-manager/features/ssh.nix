@@ -35,7 +35,7 @@ in {
         baseOptions // darwinKeychainOption;
     };
     "nix_vultr_lab" = {
-      host = "149.28.215.118";
+      host = "45.63.93.82";
       identityFile = "${config.home.homeDirectory}/.ssh/vultr_com";
       extraOptions = let
         baseOptions = {
