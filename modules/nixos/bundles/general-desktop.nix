@@ -73,7 +73,6 @@
     neovim
 
     obsidian
-    spotify
     bitwarden
   ];
 
