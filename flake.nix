@@ -96,7 +96,6 @@
         };
         vultr-lab = mkSystem "vultr-lab" {
           system = "x86_64-linux";
-          hardware = "framework-16-7040-amd";
           user = "zshen";
         };
       };
