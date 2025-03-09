@@ -94,6 +94,14 @@
           hardware = "framework-16-7040-amd";
           user = "zshen";
         };
+        vultr-lab = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            disko.nixosModules.disko
+            ./hosts/vultr-lab/configuration.nix
+            ./hosts/vultr-lab/hardware-configuration.nix
+          ];
+        };
       };
 
       darwinConfigurations = {
