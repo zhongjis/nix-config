@@ -34,6 +34,17 @@ in {
       in
         baseOptions // darwinKeychainOption;
     };
+    "nix_vultr_lab" = {
+      host = "149.28.215.118";
+      identityFile = "${config.home.homeDirectory}/.ssh/vultr_com";
+      extraOptions = let
+        baseOptions = {
+          PreferredAuthentications = "publickey";
+          AddKeysToAgent = "yes";
+        };
+      in
+        baseOptions // darwinKeychainOption;
+    };
     "dify_vultr" = {
       host = "45.77.189.121";
       identityFile = "${config.home.homeDirectory}/.ssh/vultr_com";
