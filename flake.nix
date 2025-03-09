@@ -119,7 +119,7 @@
         "zshen@framework-16" = mkHome "framework-16" {
           system = "x86_64-linux";
         };
-        "zshen@nixos" = mkHome "vultr-lab" {
+        "zshen@vultr-lab" = mkHome "vultr-lab" {
           system = "x86_64-linux";
         };
       };
