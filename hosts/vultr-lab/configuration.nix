@@ -41,13 +41,6 @@
 
   networking.hostName = "vultr-lab"; # Define your hostname.
 
-  # xremap
-  hardware.uinput.enable = true;
-  users.groups = {
-    uinput.members = ["zshen"];
-    input.members = ["zshen"];
-  };
-
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.zshen = {
     isNormalUser = true;
