@@ -39,6 +39,8 @@
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHzczNq8Vc/nrjB1pzIhE2+N/O9kEu+naEhD4BAEjokg zhongjie.x.shen@gmail.com"
   ];
 
+  networking.hostName = "vultr-lab"; # Define your hostname.
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.zshen = {
     isNormalUser = true;
