@@ -21,6 +21,19 @@
         );
         serverName = "zshen.art";
       };
+
+      locations = {
+        "/freshrss" = {
+          root = "/zfs2/servers/freshrss";
+        };
+      };
+    };
+
+    services.freshrss = {
+      enable = true;
+      baseUrl = "https://klaymore.me/freshrss";
+      dataDir = "/zfs2/servers/freshrss";
+      passwordFile = "/zfs2/servers/freshrssPassword";
     };
   };
 }
