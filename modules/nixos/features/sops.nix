@@ -1,12 +1,29 @@
-{inputs, ...}: {
+{
+  inputs,
+  config,
+  pkgs,
+  ...
+}: {
   imports = [
-    inputs.sops-nix.nixosModules.sops
+    inputs.sops-nix.homeManagerModules.sops
   ];
 
-  sops.defaultSopsFile = ../../../secrets.yaml;
-  sops.defaultSopsFormat = "yaml";
+  home.packages = with pkgs; [
+    sops
+  ];
 
-  sops.age.keyFile = "/home/zshen/.config/sops/age/keys.txt";
+  sops = {
+    age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
 
-  sops.secrets.api_keys_for_ai = {};
+    defaultSopsFile = ../../../../secrets.yaml;
+    validateSopsFiles = true;
+  };
+
+  sops.secrets = {
+    # github - personal
+    "freshrss/default-user-password" = {};
+    "freshrss/db-password" = {};
+  };
+
+  systemd.user.services.mbsync.Unit.After = ["sops-nix.service"];
 }
