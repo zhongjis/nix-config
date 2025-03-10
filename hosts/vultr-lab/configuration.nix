@@ -13,6 +13,8 @@
 
     inputs.disko.nixosModules.disko
     ./disk-config.nix
+
+    ./extras.nix
   ];
 
   myNixOS.sops.enable = true;
