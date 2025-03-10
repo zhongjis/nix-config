@@ -8,7 +8,7 @@
     inputs.sops-nix.nixosModules.sops
   ];
 
-  home.packages = with pkgs; [
+  environment.packages = with pkgs; [
     sops
   ];
 
