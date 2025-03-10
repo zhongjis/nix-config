@@ -31,7 +31,7 @@
 
     services.freshrss = {
       enable = true;
-      baseUrl = "https://klaymore.me/freshrss";
+      baseUrl = "https://zshen.art/freshrss";
       dataDir = "/zfs2/servers/freshrss";
       passwordFile = "/zfs2/servers/freshrssPassword";
     };
