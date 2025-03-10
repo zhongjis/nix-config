@@ -21,11 +21,11 @@
         }
       );
 
-      # locations = {
-      #   "/freshrss" = {
-      #     root = "/var/lib/freshrss";
-      #   };
-      # };
+      locations = {
+        "/freshrss" = {
+          root = "/var/lib/freshrss";
+        };
+      };
     };
   };
 
@@ -34,10 +34,10 @@
 
     defaultUser = "zshen";
     passwordFile = config.sops.secrets."freshrss/default-user-password".path;
-    # dataDir = "/var/lib/freshrss";
+    dataDir = "/var/lib/freshrss";
 
     baseUrl = "https://zshen.art/freshrss";
-    virtualHost = "zshen.art";
+    virtualHost = null;
 
     database = {
       type = "pgsql";
