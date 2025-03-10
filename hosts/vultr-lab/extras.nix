@@ -23,7 +23,7 @@
 
       locations = {
         "/freshrss" = {
-          root = "/zfs2/servers/freshrss";
+          root = "/var/lib/freshrss";
         };
       };
     };
@@ -32,7 +32,7 @@
   services.freshrss = {
     enable = true;
     baseUrl = "https://zshen.art/freshrss";
-    dataDir = "/zfs2/servers/freshrss";
-    passwordFile = "/zfs2/servers/freshrssPassword";
+    dataDir = "/var/lib/freshrss";
+    passwordFile = "/run/secrets/freshrss";
   };
 }
