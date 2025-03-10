@@ -32,6 +32,12 @@
   };
   services.openssh.enable = true;
 
+  networking.firewall.allowedTCPPorts = [
+    22 # ssh
+    80 # http
+    443 # https
+  ];
+
   environment.systemPackages = map lib.lowPrio [
     pkgs.curl
     pkgs.git
