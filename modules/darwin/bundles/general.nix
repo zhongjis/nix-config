@@ -42,10 +42,6 @@
 
     docker-compose
 
-    google-chrome
-    obsidian
-    spotify
-
     # fonts
     nerd-fonts.jetbrains-mono
     nerd-fonts.iosevka
@@ -64,7 +60,6 @@
     dina-font
     proggyfonts
     inter
-    font-awesome
   ];
 
   nix-homebrew = {
@@ -105,6 +100,10 @@
       "quicksilver"
       "bitwarden"
       "ghostty"
+
+      "obsidian"
+      "spotify"
+      "google-chrome"
     ];
 
     masApps = {
