@@ -21,29 +21,22 @@
         }
       );
 
-      locations = {
-        "/freshrss" = {
-          root = "/var/lib/freshrss";
-        };
-      };
+      # locations = {
+      #   "/freshrss" = {
+      #     root = "/var/lib/freshrss";
+      #   };
+      # };
     };
   };
 
   services.freshrss = {
     enable = true;
-
-    defaultUser = "zshen";
     passwordFile = config.sops.secrets."freshrss/default-user-password".path;
-    dataDir = "/var/lib/freshrss";
-
-    baseUrl = "https://zshen.art/freshrss";
-    virtualHost = null;
+    # virtualHost = "freshrss.zshen.art";
+    baseUrl = "https://zshen.art";
 
     database = {
       type = "pgsql";
-      host = "10.99.99.3";
-      port = 5432;
-      user = "freshrss";
       passFile = config.sops.secrets."freshrss/db-password".path;
     };
 
