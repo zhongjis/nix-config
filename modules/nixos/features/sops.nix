@@ -26,6 +26,4 @@
     "freshrss/default-user-password" = {};
     "freshrss/db-password" = {};
   };
-
-  systemd.user.services.mbsync.Unit.After = ["sops-nix.service"];
 }
