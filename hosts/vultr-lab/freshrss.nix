@@ -26,9 +26,10 @@ in {
     passwordFile = config.sops.secrets.freshrss_user_password.path;
     virtualHost = "rss.zshen.me";
     baseUrl = "https://rss.zshen.me";
+    user = "freshrss";
 
     database = {
-      type = "pgsql";
+      type = "sqlite";
       passFile = config.sops.secrets.freshrss_db_password.path;
     };
 
