@@ -16,10 +16,4 @@
 
     validateSopsFiles = true;
   };
-
-  sops.secrets = {
-    # github - personal
-    "freshrss/default-user-password" = {};
-    "freshrss/db-password" = {};
-  };
 }
