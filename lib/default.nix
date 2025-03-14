@@ -36,7 +36,7 @@ in rec {
       else {};
     sopsModule =
       if isDarwin
-      then inputs.sops-nix.darinModules.sops
+      then inputs.sops-nix.darwinModules.sops
       else inputs.sops-nix.nixosModules.sops;
   in
     systemFunc {
