@@ -76,6 +76,7 @@
 
     obsidian
     bitwarden
+    fluent-reader
   ];
 
   fonts.packages = with pkgs; [
