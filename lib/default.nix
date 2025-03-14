@@ -34,6 +34,10 @@ in rec {
       if hardware != ""
       then inputs.nixos-hardware.nixosModules.${hardware}
       else {};
+    sopsModule =
+      if isDarwin
+      then inputs.sops-nix.nixosModules.sops
+      else {};
   in
     systemFunc {
       system = system;
@@ -44,6 +48,7 @@ in rec {
       modules = [
         hostConfiguration
         hardwareConfiguration
+        sopsModule
 
         {
           nixpkgs.overlays = [

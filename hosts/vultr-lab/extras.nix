@@ -1,4 +1,16 @@
-{config, ...}: {
+{config, ...}: let
+  sopsFile = ../../secrets/freshrss.yaml;
+in {
+  sops.secrets = {
+    # github - personal
+    freshrss_user_password = {
+      inherit sopsFile;
+    };
+    freshrss_db_password = {
+      inherit sopsFile;
+    };
+  };
+
   security.acme = {
     acceptTerms = true;
     defaults = {
@@ -33,13 +45,13 @@
 
   services.freshrss = {
     enable = true;
-    passwordFile = config.sops.secrets."freshrss/default-user-password".path;
+    passwordFile = config.sops.secrets.freshrss_user_password.path;
     virtualHost = "rss.zshen.me";
     baseUrl = "https://rss.zshen.me";
 
     database = {
       type = "pgsql";
-      passFile = config.sops.secrets."freshrss/db-password".path;
+      passFile = config.sops.secrets.freshrss_db_password.path;
     };
 
     extensions = [];
