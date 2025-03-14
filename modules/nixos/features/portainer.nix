@@ -1,10 +1,18 @@
-{config, ...}: let
+{
+  config,
+  inputs,
+  ...
+}: let
   cfg = config.services.portainer;
 in {
+  imports = [
+    inputs.portainer-on-nixos.nixosModules.portainer
+  ];
+
   services.portainer = {
-    enable = true; 
-    version = "latest"; 
-    openFirewall = "false"; 
+    enable = true;
+    version = "latest";
+    openFirewall = "false";
     port = 9443;
   };
 
