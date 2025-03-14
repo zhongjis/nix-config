@@ -33,7 +33,7 @@ in {
     enable = true;
     passwordFile = config.sops.secrets.freshrss_user_password.path;
     virtualHost = "rss.zshen.me";
-    baseUrl = "https://rss.zshen.me";
+    baseUrl = "https://${cfg.virtualHost}";
     inherit user;
 
     database = {
