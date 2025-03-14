@@ -7,6 +7,8 @@
   myNixOS.nh.enable = true;
   myNixOS.docker.enable = true;
   myNixOS.nginx.enable = true;
+  myNixOS.homepage-dashboard.enable = true;
+  myNixOS.portainer.enable = true;
 
   # xremap - bug. when xremap.nix is not enabled. for some reason this have to be set to false
   services.xremap.enable = false;
