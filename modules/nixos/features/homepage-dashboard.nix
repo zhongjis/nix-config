@@ -6,8 +6,19 @@ in {
   };
 
   services.nginx = {
+    # placeholder for now
+    virtualHosts."zshen.me" = {
+      default = true;
+      enableACME = true;
+      forceSSL = true;
+
+      locations."/" = {
+        proxyPass = "http://localhost:8082";
+        recommendedProxySettings = true;
+      };
+    };
+
     virtualHosts."dashboard.zshen.me" = {
-      serverName = "dashboard.zshen.me";
       enableACME = true;
       forceSSL = true;
 
