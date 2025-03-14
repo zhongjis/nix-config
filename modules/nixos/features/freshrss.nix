@@ -3,7 +3,7 @@
   lib,
   ...
 }: let
-  sopsFile = ../../secrets/freshrss.yaml;
+  sopsFile = ../../../secrets/freshrss.yaml;
   cfg = config.services.freshrss;
   user = "freshrss";
 in {
