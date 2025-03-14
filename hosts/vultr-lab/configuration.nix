@@ -14,7 +14,7 @@
     inputs.disko.nixosModules.disko
     ./disk-config.nix
 
-    ./extras.nix
+    ./freshrss.nix
   ];
 
   myNixOS.bundles.general-server.enable = true;
