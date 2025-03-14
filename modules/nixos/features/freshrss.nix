@@ -7,6 +7,8 @@
   cfg = config.services.freshrss;
   user = "freshrss";
 in {
+  # reference from: https://github.com/viperML/neoinfra/blob/master/modules/rss.nix
+
   sops.secrets = {
     # github - personal
     freshrss_password = {
