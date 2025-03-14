@@ -1,13 +1,16 @@
-{config, ...}: {
+{pkgs, ...}: {
   security.acme = {
     acceptTerms = true;
     defaults = {
       email = "zhongjie.x.shen@gmail.com";
     };
   };
+
   services.nginx = {
     enable = true;
     recommendedTlsSettings = true;
+
+    # placeholder for now
     virtualHosts."zshen.art" = {
       serverName = "zshen.art";
 
@@ -21,27 +24,5 @@
         }
       );
     };
-
-    virtualHosts."rss.zshen.me" = {
-      serverName = "rss.zshen.me";
-
-      default = false;
-      enableACME = true;
-      forceSSL = true;
-    };
-  };
-
-  services.freshrss = {
-    enable = true;
-    passwordFile = config.sops.secrets."freshrss/default-user-password".path;
-    virtualHost = "rss.zshen.me";
-    baseUrl = "https://rss.zshen.me";
-
-    database = {
-      type = "pgsql";
-      passFile = config.sops.secrets."freshrss/db-password".path;
-    };
-
-    extensions = [];
   };
 }

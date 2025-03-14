@@ -13,16 +13,10 @@
 
     inputs.disko.nixosModules.disko
     ./disk-config.nix
-
-    ./extras.nix
   ];
 
-  myNixOS.sops.enable = true;
-  myNixOS.nh.enable = true;
-  myNixOS.docker.enable = true;
-
-  # xremap - bug. when xremap.nix is not enabled. for some reason this have to be set to false
-  services.xremap.enable = false;
+  myNixOS.bundles.general-server.enable = true;
+  myNixOS.freshrss.enable = true;
 
   boot.loader.grub = {
     # no need to set devices, disko will add all devices that have a EF02 partition to the list already

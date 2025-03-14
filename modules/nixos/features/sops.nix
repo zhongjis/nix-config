@@ -4,10 +4,6 @@
   pkgs,
   ...
 }: {
-  imports = [
-    inputs.sops-nix.nixosModules.sops
-  ];
-
   environment.systemPackages = with pkgs; [
     sops
   ];
@@ -19,11 +15,5 @@
     defaultSopsFormat = "yaml";
 
     validateSopsFiles = true;
-  };
-
-  sops.secrets = {
-    # github - personal
-    "freshrss/default-user-password" = {};
-    "freshrss/db-password" = {};
   };
 }
