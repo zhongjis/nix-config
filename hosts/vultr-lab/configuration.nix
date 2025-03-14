@@ -16,6 +16,7 @@
   ];
 
   myNixOS.bundles.general-server.enable = true;
+  myNixOS.homepage-dashboard.enable = true;
   myNixOS.freshrss.enable = true;
   myNixOS.dify.enable = true;
 
