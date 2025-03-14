@@ -4,6 +4,7 @@
   myNixOS.stylix.enable = true;
   myNixOS.plymouth.enable = true;
   myNixOS.flatpak.enable = true;
+  myNixOS.xremap.enable = true;
 
   # fwupd - firmware update
   services.fwupd.enable = true;
