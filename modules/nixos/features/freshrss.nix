@@ -32,8 +32,7 @@ in {
   };
 
   services.nginx = {
-    virtualHosts."rss.zshen.me" = {
-      serverName = "rss.zshen.me";
+    virtualHosts.${cfg.virtualHost} = {
       enableACME = true;
       forceSSL = true;
     };
