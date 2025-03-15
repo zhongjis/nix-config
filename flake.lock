@@ -1701,26 +1701,6 @@
         "type": "github"
       }
     },
-    "portainer-on-nixos": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1728952614,
-        "narHash": "sha256-ZihGhhRXvZFDSEzIegTjvH3VAecicKkOR+tJWJFc4Es=",
-        "owner": "cbleslie",
-        "repo": "portainer-on-nixos",
-        "rev": "166a3b32492cca267ba29147c4654115a6c6bf28",
-        "type": "gitlab"
-      },
-      "original": {
-        "owner": "cbleslie",
-        "repo": "portainer-on-nixos",
-        "type": "gitlab"
-      }
-    },
     "pre-commit-hooks": {
       "inputs": {
         "flake-compat": "flake-compat_6",
@@ -1767,7 +1747,6 @@
         "nixpkgs": "nixpkgs_6",
         "nixpkgs-stable": "nixpkgs-stable_2",
         "nixpkgs-terraform": "nixpkgs-terraform",
-        "portainer-on-nixos": "portainer-on-nixos",
         "sops-nix": "sops-nix",
         "stylix": "stylix",
         "xremap-flake": "xremap-flake"
