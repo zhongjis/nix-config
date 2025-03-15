@@ -9,7 +9,6 @@ in {
       image = "portainer/portainer-ce:latest";
       volumes = [
         "portainer_data:/data"
-        "/var/run/docker.sock:/var/run/docker.sock"
         "/run/podman/podman.sock:/var/run/docker.sock"
         "/etc/localtime:/etc/localtime"
       ];

@@ -36,4 +36,6 @@ in {
   environment.systemPackages = with pkgs; [
     podman-compose
   ];
+
+  virtualisation.oci-containers.backend = lib.mkForce "podman";
 }
