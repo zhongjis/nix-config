@@ -1,3 +1,4 @@
+{config, ...}: {
   # MONITORING: services run on loopback interface
   #             nginx reverse proxy exposes services to network
   #             - grafana:3010
@@ -14,20 +15,24 @@
     exporters = {
       node = {
         port = 3021;
-        enabledCollectors = [ "systemd" ];
+        enabledCollectors = ["systemd"];
         enable = true;
       };
     };
 
     # ingest the published nodes
-    scrapeConfigs = [{
-      job_name = "nodes";
-      static_configs = [{
-        targets = [
-          "127.0.0.1:${toString config.services.prometheus.exporters.node.port}"
+    scrapeConfigs = [
+      {
+        job_name = "nodes";
+        static_configs = [
+          {
+            targets = [
+              "127.0.0.1:${toString config.services.prometheus.exporters.node.port}"
+            ];
+          }
         ];
-      }];
-    }];
+      }
+    ];
   };
 
   # loki: port 3030 (8030)
@@ -56,16 +61,18 @@
       };
 
       schema_config = {
-        configs = [{
-          from = "2022-06-06";
-          store = "boltdb-shipper";
-          object_store = "filesystem";
-          schema = "v11";
-          index = {
-            prefix = "index_";
-            period = "24h";
-          };
-        }];
+        configs = [
+          {
+            from = "2022-06-06";
+            store = "boltdb-shipper";
+            object_store = "filesystem";
+            schema = "v11";
+            index = {
+              prefix = "index_";
+              period = "24h";
+            };
+          }
+        ];
       };
 
       storage_config = {
@@ -120,23 +127,29 @@
       positions = {
         filename = "/tmp/positions.yaml";
       };
-      clients = [{
-        url = "http://127.0.0.1:${toString config.services.loki.configuration.server.http_listen_port}/loki/api/v1/push";
-      }];
-      scrape_configs = [{
-        job_name = "journal";
-        journal = {
-          max_age = "12h";
-          labels = {
-            job = "systemd-journal";
-            host = "pihole";
+      clients = [
+        {
+          url = "http://127.0.0.1:${toString config.services.loki.configuration.server.http_listen_port}/loki/api/v1/push";
+        }
+      ];
+      scrape_configs = [
+        {
+          job_name = "journal";
+          journal = {
+            max_age = "12h";
+            labels = {
+              job = "systemd-journal";
+              host = "pihole";
+            };
           };
-        };
-        relabel_configs = [{
-          source_labels = [ "__journal__systemd_unit" ];
-          target_label = "unit";
-        }];
-      }];
+          relabel_configs = [
+            {
+              source_labels = ["__journal__systemd_unit"];
+              target_label = "unit";
+            }
+          ];
+        }
+      ];
     };
     # extraFlags
   };
@@ -209,35 +222,44 @@
         proxyPass = "http://grafana";
         proxyWebsockets = true;
       };
-      listen = [{
-        addr = "192.168.1.10";
-        port = 8010;
-      }];
+      listen = [
+        {
+          addr = "192.168.1.10";
+          port = 8010;
+        }
+      ];
     };
 
     virtualHosts.prometheus = {
       locations."/".proxyPass = "http://prometheus";
-      listen = [{
-        addr = "192.168.1.10";
-        port = 8020;
-      }];
+      listen = [
+        {
+          addr = "192.168.1.10";
+          port = 8020;
+        }
+      ];
     };
 
     # confirm with http://192.168.1.10:8030/loki/api/v1/status/buildinfo
     #     (or)     /config /metrics /ready
     virtualHosts.loki = {
       locations."/".proxyPass = "http://loki";
-      listen = [{
-        addr = "192.168.1.10";
-        port = 8030;
-      }];
+      listen = [
+        {
+          addr = "192.168.1.10";
+          port = 8030;
+        }
+      ];
     };
 
     virtualHosts.promtail = {
       locations."/".proxyPass = "http://promtail";
-      listen = [{
-        addr = "192.168.1.10";
-        port = 8031;
-      }];
+      listen = [
+        {
+          addr = "192.168.1.10";
+          port = 8031;
+        }
+      ];
     };
   };
+}
