@@ -6,7 +6,7 @@
 }: let
   sharedApiWorkerEnv =
     import ./shared-api-worker-env.nix;
-  difyConfig = pkgs.fetchFromGithub {
+  difyConfig = pkgs.fetchFromGitHub {
     owner = "langgenius";
     repo = "dify";
     rev = "main";
