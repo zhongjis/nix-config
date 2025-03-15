@@ -1,24 +1,27 @@
-{pkgs, ...}: {
-  myNixOS.nh.enable = true;
-  myNixOS.sops.enable = true;
-  myNixOS.power-management.enable = true;
-  myNixOS.stylix.enable = true;
-  myNixOS.plymouth.enable = true;
-  myNixOS.flatpak.enable = true;
-  myNixOS.xremap.enable = true;
+{
+  pkgs,
+  lib,
+  ...
+}: {
+  myNixOS.nh.enable = lib.mkDefault true;
+  myNixOS.sops.enable = lib.mkDefault true;
+  myNixOS.power-management.enable = lib.mkDefault true;
+  myNixOS.stylix.enable = lib.mkDefault true;
+  myNixOS.plymouth.enable = lib.mkDefault true;
+  myNixOS.flatpak.enable = lib.mkDefault true;
+  myNixOS.xremap.enable = lib.mkDefault true;
+  myNixOS.podman.enable = lib.mkDefault true;
 
   # fwupd - firmware update
-  services.fwupd.enable = true;
+  services.fwupd.enable = lib.mkDefault true;
 
   # Enable CUPS to print documents.
-  services = {
-    printing.enable = true;
-  };
+  services.printing.enable = lib.mkDefault true;
 
   # Enable USB auto mounting
   services = {
-    udisks2.enable = true;
-    gvfs.enable = true;
+    udisks2.enable = lib.mkDefault true;
+    gvfs.enable = lib.mkDefault true;
   };
 
   # for zsh auto completion
@@ -123,7 +126,7 @@
     '';
   };
 
-  hardware.enableAllFirmware = true;
+  hardware.enableAllFirmware = lib.mkDefault true;
 
   hardware.bluetooth = {
     enable = true;
