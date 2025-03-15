@@ -25,11 +25,9 @@
     services.amdcpu.enable = true;
     services.amdgpu.enable = true;
     multi-lang-input-layout.enable = true;
-    podman.enable = true;
     ollama.enable = true;
-    open-webui.enable = false;
     sops.enable = true;
-    vm.enable = true;
+    virt-manager.enable = true;
   };
 
   # for radeon 7700s
