@@ -77,9 +77,6 @@
       url = "github:niksingh710/minimal-tmux-status";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    portainer-on-nixos.url = "gitlab:cbleslie/portainer-on-nixos";
-    portainer-on-nixos.inputs.nixpkgs.follows = "nixpkgs";
   };
   outputs = {nixpkgs, ...} @ inputs: let
     overlays = import ./overlays {inherit inputs;};
