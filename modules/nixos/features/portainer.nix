@@ -12,7 +12,7 @@ in {
   services.portainer = {
     enable = true;
     version = "latest";
-    openFirewall = "false";
+    openFirewall = false;
     port = 9443;
   };
 
@@ -22,7 +22,7 @@ in {
       forceSSL = true;
 
       locations."/" = {
-        proxyPass = "http://localhost:${cfg.port}";
+        proxyPass = "https://localhost:${builtins.toString cfg.port}";
         recommendedProxySettings = true;
       };
     };
