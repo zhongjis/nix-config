@@ -10,7 +10,8 @@
     owner = "langgenius";
     repo = "dify";
     rev = "main";
-    sha256 = "sha256-0587eb49567b5f4bb7f9e1fe85a341a25aad0ccb";
+    sha256 = "sha256-G66BSFu60+O8BMGkD437yjmmalDxvYc8/aH/opx9aFY=";
+    # sha256 = lib.fakeSha256;
   };
 
   nginxConfigDir = "${difyConfig}/docker/nginx";
@@ -83,7 +84,7 @@ in {
       envFile
     ];
     volumes = [
-      "${volumeConfigDir}/db/data:/var/lib/postgresql/data:rw"
+      "./volumes/db/data:/var/lib/postgresql/data"
     ];
     cmd = ["postgres" "-c" "max_connections=100" "-c" "shared_buffers=128MB" "-c" "work_mem=4MB" "-c" "maintenance_work_mem=64MB" "-c" "effective_cache_size=4096MB"];
     log-driver = "journald";
@@ -244,7 +245,7 @@ in {
       envFile
     ];
     volumes = [
-      "${volumeConfigDir}/redis/data:/data:rw"
+      "./volumes/redis/data:/data"
     ];
     cmd = ["redis-server" "--requirepass" "difyai123456"];
     log-driver = "journald";
