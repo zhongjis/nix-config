@@ -155,15 +155,6 @@ in {
       "--network-alias=nginx"
       "--network=dify_default"
     ];
-    # extraOptions = [
-    #   "--entrypoint=sh"
-    #   "--network-alias=nginx"
-    #   "--network=dify_default"
-    # ];
-    # cmd = [
-    #   "-c"
-    #   "cp /docker-entrypoint-mount.sh /docker-entrypoint.sh && sed -i 's/\\r$//' /docker-entrypoint.sh && chmod +x /docker-entrypoint.sh && /docker-entrypoint.sh"
-    # ];
   };
   systemd.services."podman-dify-nginx" = {
     serviceConfig = {
