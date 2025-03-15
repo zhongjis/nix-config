@@ -1,4 +1,5 @@
 {config, ...}: {
+  # original post: https://gist.github.com/rickhull/895b0cb38fdd537c1078a858cf15d63e
   # MONITORING: services run on loopback interface
   #             nginx reverse proxy exposes services to network
   #             - grafana:3010
@@ -121,12 +122,10 @@
     enable = true;
 
     settings.server = {
-      http_addr = "127.0.0.1";
       http_port = 3010;
       # WARNING: this should match nginx setup!
       # prevents "Request origin is not authorized"
-      domain = "zshen.me";
-      rootUrl = "grafana.zshen.me";
+      root_url = "http://192.168.1.10:8010";
       serve_from_sub_path = false;
     };
 
@@ -156,11 +155,11 @@
 
   # nginx reverse proxy
   services.nginx = {
-    enable = true;
-    recommendedProxySettings = true;
-    recommendedOptimisation = true;
-    recommendedGzipSettings = true;
-    # recommendedTlsSettings = true;
+    # enable = true;
+    # recommendedProxySettings = true;
+    # recommendedOptimisation = true;
+    # recommendedGzipSettings = true;
+    # # recommendedTlsSettings = true;
 
     upstreams = {
       "grafana" = {
@@ -185,13 +184,14 @@
       };
     };
 
+    # NOTE: expose grafana dashboard to internet
     virtualHosts."grafana.zshen.me" = {
       enableACME = true;
       forceSSL = true;
 
       locations."/" = {
-        proxyPass = "https://localhost:3010";
-        recommendedProxySettings = true;
+        proxyPass = "http://192.168.1.0:8010";
+        proxyWebsockets = true;
       };
     };
 
@@ -202,7 +202,7 @@
       };
       listen = [
         {
-          addr = "192.168.1.10";
+          addr = "192.168.1.0";
           port = 8010;
         }
       ];
