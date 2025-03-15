@@ -157,19 +157,26 @@
   # grafana: port 3010 (8010)
   #
   services.grafana = {
-    port = 3010;
-    # WARNING: this should match nginx setup!
-    # prevents "Request origin is not authorized"
-    rootUrl = "http://192.168.1.10:8010"; # helps with nginx / ws / live
-
-    protocol = "http";
-    addr = "127.0.0.1";
-    analytics.reporting.enable = false;
     enable = true;
+
+    settings.server = {
+      http_addr = "127.0.0.1";
+      http_port = 3010;
+      # WARNING: this should match nginx setup!
+      # prevents "Request origin is not authorized"
+      domain = "zshen.me";
+      rootUrl = "grafana.zshen.me";
+      serve_from_sub_path = false;
+    };
+
+    settings.analytics = {
+      reporting_enabled = false;
+      feedback_links_enabled = false;
+    };
 
     provision = {
       enable = true;
-      datasources = [
+      datasources.settings.datasources = [
         {
           name = "Prometheus";
           type = "prometheus";
@@ -197,7 +204,7 @@
     upstreams = {
       "grafana" = {
         servers = {
-          "127.0.0.1:${toString config.services.grafana.port}" = {};
+          "127.0.0.1:${toString config.services.grafana.settings.server.http_port}" = {};
         };
       };
       "prometheus" = {
@@ -214,6 +221,16 @@
         servers = {
           "127.0.0.1:${toString config.services.promtail.configuration.server.http_listen_port}" = {};
         };
+      };
+    };
+
+    virtualHosts."grafana.zshen.me" = {
+      enableACME = true;
+      forceSSL = true;
+
+      locations."/" = {
+        proxyPass = "https://localhost:3010";
+        recommendedProxySettings = true;
       };
     };
 
