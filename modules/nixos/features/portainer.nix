@@ -3,15 +3,33 @@
   inputs,
   ...
 }: let
-  cfg = config.services.portainer;
 in {
+  virtualisation.oci-containers = {
+    containers.portainer-ce = {
+      image = "portainer/portainer-ce:latest";
+      volumes = [
+        "portainer_data:/data"
+        "/var/run/docker.sock:/var/run/docker.sock"
+        "/run/podman/podman.sock:/var/run/docker.sock"
+        "/etc/localtime:/etc/localtime"
+      ];
+      ports = ["9443:9443"];
+      autoStart = true;
+      extraOptions = [
+        "--pull=always"
+        "--restart=unless-stopped"
+        "--rm=false"
+      ];
+    };
+  };
+
   services.nginx = {
     virtualHosts."portainer.zshen.me" = {
       enableACME = true;
       forceSSL = true;
 
       locations."/" = {
-        proxyPass = "https://localhost:${builtins.toString cfg.port}";
+        proxyPass = "https://localhost:9443";
         recommendedProxySettings = true;
       };
     };

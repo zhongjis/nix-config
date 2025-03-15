@@ -1,15 +1,19 @@
 {
   pkgs,
   lib,
+  config,
   ...
-}: {
+}: let
+  dockerCfg = config.virtualisation.docker;
+in {
   virtualisation.libvirtd.enable = true;
-
-  virtualisation.docker.enable = lib.mkForce false;
 
   virtualisation.podman = {
     enable = true;
-    dockerCompat = true;
+    dockerCompat =
+      if dockerCfg.enable
+      then false
+      else true;
     autoPrune = {
       enable = true;
       dates = "weekly";
@@ -32,6 +36,4 @@
   environment.systemPackages = with pkgs; [
     podman-compose
   ];
-
-  virtualisation.oci-containers.backend = "podman";
 }
