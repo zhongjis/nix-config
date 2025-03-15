@@ -1,6 +1,6 @@
 {pkgs, ...}: {
   virtualisation.libvirtd.enable = true;
-  # Enable common container config files in /etc/containers
+
   virtualisation.podman = {
     enable = true;
     dockerCompat = true;
@@ -24,10 +24,7 @@
 
   # Useful other development tools
   environment.systemPackages = with pkgs; [
-    passt
-
     podman-compose
-    stable.podman-desktop
   ];
 
   virtualisation.oci-containers.backend = "podman";

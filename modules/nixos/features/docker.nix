@@ -1,5 +1,6 @@
 {pkgs, ...}: {
   virtualisation.libvirtd.enable = true;
+
   virtualisation.docker = {
     enable = true;
     autoPrune = {
@@ -13,7 +14,6 @@
 
   environment.systemPackages = with pkgs; [
     docker-compose
-    lazydocker
   ];
 
   virtualisation.oci-containers.backend = "docker";

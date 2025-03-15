@@ -11,6 +11,7 @@
   myNixOS.flatpak.enable = lib.mkDefault true;
   myNixOS.xremap.enable = lib.mkDefault true;
   myNixOS.podman.enable = lib.mkDefault true;
+  myNixOS.docker.enable = lib.mkDefault false;
 
   # fwupd - firmware update
   services.fwupd.enable = lib.mkDefault true;
