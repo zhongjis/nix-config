@@ -16,7 +16,7 @@
 
   nginxConfigDir = "${difyConfig}/docker/nginx";
   volumeConfigDir = "${difyConfig}/docker/volumes";
-  ssrfProxyConfigDir = "${difyConfig}/ssrf_proxy";
+  ssrfProxyConfigDir = "${difyConfig}/docker/ssrf_proxy";
 
   envFile = ./dify.env;
 in {
@@ -39,7 +39,8 @@ in {
       envFile
     ];
     volumes = [
-      "${volumeConfigDir}/app/storage:/app/api/storage:rw"
+      # "${volumeConfigDir}/app/storage:/app/api/storage:rw"
+      "volume-app-storage:/app/api/storage:rw"
     ];
     dependsOn = [
       "dify-db"
@@ -84,7 +85,8 @@ in {
       envFile
     ];
     volumes = [
-      "./volumes/db/data:/var/lib/postgresql/data"
+      # "./volumes/db/data:/var/lib/postgresql/data"
+      "volumes-db-data:/var/lib/postgresql/data"
     ];
     cmd = ["postgres" "-c" "max_connections=100" "-c" "shared_buffers=128MB" "-c" "work_mem=4MB" "-c" "maintenance_work_mem=64MB" "-c" "effective_cache_size=4096MB"];
     log-driver = "journald";
@@ -143,13 +145,16 @@ in {
       "${nginxConfigDir}/nginx/nginx.conf.template:/etc/nginx/nginx.conf.template:rw"
       "${nginxConfigDir}/nginx/proxy.conf.template:/etc/nginx/proxy.conf.template:rw"
       "${nginxConfigDir}/nginx/ssl:/etc/ssl:rw"
-      "${volumeConfigDir}/volumes/certbot/conf:/etc/letsencrypt:rw"
-      "${volumeConfigDir}/volumes/certbot/conf/live:/etc/letsencrypt/live:rw"
-      "${volumeConfigDir}/volumes/certbot/www:/var/www/html:rw"
+      # "${volumeConfigDir}/certbot/conf:/etc/letsencrypt:rw"
+      # "${volumeConfigDir}/certbot/conf/live:/etc/letsencrypt/live:rw"
+      # "${volumeConfigDir}/certbot/www:/var/www/html:rw"
+      "volumes-certbot-conf:/etc/letsencrypt:rw"
+      "volumes-certbot-conf/live:/etc/letsencrypt/live:rw"
+      "volumes-certbot-www:/var/www/html:rw"
     ];
     ports = [
-      "80:80/tcp"
-      "443:443/tcp"
+      "8080:80/tcp"
+      "8443:443/tcp"
     ];
     dependsOn = [
       "dify-api"
@@ -200,11 +205,9 @@ in {
         "PLUGIN_MAX_EXECUTION_TIMEOUT" = "600";
         "PIP_MIRROR_URL" = "";
       };
-    environmentFiles = [
-      envFile
-    ];
     volumes = [
-      "${volumeConfigDir}/plugin_daemon:/app/storage:rw"
+      # "${volumeConfigDir}/plugin_daemon:/app/storage:rw"
+      "volumes-plugin_daemon:/app/storage"
     ];
     ports = [
       "5003:5003/tcp"
@@ -241,11 +244,9 @@ in {
     environment = {
       "REDISCLI_AUTH" = "difyai123456";
     };
-    environmentFiles = [
-      envFile
-    ];
     volumes = [
-      "./volumes/redis/data:/data"
+      # "./volumes/redis/data:/data"
+      "volumes-redis-data:/data"
     ];
     cmd = ["redis-server" "--requirepass" "difyai123456"];
     log-driver = "journald";
@@ -420,7 +421,8 @@ in {
       envFile
     ];
     volumes = [
-      "${volumeConfigDir}/app/storage:/app/api/storage:rw"
+      # "${volumeConfigDir}/app/storage:/app/api/storage:rw"
+      "volumes-app-storage:/app/api/storage:rw"
     ];
     dependsOn = [
       "dify-db"
