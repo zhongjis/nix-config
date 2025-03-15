@@ -128,12 +128,12 @@ in {
       "NGINX_WORKER_PROCESSES" = "auto";
     };
     volumes = [
-      "${nginxConfigDir}/nginx/conf.d:/etc/nginx/conf.d:rw"
-      "${nginxConfigDir}/nginx/docker-entrypoint.sh:/docker-entrypoint-mount.sh:rw"
-      "${nginxConfigDir}/nginx/https.conf.template:/etc/nginx/https.conf.template:rw"
-      "${nginxConfigDir}/nginx/nginx.conf.template:/etc/nginx/nginx.conf.template:rw"
-      "${nginxConfigDir}/nginx/proxy.conf.template:/etc/nginx/proxy.conf.template:rw"
-      "${nginxConfigDir}/nginx/ssl:/etc/ssl:rw"
+      "${nginxConfigDir}/conf.d:/etc/nginx/conf.d:rw"
+      "${nginxConfigDir}/docker-entrypoint.sh:/docker-entrypoint-mount.sh:rw"
+      "${nginxConfigDir}/https.conf.template:/etc/nginx/https.conf.template:rw"
+      "${nginxConfigDir}/nginx.conf.template:/etc/nginx/nginx.conf.template:rw"
+      "${nginxConfigDir}/proxy.conf.template:/etc/nginx/proxy.conf.template:rw"
+      "${nginxConfigDir}/ssl:/etc/ssl:rw"
       # "${volumeConfigDir}/certbot/conf:/etc/letsencrypt:rw"
       # "${volumeConfigDir}/certbot/conf/live:/etc/letsencrypt/live:rw"
       # "${volumeConfigDir}/certbot/www:/var/www/html:rw"
