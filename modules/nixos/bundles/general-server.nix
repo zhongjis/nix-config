@@ -5,8 +5,8 @@
 }: {
   myNixOS.sops.enable = lib.mkDefault true;
   myNixOS.nh.enable = lib.mkDefault true;
-  myNixOS.podman.enable = lib.mkDefault false;
-  myNixOS.docker.enable = lib.mkDefault true;
+  myNixOS.podman.enable = lib.mkDefault true;
+  myNixOS.docker.enable = lib.mkDefault false;
   myNixOS.nginx.enable = lib.mkDefault true;
   myNixOS.homepage-dashboard.enable = lib.mkDefault true;
   myNixOS.portainer.enable = lib.mkDefault true;
