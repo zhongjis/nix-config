@@ -28,7 +28,6 @@
     ollama.enable = true;
     sops.enable = true;
     virt-manager.enable = true;
-    dify-standalone.enable = true;
   };
 
   # for radeon 7700s
