@@ -138,7 +138,7 @@ in {
       # "${volumeConfigDir}/certbot/conf/live:/etc/letsencrypt/live:rw"
       # "${volumeConfigDir}/certbot/www:/var/www/html:rw"
       "volumes-certbot-conf:/etc/letsencrypt:rw"
-      "volumes-certbot-conf/live:/etc/letsencrypt/live:rw"
+      "volumes-certbot-conf-live:/etc/letsencrypt/live:rw"
       "volumes-certbot-www:/var/www/html:rw"
     ];
     ports = [
@@ -151,10 +151,19 @@ in {
     ];
     log-driver = "journald";
     extraOptions = [
-      "--entrypoint=[\"sh\", \"-c\", \"cp /docker-entrypoint-mount.sh /docker-entrypoint.sh && sed -i 's/$//' /docker-entrypoint.sh && chmod +x /docker-entrypoint.sh && /docker-entrypoint.sh\"]"
+      "--entrypoint=[\"sh\", \"-c\", \"cp /docker-entrypoint-mount.sh /docker-entrypoint.sh && sed -i 's/\\r$//' /docker-entrypoint.sh && chmod +x /docker-entrypoint.sh && /docker-entrypoint.sh\"]"
       "--network-alias=nginx"
       "--network=dify_default"
     ];
+    # extraOptions = [
+    #   "--entrypoint=sh"
+    #   "--network-alias=nginx"
+    #   "--network=dify_default"
+    # ];
+    # cmd = [
+    #   "-c"
+    #   "cp /docker-entrypoint-mount.sh /docker-entrypoint.sh && sed -i 's/\\r$//' /docker-entrypoint.sh && chmod +x /docker-entrypoint.sh && /docker-entrypoint.sh"
+    # ];
   };
   systemd.services."podman-dify-nginx" = {
     serviceConfig = {
