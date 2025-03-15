@@ -22,6 +22,6 @@
   myHomeManager.starship.enable = lib.mkDefault true;
 
   home.sessionVariables = {
-    NH_FLAKE = "${config.home.homeDirectory}/personal/nix-config";
+    FLAKE = "${config.home.homeDirectory}/personal/nix-config";
   };
 }

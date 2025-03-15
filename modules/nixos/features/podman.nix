@@ -1,9 +1,15 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   virtualisation.libvirtd.enable = true;
+
+  virtualisation.docker.enable = lib.mkForce false;
 
   virtualisation.podman = {
     enable = true;
-    # dockerCompat = true;
+    dockerCompat = true;
     autoPrune = {
       enable = true;
       dates = "weekly";
