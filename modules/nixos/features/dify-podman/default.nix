@@ -17,8 +17,6 @@
   nginxConfigDir = "${difyConfig}/docker/nginx";
   volumeConfigDir = "${difyConfig}/docker/volumes";
   ssrfProxyConfigDir = "${difyConfig}/docker/ssrf_proxy";
-
-  envFile = ./dify.env;
 in {
   # Containers
   virtualisation.oci-containers.containers."dify-api" = {
@@ -35,9 +33,6 @@ in {
         "PLUGIN_MAX_PACKAGE_SIZE" = "52428800";
         "INNER_API_KEY_FOR_PLUGIN" = "QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1";
       };
-    environmentFiles = [
-      envFile
-    ];
     volumes = [
       # "${volumeConfigDir}/app/storage:/app/api/storage:rw"
       "volume-app-storage:/app/api/storage:rw"
@@ -81,9 +76,6 @@ in {
       "POSTGRES_DB" = "dify";
       "POSTGRES_PASSWORD" = "difyai123456";
     };
-    environmentFiles = [
-      envFile
-    ];
     volumes = [
       # "./volumes/db/data:/var/lib/postgresql/data"
       "volumes-db-data:/var/lib/postgresql/data"
@@ -135,9 +127,6 @@ in {
       "NGINX_SSL_PROTOCOLS" = "TLSv1.1 TLSv1.2 TLSv1.3";
       "NGINX_WORKER_PROCESSES" = "auto";
     };
-    environmentFiles = [
-      envFile
-    ];
     volumes = [
       "${nginxConfigDir}/nginx/conf.d:/etc/nginx/conf.d:rw"
       "${nginxConfigDir}/nginx/docker-entrypoint.sh:/docker-entrypoint-mount.sh:rw"
@@ -285,9 +274,6 @@ in {
       "SANDBOX_PORT" = "8194";
       "WORKER_TIMEOUT" = "15";
     };
-    environmentFiles = [
-      envFile
-    ];
     volumes = [
       "${volumeConfigDir}/sandbox/conf:/conf:rw"
       "${volumeConfigDir}/sandbox/dependencies:/dependencies:rw"
@@ -326,9 +312,6 @@ in {
       "SANDBOX_HOST" = "sandbox";
       "SANDBOX_PORT" = "8194";
     };
-    environmentFiles = [
-      envFile
-    ];
     volumes = [
       "${ssrfProxyConfigDir}/docker-entrypoint.sh:/docker-entrypoint-mount.sh:rw"
       "${ssrfProxyConfigDir}/squid.conf.template:/etc/squid/squid.conf.template:rw"
@@ -378,9 +361,6 @@ in {
       "TEXT_GENERATION_TIMEOUT_MS" = "60000";
       "TOP_K_MAX_VALUE" = "10";
     };
-    environmentFiles = [
-      envFile
-    ];
     log-driver = "journald";
     extraOptions = [
       "--network-alias=web"
@@ -417,9 +397,6 @@ in {
         "PLUGIN_MAX_PACKAGE_SIZE" = "52428800";
         "INNER_API_KEY_FOR_PLUGIN" = "QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1";
       };
-    environmentFiles = [
-      envFile
-    ];
     volumes = [
       # "${volumeConfigDir}/app/storage:/app/api/storage:rw"
       "volumes-app-storage:/app/api/storage:rw"
