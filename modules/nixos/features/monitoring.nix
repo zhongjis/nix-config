@@ -186,7 +186,7 @@
       forceSSL = true;
 
       locations."/" = {
-        proxyPass = "http://192.168.1.10:8010";
+        proxyPass = "http://localhost:3010";
         proxyWebsockets = true;
       };
     };
