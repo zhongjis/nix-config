@@ -123,10 +123,12 @@
 
     settings.server = {
       http_port = 3010;
+      http_addr = "127.0.0.1";
       # WARNING: this should match nginx setup!
       # prevents "Request origin is not authorized"
       root_url = "http://192.168.1.10:8010";
       serve_from_sub_path = false;
+      protocol = "http";
     };
 
     settings.analytics = {
@@ -184,7 +186,7 @@
       forceSSL = true;
 
       locations."/" = {
-        proxyPass = "http://192.168.1.0:8010";
+        proxyPass = "http://192.168.1.10:8010";
         proxyWebsockets = true;
       };
     };
@@ -196,7 +198,7 @@
       };
       listen = [
         {
-          addr = "192.168.1.0";
+          addr = "192.168.1.10";
           port = 8010;
         }
       ];
