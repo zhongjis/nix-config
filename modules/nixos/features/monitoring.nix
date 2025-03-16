@@ -154,24 +154,6 @@
 
   # nginx reverse proxy
   services.nginx = {
-    upstreams = {
-      "prometheus" = {
-        servers = {
-          "127.0.0.1:${toString config.services.prometheus.port}" = {};
-        };
-      };
-      "loki" = {
-        servers = {
-          "127.0.0.1:${toString config.services.loki.configuration.server.http_listen_port}" = {};
-        };
-      };
-      "promtail" = {
-        servers = {
-          "127.0.0.1:${toString config.services.promtail.configuration.server.http_listen_port}" = {};
-        };
-      };
-    };
-
     # NOTE: expose grafana dashboard to internet
     virtualHosts."${config.services.grafana.settings.server.domain}" = {
       enableACME = true;
@@ -182,37 +164,5 @@
         proxyWebsockets = true;
       };
     };
-
-    # virtualHosts.prometheus = {
-    #   locations."/".proxyPass = "http://prometheus";
-    #   listen = [
-    #     {
-    #       addr = "192.168.1.10";
-    #       port = 8020;
-    #     }
-    #   ];
-    # };
-
-    # # confirm with http://192.168.1.10:8030/loki/api/v1/status/buildinfo
-    # #     (or)     /config /metrics /ready
-    # virtualHosts.loki = {
-    #   locations."/".proxyPass = "http://loki";
-    #   listen = [
-    #     {
-    #       addr = "192.168.1.10";
-    #       port = 8030;
-    #     }
-    #   ];
-    # };
-
-    # virtualHosts.promtail = {
-    #   locations."/".proxyPass = "http://promtail";
-    #   listen = [
-    #     {
-    #       addr = "192.168.1.10";
-    #       port = 8031;
-    #     }
-    #   ];
-    # };
   };
 }
