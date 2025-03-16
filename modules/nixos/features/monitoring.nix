@@ -186,22 +186,9 @@
       forceSSL = true;
 
       locations."/" = {
-        proxyPass = "http://localhost:3010";
+        proxyPass = "http://127.0.0.1:3010";
         proxyWebsockets = true;
       };
-    };
-
-    virtualHosts.grafana = {
-      locations."/" = {
-        proxyPass = "http://grafana";
-        proxyWebsockets = true;
-      };
-      listen = [
-        {
-          addr = "192.168.1.10";
-          port = 8010;
-        }
-      ];
     };
 
     virtualHosts.prometheus = {
