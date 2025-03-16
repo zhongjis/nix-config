@@ -318,10 +318,14 @@ in {
     ];
     log-driver = "journald";
     extraOptions = [
-      "--entrypoint=[\"sh\", \"-c\", \"cp /docker-entrypoint-mount.sh /docker-entrypoint.sh && sed -i 's/$//' /docker-entrypoint.sh && chmod +x /docker-entrypoint.sh && /docker-entrypoint.sh\"]"
+      "--entrypoint=sh"
       "--network-alias=ssrf_proxy"
       "--network=dify_default"
       "--network=dify_ssrf_proxy_network"
+    ];
+    cmd = [
+      "-c"
+      "cp /docker-entrypoint-mount.sh /docker-entrypoint.sh && sed -i 's/\r$$//' /docker-entrypoint.sh && chmod +x /docker-entrypoint.sh && /docker-entrypoint.sh"
     ];
   };
   systemd.services."podman-dify-ssrf_proxy" = {
