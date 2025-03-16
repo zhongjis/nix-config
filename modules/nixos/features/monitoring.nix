@@ -125,7 +125,7 @@
       http_port = 3010;
       http_addr = "127.0.0.1";
       domain = "grafana.zshen.me";
-      protocol = "http";
+      protocol = "https";
     };
 
     settings.analytics = {
@@ -178,41 +178,41 @@
       forceSSL = true;
 
       locations."/" = {
-        proxyPass = "http://127.0.0.1:${toString config.services.grafana.settings.server.http_port}";
+        proxyPass = "https://127.0.0.1:${toString config.services.grafana.settings.server.http_port}";
         proxyWebsockets = true;
       };
     };
 
-    virtualHosts.prometheus = {
-      locations."/".proxyPass = "http://prometheus";
-      listen = [
-        {
-          addr = "192.168.1.10";
-          port = 8020;
-        }
-      ];
-    };
+    # virtualHosts.prometheus = {
+    #   locations."/".proxyPass = "http://prometheus";
+    #   listen = [
+    #     {
+    #       addr = "192.168.1.10";
+    #       port = 8020;
+    #     }
+    #   ];
+    # };
 
-    # confirm with http://192.168.1.10:8030/loki/api/v1/status/buildinfo
-    #     (or)     /config /metrics /ready
-    virtualHosts.loki = {
-      locations."/".proxyPass = "http://loki";
-      listen = [
-        {
-          addr = "192.168.1.10";
-          port = 8030;
-        }
-      ];
-    };
+    # # confirm with http://192.168.1.10:8030/loki/api/v1/status/buildinfo
+    # #     (or)     /config /metrics /ready
+    # virtualHosts.loki = {
+    #   locations."/".proxyPass = "http://loki";
+    #   listen = [
+    #     {
+    #       addr = "192.168.1.10";
+    #       port = 8030;
+    #     }
+    #   ];
+    # };
 
-    virtualHosts.promtail = {
-      locations."/".proxyPass = "http://promtail";
-      listen = [
-        {
-          addr = "192.168.1.10";
-          port = 8031;
-        }
-      ];
-    };
+    # virtualHosts.promtail = {
+    #   locations."/".proxyPass = "http://promtail";
+    #   listen = [
+    #     {
+    #       addr = "192.168.1.10";
+    #       port = 8031;
+    #     }
+    #   ];
+    # };
   };
 }
