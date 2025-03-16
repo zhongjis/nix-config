@@ -124,10 +124,7 @@
     settings.server = {
       http_port = 3010;
       http_addr = "127.0.0.1";
-      # WARNING: this should match nginx setup!
-      # prevents "Request origin is not authorized"
-      root_url = "http://192.168.1.10:8010";
-      serve_from_sub_path = false;
+      domain = "grafana.zshen.me";
       protocol = "http";
     };
 
@@ -158,11 +155,6 @@
   # nginx reverse proxy
   services.nginx = {
     upstreams = {
-      "grafana" = {
-        servers = {
-          "127.0.0.1:${toString config.services.grafana.settings.server.http_port}" = {};
-        };
-      };
       "prometheus" = {
         servers = {
           "127.0.0.1:${toString config.services.prometheus.port}" = {};
@@ -181,12 +173,12 @@
     };
 
     # NOTE: expose grafana dashboard to internet
-    virtualHosts."grafana.zshen.me" = {
+    virtualHosts."${config.services.grafana.settings.server.domain}" = {
       enableACME = true;
       forceSSL = true;
 
       locations."/" = {
-        proxyPass = "http://127.0.0.1:3010";
+        proxyPass = "http://127.0.0.1:${config.services.grafana.settings.server.http_port}";
         proxyWebsockets = true;
       };
     };
