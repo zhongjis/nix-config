@@ -17,7 +17,7 @@
 
   difyDockerInstall = pkgs.runCommand "dify-install" {} ''
     mkdir -p $out/docker
-    cp -r ${difyRepo}/docker/* $out/docker
+    cp -r ${difyRepo}/docker/* $out
   '';
 
   difyLib = "/lib/dify";
