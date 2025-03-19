@@ -6,18 +6,30 @@
 }: let
   sharedApiWorkerEnv =
     import ./shared-api-worker-env.nix;
-  difyConfig = pkgs.fetchFromGitHub {
+
+  difyRepo = pkgs.fetchFromGitHub {
     owner = "langgenius";
     repo = "dify";
     rev = "main";
-    sha256 = "sha256-G66BSFu60+O8BMGkD437yjmmalDxvYc8/aH/opx9aFY=";
-    # sha256 = lib.fakeSha256;
+    sha256 = lib.fakeSha256;
   };
 
-  nginxConfigDir = "${difyConfig}/docker/nginx";
-  volumeConfigDir = "${difyConfig}/docker/volumes";
-  ssrfProxyConfigDir = "${difyConfig}/docker/ssrf_proxy";
+  difyDockerInstall = pkgs.runCommand "dify-install" {} ''
+    mkdir -p $out/lib
+    cp -r ${difyRepo}/docker/* $out/lib/dify/
+  '';
+
+  difyLib = "/lib/dify";
 in {
+  # Install the files to system
+  environment.systemPackages = [difyDockerInstall];
+
+  # Create a symlink in /lib/dify
+  system.activationScripts.difyInstall = ''
+    mkdir -p /lib
+    ln -sfn ${difyDockerInstall}/lib/dify /lib/dify
+  '';
+
   # Containers
   virtualisation.oci-containers.containers."dify-api" = {
     image = "langgenius/dify-api:1.1.0";
@@ -34,8 +46,7 @@ in {
         "INNER_API_KEY_FOR_PLUGIN" = "QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1";
       };
     volumes = [
-      # "${volumeConfigDir}/app/storage:/app/api/storage:rw"
-      "volume-app-storage:/app/api/storage:rw"
+      "${difyLib}/volumes/app/storage:/app/api/storage"
     ];
     dependsOn = [
       "dify-db"
@@ -77,8 +88,7 @@ in {
       "POSTGRES_PASSWORD" = "difyai123456";
     };
     volumes = [
-      # "./volumes/db/data:/var/lib/postgresql/data"
-      "volumes-db-data:/var/lib/postgresql/data"
+      "${difyLib}/volumes/db/data:/var/lib/postgresql/data"
     ];
     cmd = ["postgres" "-c" "max_connections=100" "-c" "shared_buffers=128MB" "-c" "work_mem=4MB" "-c" "maintenance_work_mem=64MB" "-c" "effective_cache_size=4096MB"];
     log-driver = "journald";
@@ -128,18 +138,15 @@ in {
       "NGINX_WORKER_PROCESSES" = "auto";
     };
     volumes = [
-      "${nginxConfigDir}/conf.d:/etc/nginx/conf.d:rw"
-      "${nginxConfigDir}/docker-entrypoint.sh:/docker-entrypoint-mount.sh:rw"
-      "${nginxConfigDir}/https.conf.template:/etc/nginx/https.conf.template:rw"
-      "${nginxConfigDir}/nginx.conf.template:/etc/nginx/nginx.conf.template:rw"
-      "${nginxConfigDir}/proxy.conf.template:/etc/nginx/proxy.conf.template:rw"
-      "${nginxConfigDir}/ssl:/etc/ssl:rw"
-      # "${volumeConfigDir}/certbot/conf:/etc/letsencrypt:rw"
-      # "${volumeConfigDir}/certbot/conf/live:/etc/letsencrypt/live:rw"
-      # "${volumeConfigDir}/certbot/www:/var/www/html:rw"
-      "volumes-certbot-conf:/etc/letsencrypt:rw"
-      "volumes-certbot-conf-live:/etc/letsencrypt/live:rw"
-      "volumes-certbot-www:/var/www/html:rw"
+      "${difyLib}/nginx/nginx.conf.template:/etc/nginx/nginx.conf.template"
+      "${difyLib}/nginx/proxy.conf.template:/etc/nginx/proxy.conf.template"
+      "${difyLib}/nginx/https.conf.template:/etc/nginx/https.conf.template"
+      "${difyLib}/nginx/conf.d:/etc/nginx/conf.d"
+      "${difyLib}/nginx/docker-entrypoint.sh:/docker-entrypoint-mount.sh"
+      "${difyLib}/nginx/ssl:/etc/ssl # cert dir (legacy)"
+      "${difyLib}/volumes/certbot/conf/live:/etc/letsencrypt/live # cert dir (with certbot container)"
+      "${difyLib}/volumes/certbot/conf:/etc/letsencrypt"
+      "${difyLib}/volumes/certbot/www:/var/www/html"
     ];
     ports = [
       "8080:80/tcp"
@@ -195,8 +202,7 @@ in {
         "PIP_MIRROR_URL" = "";
       };
     volumes = [
-      # "${volumeConfigDir}/plugin_daemon:/app/storage:rw"
-      "volumes-plugin_daemon:/app/storage"
+      "${difyLib}/volumes/plugin_daemon:/app/storage"
     ];
     ports = [
       "5003:5003/tcp"
@@ -234,8 +240,7 @@ in {
       "REDISCLI_AUTH" = "difyai123456";
     };
     volumes = [
-      # "./volumes/redis/data:/data"
-      "volumes-redis-data:/data"
+      "${difyLib}/volumes/redis/data:/data"
     ];
     cmd = ["redis-server" "--requirepass" "difyai123456"];
     log-driver = "journald";
@@ -275,8 +280,8 @@ in {
       "WORKER_TIMEOUT" = "15";
     };
     volumes = [
-      "${volumeConfigDir}/sandbox/conf:/conf:rw"
-      "${volumeConfigDir}/sandbox/dependencies:/dependencies:rw"
+      "${difyLib}/volumes/sandbox/dependencies:/dependencies"
+      "${difyLib}./volumes/sandbox/conf:/conf"
     ];
     log-driver = "journald";
     extraOptions = [
@@ -313,8 +318,8 @@ in {
       "SANDBOX_PORT" = "8194";
     };
     volumes = [
-      "${ssrfProxyConfigDir}/docker-entrypoint.sh:/docker-entrypoint-mount.sh:rw"
-      "${ssrfProxyConfigDir}/squid.conf.template:/etc/squid/squid.conf.template:rw"
+      "${difyLib}/ssrf_proxy/squid.conf.template:/etc/squid/squid.conf.template"
+      "${difyLib}/ssrf_proxy/docker-entrypoint.sh:/docker-entrypoint-mount.sh"
     ];
     log-driver = "journald";
     extraOptions = [
@@ -402,8 +407,7 @@ in {
         "INNER_API_KEY_FOR_PLUGIN" = "QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1";
       };
     volumes = [
-      # "${volumeConfigDir}/app/storage:/app/api/storage:rw"
-      "volumes-app-storage:/app/api/storage:rw"
+      "${difyLib}/volumes/app/storage:/app/api/storage"
     ];
     dependsOn = [
       "dify-db"
