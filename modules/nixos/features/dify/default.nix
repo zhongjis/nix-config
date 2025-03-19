@@ -14,6 +14,7 @@
     sha256 = "sha256-22CBYZC3VjPbesKeXGg+YgrPwAlnS3K+6NNYVvQyBKQ=";
     # sha256 = lib.fakeSha256;
   };
+  nginxConfigDir = "${difyRepo}/docker/nginx";
 
   difyDockerInstall = pkgs.runCommand "dify-install" {} ''
     mkdir -p $out/docker
@@ -162,11 +163,12 @@ in {
       "NGINX_WORKER_PROCESSES" = "auto";
     };
     volumes = [
-      "${difyLib}/nginx/nginx.conf.template:/etc/nginx/nginx.conf.template"
-      "${difyLib}/nginx/proxy.conf.template:/etc/nginx/proxy.conf.template"
-      "${difyLib}/nginx/https.conf.template:/etc/nginx/https.conf.template"
-      "${difyLib}/nginx/conf.d:/etc/nginx/conf.d"
-      "${difyLib}/nginx/docker-entrypoint.sh:/docker-entrypoint-mount.sh"
+      "${nginxConfigDir}/conf.d:/etc/nginx/conf.d:rw"
+      "${nginxConfigDir}/docker-entrypoint.sh:/docker-entrypoint-mount.sh:rw"
+      "${nginxConfigDir}/https.conf.template:/etc/nginx/https.conf.template:rw"
+      "${nginxConfigDir}/nginx.conf.template:/etc/nginx/nginx.conf.template:rw"
+      "${nginxConfigDir}/proxy.conf.template:/etc/nginx/proxy.conf.template:rw"
+      "${nginxConfigDir}/ssl:/etc/ssl:rw"
       "${difyLib}/nginx/ssl:/etc/ssl # cert dir (legacy)"
       "${difyLib}/volumes/certbot/conf/live:/etc/letsencrypt/live # cert dir (with certbot container)"
       "${difyLib}/volumes/certbot/conf:/etc/letsencrypt"
