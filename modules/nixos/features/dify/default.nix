@@ -46,10 +46,10 @@ in {
       done
 
       # add path for volumes
-      mkdir -p /lib/dify/volumes/redis/data
       mkdir -p /lib/dify/volumes/app/storage
       mkdir -p /lib/dify/volumes/db/data
       mkdir -p /lib/dify/volumes/plugin_daemon
+      mkdir -p /lib/dify/volumes/redis/data
     '';
 
   # Containers
@@ -303,7 +303,7 @@ in {
     };
     volumes = [
       "${difyLib}/volumes/sandbox/dependencies:/dependencies"
-      "${difyLib}./volumes/sandbox/conf:/conf"
+      "${difyLib}/volumes/sandbox/conf:/conf"
     ];
     log-driver = "journald";
     extraOptions = [
