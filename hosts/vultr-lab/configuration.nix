@@ -17,7 +17,7 @@
 
   myNixOS.bundles.general-server.enable = true;
   myNixOS.freshrss.enable = true;
-  myNixOS.dify.enable = true;
+  myNixOS.dify.enable = false;
 
   boot.loader.grub = {
     # no need to set devices, disko will add all devices that have a EF02 partition to the list already
