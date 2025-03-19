@@ -11,7 +11,8 @@
     owner = "langgenius";
     repo = "dify";
     rev = "main";
-    sha256 = lib.fakeSha256;
+    sha256 = "sha256-22CBYZC3VjPbesKeXGg+YgrPwAlnS3K+6NNYVvQyBKQ=";
+    # sha256 = lib.fakeSha256;
   };
 
   difyDockerInstall = pkgs.runCommand "dify-install" {} ''
