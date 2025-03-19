@@ -26,20 +26,28 @@ in {
   environment.systemPackages = [difyDockerInstall];
 
   # Create a symlink in /lib/dify
-  system.activationScripts.difyInstall = ''
-    mkdir -p ${difyLib}
-    for file in $(find ${difyDockerInstall} -type f); do
-      relPath=$(realpath --relative-to="${difyDockerInstall}" "$file")
-      mkdir -p $(dirname "${difyLib}/$relPath")
-      ln -sfn "$file" "${difyLib}/$relPath"
-    done
+  system.activationScripts.difyInstall =
+    /*
+    sh
+    */
+    ''
+      # symlink
+      mkdir -p ${difyLib}
+      for file in $(find ${difyDockerInstall} -type f); do
+        relPath=$(realpath --relative-to="${difyDockerInstall}" "$file")
+        mkdir -p $(dirname "${difyLib}/$relPath")
+        ln -sfn "$file" "${difyLib}/$relPath"
+      done
 
-    # Also handle directories that might be empty
-    for dir in $(find ${difyDockerInstall} -type d); do
-      relPath=$(realpath --relative-to="${difyDockerInstall}" "$dir")
-      mkdir -p "${difyLib}/$relPath"
-    done
-  '';
+      # Also handle directories that might be empty
+      for dir in $(find ${difyDockerInstall} -type d); do
+        relPath=$(realpath --relative-to="${difyDockerInstall}" "$dir")
+        mkdir -p "${difyLib}/$relPath"
+      done
+
+      # add path for volumes
+      mkdir -p /lib/dify/volumes/redis/data
+    '';
 
   # Containers
   virtualisation.oci-containers.containers."dify-api" = {
