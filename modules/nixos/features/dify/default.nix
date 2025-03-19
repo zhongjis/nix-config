@@ -53,6 +53,7 @@ in {
       mkdir -p /lib/dify/volumes/certbot/www
       mkdir -p /lib/dify/volumes/plugin_daemon
       mkdir -p /lib/dify/volumes/redis/data
+      mkdir -p /lib/dify/volumes/weaviate
     '';
 
   # Containers
@@ -457,6 +458,47 @@ in {
     requires = [
       "podman-network-dify_default.service"
       "podman-network-dify_ssrf_proxy_network.service"
+    ];
+    partOf = [
+      "podman-compose-dify-root.target"
+    ];
+    wantedBy = [
+      "podman-compose-dify-root.target"
+    ];
+  };
+
+  virtualisation.oci-containers.containers."dify-weaviate" = {
+    image = "semitechnologies/weaviate:1.19.0";
+    environment = {
+      PERSISTENCE_DATA_PATH = "/var/lib/weaviate";
+      QUERY_DEFAULTS_LIMIT = "25";
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED = "false";
+      DEFAULT_VECTORIZER_MODULE = "none";
+      CLUSTER_HOSTNAME = "node1";
+      AUTHENTICATION_APIKEY_ENABLED = "true";
+      AUTHENTICATION_APIKEY_ALLOWED_KEYS = "WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih";
+      AUTHENTICATION_APIKEY_USERS = "hello@dify.ai";
+      AUTHORIZATION_ADMINLIST_ENABLED = "true";
+      AUTHORIZATION_ADMINLIST_USERS = "hello@dify.ai";
+    };
+    volumes = [
+      "${difyLib}/volumes/weaviate:/var/lib/weaviate"
+    ];
+    log-driver = "journald";
+    extraOptions = [
+      "--network-alias=redis"
+      "--network=dify_default"
+    ];
+  };
+  systemd.services."podman-dify-weaviate" = {
+    serviceConfig = {
+      Restart = lib.mkOverride 90 "always";
+    };
+    after = [
+      "podman-network-dify_default.service"
+    ];
+    requires = [
+      "podman-network-dify_default.service"
     ];
     partOf = [
       "podman-compose-dify-root.target"
