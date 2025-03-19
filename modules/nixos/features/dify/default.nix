@@ -20,7 +20,7 @@
 in {
   # Containers
   virtualisation.oci-containers.containers."dify-api" = {
-    image = "langgenius/dify-api:1.0.1";
+    image = "langgenius/dify-api:1.1.0";
     environment =
       sharedApiWorkerEnv
       // {
@@ -175,7 +175,7 @@ in {
   };
 
   virtualisation.oci-containers.containers."dify-plugin_daemon" = {
-    image = "langgenius/dify-plugin-daemon:0.0.4-local";
+    image = "langgenius/dify-plugin-daemon:0.0.5-local";
     environment =
       sharedApiWorkerEnv
       // {
@@ -349,7 +349,7 @@ in {
   };
 
   virtualisation.oci-containers.containers."dify-web" = {
-    image = "langgenius/dify-web:1.0.1";
+    image = "langgenius/dify-web:1.1.0";
     environment = {
       "APP_API_URL" = "";
       "CONSOLE_API_URL" = "";
@@ -390,7 +390,7 @@ in {
   };
 
   virtualisation.oci-containers.containers."dify-worker" = {
-    image = "langgenius/dify-api:1.0.1";
+    image = "langgenius/dify-api:1.1.0";
     environment =
       sharedApiWorkerEnv
       // {
