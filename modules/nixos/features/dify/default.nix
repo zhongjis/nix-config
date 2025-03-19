@@ -48,6 +48,8 @@ in {
       # add path for volumes
       mkdir -p /lib/dify/volumes/app/storage
       mkdir -p /lib/dify/volumes/db/data
+      mkdir -p /lib/dify/volumes/certbot/conf/live
+      mkdir -p /lib/dify/volumes/certbot/www
       mkdir -p /lib/dify/volumes/plugin_daemon
       mkdir -p /lib/dify/volumes/redis/data
     '';
