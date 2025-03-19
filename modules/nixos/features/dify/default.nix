@@ -16,8 +16,8 @@
   };
 
   difyDockerInstall = pkgs.runCommand "dify-install" {} ''
-    mkdir -p $out/lib
-    cp -r ${difyRepo}/docker/* $out/lib/dify/
+    mkdir -p $out/docker
+    cp -r ${difyRepo}/docker/* $out/docker
   '';
 
   difyLib = "/lib/dify";
@@ -28,7 +28,7 @@ in {
   # Create a symlink in /lib/dify
   system.activationScripts.difyInstall = ''
     mkdir -p /lib
-    ln -sfn ${difyDockerInstall}/lib/dify /lib/dify
+    ln -sfn ${difyDockerInstall} ${difyLib}
   '';
 
   # Containers
