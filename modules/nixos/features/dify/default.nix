@@ -486,7 +486,7 @@ in {
     ];
     log-driver = "journald";
     extraOptions = [
-      "--network-alias=redis"
+      "--network-alias=weaviate"
       "--network=dify_default"
     ];
   };
