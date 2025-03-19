@@ -28,15 +28,15 @@ in {
   # Create a symlink in /lib/dify
   system.activationScripts.difyInstall = ''
     mkdir -p ${difyLib}
-    for file in $(find ${difyDockerInstall}/lib/dify/ -type f); do
-      relPath=$(realpath --relative-to="${difyDockerInstall}/lib/dify" "$file")
+    for file in $(find ${difyDockerInstall} -type f); do
+      relPath=$(realpath --relative-to="${difyDockerInstall}" "$file")
       mkdir -p $(dirname "${difyLib}/$relPath")
       ln -sfn "$file" "${difyLib}/$relPath"
     done
 
     # Also handle directories that might be empty
-    for dir in $(find ${difyDockerInstall}/lib/dify/ -type d); do
-      relPath=$(realpath --relative-to="${difyDockerInstall}/lib/dify" "$dir")
+    for dir in $(find ${difyDockerInstall} -type d); do
+      relPath=$(realpath --relative-to="${difyDockerInstall}" "$dir")
       mkdir -p "${difyLib}/$relPath"
     done
   '';
