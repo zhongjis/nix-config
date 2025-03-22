@@ -21,7 +21,9 @@ in {
     enable = true;
     xwayland.enable = true;
     systemd.enable = false;
-    portalPackage = pkgs.xdg-desktop-portal-hyprland;
+    # NOTE: below two are defined in nixos module
+    package = null;
+    portalPackage = null;
     # See https://wiki.hyprland.org/Configuring/Monitors/
     settings.monitor =
       lib.mapAttrsToList
