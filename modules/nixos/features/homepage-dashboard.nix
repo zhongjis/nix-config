@@ -18,7 +18,7 @@ in {
       };
     };
 
-    virtualHosts."dashboard.zshen.me" = {
+    virtualHosts."home.zshen.me" = {
       enableACME = true;
       forceSSL = true;
 

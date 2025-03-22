@@ -3,14 +3,17 @@
   inputs,
   ...
 }: let
+  sockertVoume =
+    if config.virtualisation.oci-containers.backend == "docker"
+    then "/var/run/docker.sock:/var/run/docker.sock"
+    else "/run/podman/podman.sock:/var/run/docker.sock";
 in {
   virtualisation.oci-containers = {
     containers.portainer-ce = {
       image = "portainer/portainer-ce:latest";
       volumes = [
         "portainer_data:/data"
-        "/var/run/docker.sock:/var/run/docker.sock"
-        # "/run/podman/podman.sock:/var/run/docker.sock"
+        sockertVoume
         "/etc/localtime:/etc/localtime"
       ];
       ports = ["9443:9443"];
