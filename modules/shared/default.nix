@@ -10,8 +10,8 @@
   nix.settings = {
     trusted-users = ["root" "@wheel" "zshen"];
     substituters = [
-      "https://cuda-maintainers.cachix.org"
       "https://cache.nixos.org"
+      "https://cuda-maintainers.cachix.org"
       "https://hyprland.cachix.org"
       "https://devenv.cachix.org"
       "https://nix-gaming.cachix.org"
