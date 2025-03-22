@@ -172,50 +172,50 @@ in {
 
         ${lib.concatLines workspaceToMonitorSetup}
 
-        windowrulev2 = workspace special:default,class:^(vesktop)$
+        windowrule = workspace special:default,class:^(vesktop)$
 
-        windowrulev2 = workspace name:spotify,class:^(spotify)$
+        windowrule = workspace name:spotify,class:^(spotify)$
 
-        windowrulev2 = workspace name:obsidian,class:^(obsidian)$
+        windowrule = workspace name:obsidian,class:^(obsidian)$
 
-        windowrulev2 = workspace name:gaming,class:^(steam)$
-        windowrulev2 = workspace name:gaming,class:^(heroic)$
-        windowrulev2 = workspace name:gaming,class:^(com.usebottles.bottles)$
-        windowrulev2 = workspace name:gaming,class:^(steam_proton)$
-        windowrulev2 = workspace name:gaming,class:^(gamescope)$
+        windowrule = workspace name:gaming,class:^(steam)$
+        windowrule = workspace name:gaming,class:^(heroic)$
+        windowrule = workspace name:gaming,class:^(com.usebottles.bottles)$
+        windowrule = workspace name:gaming,class:^(steam_proton)$
+        windowrule = workspace name:gaming,class:^(gamescope)$
 
-        windowrulev2 = workspace name:zen,class:^(vivaldi-stable)$
+        windowrule = workspace name:zen,class:^(vivaldi-stable)$
 
         # Pavucontrol floating
-        windowrulev2 = float,class:(.*org.pulseaudio.pavucontrol.*)
-        windowrulev2 = size 900 800,class:(.*org.pulseaudio.pavucontrol.*)
-        windowrulev2 = center,class:(.*org.pulseaudio.pavucontrol.*)
-        windowrulev2 = pin,class:(.*org.pulseaudio.pavucontrol.*)
+        windowrule = float,class:(.*org.pulseaudio.pavucontrol.*)
+        windowrule = size 900 800,class:(.*org.pulseaudio.pavucontrol.*)
+        windowrule = center,class:(.*org.pulseaudio.pavucontrol.*)
+        windowrule = pin,class:(.*org.pulseaudio.pavucontrol.*)
 
         # hide xwaylandvideobridge, more detial see
         # https://wiki.hyprland.org/Useful-Utilities/Screen-Sharing/#xwayland
-        windowrulev2 = opacity 0.0 override, class:^(xwaylandvideobridge)$
-        windowrulev2 = noanim, class:^(xwaylandvideobridge)$
-        windowrulev2 = noinitialfocus, class:^(xwaylandvideobridge)$
-        windowrulev2 = maxsize 1 1, class:^(xwaylandvideobridge)$
-        windowrulev2 = noblur, class:^(xwaylandvideobridge)$
-        windowrulev2 = nofocus, class:^(xwaylandvideobridge)$
+        windowrule = opacity 0.0 override, class:^(xwaylandvideobridge)$
+        windowrule = noanim, class:^(xwaylandvideobridge)$
+        windowrule = noinitialfocus, class:^(xwaylandvideobridge)$
+        windowrule = maxsize 1 1, class:^(xwaylandvideobridge)$
+        windowrule = noblur, class:^(xwaylandvideobridge)$
+        windowrule = nofocus, class:^(xwaylandvideobridge)$
 
         # hope to fix some steam focus issue
         # NOTE: https://www.reddit.com/r/hyprland/comments/19c53ub/steam_on_hyprland_is_extremely_wonky/
-        windowrulev2 = stayfocused, title:^()$,class:^(steam)$
-        windowrulev2 = minsize 1 1, title:^()$,class:^(steam)$
+        windowrule = stayfocused, title:^()$,class:^(steam)$
+        windowrule = minsize 1 1, title:^()$,class:^(steam)$
 
         # for fcitx5
         # reference: https://discourse.nixos.org/t/pinyin-input-method-in-hyprland-wayland-for-simplified-chinese/49186
-        windowrule = pseudo, fcitx
+        windowrule = pseudo, title:^()$,class:^(fcitx)$
         exec-once=fcitx5 -d -r
         exec-once=fcitx5-remote -r
 
         # Browser Picture in Picture
-        windowrulev2 = float, title:^(Picture-in-Picture)$
-        windowrulev2 = pin, title:^(Picture-in-Picture)$
-        windowrulev2 = move 69.5% 4%, title:^(Picture-in-Picture)$
+        windowrule = float, title:^(Picture-in-Picture)$
+        windowrule = pin, title:^(Picture-in-Picture)$
+        windowrule = move 69.5% 4%, title:^(Picture-in-Picture)$
 
         cursor {
             no_hardware_cursors = true
