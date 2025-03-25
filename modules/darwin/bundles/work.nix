@@ -11,9 +11,9 @@ in {
 
       php
 
-      # **java**
-      maven
-      jdk
+      # **java17**
+      (maven.override {jdk_headless = jdk17;})
+      jdk17
 
       # kube
       kubectl
