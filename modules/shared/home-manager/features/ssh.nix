@@ -35,12 +35,20 @@ in {
       path = "${config.home.homeDirectory}/.ssh/liveaccess_adobe_zshen.pub";
     };
 
-    # liveaccess - adobe
+    # vultrlab
     "vultr_com/private_key" = {
       path = "${config.home.homeDirectory}/.ssh/vultr_com";
     };
     "vultr_com/public_key" = {
       path = "${config.home.homeDirectory}/.ssh/vultr_com.pub";
+    };
+
+    # homelab
+    "homelab/private_key" = {
+      path = "${config.home.homeDirectory}/.ssh/homelab";
+    };
+    "homelab/public_key" = {
+      path = "${config.home.homeDirectory}/.ssh/homelab.pub";
     };
   };
 
