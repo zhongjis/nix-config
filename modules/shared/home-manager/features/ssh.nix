@@ -98,5 +98,16 @@ in {
       in
         baseOptions // darwinKeychainOption;
     };
+    "homelab" = {
+      host = "10.1.140.101";
+      identityFile = "${config.home.homeDirectory}/.ssh/homelab";
+      extraOptions = let
+        baseOptions = {
+          PreferredAuthentications = "publickey";
+          AddKeysToAgent = "yes";
+        };
+      in
+        baseOptions // darwinKeychainOption;
+    };
   };
 }
