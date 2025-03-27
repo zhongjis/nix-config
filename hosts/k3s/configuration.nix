@@ -81,6 +81,10 @@ in {
     name = "iqn.2016-04.com.open-iscsi:${meta.hostname}";
   };
 
+  users.users.root.openssh.authorizedKeys.keys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINDkA9QW9+SBK4dXpIj9nR9k49wuPdjlMwLvSacM9ExM zhongjie.x.shen@gmail.com"
+  ];
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users."${currentSystemUser}" = {
     isNormalUser = true;
