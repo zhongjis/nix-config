@@ -95,6 +95,18 @@
           system = "x86_64-linux";
           user = "zshen";
         };
+        homelab-0 = mkK3sNode "k3s" {
+          system = "x86_64-linux";
+          user = "admin";
+        };
+        homelab-1 = mkK3sNode "k3s" {
+          system = "x86_64-linux";
+          user = "admin";
+        };
+        homelab-2 = mkK3sNode "k3s" {
+          system = "x86_64-linux";
+          user = "admin";
+        };
       };
 
       darwinConfigurations = {
