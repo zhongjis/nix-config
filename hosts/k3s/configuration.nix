@@ -9,7 +9,9 @@
   meta,
   currentSystemUser,
   ...
-}: {
+}: let
+  sopsFile = ../../secrets/homelab.yaml;
+in {
   imports =
     [
       (modulesPath + "/installer/scan/not-detected.nix")
@@ -19,7 +21,7 @@
     ++ lib.optional (builtins.pathExists ./hardware-configuration-${meta.hostname}.nix) ./hardware-configuration-${meta.hostname}.nix;
 
   nix = {
-    package = pkgs.nixFlakes;
+    package = pkgs.nix;
     extraOptions = ''
       experimental-features = nix-command flakes
     '';
@@ -61,10 +63,19 @@
   # Configure keymap in X11
   # services.xserver.xkb.layout = "us";
   # services.xserver.xkb.options = "eurosign:e,caps:escape";
+
+  sops.secrets = {
+    # github - personal
+    k3s_token = {
+      inherit sopsFile;
+      owner = "k3s";
+    };
+  };
+
   services.k3s = {
     enable = true;
     role = "server";
-    tokenFile = /var/lib/rancher/k3s/server/token;
+    tokenFile = config.sops.secrets.k3s_token;
     extraFlags = toString ([
         "--write-kubeconfig-mode \"0644\""
         "--cluster-init"
@@ -110,6 +121,7 @@
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINDkA9QW9+SBK4dXpIj9nR9k49wuPdjlMwLvSacM9ExM zhongjie.x.shen@gmail.com"
     ];
   };
+  programs.fish.enable = true;
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
