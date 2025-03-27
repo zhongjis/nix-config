@@ -15,9 +15,14 @@ in {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
     (modulesPath + "/profiles/qemu-guest.nix")
+    ../../modules/shared
+    ../../modules/nixos
+
     ./disk-config.nix
   ];
   # ++ lib.optional (builtins.pathExists ./hardware-configuration-${meta.hostname}.nix) ./hardware-configuration-${meta.hostname}.nix;
+
+  myNixOS.bundles.general-k3s.enable = true;
 
   boot.loader.grub = {
     # no need to set devices, disko will add all devices that have a EF02 partition to the list already
@@ -45,7 +50,6 @@ in {
   virtualisation.docker.logDriver = "json-file";
 
   sops.secrets = {
-    # github - personal
     k3s_token = {
       inherit sopsFile;
     };
@@ -91,14 +95,6 @@ in {
     ];
   };
   programs.fish.enable = true;
-
-  environment.systemPackages = with pkgs; [
-    neovim
-    k3s
-    cifs-utils
-    nfs-utils
-    git
-  ];
 
   services.openssh.enable = true;
 
