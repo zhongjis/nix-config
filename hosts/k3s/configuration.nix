@@ -23,6 +23,7 @@ in {
   # ++ lib.optional (builtins.pathExists ./hardware-configuration-${meta.hostname}.nix) ./hardware-configuration-${meta.hostname}.nix;
 
   myNixOS.bundles.general-k3s.enable = true;
+  stylix.enable = false;
 
   boot.loader.grub = {
     # no need to set devices, disko will add all devices that have a EF02 partition to the list already
