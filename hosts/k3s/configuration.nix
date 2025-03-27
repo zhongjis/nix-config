@@ -9,9 +9,7 @@
   currentSystemUser,
   ...
 }: {
-  imports = [
-    # Include the results of the hardware scan.
-  ];
+  imports = [] ++ lib.optional (builtins.pathExists ./hardware-configuration-${currentSystemName}.nix) ./hardware-configuration-${currentSystemName}.nix;
 
   nix = {
     package = pkgs.nixFlakes;
