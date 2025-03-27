@@ -3,13 +3,20 @@
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 {
   config,
+  modulesPath,
   lib,
   pkgs,
-  currentSystemName,
+  meta,
   currentSystemUser,
   ...
 }: {
-  imports = [] ++ lib.optional (builtins.pathExists ./hardware-configuration-${currentSystemName}.nix) ./hardware-configuration-${currentSystemName}.nix;
+  imports =
+    [
+      (modulesPath + "/installer/scan/not-detected.nix")
+      (modulesPath + "/profiles/qemu-guest.nix")
+      ./disk-config.nix
+    ]
+    ++ lib.optional (builtins.pathExists ./hardware-configuration-${meta.hostname}.nix) ./hardware-configuration-${meta.hostname}.nix;
 
   nix = {
     package = pkgs.nixFlakes;
@@ -22,7 +29,7 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = currentSystemName; # Define your hostname.
+  networking.hostName = meta.hostname; # Define your hostname.
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   networking.networkmanager.enable = true; # Easiest to use and most distros use this by default.
@@ -66,18 +73,18 @@
         "--disable local-storage"
       ]
       ++ (
-        if currentSystemName == "homelab-0"
+        if meta.hostname == "homelab-0"
         then []
         else [
           "--server https://homelab-0:6443"
         ]
       ));
-    clusterInit = currentSystemName == "homelab-0";
+    clusterInit = meta.hostname == "homelab-0";
   };
 
   services.openiscsi = {
     enable = true;
-    name = "iqn.2016-04.com.open-iscsi:${currentSystemName}";
+    name = "iqn.2016-04.com.open-iscsi:${meta.hostname}";
   };
 
   # Enable CUPS to print documents.

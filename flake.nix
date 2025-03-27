@@ -95,15 +95,15 @@
           system = "x86_64-linux";
           user = "zshen";
         };
-        homelab-0 = mkK3sNode "k3s" {
+        homelab-0 = mkK3sNode "homelab-0" {
           system = "x86_64-linux";
           user = "admin";
         };
-        homelab-1 = mkK3sNode "k3s" {
+        homelab-1 = mkK3sNode "homelab-1" {
           system = "x86_64-linux";
           user = "admin";
         };
-        homelab-2 = mkK3sNode "k3s" {
+        homelab-2 = mkK3sNode "homelab-2" {
           system = "x86_64-linux";
           user = "admin";
         };

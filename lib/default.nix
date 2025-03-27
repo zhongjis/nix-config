@@ -84,11 +84,13 @@ in rec {
       system = system;
       specialArgs = {
         inherit inputs outputs myLib;
+        meta = {hostname = hostName;};
       };
 
       modules = [
-        ../hosts/${hostName}/configuration.nix
+        ../hosts/k3s/configuration.nix
         inputs.sops-nix.nixosModules.sops
+        inputs.disko.nixosModules.disko
 
         {
           nixpkgs.overlays = [
@@ -104,10 +106,7 @@ in rec {
 
         {
           config._module.args = {
-            currentSystem = system;
-            currentSystemName = hostName;
             currentSystemUser = user;
-            inputs = inputs;
           };
         }
       ];
