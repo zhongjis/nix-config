@@ -56,6 +56,9 @@ in {
     k3s_token = {
       inherit sopsFile;
     };
+    server_password_sha256 = {
+      inherit sopsFile;
+    };
   };
 
   services.k3s = {
@@ -85,7 +88,7 @@ in {
   };
 
   users.users.root = {
-    initialPassword = "1234";
+    hashedPasswordFile = config.sops.secrets.server_password_sha256.path;
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINDkA9QW9+SBK4dXpIj9nR9k49wuPdjlMwLvSacM9ExM zhongjie.x.shen@gmail.com"
     ];
@@ -100,7 +103,7 @@ in {
     ];
     # Created using mkpasswd
     shell = pkgs.zsh;
-    initialPassword = "1234";
+    hashedPasswordFile = config.sops.secrets.server_password_sha256.path;
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINDkA9QW9+SBK4dXpIj9nR9k49wuPdjlMwLvSacM9ExM zhongjie.x.shen@gmail.com"
     ];
