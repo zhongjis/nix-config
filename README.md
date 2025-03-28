@@ -8,12 +8,16 @@ This is my personal nix-config. It is always a work in progress as I love tweaki
 
 ## System Status
 
-| host                  | profile                           | system         |
+| host                  | home-manager profile              | system         |
 | --------------------- | --------------------------------- | -------------- |
-| thinkpad-t480         | zshen@thinkpad-t480               | x86_64-linux   |
 | framework-16          | zshen@framework-16                | x86_64-linux   |
 | Zhongjies-MacBook-Pro | zshen@Zhongjies-MacBook-Pro.local | aarch64-darwin |
 | vultr-lab             | zshen@vultr                       | x86_64-linux   |
+
+| device        | host                    | OS      | system       |
+| ------------- | ----------------------- | ------- | ------------ |
+| thinkpad-t480 | homelab-0, homelab-1    | Proxmox | x86_64-linux |
+| zimablade     | homelab-2, TrueNAS Core | Proxmox | x86_64-linux |
 
 ## Get Started
 

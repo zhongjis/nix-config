@@ -1,11 +1,15 @@
-{pkgs, ...}: let
+{
+  pkgs,
+  lib,
+  ...
+}: let
   astronaunt = pkgs.fetchurl {
     url = "https://i.redd.it/mvev8aelh7zc1.png";
     hash = "sha256-lJjIq+3140a5OkNy/FAEOCoCcvQqOi73GWJGwR2zT9w";
   };
 in {
   stylix = {
-    enable = true;
+    enable = lib.mkDefault true;
     base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
 
     image = astronaunt;
