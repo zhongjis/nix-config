@@ -56,9 +56,6 @@ in {
     k3s_token = {
       inherit sopsFile;
     };
-    server_password_sha256 = {
-      inherit sopsFile;
-    };
   };
 
   services.k3s = {
@@ -82,6 +79,13 @@ in {
   services.openiscsi = {
     enable = true;
     name = "iqn.2016-04.com.open-iscsi:${meta.hostname}";
+  };
+
+  sops.secrets = {
+    server_password_sha256 = {
+      inherit sopsFile;
+      neededForUsers = true;
+    };
   };
 
   users.users.root = {
