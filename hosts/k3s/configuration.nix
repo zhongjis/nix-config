@@ -69,10 +69,9 @@ in {
         if meta.hostname == "homelab-0"
         then []
         else [
-          "--server https://homelab-0:6443"
+          "--server https://${meta.hostaddr}:6443"
         ]
       ));
-    serverAddr = meta.hostaddr;
     clusterInit = meta.hostname == "homelab-0";
   };
 
