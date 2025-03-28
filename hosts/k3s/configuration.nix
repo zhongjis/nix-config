@@ -96,12 +96,12 @@ in {
       tree
     ];
     # Created using mkpasswd
-    shell = pkgs.fish;
+    shell = pkgs.zsh;
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINDkA9QW9+SBK4dXpIj9nR9k49wuPdjlMwLvSacM9ExM zhongjie.x.shen@gmail.com"
     ];
   };
-  programs.fish.enable = true;
+  programs.zsh.enable = true;
 
   services.openssh.enable = true;
 
