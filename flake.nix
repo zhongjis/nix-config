@@ -81,11 +81,6 @@
   in
     with myLib; {
       nixosConfigurations = {
-        thinkpad-t480 = mkSystem "thinkpad-t480" {
-          system = "x86_64-linux";
-          hardware = "lenovo-thinkpad-t480";
-          user = "zshen";
-        };
         framework-16 = mkSystem "framework-16" {
           system = "x86_64-linux";
           hardware = "framework-16-7040-amd";
