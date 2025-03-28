@@ -78,13 +78,17 @@ in rec {
   mkK3sNode = hostName: {
     system,
     user,
+    hostAddr ? "",
   }: let
   in
     nixpkgs.lib.nixosSystem {
       system = system;
       specialArgs = {
         inherit inputs outputs myLib;
-        meta = {hostname = hostName;};
+        meta = {
+          hostname = hostName;
+          hostaddr = hostAddr;
+        };
       };
 
       modules = [

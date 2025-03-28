@@ -67,10 +67,6 @@ in {
     tokenFile = config.sops.secrets.k3s_token.path;
     extraFlags = toString ([
         "--write-kubeconfig-mode \"0644\""
-        "--cluster-init"
-        "--disable servicelb"
-        "--disable traefik"
-        "--disable local-storage"
       ]
       ++ (
         if meta.hostname == "homelab-0"
@@ -79,6 +75,7 @@ in {
           "--server https://homelab-0:6443"
         ]
       ));
+    serverAddr = meta.hostaddr;
     clusterInit = meta.hostname == "homelab-0";
   };
 

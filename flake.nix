@@ -97,10 +97,12 @@
         homelab-1 = mkK3sNode "homelab-1" {
           system = "x86_64-linux";
           user = "admin";
+          hostAddr = "10.1.140.101";
         };
         homelab-2 = mkK3sNode "homelab-2" {
           system = "x86_64-linux";
           user = "admin";
+          hostAddr = "10.1.140.101";
         };
       };
 
