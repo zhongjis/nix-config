@@ -50,6 +50,8 @@ in {
   ];
   virtualisation.docker.logDriver = "json-file";
 
+  # NOTE: below is the age key to decrypt
+  sops.age.keyFile = "keys.txt";
   sops.secrets = {
     k3s_token = {
       inherit sopsFile;
