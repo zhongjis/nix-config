@@ -12,15 +12,16 @@
 }: let
   sopsFile = ../../secrets/homelab.yaml;
 in {
-  imports = [
-    (modulesPath + "/installer/scan/not-detected.nix")
-    (modulesPath + "/profiles/qemu-guest.nix")
-    ../../modules/shared
-    ../../modules/nixos
+  imports =
+    [
+      (modulesPath + "/installer/scan/not-detected.nix")
+      (modulesPath + "/profiles/qemu-guest.nix")
+      ../../modules/shared
+      ../../modules/nixos
 
-    ./disk-config.nix
-  ];
-  # ++ lib.optional (builtins.pathExists ./hardware-configuration-${meta.hostname}.nix) ./hardware-configuration-${meta.hostname}.nix;
+      ./disk-config.nix
+    ]
+    ++ lib.optional (builtins.pathExists ./hardware-configuration-${meta.hostname}.nix) ./hardware-configuration-${meta.hostname}.nix;
 
   myNixOS.bundles.general-k3s.enable = true;
   stylix.enable = false;
@@ -110,6 +111,7 @@ in {
   services.openssh.enable = true;
 
   networking.firewall.enable = false;
+  # NOTE: for more defined firewall configurations
   # https://docs.k3s.io/installation/requirements#inbound-rules-for-k3s-nodes
   # networking.firewall = {
   #   enable = true;
