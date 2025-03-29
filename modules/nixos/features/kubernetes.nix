@@ -16,6 +16,7 @@
 in {
   environment.systemPackages = with pkgs; [
     kubectl
+    kustomize
     k9s
 
     my-kubernetes-helm
