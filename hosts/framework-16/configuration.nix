@@ -95,11 +95,7 @@
   hardware.logitech.wireless.enable = true;
   hardware.logitech.wireless.enableGraphical = true; # for solaar to be included
 
-  environment.systemPackages = with pkgs; [
-    vivaldi
-    neovim
-    unzip
-  ];
+  environment.systemPackages = with pkgs; [];
 
   system.stateVersion = "24.05"; # Did you read the comment?
 }

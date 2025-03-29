@@ -81,6 +81,8 @@
     obsidian
     bitwarden
     fluent-reader
+
+    vivaldi
   ];
 
   fonts.packages = with pkgs; [
