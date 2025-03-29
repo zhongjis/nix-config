@@ -28,14 +28,12 @@ root@10.1.140.104
 
 ```nix
 nixos-rebuild switch --flake .#homelab-0 \
-  --target-host root@10.1.140.104 \
-  --build-host localhost
+  --target-host root@10.1.140.104
 ```
 
 ### homelab-1
 
 ```nix
 nixos-rebuild switch --flake .#homelab-1 \
-  --target-host root@10.1.140.105 \
-  --build-host localhost
+  --target-host root@10.1.140.105
 ```
