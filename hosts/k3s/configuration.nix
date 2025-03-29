@@ -112,7 +112,12 @@ in {
 
   services.openssh.enable = true;
 
-  networking.firewall.enable = false;
+  # https://docs.k3s.io/installation/requirements#inbound-rules-for-k3s-nodes
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [2379 2380 6443 10250 5001 6443];
+    allowedUDPPorts = [8472 51820 51821];
+  };
 
   system.stateVersion = "24.05"; # Did you read the comment?
 }
