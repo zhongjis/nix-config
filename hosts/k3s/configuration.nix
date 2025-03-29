@@ -65,6 +65,8 @@ in {
     tokenFile = config.sops.secrets.k3s_token.path;
     extraFlags = toString ([
         "--write-kubeconfig-mode \"0644\""
+        "--disable servicelb"
+        "--disable traefik"
       ]
       ++ (
         if meta.hostname == "homelab-0"
