@@ -12,6 +12,7 @@
   myNixOS.xremap.enable = lib.mkDefault true;
   myNixOS.podman.enable = lib.mkDefault true;
   myNixOS.docker.enable = lib.mkDefault false;
+  myNixOS.kubernetes.enable = lib.mkDefault true;
 
   # fwupd - firmware update
   services.fwupd.enable = lib.mkDefault true;
