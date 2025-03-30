@@ -14,6 +14,10 @@
   myNixOS.docker.enable = lib.mkDefault false;
   myNixOS.kubernetes.enable = lib.mkDefault true;
 
+  # firewall
+  networking.firewall.enable = true;
+  networking.firewall.allowedTCPPorts = [111 2049];
+
   # fwupd - firmware update
   services.fwupd.enable = lib.mkDefault true;
 
