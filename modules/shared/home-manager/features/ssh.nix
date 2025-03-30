@@ -99,7 +99,7 @@ in {
         baseOptions // darwinKeychainOption;
     };
     "homelab" = {
-      host = "10.1.140.104 10.1.140.105";
+      host = "192.168.50.201 192.168.50.202 192.168.50.203";
       identityFile = "${config.home.homeDirectory}/.ssh/homelab";
       extraOptions = let
         baseOptions = {
