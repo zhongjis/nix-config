@@ -24,6 +24,16 @@ nix run nixpkgs#nixos-anywhere -- \
 nixos@192.168.50.184
 ```
 
+#### homelab-2
+
+```nix
+nix run nixpkgs#nixos-anywhere -- \
+--flake .#homelab-2 \
+--generate-hardware-config nixos-generate-config ./hosts/k3s/hardware-configuration-homelab-2.nix \
+--extra-files /home/zshen/.config/sops/age \
+nixos@192.168.50.113
+```
+
 ### on Darwin
 
 ```nix
@@ -48,4 +58,11 @@ nixos-rebuild switch --flake .#homelab-0 \
 ```nix
 nixos-rebuild switch --flake .#homelab-1 \
   --target-host root@192.168.50.184
+```
+
+### homelab-2
+
+```nix
+nixos-rebuild switch --flake .#homelab-1 \
+  --target-host root@192.168.50.113
 ```
