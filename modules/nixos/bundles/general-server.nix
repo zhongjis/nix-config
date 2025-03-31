@@ -16,6 +16,7 @@
   services.xremap.enable = false;
 
   environment.systemPackages = map lib.lowPrio [
+    pkgs.bind
     pkgs.curl
     pkgs.git
     pkgs.neovim

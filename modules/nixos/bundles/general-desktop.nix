@@ -80,6 +80,7 @@
     zip
     wget
     git
+    bind
 
     neovim
 
