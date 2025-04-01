@@ -22,8 +22,8 @@
     bundles.general-desktop.enable = true;
     bundles.hyprland.enable = true;
     bundles.gaming.enable = true;
-    services.amdcpu.enable = true;
-    services.amdgpu.enable = true;
+    services.amdcpu.enable = false;
+    services.amdgpu.enable = false;
     multi-lang-input-layout.enable = true;
     ollama.enable = true;
     sops.enable = true;
