@@ -14,7 +14,7 @@
   };
 
   hardware.amdgpu = {
-    opencl.enable = false; # FIXME: this one was broken
+    opencl.enable = true; # FIXME: this one was broken
     initrd.enable = true;
     amdvlk = {
       enable = true;
