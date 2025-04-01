@@ -9,6 +9,8 @@
     enable32Bit = true;
     extraPackages = with pkgs; [
       amdvlk
+    ];
+    hardware.opengl.extraPackages32 = with pkgs; [
       driversi686Linux.amdvlk
     ];
   };
@@ -30,5 +32,9 @@
 
   environment.systemPackages = with pkgs; [
     nvtopPackages.amd
+    lact
   ];
+
+  systemd.packages = with pkgs; [lact];
+  systemd.services.lactd.wantedBy = ["multi-user.target"];
 }
