@@ -35,12 +35,20 @@ in {
       path = "${config.home.homeDirectory}/.ssh/liveaccess_adobe_zshen.pub";
     };
 
-    # liveaccess - adobe
+    # vultrlab
     "vultr_com/private_key" = {
       path = "${config.home.homeDirectory}/.ssh/vultr_com";
     };
     "vultr_com/public_key" = {
       path = "${config.home.homeDirectory}/.ssh/vultr_com.pub";
+    };
+
+    # homelab
+    "homelab/private_key" = {
+      path = "${config.home.homeDirectory}/.ssh/homelab";
+    };
+    "homelab/public_key" = {
+      path = "${config.home.homeDirectory}/.ssh/homelab.pub";
     };
   };
 
@@ -82,6 +90,17 @@ in {
     "dify_vultr" = {
       host = "45.77.189.121";
       identityFile = "${config.home.homeDirectory}/.ssh/vultr_com";
+      extraOptions = let
+        baseOptions = {
+          PreferredAuthentications = "publickey";
+          AddKeysToAgent = "yes";
+        };
+      in
+        baseOptions // darwinKeychainOption;
+    };
+    "homelab" = {
+      host = "192.168.50.201 192.168.50.202 192.168.50.203";
+      identityFile = "${config.home.homeDirectory}/.ssh/homelab";
       extraOptions = let
         baseOptions = {
           PreferredAuthentications = "publickey";

@@ -75,6 +75,47 @@ in rec {
       ];
     };
 
+  mkK3sNode = hostName: {
+    system,
+    user,
+    hostAddr ? "",
+  }: let
+  in
+    nixpkgs.lib.nixosSystem {
+      system = system;
+      specialArgs = {
+        inherit inputs outputs myLib;
+        meta = {
+          hostname = hostName;
+          hostaddr = hostAddr;
+        };
+      };
+
+      modules = [
+        ../hosts/k3s/configuration.nix
+        inputs.sops-nix.nixosModules.sops
+        inputs.disko.nixosModules.disko
+
+        {
+          nixpkgs.overlays = [
+            overlays.modifications
+            overlays.stable-packages
+            inputs.nh-4-beta.overlays.default
+          ];
+          nixpkgs.config = {
+            allowUnfree = true;
+            allowUnfreePredicate = _: true;
+          };
+        }
+
+        {
+          config._module.args = {
+            currentSystemUser = user;
+          };
+        }
+      ];
+    };
+
   mkHome = systemName: {
     system,
     darwin ? false,

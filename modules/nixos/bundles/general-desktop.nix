@@ -12,6 +12,11 @@
   myNixOS.xremap.enable = lib.mkDefault true;
   myNixOS.podman.enable = lib.mkDefault true;
   myNixOS.docker.enable = lib.mkDefault false;
+  myNixOS.kubernetes.enable = lib.mkDefault true;
+
+  # firewall
+  networking.firewall.enable = true;
+  networking.firewall.allowedTCPPorts = [111 2049];
 
   # fwupd - firmware update
   services.fwupd.enable = lib.mkDefault true;
@@ -75,12 +80,18 @@
     zip
     wget
     git
+    bind
+    nfs-utils
 
     neovim
 
     obsidian
     bitwarden
     fluent-reader
+
+    vivaldi
+
+    claude-code
   ];
 
   fonts.packages = with pkgs; [

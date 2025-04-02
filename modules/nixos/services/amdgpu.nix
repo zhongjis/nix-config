@@ -8,13 +8,27 @@
     enable = true;
     enable32Bit = true;
     extraPackages = with pkgs; [
+      vaapiVdpau
+
+      rocmPackages.clr
+      rocmPackages.clr.icd
+
       amdvlk
-      driversi686Linux.amdvlk
     ];
+    extraPackages32 = with pkgs; [driversi686Linux.amdvlk];
   };
 
+  environment.variables = {
+    "VDPAU_DRIVER" = "radeonsi";
+    "LIBVA_DRIVER_NAME" = "radeonsi";
+  };
+  # Most software has the HIP libraries hard-coded. Workaround:
+  systemd.tmpfiles.rules = [
+    "L+    /opt/rocm/hip   -    -    -     -    ${pkgs.rocmPackages.clr}"
+  ];
+
   hardware.amdgpu = {
-    opencl.enable = false; # FIXME: this one was broken
+    opencl.enable = true; # FIXME: this one was broken
     initrd.enable = true;
     amdvlk = {
       enable = true;
