@@ -81,6 +81,7 @@
     wget
     git
     bind
+    nfs-utils
 
     neovim
 
@@ -89,6 +90,8 @@
     fluent-reader
 
     vivaldi
+
+    claude-code
   ];
 
   fonts.packages = with pkgs; [

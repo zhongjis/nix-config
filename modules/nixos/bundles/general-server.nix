@@ -21,5 +21,6 @@
     pkgs.git
     pkgs.neovim
     pkgs.unzip
+    pkgs.nfs-utils
   ];
 }
