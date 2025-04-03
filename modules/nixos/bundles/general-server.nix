@@ -21,6 +21,16 @@
     pkgs.git
     pkgs.neovim
     pkgs.unzip
+
+    pkgs.openiscsi
     pkgs.nfs-utils
   ];
+
+  # NOTE: setup iscsi
+  services.openiscsi.enable = true;
+  services.openiscsi.discoverPortal = "ip:3260";
+  services.openiscsi.name = "iqn.2016-04.com.open-iscsi:${meta.hostname}";
+
+  # NOTE: setup nfs
+  boot.supportedFilesystems = ["nfs"];
 }
