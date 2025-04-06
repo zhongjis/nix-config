@@ -92,6 +92,7 @@
     vivaldi
 
     claude-code
+    colmena
   ];
 
   fonts.packages = with pkgs; [
