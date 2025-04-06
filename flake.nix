@@ -52,10 +52,6 @@
 
     ## hyprland
     hyprland.url = "github:hyprwm/Hyprland";
-    hyprpanel = {
-      url = "github:Jas-SinghFSU/HyprPanel";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
 
     ## framework laptop
     fw-fanctrl = {
