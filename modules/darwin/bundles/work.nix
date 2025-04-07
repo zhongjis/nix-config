@@ -43,8 +43,6 @@ in {
       gh
 
       charles
-
-      code-cursor
     ]
     ++ stable_pkgs;
 
@@ -58,6 +56,7 @@ in {
       "intellij-idea"
       "mongodb-compass"
       "sublime-merge@dev"
+      "cursor"
     ];
   };
 }
