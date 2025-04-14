@@ -62,10 +62,9 @@ in {
             border_size = 2
 
             # https://wiki.hyprland.org/Configuring/Variables/#variable-types for info about colors
-            # col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
-            # col.inactive_border = rgba(595959aa)
-            col.active_border = rgba(${base0E}ff) rgba(${base09}ff) 60deg
-            col.inactive_border = rgba(${base00}ff)
+            # NOTE: below block managed by stylix
+            # col.active_border = rgba(${base0E}ff) rgba(${base09}ff) 60deg
+            # col.inactive_border = rgba(${base00}ff)
 
             # Set to true enable resizing windows by clicking and dragging on borders and gaps
             resize_on_border = false
@@ -91,7 +90,8 @@ in {
                 enabled = false # for laptop battery
                 range = 30
                 render_power = 3
-              # color = 0x66000000 # managed by stylix
+                # NOTE: below block managed by stylix
+                # color = 0x66000000 # managed by stylix
             }
         }
 

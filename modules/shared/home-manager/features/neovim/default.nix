@@ -111,9 +111,6 @@ in {
       # **conform**
       conform-nvim
 
-      # **theme**
-      catppuccin-nvim
-
       # **lualine.nvim**
       lualine-nvim
 

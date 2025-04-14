@@ -6,7 +6,7 @@
 
   stylix.targets = {
     waybar.enable = false;
-    neovim.enable = false;
+    neovim.enable = true;
     swaync.enable = false;
     hyprlock.enable = false;
     kde.enable = false;
