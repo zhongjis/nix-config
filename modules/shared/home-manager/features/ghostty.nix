@@ -16,6 +16,9 @@
       cursor-style = "block";
       cursor-style-blink = false;
 
+      # font
+      font-size = 14;
+
       # window
       window-decoration = false;
       window-padding-x = 18;

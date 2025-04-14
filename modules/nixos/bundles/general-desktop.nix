@@ -1,4 +1,5 @@
 {
+  inputs,
   pkgs,
   lib,
   ...
@@ -75,27 +76,27 @@
     enable32Bit = true;
   };
 
-  environment.systemPackages = with pkgs; [
-    unzip
-    zip
-    wget
-    git
-    bind
-    nfs-utils
+  environment.systemPackages = with pkgs;
+    [
+      unzip
+      zip
+      wget
+      git
+      bind
+      nfs-utils
 
-    neovim
+      neovim
 
-    obsidian
-    bitwarden
-    fluent-reader
+      obsidian
+      bitwarden
+      fluent-reader
 
-    vivaldi
+      vivaldi
 
-    claude-code
-    colmena
-
-    ghostty
-  ];
+      claude-code
+      colmena
+    ]
+    ++ [inputs.ghostty.packages.${pkgs.system}.default];
 
   fonts.packages = with pkgs; [
     # fonts
