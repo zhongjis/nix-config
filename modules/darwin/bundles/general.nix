@@ -9,7 +9,6 @@
     inputs.nix-homebrew.darwinModules.nix-homebrew
   ];
 
-  myNixDarwin.aerospace.enable = lib.mkDefault false;
   myNixDarwin.nh.enable = lib.mkDefault true;
 
   # for zsh auto completion
