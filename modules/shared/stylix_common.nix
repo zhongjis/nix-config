@@ -10,22 +10,22 @@
 in {
   stylix = {
     enable = lib.mkDefault true;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/3024.yaml";
 
     image = astronaunt;
 
     fonts = {
       monospace = {
-        package = pkgs.jetbrains-mono;
-        name = "JetBrainsMono Nerd Font Mono";
+        package = pkgs.nerd-fonts.hack;
+        name = "Hack Nerd Font";
       };
       sansSerif = {
         package = pkgs.dejavu_fonts;
         name = "DejaVu Sans";
       };
-      serif = {
-        package = pkgs.dejavu_fonts;
-        name = "DejaVu Serif";
+      emoji = {
+        package = pkgs.noto-fonts-emoji;
+        name = "Noto Color Emoji";
       };
     };
   };
@@ -38,7 +38,7 @@ in {
 
   stylix.opacity = {
     applications = 1.0;
-    terminal = 0.85;
+    terminal = 0.90;
     desktop = 1.0;
     popups = 1.0;
   };
