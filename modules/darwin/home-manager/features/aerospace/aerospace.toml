@@ -21,7 +21,7 @@ enable-normalization-opposite-orientation-for-nested-containers = true
 # See: https://nikitabobko.github.io/AeroSpace/guide#layouts
 # The 'accordion-padding' specifies the size of accordion padding
 # You can set 0 to disable the padding feature
-accordion-padding = 30
+accordion-padding = 25
 
 # Possible values: tiles|accordion
 default-root-container-layout = 'tiles'
@@ -209,7 +209,7 @@ alt-shift-k = ['join-with up', 'mode main']
 alt-shift-l = ['join-with right', 'mode main']
 
 [[on-window-detected]]
-if.app-id = 'org.mozilla.com.zen.browser'
+if.app-id = 'com.vivaldi.Vivaldi'
 run = 'move-node-to-workspace Z'          # mnemonics Z - Zen Browser
 
 [[on-window-detected]]
@@ -221,17 +221,17 @@ if.app-id = 'com.kapeli.dashdoc'
 run = 'move-node-to-workspace D' # mnemonics D - Dash
 
 [[on-window-detected]]
-if.app-id = 'com.kapeli.dashdoc'
+if.app-id = 'com.jetbrains.intellij'
 run = 'move-node-to-workspace I' # mnemonics I - Intellij Idea
-
-[[on-window-detected]]
-if.app-id = 'com.kapeli.dashdoc'
-run = 'move-node-to-workspace S' # mnemonics S - Spotify
-
-[[on-window-detected]]
-if.app-id = 'md.obsidian'
-run = 'move-node-to-workspace O' # mnemonics O - Obsidian
 
 [[on-window-detected]]
 if.app-id = 'com.spotify.client'
 run = 'move-node-to-workspace S' # mnemonics S - Spotify
+
+[[on-window-detected]]
+if.app-id = 'com.tinyspeck.slackmacgap'
+run = 'move-node-to-workspace S' # mnemonics S - Slack
+
+[[on-window-detected]]
+if.app-id = 'md.obsidian'
+run = 'move-node-to-workspace O' # mnemonics O - Obsidian
