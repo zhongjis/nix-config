@@ -14,11 +14,6 @@ This is my personal nix-config. It is always a work in progress as I love tweaki
 | Zhongjies-MacBook-Pro | zshen@Zhongjies-MacBook-Pro.local | aarch64-darwin |
 | vultr-lab             | zshen@vultr                       | x86_64-linux   |
 
-| device        | host                    | OS      | system       |
-| ------------- | ----------------------- | ------- | ------------ |
-| thinkpad-t480 | homelab-0, homelab-1    | Proxmox | x86_64-linux |
-| zimablade     | homelab-2, TrueNAS Core | Proxmox | x86_64-linux |
-
 ## Get Started
 
 1. install nix (https://zero-to-nix.com/start/install)
