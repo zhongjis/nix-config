@@ -93,6 +93,8 @@
 
     claude-code
     colmena
+
+    ghostty
   ];
 
   fonts.packages = with pkgs; [
