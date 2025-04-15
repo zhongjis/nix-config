@@ -3,11 +3,11 @@
     "aerospace-tap": {
       "flake": false,
       "locked": {
-        "lastModified": 1744541332,
-        "narHash": "sha256-oZAAw2D7DT+NQY35A+EYuWSxk1Y60U2SiLz9+ICaHUI=",
+        "lastModified": 1744662913,
+        "narHash": "sha256-u+Z3wdxJSsIOsPJiat5ZJqCkkJuGV8/08dmYi1a2zxo=",
         "owner": "nikitabobko",
         "repo": "homebrew-tap",
-        "rev": "ae14eff31017d749072bd0ae1f1015c0971f0345",
+        "rev": "2629feb5ffdc523b004181b66f376d76161ce87b",
         "type": "github"
       },
       "original": {
