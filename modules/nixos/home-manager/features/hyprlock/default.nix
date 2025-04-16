@@ -5,6 +5,10 @@
 }: let
   uptime-sh = pkgs.writeShellScript "uptime-nixos" (builtins.readFile ./scripts/uptime-nixos.sh);
 in {
+  home.packages = with pkgs; [
+    nerd-fonts.jetbrains-mono
+  ];
+
   # hyprlock
   programs.hyprlock = {
     enable = true;
