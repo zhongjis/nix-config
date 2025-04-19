@@ -36,6 +36,7 @@ in {
   environment.systemPackages = with pkgs; [
     kubectl
     kustomize
+    kubectx
 
     cust-kubernetes-helm
     cust-helmfile
