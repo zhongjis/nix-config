@@ -18,6 +18,8 @@
     inherit (cust-kubernetes-helm) pluginsDir;
   };
 in {
+  programs.zsh.shellAliases.k = "kubectl";
+
   programs.k9s = {
     enable = true;
     settings = {
