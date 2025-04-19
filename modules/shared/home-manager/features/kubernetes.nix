@@ -20,6 +20,7 @@
 in {
   programs.zsh.shellAliases.k = "kubectl";
   programs.zsh.shellAliases.kt = "kubectx";
+  programs.zsh.shellAliases.kn = "kubens";
 
   programs.k9s = {
     enable = true;
