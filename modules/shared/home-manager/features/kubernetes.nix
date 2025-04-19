@@ -19,6 +19,7 @@
   };
 in {
   programs.zsh.shellAliases.k = "kubectl";
+  programs.zsh.shellAliases.kt = "kubectx";
 
   programs.k9s = {
     enable = true;
