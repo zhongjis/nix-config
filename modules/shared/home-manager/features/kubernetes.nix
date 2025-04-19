@@ -33,7 +33,7 @@ in {
     enableZshIntegration = config.programs.zsh.enable;
   };
 
-  environment.systemPackages = with pkgs; [
+  home.packages = with pkgs; [
     kubectl
     kustomize
     kubectx

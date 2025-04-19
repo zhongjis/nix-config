@@ -14,7 +14,6 @@
   myHomeManager.direnv.enable = lib.mkDefault false;
   myHomeManager.fzf.enable = lib.mkDefault true;
   myHomeManager.git.enable = lib.mkDefault true;
-  myHomeManager.k9s.enable = lib.mkDefault true;
   myHomeManager.lazygit.enable = lib.mkDefault true;
   myHomeManager.sops.enable = lib.mkDefault true;
   myHomeManager.ssh.enable = lib.mkDefault true;
