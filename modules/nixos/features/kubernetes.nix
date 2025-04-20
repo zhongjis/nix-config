@@ -14,7 +14,7 @@
     inherit (cust-kubernetes-helm) pluginsDir;
   };
 in {
-  home.packages = with pkgs; [
+  environment.systemPackages = with pkgs; [
     kubectl
     kustomize
     kubectx
