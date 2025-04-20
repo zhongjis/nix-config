@@ -41,6 +41,7 @@ in {
     kubectl
     kustomize
     kubectx
+    yq # format output formatting
 
     cust-kubernetes-helm
     cust-helmfile
