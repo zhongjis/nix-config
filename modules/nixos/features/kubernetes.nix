@@ -1,6 +1,6 @@
 {pkgs, ...}: let
   # https://nixos.wiki/wiki/Helm_and_Helmfile
-  my-kubernetes-helm = with pkgs;
+  cust-kubernetes-helm = with pkgs;
     wrapHelm kubernetes-helm {
       plugins = with pkgs.kubernetes-helmPlugins; [
         helm-secrets
@@ -10,16 +10,17 @@
       ];
     };
 
-  my-helmfile = pkgs.helmfile-wrapped.override {
-    inherit (my-kubernetes-helm) pluginsDir;
+  cust-helmfile = pkgs.helmfile-wrapped.override {
+    inherit (cust-kubernetes-helm) pluginsDir;
   };
 in {
-  environment.systemPackages = with pkgs; [
+  home.packages = with pkgs; [
     kubectl
     kustomize
-    k9s
+    kubectx
+    yq # format output formatting
 
-    my-kubernetes-helm
-    my-helmfile
+    cust-kubernetes-helm
+    cust-helmfile
   ];
 }
