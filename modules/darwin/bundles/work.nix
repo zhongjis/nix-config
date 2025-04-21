@@ -18,6 +18,9 @@ in {
       # kube
       kubectl
       kubelogin
+      kustomize
+      kubectx
+      yq # format output formatting
 
       # git
       pre-commit
