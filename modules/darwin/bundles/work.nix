@@ -3,7 +3,9 @@
   inputs,
   ...
 }: let
-  stable_pkgs = with pkgs.stable; [];
+  stable_pkgs = with pkgs.stable; [
+    kubelogin
+  ];
 in {
   environment.systemPackages = with pkgs;
     [
@@ -17,7 +19,6 @@ in {
 
       # kube
       kubectl
-      kubelogin
       kustomize
       kubectx
       yq # format output formatting
