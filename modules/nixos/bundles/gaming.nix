@@ -34,7 +34,7 @@
 
   environment.systemPackages = with pkgs; [
     wineWayland
-    # bottles # NOTE: now managed under flatpak
+    bottles
     mangohud
     gamescope
     protonup-qt

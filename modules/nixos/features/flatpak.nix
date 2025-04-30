@@ -13,7 +13,6 @@
     };
     packages = [
       "com.spotify.Client"
-      "com.usebottles.bottles"
     ];
 
     overrides.global = {
