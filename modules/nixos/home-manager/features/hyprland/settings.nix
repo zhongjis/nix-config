@@ -24,7 +24,7 @@
       # Please see https://wiki.hyprland.org/Configuring/Tearing/ before you turn this on
       allow_tearing = true;
 
-      layout = "master";
+      layout = "dwindle";
     };
 
     # https://wiki.hyprland.org/Configuring/Variables/#decoration
@@ -48,7 +48,7 @@
     };
     # https://wiki.hyprland.org/Configuring/Variables/#animations
     animations = {
-      enabled = true;
+      enabled = false;
       bezier = [
         "linear, 0, 0, 1, 1"
         "md3_standard, 0.2, 0, 0, 1"
