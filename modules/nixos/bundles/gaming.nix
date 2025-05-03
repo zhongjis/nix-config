@@ -17,26 +17,47 @@
   programs.gamemode = {
     enable = true;
     settings = {
+      general = {
+        softrealtime = "auto";
+        renice = 15;
+      };
       custom = {
         start = "${pkgs.libnotify}/bin/notify-send -h string:x-canonical-private-synchronous:'Game Mode' 'GameMode started'";
         end = "${pkgs.libnotify}/bin/notify-send -h string:x-canonical-private-synchronous:'Game Mode' 'GameMode stopped'";
       };
     };
   };
+
+  programs.gamescope = {
+    enable = true;
+    capSysNice = true;
+    args = [
+      "--rt"
+      "--expose-wayland"
+      "-W 3440"
+      "-H 1440"
+      "--force-grab-cursor"
+      "--mangoapp"
+      "-f"
+    ];
+  };
+
   programs.steam = {
     enable = true;
-    gamescopeSession.enable = false;
+    gamescopeSession.enable = true;
     platformOptimizations.enable = false;
     remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = true;
     localNetworkGameTransfers.openFirewall = true;
+    extraCompatPackages = [
+      pkgs.proton-ge-bin
+    ];
   };
 
   environment.systemPackages = with pkgs; [
     wineWayland
     bottles
     mangohud
-    gamescope
     protonup-qt
     dxvk
     heroic
