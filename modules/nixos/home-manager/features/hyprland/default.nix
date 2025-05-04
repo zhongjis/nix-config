@@ -86,8 +86,8 @@ in {
 
         # hope to fix some steam focus issue
         # NOTE: https://www.reddit.com/r/hyprland/comments/19c53ub/steam_on_hyprland_is_extremely_wonky/
-        windowrule = stayfocused, title:^()$,class:^(steam)$
-        windowrule = minsize 1 1, title:^()$,class:^(steam)$
+        # windowrule = stayfocused, title:^()$,class:^(steam)$
+        # windowrule = minsize 1 1, title:^()$,class:^(steam)$
 
         # for fcitx5
         # reference: https://discourse.nixos.org/t/pinyin-input-method-in-hyprland-wayland-for-simplified-chinese/49186

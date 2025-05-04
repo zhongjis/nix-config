@@ -28,23 +28,9 @@
     };
   };
 
-  programs.gamescope = {
-    enable = true;
-    capSysNice = true;
-    args = [
-      "--rt"
-      "--expose-wayland"
-      "-W 3440"
-      "-H 1440"
-      "--force-grab-cursor"
-      "--mangoapp"
-      "-f"
-    ];
-  };
-
   programs.steam = {
     enable = true;
-    gamescopeSession.enable = true;
+    gamescopeSession.enable = false;
     platformOptimizations.enable = false;
     remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = true;
@@ -54,21 +40,24 @@
     ];
   };
 
-  environment.systemPackages = with pkgs; [
-    wineWayland
-    bottles
-    mangohud
-    protonup-qt
-    dxvk
-    heroic
+  environment.systemPackages = with pkgs;
+    [
+      wineWayland
+      bottles
+      mangohud
+      protonup-qt
+      dxvk
+      heroic
 
-    # parsec-bin
-    vesktop # discord client
+      # parsec-bin
+      vesktop # discord client
 
-    # steamtinkerlaunch %command%
-    steamtinkerlaunch
-  ];
+      # steamtinkerlaunch %command%
+      steamtinkerlaunch
+    ]
+    ++ [
+      pkgs.stable.gamescope
+    ];
 
-  # dota 2: LD_PRELOAD= gamescope -W 3440 -H 1440 --force-grab-cursor --mangoapp -f -- env LD_PRELOAD="$LD_PRELOAD" gamemoderun %command%
-  # frost punk 2: gamemoderun PROTON_ENABLE_NVAPI=1 PROTON_HIDE_NVIDIA_GPU=0 %command%
+  # dota 2: LD_PRELOAD= gamescope -W 3440 -H 1440 --force-grab-cursor --expose-wayland --rt -r 144 --mangoapp -f -- env LD_PRELOAD="$LD_PRELOAD" gamemoderun %command%
 }
