@@ -48,7 +48,6 @@
     stylix.url = "github:danth/stylix";
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     ghostty.url = "github:ghostty-org/ghostty";
-    nh-4-beta.url = "github:viperML/nh";
 
     ## hyprland
     hyprland.url = "github:hyprwm/Hyprland";

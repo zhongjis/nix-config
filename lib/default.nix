@@ -55,7 +55,6 @@ in rec {
             inputs.nixpkgs-terraform.overlays.default
             overlays.modifications
             overlays.stable-packages
-            inputs.nh-4-beta.overlays.default
           ];
           nixpkgs.config = {
             allowUnfree = true;
