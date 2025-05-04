@@ -36,10 +36,10 @@ in {
         bind r source-file ${config.home.homeDirectory}/.config/tmux/tmux.conf
 
         # Pane movement like vim
-        bind-key l select-pane -L
-        bind-key k select-pane -D
-        bind-key i select-pane -U
-        bind-key j select-pane -R
+        bind-key h select-pane -L
+        bind-key j select-pane -D
+        bind-key k select-pane -U
+        bind-key l select-pane -R
 
         # True color
         # https://gist.github.com/andersevenrud/015e61af2fd264371032763d4ed965b6
