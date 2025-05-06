@@ -39,7 +39,7 @@ in {
             else "transform,${toString m.rotate}";
         in "${name},${
           if m.enabled
-          then "${resolution},${position},${scale},${transform}"
+          then "${resolution},${position},${scale},${transform},vrr,1"
           else "disable"
         }"
       )
