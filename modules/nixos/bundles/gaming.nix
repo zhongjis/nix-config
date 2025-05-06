@@ -1,6 +1,7 @@
 {
   inputs,
   pkgs,
+  lib,
   ...
 }: {
   imports = [
@@ -8,6 +9,7 @@
     inputs.nix-gaming.nixosModules.pipewireLowLatency
   ];
 
+  myNixOS.lact.enable = lib.mkDefault true;
   services.pipewire.lowLatency.enable = true;
 
   environment.sessionVariables = {
@@ -54,9 +56,6 @@
 
       # steamtinkerlaunch %command%
       steamtinkerlaunch
-
-      # gpu gui
-      lact
     ]
     ++ [
       pkgs.stable.gamescope
