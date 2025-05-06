@@ -54,6 +54,9 @@
 
       # steamtinkerlaunch %command%
       steamtinkerlaunch
+
+      # gpu gui
+      lact
     ]
     ++ [
       pkgs.stable.gamescope
