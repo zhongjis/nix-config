@@ -19,6 +19,7 @@
   myHomeManager.direnv.enable = lib.mkDefault true;
   myHomeManager.fzf.enable = lib.mkDefault true;
   myHomeManager.ghostty.enable = lib.mkDefault true;
+  myHomeManager.wezterm.enable = lib.mkDefault true;
   myHomeManager.git.enable = lib.mkDefault true;
   myHomeManager.kitty.enable = lib.mkDefault true;
   myHomeManager.kubernetes.enable = lib.mkDefault true;
