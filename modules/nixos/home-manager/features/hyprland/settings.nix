@@ -8,8 +8,8 @@
 
     # https://wiki.hyprland.org/Configuring/Variables/#general
     general = {
-      gaps_in = 5;
-      gaps_out = 10;
+      gaps_in = 2;
+      gaps_out = 5;
 
       border_size = 2;
 
@@ -29,7 +29,7 @@
 
     # https://wiki.hyprland.org/Configuring/Variables/#decoration
     decoration = {
-      rounding = 10;
+      rounding = 0;
       active_opacity = 1.0;
       inactive_opacity = 1.0;
       fullscreen_opacity = 1.0;
