@@ -22,6 +22,7 @@
     bundles.general-desktop.enable = true;
     bundles.hyprland.enable = true;
     bundles.gaming.enable = true;
+    bundles.printing.enable = true;
     services.amdcpu.enable = true;
     services.amdgpu.enable = true;
     multi-lang-input-layout.enable = true;
