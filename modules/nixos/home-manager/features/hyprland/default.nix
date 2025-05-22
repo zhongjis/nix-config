@@ -67,7 +67,7 @@ in {
         windowrule = workspace name:gaming,class:^(steam_proton)$
         windowrule = workspace name:gaming,class:^(gamescope)$
 
-        windowrule = workspace name:zen,class:^(vivaldi-stable)$
+        windowrule = workspace name:zen,class:^(Vivaldi-stable)$
 
         # Pavucontrol floating
         windowrule = float,class:(.*org.pulseaudio.pavucontrol.*)
