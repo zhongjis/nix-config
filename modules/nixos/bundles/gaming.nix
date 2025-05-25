@@ -56,10 +56,11 @@
 
       # steamtinkerlaunch %command%
       steamtinkerlaunch
+
+      gamescope
     ]
     ++ (with pkgs.stable; [
-      gamescope
-    ]);
+      ]);
 
   # dota 2: LD_PRELOAD= gamescope -W 3440 -H 1440 --force-grab-cursor --expose-wayland --rt -r 144 --mangoapp -f -- env LD_PRELOAD="$LD_PRELOAD" gamemoderun %command%
 }

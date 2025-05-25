@@ -13,6 +13,7 @@
     rev = "main";
     sha256 = "sha256-22CBYZC3VjPbesKeXGg+YgrPwAlnS3K+6NNYVvQyBKQ=";
     # sha256 = lib.fakeSha256;
+    # hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
   };
   nginxConfigDir = "${difyRepo}/docker/nginx";
 
