@@ -27,8 +27,8 @@
       };
 
       patches = [
-        ./shaders-path.patch
-        ./gamescopereaper.patch
+        ./gamescope/shaders-path.patch
+        ./gamescope/gamescopereaper.patch
       ];
     });
   };
