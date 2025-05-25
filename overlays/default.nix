@@ -16,6 +16,21 @@
     #     hash = "sha256-2Wp426uBn1V1AXNERESZW1Ax69zBW3ev672NvAKvNPQ=";
     #   };
     # });
+    gamescope = prev.gamescope.overrideAttrs (oldAttrs: rec {
+      version = "3.16.4";
+      src = prev.fetchFromGitHub {
+        owner = "ValveSoftware";
+        repo = "gamescope";
+        rev = "refs/tags/${version}";
+        fetchSubmodules = true;
+        hash = "sha256-2AxqvZA1eZaJFKMfRljCIcP0M2nMngw0FQiXsfBW7IA=";
+      };
+
+      patches = [
+        ./shaders-path.patch
+        ./gamescopereaper.patch
+      ];
+    });
   };
 
   # When applied, the unstable nixpkgs set (declared in the flake inputs) will
