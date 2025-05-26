@@ -16,7 +16,7 @@
   ];
 
   # gaming kernel. not sure if it is good
-  boot.kernelPackages = pkgs.linuxPackages_zen;
+  boot.kernelPackages = pkgs.stable.linuxPackages_zen;
 
   myNixOS = {
     bundles.general-desktop.enable = true;
