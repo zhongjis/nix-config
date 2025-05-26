@@ -17,13 +17,13 @@
     #   };
     # });
     gamescope = prev.gamescope.overrideAttrs (oldAttrs: rec {
-      version = "3.16.4";
+      version = "3.15.13";
       src = prev.fetchFromGitHub {
         owner = "ValveSoftware";
         repo = "gamescope";
         rev = "refs/tags/${version}";
         fetchSubmodules = true;
-        hash = "sha256-2AxqvZA1eZaJFKMfRljCIcP0M2nMngw0FQiXsfBW7IA=";
+        hash = "sha256-AePYKdDyAtnVkL8/VeWmhJ3ATZnhyVZcU/QtVpCfTQE=";
       };
 
       patches = [
