@@ -1,7 +1,7 @@
 {inputs, ...}: {
   imports = [
     ../../stylix_common.nix
-    inputs.stylix.homeManagerModules.stylix
+    inputs.stylix.homeModules.stylix
   ];
 
   stylix.targets = {

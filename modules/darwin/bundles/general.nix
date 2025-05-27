@@ -116,6 +116,8 @@
     keyboard.remapCapsLockToEscape = true;
   };
 
+  system.primaryUser = "zshen";
+
   # Dock
   system.defaults.dock = {
     autohide = true;
