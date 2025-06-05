@@ -54,6 +54,8 @@
   programs.zoxide.enable = true;
   programs.zoxide.enableZshIntegration = true;
 
+  # TODO: add pay-respects later: https://github.com/nix-community/home-manager/issues/6204
+
   programs.carapace.enable = true;
   programs.carapace.enableZshIntegration = true;
 
