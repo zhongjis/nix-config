@@ -54,9 +54,6 @@
   programs.zoxide.enable = true;
   programs.zoxide.enableZshIntegration = true;
 
-  programs.thefuck.enable = true;
-  programs.thefuck.enableZshIntegration = true;
-
   programs.carapace.enable = true;
   programs.carapace.enableZshIntegration = true;
 
