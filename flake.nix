@@ -49,9 +49,6 @@
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     ghostty.url = "github:ghostty-org/ghostty";
 
-    ## hyprland
-    hyprland.url = "github:hyprwm/Hyprland";
-
     ## framework laptop
     fw-fanctrl = {
       url = "github:TamtamHero/fw-fanctrl/packaging/nix";
