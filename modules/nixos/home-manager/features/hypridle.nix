@@ -18,7 +18,7 @@ in {
         }
 
         {
-          timeout = 600; # 10min - lock
+          timeout = 1200; # 20min - lock
           on-timeout = "loginctl lock-session"; # command to run when timeout has passed
         }
 
