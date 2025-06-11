@@ -4,7 +4,6 @@
   ...
 }: let
   stable_pkgs = with pkgs.stable; [
-    kubelogin
   ];
 in {
   environment.systemPackages = with pkgs;
@@ -47,6 +46,8 @@ in {
       gh
 
       charles
+
+      kubelogin
     ]
     ++ stable_pkgs;
 
