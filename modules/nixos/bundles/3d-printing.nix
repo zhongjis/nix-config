@@ -9,7 +9,7 @@
   environment.systemPackages = with pkgs;
     [
       orca-slicer
-      freecad-wayland
+      freecad
     ]
     ++ (with pkgs.stable; [
       ]);
