@@ -6,6 +6,7 @@
   # This one contains whatever you want to overlay
   # You can change versions, add patches, set compilation flags, anything really.
   # https://nixos.wiki/wiki/Overlays
+  # hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
   modifications = final: prev: rec {
     # jdk = prev."jdk${toString 17}";
     # maven = prev.maven.override {inherit jdk;};
@@ -16,6 +17,16 @@
     #     hash = "sha256-2Wp426uBn1V1AXNERESZW1Ax69zBW3ev672NvAKvNPQ=";
     #   };
     # });
+    orca-slicer = prev.orca-slicer.overrideAttrs (oldAttrs: rec {
+      version = "nightly-builds";
+
+      src = prev.fetchFromGitHub {
+        owner = "SoftFever";
+        repo = "OrcaSlicer";
+        tag = version;
+        hash = "sha256-IJB29iq21XoJsLUOBAPbEm88MzdGhndOrkhXMdZE8o0=";
+      };
+    });
     gamescope = prev.gamescope.overrideAttrs (oldAttrs: rec {
       version = "3.15.13";
       src = prev.fetchFromGitHub {
