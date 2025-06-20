@@ -30,16 +30,27 @@
     };
   };
 
+  programs.gamescope.enable = true;
+
   programs.steam = {
     enable = true;
-    gamescopeSession.enable = false;
+
     platformOptimizations.enable = false;
+
+    localNetworkGameTransfers.openFirewall = true;
     remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = true;
-    localNetworkGameTransfers.openFirewall = true;
-    extraCompatPackages = [
-      pkgs.proton-ge-bin
+
+    extraCompatPackages = with pkgs; [
+      proton-ge-bin
     ];
+    extraPackages = with pkgs; [
+      SDL2
+      er-patcherAdd
+      commentMore
+      actions
+    ];
+    protontricks.enable = true;
   };
 
   environment.systemPackages = with pkgs;
@@ -56,8 +67,6 @@
 
       # steamtinkerlaunch %command%
       steamtinkerlaunch
-
-      gamescope
     ]
     ++ (with pkgs.stable; [
       ]);
