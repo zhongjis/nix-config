@@ -16,19 +16,7 @@
     STEAM_EXTRA_COMPAT_TOOLS_PATHS = "\${HOME}/.steam/root/compatibilitytools.d";
   };
 
-  programs.gamemode = {
-    enable = true;
-    settings = {
-      general = {
-        softrealtime = "auto";
-        renice = 15;
-      };
-      custom = {
-        start = "${pkgs.libnotify}/bin/notify-send -h string:x-canonical-private-synchronous:'Game Mode' 'GameMode started'";
-        end = "${pkgs.libnotify}/bin/notify-send -h string:x-canonical-private-synchronous:'Game Mode' 'GameMode stopped'";
-      };
-    };
-  };
+  programs.gamemode.enable = true;
 
   programs.gamescope.enable = true;
 
@@ -46,9 +34,8 @@
     ];
     extraPackages = with pkgs; [
       SDL2
-      er-patcherAdd
-      commentMore
-      actions
+      gamescope
+      er-patcher
     ];
     protontricks.enable = true;
   };
