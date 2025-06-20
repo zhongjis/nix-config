@@ -17,6 +17,18 @@
     #     hash = "sha256-2Wp426uBn1V1AXNERESZW1Ax69zBW3ev672NvAKvNPQ=";
     #   };
     # });
+    kubelogin = prev.kubelogin.overrideAttrs (oldAttrs: rec {
+      version = "0.1.9";
+
+      src = prev.fetchFromGitHub {
+        owner = "Azure";
+        repo = "kubelogin";
+        rev = "v${version}";
+        sha256 = "sha256-u9Fj2YkHVbFHpxrrxdYrRBvbGsLvxQQlsPHf4++L0g0=";
+      };
+
+      vendorHash = "sha256-HYUI0x4fCA8nhIHPguGCJ+F36fxb7m97bgyigwiXWd8=";
+    });
     orca-slicer = prev.orca-slicer.overrideAttrs (oldAttrs: rec {
       version = "nightly-builds";
 
