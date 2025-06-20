@@ -21,6 +21,7 @@
   myNixOS = {
     bundles.general-desktop.enable = true;
     bundles.hyprland.enable = true;
+    bundles.kde.enable = true;
     bundles.gaming.enable = true;
     bundles."3d-printing".enable = true;
     services.amdcpu.enable = true;
