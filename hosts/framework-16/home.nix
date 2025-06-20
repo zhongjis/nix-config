@@ -1,8 +1,4 @@
-{
-  pkgs,
-  ...
-}: 
-let 
+{pkgs, ...}: let
   internalMonitor = "desc:BOE 0x0BC9";
   lgUntraWideMonitor = "desc:LG Electronics LG ULTRAGEAR 009NTDV4B698";
   dellMonitor = "desc:Dell Inc. DELL P2419H 78NFR63";
@@ -41,19 +37,19 @@ in {
       rotate = 1;
     };
   };
-  myHomeManager.hyprland.workspaces = {   
-      "name:spotify" = {
-        monitorId = internalMonitor;
-        autostart = with pkgs; [];
-      };
-      "name:gaming" = {
-        monitorId = lgUntraWideMonitor;
-        autostart =  with pkgs; [];
-      };
-      "name:zen" = {
-        monitorId = lgUntraWideMonitor;
-        autostart =  with pkgs; [];
-      };
+  myHomeManager.hyprland.workspaces = {
+    "name:spotify" = {
+      monitorId = internalMonitor;
+      autostart = with pkgs; [];
+    };
+    "name:gaming" = {
+      monitorId = lgUntraWideMonitor;
+      autostart = with pkgs; [];
+    };
+    "name:zen" = {
+      monitorId = lgUntraWideMonitor;
+      autostart = with pkgs; [];
+    };
   };
 
   myHomeManager.bundles.linux.enable = true;

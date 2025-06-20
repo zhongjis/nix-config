@@ -21,7 +21,7 @@
   myNixOS = {
     bundles.general-desktop.enable = true;
     bundles.hyprland.enable = true;
-    bundles.kde.enable = true;
+    bundles.kde.enable = false;
     bundles.gaming.enable = true;
     bundles."3d-printing".enable = true;
     services.amdcpu.enable = true;
@@ -36,7 +36,7 @@
   services.ollama = {
     package = pkgs.stable.ollama;
     acceleration = "rocm";
-    rocmOverrideGfx = "11.0.2"; # NOTE: failing build on unstalbe as of 01.27.2024
+    rocmOverrideGfx = "11.0.2";
   };
 
   # xremap
