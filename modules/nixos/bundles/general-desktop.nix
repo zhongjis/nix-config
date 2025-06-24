@@ -96,7 +96,6 @@
       code-cursor
       claude-code
       colmena
-      fluxcd
     ]
     ++ [inputs.ghostty.packages.${pkgs.system}.default];
 
