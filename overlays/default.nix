@@ -29,16 +29,6 @@
 
       vendorHash = "sha256-HYUI0x4fCA8nhIHPguGCJ+F36fxb7m97bgyigwiXWd8=";
     });
-    orca-slicer = prev.orca-slicer.overrideAttrs (oldAttrs: rec {
-      version = "nightly-builds";
-
-      src = prev.fetchFromGitHub {
-        owner = "SoftFever";
-        repo = "OrcaSlicer";
-        tag = version;
-        hash = "sha256-IJB29iq21XoJsLUOBAPbEm88MzdGhndOrkhXMdZE8o0=";
-      };
-    });
     gamescope = prev.gamescope.overrideAttrs (oldAttrs: rec {
       version = "3.15.13";
       src = prev.fetchFromGitHub {
