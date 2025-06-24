@@ -93,7 +93,6 @@
 
       vivaldi
 
-      code-cursor
       claude-code
       colmena
     ]
