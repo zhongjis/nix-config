@@ -15,6 +15,7 @@ in {
     ./env.nix
     ./keymaps.nix
     ./settings.nix
+    ./plugins.nix
   ];
 
   # hyprland
