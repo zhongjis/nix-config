@@ -16,6 +16,8 @@
 in {
   environment.systemPackages = with pkgs; [
     fluxcd
+    gnupg # for fluxcd sops
+
     kubectl
     kustomize
     kubectx
