@@ -12,7 +12,6 @@ This is my personal nix-config. It is always a work in progress as I love tweaki
 | --------------------- | --------------------------------- | -------------- |
 | framework-16          | zshen@framework-16                | x86_64-linux   |
 | Zhongjies-MacBook-Pro | zshen@Zhongjies-MacBook-Pro.local | aarch64-darwin |
-| vultr-lab             | zshen@vultr                       | x86_64-linux   |
 
 ## Get Started
 
