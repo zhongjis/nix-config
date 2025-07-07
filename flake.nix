@@ -47,6 +47,7 @@
     nixpkgs-terraform.url = "github:stackbuilders/nixpkgs-terraform";
     stylix.url = "github:danth/stylix";
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
+    nvf.url = "github:notashelf/nvf";
     ghostty.url = "github:ghostty-org/ghostty";
 
     ## framework laptop
