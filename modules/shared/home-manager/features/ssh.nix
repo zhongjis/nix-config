@@ -48,7 +48,20 @@ in {
   programs.ssh.matchBlocks = {
     "github-com" = {
       host = "github.com";
+      hostname = "github.com";
       identityFile = "${config.home.homeDirectory}/.ssh/github_com_zhongjis";
+      extraOptions = let
+        baseOptions = {
+          PreferredAuthentications = "publickey";
+          AddKeysToAgent = "yes";
+        };
+      in
+        baseOptions // darwinKeychainOption;
+    };
+    "github-enterprise" = {
+      host = "github-enterprise";
+      hostname = "github.com";
+      identityFile = "${config.home.homeDirectory}/.ssh/github_adobe_zshen";
       extraOptions = let
         baseOptions = {
           PreferredAuthentications = "publickey";
