@@ -50,6 +50,7 @@ in {
       host = "github.com-zhongjis";
       hostname = "github.com";
       identityFile = "${config.home.homeDirectory}/.ssh/github_com_zhongjis";
+      identitiesOnly = true;
       extraOptions = let
         baseOptions = {
           PreferredAuthentications = "publickey";
@@ -62,6 +63,7 @@ in {
       host = "github.com-zshen_adobe";
       hostname = "github.com";
       identityFile = "${config.home.homeDirectory}/.ssh/github_adobe_zshen";
+      identitiesOnly = true;
       extraOptions = let
         baseOptions = {
           PreferredAuthentications = "publickey";
