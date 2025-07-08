@@ -46,8 +46,8 @@ in {
 
   programs.ssh.enable = true;
   programs.ssh.matchBlocks = {
-    "github-com" = {
-      host = "github.com";
+    "github.com-zhongjis" = {
+      host = "github.com-zhongjis";
       hostname = "github.com";
       identityFile = "${config.home.homeDirectory}/.ssh/github_com_zhongjis";
       extraOptions = let
@@ -58,8 +58,8 @@ in {
       in
         baseOptions // darwinKeychainOption;
     };
-    "github-enterprise" = {
-      host = "github-enterprise";
+    "github.com-zshen_adobe" = {
+      host = "github.com-zshen_adobe";
       hostname = "github.com";
       identityFile = "${config.home.homeDirectory}/.ssh/github_adobe_zshen";
       extraOptions = let
