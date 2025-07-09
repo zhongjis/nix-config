@@ -9,7 +9,7 @@
 
     statusline.lualine.enable = true;
     git.gitsigns.enable = true;
-    terminal.toggleterm.lazygit.enabl = true;
+    terminal.toggleterm.lazygit.enable = true;
     utility.oil-nvim.enable = true;
     notes.todo-comments.enable = true;
 
@@ -55,11 +55,12 @@
         confirm = "<C-y>";
         complete = "<C-Space>";
       };
-      sourcePlugins = ["cmp-path" "cmp-nvim-lsp" "cmp-cmdline" "cmp-buffer" "cmp_luasnip"];
+      sourcePlugins = ["cmp-path" "cmp-nvim-lsp" "cmp-buffer" pkgs.vimPlugins.cmp_luasnip pkgs.vimPlugins.cmp-cmdline];
     };
 
+    lsp.enable = true;
+
     languages = {
-      enableLSP = true;
       enableTreesitter = true;
 
       lua = {
@@ -76,7 +77,7 @@
 
     formatter.conform-nvim = {
       enable = true;
-      formatters_by_ft = {
+      setupOpts.formatters_by_ft = {
         lua = ["stylua"];
         nix = ["alejandra"];
         sh = ["shfmt"];

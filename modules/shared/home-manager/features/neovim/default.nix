@@ -3,11 +3,7 @@
   inputs,
   ...
 }: let
-  configModule = {
-    # Add any custom options (and do feel free to upstream them!)
-    # options = { ... };
-    config = ./nvf-configuration.nix;
-  };
+  configModule = import ./nvf-configuration.nix;
 
   customNeovim = inputs.nvf.lib.neovimConfiguration {
     inherit pkgs;
