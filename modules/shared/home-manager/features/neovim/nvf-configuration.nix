@@ -8,10 +8,23 @@
     # and more options as you see fit...
 
     statusline.lualine.enable = true;
-    git.gitsigns.enable = true;
+    git.gitsigns = {
+      enable = true;
+      setupOpts = {
+        signs = {
+          add = {text = "▎";};
+          change = {text = "▎";};
+          delete = {text = "";};
+          topdelete = {text = "";};
+          changedelete = {text = "▎";};
+          untracked = {text = "▎";};
+        };
+      };
+    };
     terminal.toggleterm.lazygit.enable = true;
     utility.oil-nvim.enable = true;
     notes.todo-comments.enable = true;
+    visuals.nvim-web-devicons.enable = true;
 
     mini.ai = {
       enable = true;
