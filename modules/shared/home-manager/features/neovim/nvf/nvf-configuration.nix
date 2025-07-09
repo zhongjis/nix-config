@@ -1,13 +1,24 @@
 {
+  config,
   pkgs,
-  lib,
   ...
-}: {
+}: let
+  inherit (config.lib.stylix) colors;
+in {
   vim = {
-    theme.enable = false;
-    # and more options as you see fit...
+    theme =  {
+      enable = true;
+      name = "base16";
+      style = "dark";
+      base16-colors = colors;
+      transparent = false;
+    };
 
-    statusline.lualine.enable = true;
+    statusline.lualine = {
+      enable = true;
+      theme = "base16";
+    };
+
     git.gitsigns = {
       enable = true;
       setupOpts = {
