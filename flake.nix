@@ -68,7 +68,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs = {nixpkgs, ...} @ inputs: let
+  outputs = {
+    nixpkgs,
+    nvf,
+    ...
+  } @ inputs: let
     overlays = import ./overlays {inherit inputs;};
     myLib = import ./lib/default.nix {inherit overlays nixpkgs inputs;};
   in
@@ -101,6 +105,12 @@
           system = "x86_64-linux";
         };
       };
+
+      packages."x86_64-linux".neovim =
+        (nvf.lib.neovimConfiguration {
+          pkgs = nixpkgs.legacyPackages."x86_64-linux";
+          modules = [./nvf];
+        }).neovim;
 
       nixDarwinModules.default = ./modules/darwin;
       homeManagerModules.default = ./modules/shared/home-manager;

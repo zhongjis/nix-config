@@ -3,15 +3,14 @@
   pkgs,
   ...
 }: let
-  inherit (config.lib.stylix) colors;
 in {
   vim = {
-    theme =  {
+    theme = {
       enable = true;
       name = "base16";
       style = "dark";
-      base16-colors = colors;
-      transparent = false;
+      # base16-colors = colors;
+      # transparent = false;
     };
 
     statusline.lualine = {
