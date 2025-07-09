@@ -7,8 +7,8 @@ in {
   vim = {
     theme = {
       enable = true;
-      name = "base16";
-      style = "dark";
+      # name = "base16";
+      # style = "dark";
       # base16-colors = colors;
       # transparent = false;
     };

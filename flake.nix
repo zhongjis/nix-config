@@ -106,10 +106,10 @@
         };
       };
 
-      packages."x86_64-linux".default =
+      packages."x86_64-linux".neovim =
         (nvf.lib.neovimConfiguration {
           pkgs = nixpkgs.legacyPackages."x86_64-linux";
-          modules = [./nvf];
+          modules = [./packages/nvf];
         }).neovim;
 
       nixDarwinModules.default = ./modules/darwin;
