@@ -106,11 +106,14 @@
         };
       };
 
-      packages."x86_64-linux".neovim =
-        (nvf.lib.neovimConfiguration {
-          pkgs = nixpkgs.legacyPackages."x86_64-linux";
-          modules = [./packages/nvf];
-        }).neovim;
+      packages = forAllSystems (pkgs: {
+        # This 'pkgs' argument here is already nixpkgs.legacyPackages.${system}
+        neovim =
+          (nvf.lib.neovimConfiguration {
+            pkgs = pkgs; # Pass the system-specific pkgs
+            modules = [./packages/nvf];
+          }).neovim;
+      });
 
       nixDarwinModules.default = ./modules/darwin;
       homeManagerModules.default = ./modules/shared/home-manager;
