@@ -6,7 +6,7 @@
 in {
   imports = [
     ./autocmds.nix
-    ./usercmds.nix
+    # ./usercmds.nix
     ./options.nix
   ];
   vim = {
