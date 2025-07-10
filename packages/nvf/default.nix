@@ -41,16 +41,19 @@ in {
       };
     };
 
+    # FIXME: not working
     terminal.toggleterm.lazygit = {
       enable = true;
       mappings.open = "<leader>gg";
     };
 
     utility.oil-nvim.enable = true;
+    binds.whichKey.enable = true;
 
     notes.todo-comments.enable = true;
 
     visuals.nvim-web-devicons.enable = true;
+    visuals.fidget-nvim.enable = true;
 
     mini.ai = {
       enable = true;
@@ -80,10 +83,6 @@ in {
           setup = {fzf = {fuzzy = true;};};
         }
       ];
-      mappings = {
-        liveGrep = "<leader>sg";
-        findFiles = "<leader>sf";
-      };
     };
 
     autocomplete.nvim-cmp = {
@@ -113,6 +112,27 @@ in {
           terraform = ["terraform_fmt"];
           java = ["google-java-format"];
           xml = ["xmlstarlet"];
+        };
+        format_on_save = {
+          _type = "lua-inline";
+          expr = ''
+            function(bufnr)
+                  -- Disable with a global or buffer-local variable
+                  if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+                    return
+                  end
+
+                  -- Disable "format_on_save lsp_fallback" for languages that don't
+                  -- have a well standardized coding style. You can add additional
+                  -- languages here or re-enable it for the disabled ones.
+                  local disable_filetypes =
+                    { c = true, cpp = true, typescript = true, javascript = true, yaml = true }
+                  return {
+                    timeout_ms = 500,
+                    lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
+                  }
+                end
+          '';
         };
       };
     };
