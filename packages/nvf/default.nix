@@ -99,6 +99,32 @@ in {
     formatter.conform-nvim = {
       enable = true;
       setupOpts = {
+        formatters = {
+          stylua = {
+            prepend_args = [
+              "--indent-type"
+              "Spaces"
+              "--indent-width"
+              2
+              "--column-width"
+              85
+              "--sort-requires"
+            ];
+          };
+          black = {
+            prepend_args = [
+              "--line-length"
+              85
+            ];
+          };
+          shfmt = {
+            args = [
+              "-i"
+              2
+              "-ci"
+            ];
+          };
+        };
         formatters_by_ft = {
           lua = ["stylua"];
           nix = ["alejandra"];
