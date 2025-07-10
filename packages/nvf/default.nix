@@ -4,6 +4,7 @@
   ...
 }: let
 in {
+  imports = [./autocmds.nix];
   vim = {
     theme.enable = true;
     statusline.lualine.enable = true;
