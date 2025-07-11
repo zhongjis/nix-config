@@ -1,4 +1,15 @@
-{
+{pkgs, ...}: {
+  extraPackages = with pkgs; [
+    stylua
+    nixpkgs-fmt
+    alejandra
+    shfmt
+    prettierd
+    black
+    google-java-format
+    xmlstarlet
+  ];
+
   vim.languages.enableFormat = true;
   vim.formatter.conform-nvim = {
     enable = true;

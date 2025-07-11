@@ -61,17 +61,6 @@ in {
 
     snippets.luasnip.enable = true;
 
-    telescope = {
-      enable = true;
-      extensions = [
-        {
-          name = "fzf";
-          packages = [pkgs.vimPlugins.telescope-fzf-native-nvim];
-          setup = {fzf = {fuzzy = true;};};
-        }
-      ];
-    };
-
     autocomplete.nvim-cmp = {
       enable = true;
       mappings = {
@@ -82,18 +71,5 @@ in {
       };
       sourcePlugins = ["cmp-path" "cmp-nvim-lsp" "cmp-buffer" pkgs.vimPlugins.cmp_luasnip pkgs.vimPlugins.cmp-cmdline];
     };
-
-    extraPackages = with pkgs; [
-      fzf
-      ripgrep
-      stylua
-      nixpkgs-fmt
-      alejandra
-      shfmt
-      prettierd
-      black
-      google-java-format
-      xmlstarlet
-    ];
   };
 }
