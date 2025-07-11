@@ -30,10 +30,14 @@ in {
     };
 
     # FIXME: not working
-    terminal.toggleterm.enable = true;
-    terminal.toggleterm.lazygit = {
+    terminal.toggleterm = {
       enable = true;
-      mappings.open = "<leader>gg";
+      mappings.open = "<leader>tt";
+
+      lazygit = {
+        enable = true;
+        mappings.open = "<leader>gg";
+      };
     };
 
     utility.oil-nvim.enable = true;
