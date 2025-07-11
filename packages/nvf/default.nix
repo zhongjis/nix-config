@@ -7,6 +7,7 @@ in {
   imports = [
     ./autocmds.nix
     ./formatter.nix
+    ./lint.nix
     ./lsp.nix
     ./options.nix
     ./telescope.nix
