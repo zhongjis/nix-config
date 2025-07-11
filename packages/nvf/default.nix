@@ -6,9 +6,10 @@
 in {
   imports = [
     ./autocmds.nix
-    ./options.nix
-    ./lsp.nix
     ./formatter.nix
+    ./lsp.nix
+    ./options.nix
+    ./telescope.nix
   ];
   vim = {
     theme.enable = true;

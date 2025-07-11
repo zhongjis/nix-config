@@ -21,9 +21,5 @@
     terraform.enable = true;
     yaml.enable = true;
     python.enable = true;
-
-    vim.extraPackages = with pkgs; [
-      terraform
-    ];
   };
 }

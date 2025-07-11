@@ -1,5 +1,5 @@
 {pkgs, ...}: {
-  extraPackages = with pkgs; [
+  vim.extraPackages = with pkgs; [
     stylua
     nixpkgs-fmt
     alejandra
