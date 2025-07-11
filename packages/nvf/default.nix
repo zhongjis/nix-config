@@ -66,7 +66,5 @@ in {
         action = "<cmd>Oil<cr>";
       }
     ];
-
-    snippets.luasnip.enable = true;
   };
 }
