@@ -30,6 +30,7 @@ in {
     };
 
     # FIXME: not working
+    terminal.toggleterm.enable = true;
     terminal.toggleterm.lazygit = {
       enable = true;
       mappings.open = "<leader>gg";
