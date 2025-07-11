@@ -4,8 +4,14 @@
   inputs,
   ...
 }: let
+  nvfNeovim = inputs.self.packages.${pkgs.system}.neovim;
 in {
   home.packages = [
-    inputs.self.packages.${pkgs.system}.neovim
+    nvfNeovim
   ];
+
+  home.sessionVariables = {
+    EDITOR = "${nvfNeovim}/bin/nvim";
+    VISUAL = "${nvfNeovim}/bin/nvim";
+  };
 }
