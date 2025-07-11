@@ -6,6 +6,7 @@
 in {
   imports = [
     ./autocmds.nix
+    ./cmp.nix
     ./formatter.nix
     ./lint.nix
     ./lsp.nix
@@ -67,16 +68,5 @@ in {
     ];
 
     snippets.luasnip.enable = true;
-
-    autocomplete.nvim-cmp = {
-      enable = true;
-      mappings = {
-        next = "<C-n>";
-        previous = "<C-p>";
-        confirm = "<C-y>";
-        complete = "<C-Space>";
-      };
-      sourcePlugins = ["cmp-path" "cmp-nvim-lsp" "cmp-buffer" pkgs.vimPlugins.cmp_luasnip pkgs.vimPlugins.cmp-cmdline];
-    };
   };
 }
