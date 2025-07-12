@@ -53,6 +53,7 @@
         terraform = ["terraform_fmt"];
         java = ["google-java-format"];
         xml = ["xmlstarlet"];
+        json = ["prettierd"];
       };
       format_on_save = {
         _type = "lua-inline";
