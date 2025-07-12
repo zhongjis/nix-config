@@ -12,6 +12,7 @@ in {
     ./oil.nix
     ./telescope.nix
     ./toggleterm.nix
+    ./trouble.nix
     ./whichkey.nix
   ];
 }

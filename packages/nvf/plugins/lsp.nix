@@ -1,9 +1,5 @@
 {pkgs, ...}: {
-  vim.lsp = {
-    enable = true;
-
-    trouble.enable = true;
-  };
+  vim.lsp.enable = true;
 
   vim.languages = {
     enableTreesitter = true;
