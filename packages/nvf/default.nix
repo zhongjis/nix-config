@@ -6,11 +6,7 @@
 in {
   imports = [
     ./config
-    ./cmp.nix
-    ./formatter.nix
-    ./lint.nix
-    ./lsp.nix
-    ./telescope.nix
+    ./plugins
   ];
   vim = {
     viAlias = true;
