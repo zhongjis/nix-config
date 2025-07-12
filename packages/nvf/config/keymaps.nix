@@ -1,4 +1,4 @@
-{...}: {
+{lib, ...}: {
   vim.keymaps = [
     {
       key = "<Esc>";
@@ -22,7 +22,7 @@
       key = "p";
       mode = ["x"];
       silent = true;
-      action = "[[\"_dp]]";
+      action = "_dp";
     }
     {
       key = "<leader>e";
