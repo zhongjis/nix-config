@@ -94,6 +94,9 @@
       vivaldi
 
       claude-code
+      mcp-k8s-go
+      fluxcd-operator-mcp
+
       colmena
     ]
     ++ [inputs.ghostty.packages.${pkgs.system}.default];
