@@ -16,13 +16,13 @@ in {
       path_display = ["smart"];
       mappings = {
         i = {
-          "[\"<c-q>\"]" = lib.mkLuaInline "require(\"trouble.sources.telescope\").open()";
-          "[\"<c-a>\"]" = lib.mkLuaInline "require(\"trouble.sources.telescope\").add()";
+          "[\"<c-q>\"]" = lib.mkLuaInline "require(\"trouble.sources.telescope\").open";
+          "[\"<c-a>\"]" = lib.mkLuaInline "require(\"trouble.sources.telescope\").add";
           "<ESC>" = lib.mkLuaInline ''require("telescope.actions").close'';
         };
         n = {
-          "[\"<c-q>\"]" = lib.mkLuaInline "require(\"trouble.sources.telescope\").open()";
-          "[\"<c-a>\"]" = lib.mkLuaInline "require(\"trouble.sources.telescope\").add()";
+          "[\"<c-q>\"]" = lib.mkLuaInline "require(\"trouble.sources.telescope\").open";
+          "[\"<c-a>\"]" = lib.mkLuaInline "require(\"trouble.sources.telescope\").add";
         };
       };
     };
