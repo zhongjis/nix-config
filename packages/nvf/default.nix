@@ -5,12 +5,11 @@
 }: let
 in {
   imports = [
-    ./autocmds.nix
+    ./config
     ./cmp.nix
     ./formatter.nix
     ./lint.nix
     ./lsp.nix
-    ./options.nix
     ./telescope.nix
   ];
   vim = {
@@ -58,6 +57,7 @@ in {
     visuals.nvim-web-devicons.enable = true;
     visuals.fidget-nvim.enable = true;
     visuals.highlight-undo.enable = true;
+    visuals.indent-blankline.enable = true;
 
     mini.ai = {
       enable = true;
