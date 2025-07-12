@@ -10,5 +10,6 @@ in {
     ./lint.nix
     ./lsp.nix
     ./telescope.nix
+    ./toggleterm.nix
   ];
 }
