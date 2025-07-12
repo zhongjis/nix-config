@@ -1,8 +1,8 @@
-{pkgs, ...}: let
-  mkLuaInline = expr: {
-    _type = "lua-inline";
-    inherit expr;
-  };
+{
+  pkgs,
+  lib,
+  ...
+}: let
 in {
   vim.extraPackages = with pkgs; [
     fzf
@@ -16,12 +16,13 @@ in {
       path_display = ["smart"];
       mappings = {
         i = {
-          "[\"<c-q>\"]" = mkLuaInline "require(\"telescope.actions\").send_to_qflist";
-          "[\"<c-a>\"]" = mkLuaInline "require(\"telescope.actions\").add_to_qflist";
+          "[\"<c-q>\"]" = lib.mkLuaInline "require(\"telescope.actions\").send_to_qflist";
+          "[\"<c-a>\"]" = lib.mkLuaInline "require(\"telescope.actions\").add_to_qflist";
+          "<ESC>" = lib.mkLuaInline ''require("telescope.actions").close'';
         };
         n = {
-          "[\"<c-q>\"]" = mkLuaInline "require(\"telescope.actions\").send_to_qflist";
-          "[\"<c-a>\"]" = mkLuaInline "require(\"telescope.actions\").add_to_qflist";
+          "[\"<c-q>\"]" = lib.mkLuaInline "require(\"telescope.actions\").send_to_qflist";
+          "[\"<c-a>\"]" = lib.mkLuaInline "require(\"telescope.actions\").add_to_qflist";
         };
       };
     };
