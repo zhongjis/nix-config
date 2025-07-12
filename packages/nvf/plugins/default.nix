@@ -9,7 +9,9 @@ in {
     ./formatter.nix
     ./lint.nix
     ./lsp.nix
+    ./oil.nix
     ./telescope.nix
     ./toggleterm.nix
+    ./whichkey.nix
   ];
 }

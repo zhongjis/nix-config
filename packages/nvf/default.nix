@@ -34,9 +34,6 @@ in {
       };
     };
 
-    utility.oil-nvim.enable = true;
-    binds.whichKey.enable = true;
-
     notes.todo-comments.enable = true;
 
     visuals.nvim-web-devicons.enable = true;
