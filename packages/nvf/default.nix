@@ -14,8 +14,16 @@ in {
     ./telescope.nix
   ];
   vim = {
+    viAlias = true;
+    vimAlias = true;
+
     theme.enable = true;
     statusline.lualine.enable = true;
+
+    spellcheck = {
+      enable = true;
+      programmingWordlist.enable = true;
+    };
 
     git.gitsigns = {
       enable = true;
@@ -49,6 +57,7 @@ in {
 
     visuals.nvim-web-devicons.enable = true;
     visuals.fidget-nvim.enable = true;
+    visuals.highlight-undo.enable = true;
 
     mini.ai = {
       enable = true;

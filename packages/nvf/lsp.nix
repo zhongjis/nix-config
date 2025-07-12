@@ -1,25 +1,37 @@
 {pkgs, ...}: {
-  vim.lsp.enable = true;
+  vim.lsp = {
+    enable = true;
+
+    trouble.enable = true;
+  };
+
   vim.languages = {
     enableTreesitter = true;
     enableExtraDiagnostics = true;
 
-    lua = {
-      enable = true;
-      lsp.lazydev.enable = true;
-    };
     nix = {
       enable = true;
       lsp.server = "nixd";
     };
-    ts = {
+    markdown.enable = true;
+
+    bash.enable = true;
+    lua = {
       enable = true;
-      extensions.ts-error-translator.enable = true;
-      format.type = "prettierd";
+      lsp.lazydev.enable = true;
     };
     java.enable = true;
     terraform.enable = true;
     yaml.enable = true;
     python.enable = true;
+
+    css.enable = true;
+    tailwind.enable = true;
+    html.enable = true;
+    ts = {
+      enable = true;
+      extensions.ts-error-translator.enable = true;
+      format.type = "prettierd";
+    };
   };
 }
