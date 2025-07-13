@@ -15,10 +15,10 @@ in {
     theme.enable = true;
     statusline.lualine.enable = true;
 
-    spellcheck = {
-      enable = true;
-      programmingWordlist.enable = true;
-    };
+    # spellcheck = {
+    #   enable = true;
+    #   programmingWordlist.enable = true;
+    # };
 
     git.gitsigns = {
       enable = true;
