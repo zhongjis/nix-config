@@ -12,4 +12,8 @@
     enable = true;
     settings = ../../../../../packages/nvf;
   };
+
+  home.sessionVariables = {
+    EDITOR = "nvim";
+  };
 }
