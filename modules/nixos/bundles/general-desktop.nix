@@ -94,6 +94,8 @@
       vivaldi
 
       claude-code
+      opencode
+
       mcp-k8s-go
       fluxcd-operator-mcp
 
