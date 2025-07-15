@@ -1,4 +1,4 @@
-{...}: {
+{lib, ...}: {
   ## Leader keys
   vim.globals.mapleader = " "; # Set global leader key to whitespace
   vim.globals.maplocalleader = " "; # Set local leader key to whitespace
@@ -31,8 +31,9 @@
   # Files and backups
   vim.options.swapfile = false; # Disable swap file creation
   vim.options.backup = false; # Disable backup file creation
-  # vim.options.undodir = os.getenv("HOME") .. "/.vim/undodir"; # Set undo directory
+
   vim.options.undofile = true; # Enable persistent undo
+  vim.options.undodir = lib.mkLualine "os.getenv(\"HOME\") .. \"/.vim/undodir\""; # Set undo directory
 
   # Clipboard
   vim.options.clipboard = "unnamedplus"; # Use the system clipboard

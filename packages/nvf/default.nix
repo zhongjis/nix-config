@@ -36,26 +36,6 @@ in {
 
     notes.todo-comments.enable = true;
 
-    visuals.nvim-web-devicons.enable = true;
-    visuals.fidget-nvim.enable = true;
-    visuals.highlight-undo.enable = true;
-    visuals.indent-blankline.enable = true;
 
-    mini.ai = {
-      enable = true;
-      setupOpts = {
-        n_lines = 500;
-      };
-    };
-    mini.surround.enable = true;
-
-    keymaps = [
-      {
-        key = "<leader>o";
-        mode = "n";
-        silent = true;
-        action = "<cmd>Oil<cr>";
-      }
-    ];
   };
 }

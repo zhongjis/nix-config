@@ -11,6 +11,7 @@ in {
     ./telescope.nix
     ./toggleterm.nix
     ./trouble.nix
+    ./visual.nix
     ./whichkey.nix
   ];
 }

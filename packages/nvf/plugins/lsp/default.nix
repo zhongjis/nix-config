@@ -25,6 +25,7 @@
     terraform.enable = true;
     yaml.enable = true;
     python.enable = true;
+
     css.enable = true;
     tailwind.enable = true;
     html.enable = true;
