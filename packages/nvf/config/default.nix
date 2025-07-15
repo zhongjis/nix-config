@@ -6,8 +6,10 @@
 in {
   imports = [
     ./autocmds.nix
-    ./keymaps.nix
-    ./options.nix
-    # ./usrcmds.nix
+  ];
+  vim.extraLuaFiles = [
+    ./lua/keymaps.lua
+    ./lua/options.lua
+    ./lua/usrcmds.lua
   ];
 }
