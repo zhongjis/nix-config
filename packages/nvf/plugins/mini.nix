@@ -8,5 +8,5 @@
 
   vim.mini.surround.enable = true;
 
-  vim.mini.icons.enable = true;
+  vim.mini.icons.enable = false;
 }
