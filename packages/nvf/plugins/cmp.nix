@@ -12,6 +12,11 @@
 
   vim.autocomplete.blink-cmp = {
     enable = true;
+    friendly-snippets.enable = true;
+    setupOpts = {
+      cmdline.completion.menu.auto_show = true;
+      signature.enabled = true;
+    };
     mappings = {
       next = "<C-n>";
       previous = "<C-p>";
@@ -22,7 +27,6 @@
       ripgrep.enable = true;
       spell.enable = true;
     };
-    friendly-snippets.enable = true;
   };
 
   vim.snippets.luasnip.enable = true;

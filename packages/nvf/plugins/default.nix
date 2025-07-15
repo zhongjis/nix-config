@@ -5,10 +5,8 @@
 }: let
 in {
   imports = [
+    ./lsp
     ./cmp.nix
-    ./formatter.nix
-    ./lint.nix
-    ./lsp.nix
     ./oil.nix
     ./telescope.nix
     ./toggleterm.nix

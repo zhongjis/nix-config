@@ -75,6 +75,9 @@
                 }
               end
         '';
+        format_after_save = {
+          lsp_format = "fallback";
+        };
       };
     };
   };
