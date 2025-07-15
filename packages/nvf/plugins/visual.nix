@@ -7,6 +7,6 @@
   };
 
   vim.ui = {
-    illuminate.enable = true;
+    illuminate.enable = false;
   };
 }

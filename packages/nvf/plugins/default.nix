@@ -7,6 +7,7 @@ in {
   imports = [
     ./lsp
     ./cmp.nix
+    ./mini.nix
     ./oil.nix
     ./telescope.nix
     ./toggleterm.nix
