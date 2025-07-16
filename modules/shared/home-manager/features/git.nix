@@ -1,4 +1,4 @@
-{...}: {
+{pkgs, ...}: {
   programs.git = {
     enable = true;
 
@@ -12,4 +12,8 @@
       "push.default current"
     ];
   };
+
+  home.packges = with pkgs; [
+    git-agecrypt
+  ];
 }
