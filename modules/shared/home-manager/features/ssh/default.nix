@@ -10,6 +10,8 @@
     }
     else {};
 in {
+  import = [./adobe];
+
   sops.secrets = {
     # github - personal
     "github_com_zhongjis/private_key" = {
