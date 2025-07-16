@@ -1,0 +1,3 @@
+[submodule "modules/shared/home-manager/features/ssh/adobe"]
+	path = modules/shared/home-manager/features/ssh/adobe
+	url = git@github.com-zhongjis:zhongjis/adobe.git

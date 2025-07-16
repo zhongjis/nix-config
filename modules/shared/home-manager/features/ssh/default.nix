@@ -10,7 +10,7 @@
     }
     else {};
 in {
-  import = [./adobe];
+  imports = [./adobe];
 
   sops.secrets = {
     # github - personal
@@ -19,22 +19,6 @@ in {
     };
     "github_com_zhongjis/public_key" = {
       path = "${config.home.homeDirectory}/.ssh/github_com_zhongjis.pub";
-    };
-
-    # github - adobe
-    "github_adobe_zshen/private_key" = {
-      path = "${config.home.homeDirectory}/.ssh/github_adobe_zshen";
-    };
-    "github_adobe_zshen/public_key" = {
-      path = "${config.home.homeDirectory}/.ssh/github_adobe_zshen.pub";
-    };
-
-    # liveaccess - adobe
-    "liveaccess_adobe_zshen/private_key" = {
-      path = "${config.home.homeDirectory}/.ssh/liveaccess_adobe_zshen";
-    };
-    "liveaccess_adobe_zshen/public_key" = {
-      path = "${config.home.homeDirectory}/.ssh/liveaccess_adobe_zshen.pub";
     };
 
     # homelab
@@ -53,30 +37,6 @@ in {
       hostname = "github.com";
       identityFile = "${config.home.homeDirectory}/.ssh/github_com_zhongjis";
       identitiesOnly = true;
-      extraOptions = let
-        baseOptions = {
-          PreferredAuthentications = "publickey";
-          AddKeysToAgent = "yes";
-        };
-      in
-        baseOptions // darwinKeychainOption;
-    };
-    "github.com-zshen_adobe" = {
-      host = "github.com-zshen_adobe";
-      hostname = "github.com";
-      identityFile = "${config.home.homeDirectory}/.ssh/github_adobe_zshen";
-      identitiesOnly = true;
-      extraOptions = let
-        baseOptions = {
-          PreferredAuthentications = "publickey";
-          AddKeysToAgent = "yes";
-        };
-      in
-        baseOptions // darwinKeychainOption;
-    };
-    "git-corp-adobe-com" = {
-      host = "git.corp.adobe.com";
-      identityFile = "${config.home.homeDirectory}/.ssh/github_adobe_zshen";
       extraOptions = let
         baseOptions = {
           PreferredAuthentications = "publickey";
