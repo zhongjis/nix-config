@@ -1,9 +1,17 @@
-{config, ...}: {
+{config, ...}: let
+  sopsFile = ../../../../secrets/ai-tokens.yaml;
+in {
   sops.secrets = {
     # github - personal
-    openai_api_key = {};
-    anthropic_api_key = {};
-    openrouter_api_key = {};
+    openai_api_key = {
+      inherit sopsFile;
+    };
+    anthropic_api_key = {
+      inherit sopsFile;
+    };
+    openrouter_api_key = {
+      inherit sopsFile;
+    };
   };
 
   programs.opencode = {
