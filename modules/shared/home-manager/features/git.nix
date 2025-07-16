@@ -13,7 +13,7 @@
     ];
   };
 
-  home.packges = with pkgs; [
+  home.packages = with pkgs; [
     git-agecrypt
   ];
 }
