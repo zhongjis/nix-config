@@ -37,7 +37,7 @@ in {
     forwardAgent = true;
     serverAliveInterval = 60;
     # NOTE: never figure out a way to put this under host *. so just set it as override for now
-    extraOptionsOverride = {
+    extraOptionOverrides = {
       HostkeyAlgorithms = "+ssh-rsa";
       PubkeyAcceptedAlgorithms = "+ssh-rsa";
     };
