@@ -5,6 +5,7 @@
   currentSystemName,
   ...
 }: let
+  initExtraAdobe = ./adobe.nix;
 in {
   home.file = {
     ".local/share/zsh/zsh-autosuggestions".source = "${pkgs.zsh-autosuggestions}/share/zsh-autosuggestions";
@@ -41,7 +42,8 @@ in {
 
           ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#${config.lib.stylix.colors.base03},bg=cyan,bold,underline"
           source "$HOME/.local/share/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
-        '';
+        ''
+        ++ initExtraAdobe;
 
       # Load before fzf to resolve conflicting shortcuts
       initExtraBeforeCompInit =
