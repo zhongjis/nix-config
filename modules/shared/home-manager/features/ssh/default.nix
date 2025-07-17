@@ -10,7 +10,7 @@
     }
     else {};
 in {
-  imports = [./adobe];
+  imports = [./adobe.nix];
 
   sops.secrets = {
     # github - personal
@@ -31,6 +31,17 @@ in {
   };
 
   programs.ssh.enable = true;
+  programs.ssh = {
+    addKeysToAgent = "yes";
+    controlMaster = "auto";
+    forwardAgent = true;
+    extraConfig = ''
+      IdentityFile: ${config.home.homeDirectory}/.ssh/github_com_zhongjis;
+      ServerAliveInterval: 60
+      HostkeyAlgorithms: +ssh-rsa
+      PubkeyAcceptedAlgorithms : +ssh-rsa
+    '';
+  };
   programs.ssh.matchBlocks = {
     "github.com-zhongjis" = {
       host = "github.com-zhongjis";
