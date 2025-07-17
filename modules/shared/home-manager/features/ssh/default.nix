@@ -35,12 +35,12 @@ in {
     addKeysToAgent = "yes";
     controlMaster = "auto";
     forwardAgent = true;
-    extraConfig = ''
-      IdentityFile: ${config.home.homeDirectory}/.ssh/github_com_zhongjis;
-      ServerAliveInterval: 60
-      HostkeyAlgorithms: +ssh-rsa
-      PubkeyAcceptedAlgorithms : +ssh-rsa
-    '';
+    serverAliveInterval = 60;
+    # NOTE: never figure out a way to put this under host *. so just set it as override for now
+    extraOptionsOverride = {
+      HostkeyAlgorithms = "+ssh-rsa";
+      PubkeyAcceptedAlgorithms = "+ssh-rsa";
+    };
   };
   programs.ssh.matchBlocks = {
     "github.com-zhongjis" = {
@@ -51,7 +51,6 @@ in {
       extraOptions = let
         baseOptions = {
           PreferredAuthentications = "publickey";
-          AddKeysToAgent = "yes";
         };
       in
         baseOptions // darwinKeychainOption;
@@ -62,7 +61,6 @@ in {
       extraOptions = let
         baseOptions = {
           PreferredAuthentications = "publickey";
-          AddKeysToAgent = "yes";
         };
       in
         baseOptions // darwinKeychainOption;
