@@ -1,2 +1,2 @@
 modules/shared/home-manager/features/ssh/adobe.nix filter=git-agecrypt diff=git-agecrypt
-modules/shared/home-manager/features/zsh/adobe.nix filter=git-agecrypt diff=git-agecrypt
+modules/shared/home-manager/features/zsh/adobe.sh filter=git-agecrypt diff=git-agecrypt
