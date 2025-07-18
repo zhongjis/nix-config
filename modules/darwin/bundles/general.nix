@@ -102,6 +102,7 @@
       "obsidian"
       "spotify"
       "google-chrome"
+      "zen"
     ];
 
     masApps = {

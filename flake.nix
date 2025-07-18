@@ -49,6 +49,7 @@
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     nvf.url = "github:notashelf/nvf";
     ghostty.url = "github:ghostty-org/ghostty";
+    zen-browser.url = "github:youwen5/zen-browser-flake";
 
     ## framework laptop
     fw-fanctrl = {
