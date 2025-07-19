@@ -99,6 +99,9 @@
       fluxcd-operator-mcp
 
       colmena
+
+      mongodb-compass
+      mongodb
     ]
     ++ [
       inputs.ghostty.packages.${pkgs.system}.default
