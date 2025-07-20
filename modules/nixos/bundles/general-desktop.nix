@@ -92,16 +92,6 @@
       fluent-reader
 
       vivaldi
-
-      claude-code
-
-      mcp-k8s-go
-      fluxcd-operator-mcp
-
-      colmena
-
-      mongodb-compass
-      mongodb
     ]
     ++ [
       inputs.ghostty.packages.${pkgs.system}.default
