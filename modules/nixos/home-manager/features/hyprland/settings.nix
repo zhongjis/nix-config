@@ -84,7 +84,9 @@
 
     # https://wiki.hyprland.org/Configuring/Variables/#misc
     misc = {
-      force_default_wallpaper = 0;
+      disable_hyprland_logo = true;
+      disable_splash_rendering = true;
+      initial_workspace_tracking = 1;
     };
 
     #############
@@ -97,15 +99,16 @@
       kb_variant = "";
       kb_model = "";
       kb_options = "";
-      kb_rules = "";
-
+      numlock_by_default = true;
       follow_mouse = 1;
-
-      sensitivity = 0; # -1.0 - 1.0, 0 means no modification.
+      mouse_refocus = false;
 
       touchpad = {
         natural_scroll = true;
+        scroll_factor = 1.0; # Touchpad scroll factor
       };
+
+      sensitivity = 0; # -1.0 - 1.0, 0 means no modification.
     };
 
     # https://wiki.hyprland.org/Configuring/Variables/#gestures
