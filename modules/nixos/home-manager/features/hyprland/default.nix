@@ -70,7 +70,7 @@ in {
         windowrule = workspace name:gaming,class:^(gamescope)$
 
         windowrule = workspace name:zen,class:^(Vivaldi-stable)$
-        windowrule = workspace name:zen,class:^(Zen Browser)$
+        windowrule = workspace name:zen,class:^(zen)$
 
         # Pavucontrol floating
         windowrule = float,class:(.*org.pulseaudio.pavucontrol.*)
