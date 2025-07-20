@@ -11,9 +11,6 @@
   myNixOS.plymouth.enable = lib.mkDefault true;
   myNixOS.flatpak.enable = lib.mkDefault true;
   myNixOS.xremap.enable = lib.mkDefault true;
-  myNixOS.podman.enable = lib.mkDefault true;
-  myNixOS.docker.enable = lib.mkDefault false;
-  myNixOS.kubernetes.enable = lib.mkDefault true;
 
   # firewall
   networking.firewall.enable = true;
