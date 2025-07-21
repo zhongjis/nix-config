@@ -62,6 +62,7 @@ in {
       "mongodb-compass"
       "sublime-merge@dev"
       "cursor"
+      "dbeaver-community"
     ];
   };
 }
