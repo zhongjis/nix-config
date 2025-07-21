@@ -52,10 +52,12 @@ in {
     ++ stable_pkgs;
 
   homebrew = {
-    brews = [];
+    brews = [
+      "docker"
+    ];
 
     casks = [
-      "docker"
+      "docker-desktop"
       "dash"
       "devtoys"
       "intellij-idea"
