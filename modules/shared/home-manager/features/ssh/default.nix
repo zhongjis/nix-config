@@ -56,8 +56,19 @@ in {
         baseOptions // darwinKeychainOption;
     };
     "homelab" = {
-      host = "192.168.50.2 192.168.50.103 192.168.50.104";
+      host = "192.168.50.103 192.168.50.104";
       identityFile = "${config.home.homeDirectory}/.ssh/homelab";
+      extraOptions = let
+        baseOptions = {
+          PreferredAuthentications = "publickey";
+        };
+      in
+        baseOptions // darwinKeychainOption;
+    };
+    "raspberrypi4b" = {
+      host = "192.168.50.2";
+      identityFile = "${config.home.homeDirectory}/.ssh/homelab";
+      identitiesOnly = true;
       extraOptions = let
         baseOptions = {
           PreferredAuthentications = "publickey";
