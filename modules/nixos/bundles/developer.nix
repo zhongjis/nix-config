@@ -21,8 +21,11 @@
       colmena
 
       # db
-      mongodb-compass
       mongosh
+      postgresql
+
+      # db client
+      mongodb-compass
       dbeaver-bin
     ]
     ++ [
