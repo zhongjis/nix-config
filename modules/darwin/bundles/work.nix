@@ -52,9 +52,7 @@ in {
     ++ stable_pkgs;
 
   homebrew = {
-    brews = [
-      "docker"
-    ];
+    brews = [];
 
     casks = [
       "docker-desktop"
