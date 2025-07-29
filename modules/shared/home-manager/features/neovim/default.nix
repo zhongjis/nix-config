@@ -10,7 +10,7 @@
 
   programs.nvf = {
     enable = true;
-    settings = ../../../../../packages/nvf;
+    settings = ./nvf;
   };
 
   home.sessionVariables = {

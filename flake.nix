@@ -6,6 +6,11 @@
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.05";
     nixos-hardware.url = "github:nixos/nixos-hardware/master";
 
+    # nix-config-private = {
+    #   url = "github:zhongjis/nix-config-private"; # Use your actual username/repo
+    #   flake = false;
+    # };
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -112,7 +117,7 @@
         neovim =
           (nvf.lib.neovimConfiguration {
             pkgs = pkgs; # Pass the system-specific pkgs
-            modules = [./packages/nvf];
+            modules = [./modules/shared/home-manager/features/neovim/nvf];
           }).neovim;
       });
 
