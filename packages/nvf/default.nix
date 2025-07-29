@@ -35,7 +35,5 @@ in {
     };
 
     notes.todo-comments.enable = true;
-
-
   };
 }
