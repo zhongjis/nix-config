@@ -10,7 +10,7 @@
 in {
   stylix = {
     enable = lib.mkDefault true;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/3024.yaml";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-hard.yaml";
 
     image = astronaunt;
 
