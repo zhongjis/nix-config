@@ -19,21 +19,5 @@ in {
     #   enable = true;
     #   programmingWordlist.enable = true;
     # };
-
-    git.gitsigns = {
-      enable = true;
-      setupOpts = {
-        signs = {
-          add = {text = "▎";};
-          change = {text = "▎";};
-          delete = {text = "";};
-          topdelete = {text = "";};
-          changedelete = {text = "▎";};
-          untracked = {text = "▎";};
-        };
-      };
-    };
-
-    notes.todo-comments.enable = true;
   };
 }
