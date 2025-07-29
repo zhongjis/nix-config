@@ -59,6 +59,7 @@ in {
       "dash"
       "devtoys"
       "intellij-idea"
+      "phpstorm"
       "mongodb-compass"
       "sublime-merge@dev"
       "cursor"
