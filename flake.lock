@@ -1033,6 +1033,22 @@
         "type": "github"
       }
     },
+    "nix-config-private": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1753901665,
+        "narHash": "sha256-CejTHKUUkJKJAfaQpTM2nszUqxhUb+ZlOzm8c6OuVQA=",
+        "ref": "refs/heads/main",
+        "rev": "99e44ad76f83f35b8ac2fe8a8c64832c81b2170c",
+        "revCount": 6,
+        "type": "git",
+        "url": "ssh://git@github.com/zhongjis/nix-config-private.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/zhongjis/nix-config-private.git"
+      }
+    },
     "nix-darwin": {
       "inputs": {
         "nixpkgs": [
@@ -1492,6 +1508,7 @@
         "homebrew-core": "homebrew-core",
         "minimal-tmux": "minimal-tmux",
         "neovim-nightly-overlay": "neovim-nightly-overlay",
+        "nix-config-private": "nix-config-private",
         "nix-darwin": "nix-darwin",
         "nix-flatpak": "nix-flatpak",
         "nix-gaming": "nix-gaming",

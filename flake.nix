@@ -7,7 +7,7 @@
     nixos-hardware.url = "github:nixos/nixos-hardware/master";
 
     nix-config-private = {
-      url = "github:zhongjis/nix-config-private";
+      url = "git+ssh://git@github.com/zhongjis/nix-config-private.git";
       flake = false;
     };
 
