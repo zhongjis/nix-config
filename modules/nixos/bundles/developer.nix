@@ -13,10 +13,6 @@
       # ai
       claude-code
 
-      # ai-mcps
-      mcp-k8s-go
-      fluxcd-operator-mcp
-
       # nix
       colmena
 
