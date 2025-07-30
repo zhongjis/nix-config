@@ -20,17 +20,15 @@ in {
 
   programs.opencode = {
     enable = true;
-    package = pkgs.writeShellScriptBin "opencode" ''
-      export ANTHROPIC_API_KEY="$(cat ${config.sops.secrets.anthropic_api_key.path})"
-      export OPENAI_API_KEY="$(cat ${config.sops.secrets.openrouter_api_key.path})"
-      export OPENROUTER_API_KEY="$(cat ${config.sops.secrets.openai_api_key.path})"
-      exec ${pkgs.opencode}/bin/opencode "$@"
-    '';
+    # package = pkgs.writeShellScriptBin "opencode" ''
+    #   export ANTHROPIC_API_KEY="$(cat ${config.sops.secrets.anthropic_api_key.path})"
+    #   export OPENAI_API_KEY="$(cat ${config.sops.secrets.openrouter_api_key.path})"
+    #   export OPENROUTER_API_KEY="$(cat ${config.sops.secrets.openai_api_key.path})"
+    #   exec ${pkgs.opencode}/bin/opencode "$@"
+    # '';
 
     settings = {
-      "$schema" = "https://opencode.ai/config.json";
       theme = "gruvbox";
-      model = "deepseek/deepseek-r1-0528:free";
       autoshare = false;
       autoupdate = false;
       provider = {
