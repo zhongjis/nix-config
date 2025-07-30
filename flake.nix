@@ -6,10 +6,10 @@
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.05";
     nixos-hardware.url = "github:nixos/nixos-hardware/master";
 
-    # nix-config-private = {
-    #   url = "github:zhongjis/nix-config-private"; # Use your actual username/repo
-    #   flake = false;
-    # };
+    nix-config-private = {
+      url = "github:zhongjis/nix-config-private";
+      flake = false;
+    };
 
     home-manager = {
       url = "github:nix-community/home-manager";
