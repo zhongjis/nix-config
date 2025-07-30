@@ -80,7 +80,7 @@ in {
         "flux-operator-mcp" = {
           type = "local";
           enabled = true;
-          command = ["nix" "run" "nixpkgs#flux-operator-mcp" "serve"];
+          command = ["nix" "run" "nixpkgs#fluxcd-operator-mcp" "serve"];
           environment = {
             "KUBECONFIG" = "/home/zshen/.kube/config";
           };
