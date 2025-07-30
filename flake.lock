@@ -1034,7 +1034,12 @@
       }
     },
     "nix-config-private": {
-      "flake": false,
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "sops-nix": "sops-nix"
+      },
       "locked": {
         "lastModified": 1753901665,
         "narHash": "sha256-CejTHKUUkJKJAfaQpTM2nszUqxhUb+ZlOzm8c6OuVQA=",
@@ -1518,13 +1523,34 @@
         "nixpkgs-stable": "nixpkgs-stable",
         "nixpkgs-terraform": "nixpkgs-terraform",
         "nvf": "nvf",
-        "sops-nix": "sops-nix",
+        "sops-nix": "sops-nix_2",
         "stylix": "stylix",
         "xremap-flake": "xremap-flake",
         "zen-browser": "zen-browser"
       }
     },
     "sops-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nix-config-private",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1752544651,
+        "narHash": "sha256-GllP7cmQu7zLZTs9z0J2gIL42IZHa9CBEXwBY9szT0U=",
+        "owner": "Mic92",
+        "repo": "sops-nix",
+        "rev": "2c8def626f54708a9c38a5861866660395bb3461",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Mic92",
+        "repo": "sops-nix",
+        "type": "github"
+      }
+    },
+    "sops-nix_2": {
       "inputs": {
         "nixpkgs": [
           "nixpkgs"
