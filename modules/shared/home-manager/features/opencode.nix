@@ -70,24 +70,17 @@ in {
         "nixos" = {
           type = "local";
           enabled = true;
-          command = [
-            "nix"
-            "run"
-            "github:utensils/mcp-nixos"
-          ];
+          command = ["nix" "run" "github:utensils/mcp-nixos"];
         };
         "mcp_k8s" = {
           type = "local";
           enabled = true;
-          command = ["mcp-k8s-go"];
+          command = ["nix" "run" "nixpkgs#mcp-k8s-go"];
         };
         "flux-operator-mcp" = {
           type = "local";
           enabled = true;
-          command = [
-            "flux-operator-mcp"
-            "serve"
-          ];
+          command = ["nix" "run" "nixpkgs#flux-operator-mcp" "serve"];
           environment = {
             "KUBECONFIG" = "/home/zshen/.kube/config";
           };
