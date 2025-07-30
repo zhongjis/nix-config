@@ -6,8 +6,6 @@
   ...
 }: let
 in {
-  imports = [./adobe.nix];
-
   home.file = {
     ".local/share/zsh/zsh-autosuggestions".source = "${pkgs.zsh-autosuggestions}/share/zsh-autosuggestions";
     ".local/share/zsh/zsh-fast-syntax-highlighting".source = "${pkgs.zsh-fast-syntax-highlighting}/share/zsh/site-functions";
