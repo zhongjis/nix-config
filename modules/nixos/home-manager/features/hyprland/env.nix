@@ -16,8 +16,8 @@
     export XDG_SESSION_DESKTOP = Hyprland
 
     # GSYNC
-    export __GL_GSYNC_ALLOWED = 1
-    export __GL_VRR_ALLOWED = 0
+    # export __GL_GSYNC_ALLOWED = 1
+    # export __GL_VRR_ALLOWED = 0
 
     # NVIDIA https://wiki.hyprland.org/Nvidia/
     # export LIBVA_DRIVER_NAME = nvidia
