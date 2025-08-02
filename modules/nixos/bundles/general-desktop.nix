@@ -92,7 +92,14 @@
     ]
     ++ [
       inputs.ghostty.packages.${pkgs.system}.default
-      inputs.zen-browser.packages.${pkgs.system}.default
+      inputs.zen-browser.packages."${pkgs.system}".default.override
+      {
+        policies = {
+          DisableAppUpdate = true;
+          DisableTelemetry = true;
+          # find more options here: https://mozilla.github.io/policy-templates/
+        };
+      }
     ];
 
   fonts.packages = with pkgs; [
