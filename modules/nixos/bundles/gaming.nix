@@ -22,21 +22,11 @@
   programs.steam = {
     enable = true;
 
-    platformOptimizations.enable = false;
+    platformOptimizations.enable = true;
 
     localNetworkGameTransfers.openFirewall = true;
     remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = true;
-
-    extraCompatPackages = with pkgs; [
-      proton-ge-bin
-    ];
-    extraPackages = with pkgs; [
-      SDL2
-      gamescope
-      er-patcher
-    ];
-    protontricks.enable = true;
   };
 
   environment.systemPackages = with pkgs;
