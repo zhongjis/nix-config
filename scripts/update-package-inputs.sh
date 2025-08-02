@@ -1,0 +1,8 @@
+nix flake update sops-nix
+nix flake update fw-fanctrl
+nix flake update minimal-tmux
+nix flake update zen-browser
+nix flake update stylix
+nix flake update neovim-nightly-overlay
+nix flake update nvf
+# nix flake update ghostty
