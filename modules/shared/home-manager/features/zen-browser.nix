@@ -10,83 +10,31 @@
 
   programs.zen-browser = {
     enable = true;
-    policies = {
+    policies = let
+      locked = value: {
+        Value = value;
+        Status = "locked";
+      };
+    in {
+      AutofillAddressEnabled = true;
+      AutofillCreditCardEnabled = false;
       DisableAppUpdate = true;
+      DisableFeedbackCommands = true;
+      DisableFirefoxStudies = true;
+      DisablePocket = true; # save webs for later reading
       DisableTelemetry = true;
-
-      AutofillAddressesEnabled = false;
-      AutoFillCreditCardEnabled = false;
-      DisablePocket = true;
-      DisableProfileImport = true;
-      DisableSetDesktopBackground = true;
       DontCheckDefaultBrowser = true;
-      NewTabPage = true;
+      NoDefaultBookmarks = true;
       OfferToSaveLogins = false;
-      # find more options here: https://mozilla.github.io/policy-templates/
-    };
-
-    profiles = {
-      default = {
-        id = 0;
-        name = "default";
-        isDefault = true;
-        settings = {
-          "browser.startup.homepage" = "https://searx.aicampground.com";
-          "browser.search.defaultenginename" = "Searx";
-          "browser.search.order.1" = "Searx";
-        };
-        search = {
-          force = true;
-          default = "Searx";
-          order = ["Searx" "Google"];
-          engines = {
-            "Nix Packages" = {
-              urls = [
-                {
-                  template = "https://search.nixos.org/packages";
-                  params = [
-                    {
-                      name = "type";
-                      value = "packages";
-                    }
-                    {
-                      name = "query";
-                      value = "{searchTerms}";
-                    }
-                  ];
-                }
-              ];
-              icon = "''${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
-              definedAliases = ["@np"];
-            };
-            "NixOS Wiki" = {
-              urls = [{template = "https://nixos.wiki/index.php?search={searchTerms}";}];
-              iconUpdateURL = "https://nixos.wiki/favicon.png";
-              updateInterval = 24 * 60 * 60 * 1000; # every day
-              definedAliases = ["@nw"];
-            };
-            "Searx" = {
-              urls = [{template = "https://searx.aicampground.com/?q={searchTerms}";}];
-              iconUpdateURL = "https://nixos.wiki/favicon.png";
-              updateInterval = 24 * 60 * 60 * 1000; # every day
-              definedAliases = ["@searx"];
-            };
-            "Bing".metaData.hidden = true;
-            "Google".metaData.alias = "@g"; # builtin engines only support specifying one additional alias
-          };
-        };
-        extensions = with pkgs.nur.repos.rycee.firefox-addons; [
-          ublock-origin
-          bitwarden
-          darkreader
-          raindropio
-          refined-github
-          enhancer-for-youtube
-          return-youtube-dislikes
-          privacy-badger
-          smartproxy
-          # vimium
-        ];
+      EnableTrackingProtection = {
+        Value = true;
+        Locked = true;
+        Cryptomining = true;
+        Fingerprinting = true;
+      };
+      Preferences = builtins.mapAttrs (_: locked) {
+        "browser.tabs.warnOnClose" = false;
+        "media.videocontrols.picture-in-picture.video-toggle.enabled" = true;
       };
     };
   };

@@ -92,7 +92,7 @@
     ]
     ++ [
       inputs.ghostty.packages.${pkgs.system}.default
-      inputs.zen-browser.packages.${pkgs.system}.default
+      # inputs.zen-browser.packages.${pkgs.system}.default
     ];
 
   fonts.packages = with pkgs; [
