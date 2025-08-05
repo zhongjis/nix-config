@@ -32,7 +32,9 @@
 
   myHomeManager.starship.enable = lib.mkDefault true;
 
-  programs.btop.enable = true;
+  programs.btop.enable = lib.mkDefault true;
+
+  programs.zen-browser.enable = lib.mkDefault true;
 
   home.sessionVariables = {
     FLAKE = "${config.home.homeDirectory}/personal/nix-config";
