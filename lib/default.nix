@@ -111,6 +111,7 @@ in rec {
       modules = [
         homeConfiguration
         inputs.sops-nix.homeManagerModules.sops
+        inputs.stylix.homeModules.stylix
       ];
     };
 
