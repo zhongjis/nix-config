@@ -91,5 +91,6 @@
     };
   };
 
-  stylix.targets.zen-browser.profileNames = lib.singleton "default";
+  # NOTE: for some reason this only works under stylix.nix under hm module
+  # stylix.targets.zen-browser.profileNames = lib.singleton "default";
 }

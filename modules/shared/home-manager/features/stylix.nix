@@ -1,4 +1,4 @@
-{inputs, ...}: {
+{lib, ...}: {
   imports = [
     ../../stylix_common.nix
   ];
@@ -10,5 +10,6 @@
     hyprlock.enable = false;
     kde.enable = false;
     rofi.enable = false;
+    zen-browser.profileNames = lib.singleton "default";
   };
 }
