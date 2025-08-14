@@ -10,6 +10,9 @@
     hyprlock.enable = false;
     kde.enable = false;
     rofi.enable = false;
-    zen-browser.profileNames = lib.singleton "default";
+    zen-browser = {
+      enable = false;
+      profileNames = lib.singleton "default";
+    };
   };
 }
