@@ -9,6 +9,7 @@
     nix-config-private = {
       url = "git+ssh://git@github.com/zhongjis/nix-config-private.git";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
     };
 
     home-manager = {
