@@ -98,6 +98,7 @@
       "quicksilver"
       "bitwarden"
       "ghostty"
+      "claude-code"
 
       "obsidian"
       "spotify"
