@@ -1,10 +1,14 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   programs.git = {
     enable = true;
 
     # configure username and email in home.nix
-    # userName = "zhongjis";
-    # userEmail = "zhongjie.x.shen@gmail.com";
+    userName = lib.mkDefault "zhongjis";
+    userEmail = lib.mkDefault "zhongjie.x.shen@gmail.com";
 
     aliases = {};
 
@@ -14,6 +18,6 @@
   };
 
   home.packages = with pkgs; [
-    git-agecrypt
+    # git-agecrypt
   ];
 }
