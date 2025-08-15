@@ -19,7 +19,7 @@ This is a personal Nix configuration repository using Nix Flakes to manage multi
 nh os switch .
 
 # Build and switch specific host
-nixos-rebuild switch --flake .#framework-16
+nh os switch .#framework-16
 ```
 
 **macOS (nix-darwin):**
@@ -38,8 +38,8 @@ darwin-rebuild switch --switch-generation 41
 **Home Manager:**
 ```bash
 # Switch home-manager configuration
-home-manager switch --flake .#zshen@framework-16
-home-manager switch --flake .#zshen@Zhongjies-MacBook-Pro
+nh home switch .#zshen@framework-16
+nh home switch .#zshen@Zhongjies-MacBook-Pro
 ```
 
 ### Development Tools
@@ -49,10 +49,15 @@ home-manager switch --flake .#zshen@Zhongjies-MacBook-Pro
 nh search <query>
 
 # Update specific flake input
-nix run github:zhongjis/nix-update-input
+nix flake update input-name
 
 # View secrets (requires sops setup)
 nix run nixpkgs#sops -- secrets.yaml
+
+# Check flake inputs and updates
+nix flake show
+nix flake check
+nix flake update
 ```
 
 ### Package Management
@@ -61,6 +66,12 @@ nix run nixpkgs#sops -- secrets.yaml
 # Build neovim package directly
 nix build .#packages.x86_64-linux.neovim
 nix build .#packages.aarch64-darwin.neovim
+
+# Test configurations without switching
+refer back to the 
+
+# Clean up old generations
+see helps using `nh clean`
 ```
 
 ## Architecture
@@ -68,13 +79,15 @@ nix build .#packages.aarch64-darwin.neovim
 ### Core Structure
 
 - `flake.nix` - Main flake configuration defining all systems and inputs
-- `lib/default.nix` - Custom library functions for system building (`mkSystem`, `mkHome`)
+- `lib/default.nix` - Custom library functions for system building (`mkSystem`, `mkHome`) and module extensions
 - `modules/` - Modular configuration split by platform:
   - `modules/shared/` - Common configurations for all platforms
   - `modules/nixos/` - NixOS-specific modules
   - `modules/darwin/` - macOS/nix-darwin specific modules
-- `hosts/` - Per-machine configurations
+- `hosts/` - Per-machine configurations (`configuration.nix` and `home.nix`)
 - `overlays/` - Package modifications and additions
+- `packages/` - Custom packages (e.g., nvf-based Neovim configuration)
+- `secrets.yaml` and `secrets/` - SOPS-encrypted secrets
 
 ### Module System
 
@@ -127,6 +140,25 @@ Configurations are organized into bundles in `modules/{nixos,darwin}/bundles/`:
 Uses sops-nix for secret management:
 - Age key file: `~/.config/sops/age/keys.txt`
 - Secrets stored in `secrets.yaml` and `secrets/homelab.yaml`
+
+## Flake Inputs & Dependencies
+
+Key external inputs used in this configuration:
+- `nixpkgs` (unstable) and `nixpkgs-stable` for packages
+- `home-manager` for user environment management
+- `nix-darwin` for macOS system configuration  
+- `sops-nix` for encrypted secrets management
+- `nixos-hardware` for hardware-specific optimizations
+- `nix-config-private` - Private configuration repository
+- Homebrew taps for macOS apps (aerospace, etc.)
+
+## Custom Library Functions
+
+The `lib/default.nix` provides key abstractions:
+- `mkSystem` - Creates NixOS or Darwin systems with shared configuration
+- `mkHome` - Creates Home Manager configurations
+- `extendModule`/`extendModules` - Extends existing modules with additional options/config
+- `filesIn`/`dirsIn` - Directory traversal helpers for modular imports
 
 ## Host-Specific Notes
 
