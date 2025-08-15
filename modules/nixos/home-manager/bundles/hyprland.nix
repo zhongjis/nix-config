@@ -4,6 +4,7 @@
   # myHomeManager.wlogout.enable = true;
   myHomeManager.hyprlock.enable = true;
   myHomeManager.hyprpaper.enable = true;
+  myHomeManager.hyprsunset.enable = true;
   myHomeManager.hypridle.enable = true;
 
   # myHomeManager.swaync.enable = true;
