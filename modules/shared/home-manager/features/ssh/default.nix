@@ -42,7 +42,7 @@ in {
   };
   programs.ssh.matchBlocks = {
     "github.com-zhongjis" = {
-      host = "github.com-zhongjis";
+      host = "github.com";
       hostname = "github.com";
       identityFile = "${config.home.homeDirectory}/.ssh/github_com_zhongjis";
       identitiesOnly = true;
