@@ -4,11 +4,12 @@
   inputs,
   ...
 }: {
-  imports = [
-    ../../modules/shared/home-manager
-    ../../modules/darwin/home-manager
-    inputs.nix-config-private.homeModules.zshen-nix-config-private
-  ];
+  imports =
+    [
+      ../../modules/shared/home-manager
+      ../../modules/darwin/home-manager
+    ]
+    ++ inputs.nix-config-private.homeModules.zshen-nix-config-private;
 
   zshen-private-flake.adobe-marketo-flex.enable = true;
 

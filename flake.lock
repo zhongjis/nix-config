@@ -1041,11 +1041,11 @@
         "sops-nix": "sops-nix"
       },
       "locked": {
-        "lastModified": 1753901665,
-        "narHash": "sha256-CejTHKUUkJKJAfaQpTM2nszUqxhUb+ZlOzm8c6OuVQA=",
+        "lastModified": 1755275864,
+        "narHash": "sha256-kz3pazN4Zl7aQxoVjMV2c0bm7Iayj+d83KCO9gCVs5Q=",
         "ref": "refs/heads/main",
-        "rev": "99e44ad76f83f35b8ac2fe8a8c64832c81b2170c",
-        "revCount": 6,
+        "rev": "a3ef185238c601ba7852eba3718bf3c4800ea419",
+        "revCount": 12,
         "type": "git",
         "url": "ssh://git@github.com/zhongjis/nix-config-private.git"
       },
