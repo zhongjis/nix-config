@@ -1,12 +1,17 @@
 {
   lib,
   pkgs,
+  inputs,
   ...
 }: {
-  imports = [
-    ../../modules/shared/home-manager
-    ../../modules/darwin/home-manager
-  ];
+  imports =
+    [
+      ../../modules/shared/home-manager
+      ../../modules/darwin/home-manager
+    ]
+    ++ inputs.nix-config-private.homeModules.zshen-nix-config-private;
+
+  zshen-private-flake.adobe-marketo-flex.enable = true;
 
   myHomeManager.bundles.general.enable = true;
   myHomeManager.bundles.darwin.enable = true;
