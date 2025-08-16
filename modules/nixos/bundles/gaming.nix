@@ -31,11 +31,9 @@
 
   environment.systemPackages = with pkgs;
     [
-      wineWayland
       bottles
       mangohud
       protonup-qt
-      dxvk
       heroic
 
       # parsec-bin
@@ -44,8 +42,7 @@
       # steamtinkerlaunch %command%
       steamtinkerlaunch
     ]
-    ++ (with pkgs.stable; [
-      ]);
+    ++ (with pkgs.stable; []);
 
   # dota 2: LD_PRELOAD= gamescope -W 3440 -H 1440 --force-grab-cursor --expose-wayland --rt -r 144 --mangoapp -f -- env LD_PRELOAD="$LD_PRELOAD" gamemoderun %command%
 }
