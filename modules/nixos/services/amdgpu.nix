@@ -22,8 +22,10 @@
   };
 
   environment.variables = {
-    "VDPAU_DRIVER" = "radeonsi";
-    "LIBVA_DRIVER_NAME" = "radeonsi";
+    VDPAU_DRIVER = "radeonsi";
+    LIBVA_DRIVER_NAME = "radeonsi";
+
+    AMD_VULKAN_ICD = "RADV";
   };
   # Most software has the HIP libraries hard-coded. Workaround:
   systemd.tmpfiles.rules = [
