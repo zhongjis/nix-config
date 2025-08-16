@@ -17,12 +17,13 @@
   };
 
   programs.gamemode.enable = true;
-  programs.gamescope.enable = true;
+  programs.gamescope = {
+    enable = true;
+    capSysNice = true;
+  };
 
   programs.steam = {
     enable = true;
-
-    platformOptimizations.enable = true;
 
     localNetworkGameTransfers.openFirewall = true;
     remotePlay.openFirewall = true;
@@ -45,4 +46,6 @@
     ++ (with pkgs.stable; []);
 
   # dota 2: LD_PRELOAD= gamescope -W 3440 -H 1440 --force-grab-cursor --expose-wayland --rt -r 144 --mangoapp -f -- env LD_PRELOAD="$LD_PRELOAD" gamemoderun %command%
+  # dota 2 test: LD_PRELOAD= gamescope -W 3440 -H 1440 --force-grab-cursor --hdr-enabled --expose-wayland --rt -r 144 --mangoapp -f -- env LD_PRELOAD="$LD_PRELOAD" gamemoderun %command%
+  # lutris: gamescope -h 1200 -H 1600 -w 1920 -W 2560 -F fsr -f --hdr-enabled --fsr-sharpness 20 -- prismlauncher
 }
