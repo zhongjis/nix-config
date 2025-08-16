@@ -7,6 +7,6 @@
 in {
   services.hyprsunset = {
     enable = true;
-    package = pkgs.sunsetr;
+    # package = pkgs.sunsetr;
   };
 }
