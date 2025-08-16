@@ -26,6 +26,11 @@ in {
     # NOTE: below two are defined in nixos module
     package = null;
     portalPackage = null;
+
+    settings.debug = {
+      full_cm_proto = true;
+    };
+
     # See https://wiki.hyprland.org/Configuring/Monitors/
     settings.monitor =
       lib.mapAttrsToList
