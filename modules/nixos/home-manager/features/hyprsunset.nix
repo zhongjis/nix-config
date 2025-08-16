@@ -5,8 +5,8 @@
   ...
 }: let
 in {
-  services.hyprsunset = {
-    enable = true;
-    # package = pkgs.sunsetr;
-  };
+  # services.hyprsunset = {
+  #   enable = true;
+  #   # package = pkgs.sunsetr;
+  # };
 }
