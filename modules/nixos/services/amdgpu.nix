@@ -13,11 +13,11 @@
       rocmPackages.clr
       rocmPackages.clr.icd
 
-      amdvlk
+      # amdvlk
     ];
-    extraPackages32 = with pkgs; [
-      driversi686Linux.amdvlk
-    ];
+    # extraPackages32 = with pkgs; [
+    #   driversi686Linux.amdvlk
+    # ];
   };
 
   environment.variables = {
@@ -32,10 +32,10 @@
   hardware.amdgpu = {
     opencl.enable = true;
     initrd.enable = true;
-    amdvlk = {
-      enable = true;
-      support32Bit.enable = true;
-    };
+    # amdvlk = {
+    #   enable = true;
+    #   support32Bit.enable = true;
+    # };
   };
 
   # Tell Xorg to use the amd driver
