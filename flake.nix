@@ -61,6 +61,13 @@
       inputs.home-manager.follows = "home-manager";
     };
 
+    ## hyprland
+    hyprland.url = "github:hyprwm/Hyprland";
+    hyprland-plugins = {
+      url = "github:hyprwm/hyprland-plugins";
+      inputs.hyprland.follows = "hyprland";
+    };
+
     ## framework laptop
     fw-fanctrl = {
       url = "github:TamtamHero/fw-fanctrl/packaging/nix";

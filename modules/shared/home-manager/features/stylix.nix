@@ -8,10 +8,10 @@
     # neovim.enable = false;
     swaync.enable = false;
     hyprlock.enable = false;
-    kde.enable = false;
+    # kde.enable = false;
     rofi.enable = false;
     zen-browser = {
-      enable = false;
+      # enable = false;
       profileNames = lib.singleton "default";
     };
   };
