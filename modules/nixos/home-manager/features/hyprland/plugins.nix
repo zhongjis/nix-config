@@ -9,11 +9,14 @@ in {
   # hyprland
   wayland.windowManager.hyprland = {
     # plugins = with pkgs; [
-    plugsin = with inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}; [
-      hyprlandPlugins.hy3
-      hyprlandPlugins.csgo-vulkan-fix
-      hyprlandPlugins.hypr-dynamic-cursors
-    ];
+    plugins = with inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system};
+      [
+        csgo-vulkan-fix
+      ]
+      ++ [
+        inputs.hy3.packages.${pkgs.stdenv.hostPlatform.system}.hy3
+        inputs.hypr-dynamic-cursors.packages.${pkgs.system}.hypr-dynamic-cursors
+      ];
     settings = {
       "plugin:dynamic-cursors" = {
         mode = "none";
