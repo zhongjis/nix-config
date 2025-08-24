@@ -8,40 +8,35 @@
     enable = true;
     enable32Bit = true;
     extraPackages = with pkgs; [
-      # vaapiVdpau
+      vaapiVdpau
 
-      # rocmPackages.clr
-      # rocmPackages.clr.icd
-
-      # amdvlk
+      rocmPackages.clr
+      rocmPackages.clr.icd
     ];
-    # extraPackages32 = with pkgs; [
-    #   driversi686Linux.amdvlk
-    # ];
   };
 
   environment.variables = {
-    # VDPAU_DRIVER = "radeonsi";
-    # LIBVA_DRIVER_NAME = "radeonsi";
+    VDPAU_DRIVER = "radeonsi";
+    LIBVA_DRIVER_NAME = "radeonsi";
 
     # Force radv
-    AMD_VULKAN_ICD = "RADV";
-    VK_ICD_FILENAMES = "/run/opengl-driver/share/vulkan/icd.d/radeon_icd.x86_64.json";
+    # AMD_VULKAN_ICD = "RADV";
+    # VK_ICD_FILENAMES = "/run/opengl-driver/share/vulkan/icd.d/radeon_icd.x86_64.json";
   };
 
   # Most software has the HIP libraries hard-coded. Workaround:
-  # systemd.tmpfiles.rules = [
-  #   "L+    /opt/rocm/hip   -    -    -     -    ${pkgs.rocmPackages.clr}"
-  # ];
+  systemd.tmpfiles.rules = [
+    "L+    /opt/rocm/hip   -    -    -     -    ${pkgs.rocmPackages.clr}"
+  ];
 
-  # hardware.amdgpu = {
-  #   opencl.enable = true;
-  #   initrd.enable = true;
-  #   amdvlk = {
-  #     enable = true;
-  #     support32Bit.enable = true;
-  #   };
-  # };
+  hardware.amdgpu = {
+    opencl.enable = true;
+    initrd.enable = true;
+    amdvlk = {
+      enable = true;
+      support32Bit.enable = true;
+    };
+  };
 
   # Tell Xorg to use the amd driver
   services.xserver = {
