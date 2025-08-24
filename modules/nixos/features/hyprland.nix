@@ -1,6 +1,7 @@
 {
   pkgs,
   inputs,
+  lib,
   ...
 }: let
   hyprland-pkgs-unstable = inputs.hyprland.inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system};
@@ -34,4 +35,6 @@ in {
 
     kitty
   ];
+
+  services.gnome.gnome-keyring.enable = lib.mkDefault true; # NOTE: to store password for things like nextcloud-client
 }

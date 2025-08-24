@@ -1,5 +1,5 @@
 {pkgs, ...}: let
-  stable_pkgs = with pkgs.stable; [nextcloud-client];
+  stable_pkgs = with pkgs; [nextcloud-client];
 in {
   home.packages = with pkgs;
     [
