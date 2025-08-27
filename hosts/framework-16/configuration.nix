@@ -8,7 +8,7 @@
     ../../modules/shared
     ../../modules/nixos
     ./hardware-configuration.nix
-    ./fw-fanctrl.nix
+    # ./fw-fanctrl.nix
 
     # disk placeholder
     # inputs.disko.nixosModules.default
