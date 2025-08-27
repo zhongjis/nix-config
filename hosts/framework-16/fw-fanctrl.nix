@@ -1,8 +1,8 @@
 {inputs, ...}: {
   imports = [inputs.fw-fanctrl.nixosModules.default];
 
-  programs.fw-fanctrl.enable = true;
-  programs.fw-fanctrl.config = {
+  hardware.fw-fanctrl.enable = true;
+  hardware.fw-fanctrl.config = {
     defaultStrategy = "lazy";
     strategies = {
       "lazy" = {
