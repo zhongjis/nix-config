@@ -6,7 +6,7 @@
     systems.url = "github:nix-systems/default";
     flake-utils = {
       url = "github:numtide/flake-utils";
-      systems.follows = "systems";
+      inputs.systems.follows = "systems";
     };
   };
 
