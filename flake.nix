@@ -126,7 +126,7 @@
           }).neovim;
       });
 
-      flake.templates = {
+      templates = {
         java8 = {
           path = ./templates/java8;
           description = "nix flake new -t github:zhongjis/nix-config#java8 .";
