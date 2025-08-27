@@ -1,52 +1,49 @@
 {
-  description = "Java 8 Dev Env";
+  description = "A Nix-flake-based Java development environment";
 
-  inputs = {
-    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1.*.tar.gz";
-    systems.url = "github:nix-systems/default";
-    flake-utils = {
-      url = "github:numtide/flake-utils";
-      inputs.systems.follows = "systems";
-    };
-  };
+  inputs.nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1.*.tar.gz";
 
   outputs = {
     self,
     nixpkgs,
-    flake-utils,
-    ...
   }: let
-    javaVersion = 8;
-  in
-    flake-utils.lib.eachDefaultSystem (
-      system: let
-        pkgs = nixpkgs.legacyPackages.${system};
-      in {
-        overlays.default = final: prev: let
-        in rec {
-          jdk = prev."jdk${toString javaVersion}";
-          maven = prev.maven.override {jdk_headless = jdk;};
-          lombok = prev.lombok.override {inherit jdk;};
-        };
+    javaVersion = 17; # Change this value to update the whole stack
 
-        devShells.default = pkgs.mkShell {
-          shell = "/bin/zsh";
-          shellHook = let
-            loadLombok = "-javaagent:${pkgs.lombok}/share/java/lombok.jar";
-            prev = "\${JAVA_TOOL_OPTIONS:+ $JAVA_TOOL_OPTIONS}";
-          in ''
-            export JAVA_TOOL_OPTIONS="${loadLombok}${prev}"
-            echo "[[java_8]] shell activated!!!"
-          '';
-          packages = with pkgs; [
-            gcc
-            jdk
-            maven
-            ncurses
-            patchelf
-            zlib
-          ];
-        };
-      }
-    );
+    supportedSystems = ["x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"];
+    forEachSupportedSystem = f:
+      nixpkgs.lib.genAttrs supportedSystems (system:
+        f {
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = [self.overlays.default];
+          };
+        });
+  in {
+    overlays.default = final: prev: let
+    in rec {
+      jdk = prev."jdk${toString javaVersion}";
+      maven = prev.maven.override {jdk_headless = jdk;};
+      lombok = prev.lombok.override {inherit jdk;};
+    };
+
+    devShells = forEachSupportedSystem ({pkgs}: {
+      default = pkgs.mkShell {
+        packages = with pkgs; [
+          gcc
+          jdk
+          maven
+          ncurses
+          patchelf
+          zlib
+        ];
+
+        shellHook = let
+          loadLombok = "-javaagent:${pkgs.lombok}/share/java/lombok.jar";
+          prev = "\${JAVA_TOOL_OPTIONS:+ $JAVA_TOOL_OPTIONS}";
+        in ''
+          export JAVA_TOOL_OPTIONS="${loadLombok}${prev}"
+        '';
+      };
+    });
+  };
 }
