@@ -13,8 +13,12 @@ in {
       php
 
       # **java17**
-      (maven.override {jdk_headless = jdk17;})
-      jdk17
+      # (maven.override {jdk_headless = jdk17;})
+      # jdk17
+
+      # **java17**
+      (maven.override {jdk_headless = jdk8;})
+      jdk8
 
       # kube
       kubectl
