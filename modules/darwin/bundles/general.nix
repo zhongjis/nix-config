@@ -104,6 +104,8 @@
       "spotify"
       "google-chrome"
       "zen"
+
+      "postman"
     ];
 
     masApps = {

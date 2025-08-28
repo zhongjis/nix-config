@@ -19,6 +19,7 @@ in {
       # **java17**
       (maven.override {jdk_headless = jdk8;})
       jdk8
+      tomcat9
 
       # kube
       kubectl
