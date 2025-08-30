@@ -42,8 +42,8 @@ in {
       redis
 
       # azure
-      azure-cli
-      azure-functions-core-tools
+      # azure-cli
+      # azure-functions-core-tools
 
       # aws
       awscli2
