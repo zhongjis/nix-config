@@ -45,6 +45,10 @@
     # Toolkit Backend
     export GDK_BACKEND = wayland,x11,*
     export CLUTTER_BACKEND = wayland
+
+    export NIXOS_OZONE_WL = 1
+    export SDL_VIDEODRIVER = wayland
+    export CLUTTER_BACKEND = wayland
   '';
 
   # others?

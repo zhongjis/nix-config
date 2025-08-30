@@ -60,6 +60,8 @@ in {
     exec-once =
       [
         (lib.getExe monitorScript)
+        # TODO: need testing
+        # "${lib.getExe pkgs.wlr-randr} --output 1 --primary"
 
         "nextcloud"
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"

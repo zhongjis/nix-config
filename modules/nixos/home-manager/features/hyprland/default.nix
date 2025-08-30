@@ -23,7 +23,7 @@ in {
     enable = true;
     xwayland.enable = true;
     systemd.enable = false;
-    # NOTE: below two are defined in nixos module
+    # NOTE: set the Hyprland and XDPH packages to null to use the ones from the NixOS module
     package = null;
     portalPackage = null;
     # See https://wiki.hyprland.org/Configuring/Monitors/

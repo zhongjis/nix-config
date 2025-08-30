@@ -126,5 +126,9 @@
     cursor = {
       no_hardware_cursors = true;
     };
+
+    debug = {
+      full_cm_proto = true;
+    };
   };
 }

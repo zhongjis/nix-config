@@ -17,7 +17,10 @@
   };
 
   programs.gamemode.enable = true;
-  programs.gamescope.enable = true;
+  programs.gamescope = {
+    enable = true;
+    capSysNice = true;
+  };
 
   programs.steam = {
     enable = true;
@@ -27,25 +30,26 @@
     localNetworkGameTransfers.openFirewall = true;
     remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = true;
+
+    extraPackages = with pkgs; [
+      SDL2
+    ];
   };
 
-  environment.systemPackages = with pkgs;
-    [
-      wineWayland
-      bottles
-      mangohud
-      protonup-qt
-      dxvk
-      heroic
+  environment.systemPackages = with pkgs; [
+    mangohud
+    protonup-qt
+    dxvk
 
-      # parsec-bin
-      vesktop # discord client
+    heroic
+    bottles
 
-      # steamtinkerlaunch %command%
-      steamtinkerlaunch
-    ]
-    ++ (with pkgs.stable; [
-      ]);
+    # parsec-bin
+    vesktop # discord client
+
+    # steamtinkerlaunch %command%
+    steamtinkerlaunch
+  ];
 
   # dota 2: LD_PRELOAD= gamescope -W 3440 -H 1440 --force-grab-cursor --expose-wayland --rt -r 144 --mangoapp -f -- env LD_PRELOAD="$LD_PRELOAD" gamemoderun %command%
 }
