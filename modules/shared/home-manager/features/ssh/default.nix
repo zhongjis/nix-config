@@ -29,18 +29,21 @@ in {
   };
 
   programs.ssh.enable = true;
-  programs.ssh = {
-    addKeysToAgent = "yes";
-    controlMaster = "auto";
-    forwardAgent = true;
-    serverAliveInterval = 60;
-    # NOTE: never figure out a way to put this under host *. so just set it as override for now
-    extraOptionOverrides = {
-      HostkeyAlgorithms = "+ssh-rsa";
-      PubkeyAcceptedAlgorithms = "+ssh-rsa";
-    };
-  };
+  programs.ssh.enableDefaultConfig = false;
+  # NOTE: example for entry order
+  # "*" = lib.hm.dag.entryBefore ["*.example.com"] {
   programs.ssh.matchBlocks = {
+    "*" = {
+      addKeysToAgent = "yes";
+      controlMaster = "auto";
+      forwardAgent = true;
+      serverAliveInterval = 60;
+      # NOTE: never figure out a way to put this under host *. so just set it as override for now
+      extraOptions = {
+        HostkeyAlgorithms = "+ssh-rsa";
+        PubkeyAcceptedAlgorithms = "+ssh-rsa";
+      };
+    };
     "github.com-zhongjis" = {
       host = "github.com";
       hostname = "github.com";
