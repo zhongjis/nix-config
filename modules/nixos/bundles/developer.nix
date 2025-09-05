@@ -23,6 +23,8 @@
       # db client
       mongodb-compass
       dbeaver-bin
+
+      postman
     ]
     ++ [
     ];
