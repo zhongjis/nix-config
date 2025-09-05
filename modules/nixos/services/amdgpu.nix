@@ -2,6 +2,8 @@
   # https://nixos.wiki/wiki/AMD_GPU
   # https://github.com/xerhaxs/nixos/blob/main/nixosModules/hardware/amdgpu.nix
 
+  chaotic.mesa-git.enable = true;
+
   boot.initrd.kernelModules = ["amdgpu"];
 
   hardware.graphics = {
@@ -33,8 +35,8 @@
     opencl.enable = true;
     initrd.enable = true;
     amdvlk = {
-      enable = true;
-      support32Bit.enable = true;
+      enable = false;
+      support32Bit.enable = false;
     };
   };
 

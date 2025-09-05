@@ -34,6 +34,10 @@ in rec {
       if hardware != ""
       then inputs.nixos-hardware.nixosModules.${hardware}
       else {};
+    chaoticModule =
+      if isDarwin
+      then {}
+      else inputs.chaotic.nixosModules.default;
     sopsModule =
       if isDarwin
       then inputs.sops-nix.darwinModules.sops
@@ -48,6 +52,7 @@ in rec {
       modules = [
         hostConfiguration
         hardwareConfiguration
+        chaoticModule
         sopsModule
 
         {

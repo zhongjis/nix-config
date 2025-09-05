@@ -6,6 +6,8 @@
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.05";
     nixos-hardware.url = "github:nixos/nixos-hardware/master";
 
+    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
+
     nix-config-private = {
       url = "git+ssh://git@github.com/zhongjis/nix-config-private.git";
       inputs.nixpkgs.follows = "nixpkgs";
