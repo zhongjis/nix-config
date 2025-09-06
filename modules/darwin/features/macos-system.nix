@@ -35,7 +35,7 @@
     ShowStatusBar = true;
   };
 
-  security.pam.enableSudoTouchIdAuth = true;
+  security.pam.services.sudo_local.touchIdAuth = true;
 
   # NOTE: need to allow full diskaccess for terminal emulator for the following
   system.defaults.universalaccess.reduceMotion = true;
