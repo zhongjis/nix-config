@@ -19,6 +19,7 @@
       "https://nix-community.cachix.org"
       "https://mitchellh-nixos-config.cachix.org"
       "https://chaotic-nyx.cachix.org/"
+      "https://zshen-cache-default.cachix.org"
     ];
     trusted-public-keys = [
       "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
@@ -28,6 +29,7 @@
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       "mitchellh-nixos-config.cachix.org-1:bjEbXJyLrL1HZZHBbO4QALnI5faYZppzkU4D2s0G8RQ="
       "chaotic-nyx.cachix.org-1:HfnXSw4pj95iI/n17rIDy40agHj12WfF+Gqk6SonIT8="
+      "zshen-cache-default.cachix.org-1:+UMXDbrtkRBEOF6NU4F1S8lKvjC6bxyB0llevRggXo4="
     ];
   };
 
