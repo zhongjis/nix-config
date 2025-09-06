@@ -38,6 +38,10 @@ in rec {
       if isDarwin
       then {}
       else inputs.chaotic.nixosModules.default;
+    determinateModule =
+      if isDarwin
+      then {}
+      else inputs.determinate.nixosModules.default;
     sopsModule =
       if isDarwin
       then inputs.sops-nix.darwinModules.sops
@@ -53,6 +57,7 @@ in rec {
         hostConfiguration
         hardwareConfiguration
         chaoticModule
+        determinateModule
         sopsModule
 
         {

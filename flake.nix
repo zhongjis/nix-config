@@ -6,6 +6,8 @@
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.05";
     nixos-hardware.url = "github:nixos/nixos-hardware/master";
 
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
+
     chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
 
     nix-config-private = {

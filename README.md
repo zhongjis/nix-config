@@ -18,7 +18,7 @@ This is my personal nix-config. It is always a work in progress as I love tweaki
 1. install nix (https://zero-to-nix.com/start/install)
 
 ```bash
-curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --determinate
 ```
 
 2. clone this repo

@@ -33,7 +33,7 @@
     ];
   };
 
-  nix.package = pkgs.nix;
+  # nix.package = pkgs.nix;
   nix.extraOptions = ''
     experimental-features = nix-command flakes
   '';

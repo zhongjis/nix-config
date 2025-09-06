@@ -9,6 +9,8 @@
     inputs.nix-homebrew.darwinModules.nix-homebrew
   ];
 
+  nix.enable = false; # NOTE: use determinate nix
+
   myNixDarwin.nh.enable = lib.mkDefault true;
   myNixDarwin.macos-system.enable = lib.mkDefault true;
 
