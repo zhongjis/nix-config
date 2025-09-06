@@ -1,5 +1,6 @@
 {
   inputs,
+  lib,
   pkgs,
   ...
 }: {
@@ -33,10 +34,10 @@
     ];
   };
 
-  # nix.package = pkgs.nix;
+  # nix.package = pkgs.nix; # NOTE: managed by determinate nix
   nix.extraOptions = ''
     experimental-features = nix-command flakes
   '';
 
-  nix.optimise.automatic = true;
+  nix.optimise.automatic = lib.mkDefault true;
 }

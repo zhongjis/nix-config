@@ -37,7 +37,7 @@ in {
   # ++ services;
 
   nix.gc = {
-    automatic = true;
+    automatic = lib.mkDefault true;
     interval = {
       Weekday = 0;
       Hour = 0;
