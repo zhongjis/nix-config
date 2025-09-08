@@ -118,7 +118,7 @@
       };
 
       darwinConfigurations = {
-        Zhongjies-MacBook-Pro = mkSystem "mac-m1-max" {
+        Zhongjies-MacBook-Pro-2 = mkSystem "mac-m1-max" {
           system = "aarch64-darwin";
           user = "zshen";
           darwin = true;
@@ -126,7 +126,7 @@
       };
 
       homeConfigurations = {
-        "zshen@Zhongjies-MacBook-Pro" = mkHome "mac-m1-max" {
+        "zshen@Zhongjies-MacBook-Pro-2" = mkHome "mac-m1-max" {
           system = "aarch64-darwin";
           darwin = true;
         };
