@@ -24,7 +24,7 @@
       mongodb-compass
       dbeaver-bin
 
-      postman
+      insomnia
     ]
     ++ [
     ];

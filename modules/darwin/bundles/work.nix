@@ -69,7 +69,7 @@ in {
       "sublime-merge@dev"
       "cursor"
       "dbeaver-community"
-      "postman"
+      "insomnia"
     ];
   };
 }
