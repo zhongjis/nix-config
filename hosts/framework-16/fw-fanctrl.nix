@@ -1,10 +1,6 @@
 {pkgs, ...}: {
   hardware.fw-fanctrl = {
     enable = true;
-    # TODO: wait https://github.com/TamtamHero/fw-fanctrl/issues/159 to be fixed
-    package = pkgs.fw-fanctrl.overrideAttrs (finalAttrs: prevAttrs: {
-      patches = (prevAttrs.patches or []) ++ [./fw-fanctrl.patch];
-    });
     config = {
       defaultStrategy = "lazy";
       strategies = {
