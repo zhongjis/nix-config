@@ -32,7 +32,7 @@ in {
 
       # Hashicorp
       terraform
-      terraform-docs
+      # terraform-docs
       vault
 
       # python
