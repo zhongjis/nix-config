@@ -18,13 +18,14 @@ in {
       scale = 1.0;
       # scale = 1.;
     };
-    "desc:LG Electronics LG ULTRAGEAR 009NTDV4B698" = {
-      width = 3440;
-      height = 1440;
-      refreshRate = 143.92;
+    "desc:ASUSTek COMPUTER INC PG27UCDM T1LMAS019666" = {
+      width = 3840;
+      height = 2160;
+      refreshRate = 240.0;
+      scale = 2.0;
       # refreshRate = 60.;
       # x = 2560
-      x = 2048;
+      x = 2560;
       y = 0;
     };
     "desc:Dell Inc. DELL P2419H 78NFR63" = {
