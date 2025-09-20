@@ -2238,11 +2238,11 @@
         "systems": "systems_4"
       },
       "locked": {
-        "lastModified": 1757955071,
-        "narHash": "sha256-owSpkt551cIqDDk5iHesdEus9REFeOIY3rY4C5ZPm/Y=",
+        "lastModified": 1758271661,
+        "narHash": "sha256-ENqd2/33uP5vB44ClDjjAV+J78oF8q1er4QUZuT8Z7g=",
         "owner": "notashelf",
         "repo": "nvf",
-        "rev": "1bd9fc116420db4c1156819d61df5d5312e1bbea",
+        "rev": "b7571df4d6e9ac08506a738ddceeec0b141751b0",
         "type": "github"
       },
       "original": {
