@@ -37,4 +37,5 @@ in {
   ];
 
   services.gnome.gnome-keyring.enable = lib.mkDefault true; # NOTE: to store password for things like nextcloud-client
+  security.pam.services.gnome_keyring = {};
 }
