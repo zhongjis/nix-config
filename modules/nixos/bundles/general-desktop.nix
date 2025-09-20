@@ -89,9 +89,9 @@
       fluent-reader
 
       vivaldi
+      ghostty
     ]
     ++ [
-      inputs.ghostty.packages.${pkgs.system}.default
       # inputs.zen-browser.packages.${pkgs.system}.default
     ];
 

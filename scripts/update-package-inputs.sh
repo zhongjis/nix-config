@@ -5,5 +5,4 @@ nix flake update zen-browser
 nix flake update stylix
 nix flake update neovim-nightly-overlay
 nix flake update nvf
-nix flake update ghostty
 nix flake update nixpkgs-terraform
