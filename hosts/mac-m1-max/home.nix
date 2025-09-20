@@ -17,7 +17,7 @@
   myHomeManager.bundles.darwin.enable = true;
 
   programs.git.userName = "zshen";
-  programs.git.userEmail = "zshen@adobe.com";
+  programs.git.userEmail = "zhongjie.x.shen@gmail.com";
 
   home.username = "zshen";
   home.homeDirectory = lib.mkForce "/Users/zshen";
