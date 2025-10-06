@@ -68,6 +68,7 @@ in {
       "mongodb-compass"
       "sublime-merge@dev"
       "cursor"
+      "cursor-cli"
       "dbeaver-community"
       "insomnia"
     ];

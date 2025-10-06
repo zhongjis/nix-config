@@ -22,6 +22,7 @@
       lsp.lazydev.enable = true;
     };
     java.enable = true;
+    scala.enable = true;
     terraform.enable = true;
     yaml.enable = true;
     python.enable = true;
