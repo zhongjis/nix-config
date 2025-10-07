@@ -34,10 +34,6 @@
   hardware.amdgpu = {
     opencl.enable = true;
     initrd.enable = true;
-    amdvlk = {
-      enable = false;
-      support32Bit.enable = false;
-    };
   };
 
   # Tell Xorg to use the amd driver
