@@ -90,15 +90,18 @@
 
     taps = builtins.attrNames config.nix-homebrew.taps;
 
-    brews = [];
+    brews = [
+      "bitwarden-cli"
+    ];
 
     casks = [
-      "flux"
+      # "flux"
       "box-drive"
       "caffeine"
       "aerospace"
       "appcleaner"
-      "quicksilver"
+      # "quicksilver"
+      "alfred"
       "bitwarden"
       "ghostty"
       "claude-code"
