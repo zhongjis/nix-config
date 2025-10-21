@@ -26,6 +26,7 @@
   myHomeManager.kubernetes.enable = lib.mkDefault true;
   myHomeManager.lazygit.enable = lib.mkDefault true;
   myHomeManager.opencode.enable = lib.mkDefault true;
+  myHomeManager.rg.enable = lib.mkDefault true;
   myHomeManager.sops.enable = lib.mkDefault true;
   myHomeManager.ssh.enable = lib.mkDefault true;
   myHomeManager.yazi.enable = lib.mkDefault true;
