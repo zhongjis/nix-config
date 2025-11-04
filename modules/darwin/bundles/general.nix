@@ -100,6 +100,7 @@
       "caffeine"
       "aerospace"
       "appcleaner"
+      "bartender"
       # "quicksilver"
       "alfred"
       "bitwarden"

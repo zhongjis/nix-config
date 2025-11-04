@@ -13,8 +13,8 @@ in {
       php
 
       # **java17**
-      (maven.override {jdk_headless = jdk17;})
-      jdk17
+      # (maven.override {jdk_headless = jdk17;})
+      # jdk17
 
       # **java8**
       # (maven.override {jdk_headless = jdk8;})
@@ -57,7 +57,10 @@ in {
     ++ stable_pkgs;
 
   homebrew = {
-    brews = [];
+    brews = [
+      "maven"
+      "openjdk@17"
+    ];
 
     casks = [
       "docker-desktop"
@@ -70,7 +73,6 @@ in {
       "cursor"
       "cursor-cli"
       "dbeaver-community"
-      "insomnia"
     ];
   };
 }
