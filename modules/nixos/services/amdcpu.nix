@@ -9,6 +9,6 @@
   };
 
   environment.systemPackages = [
-    pkgs.microcodeAmd
+    pkgs.microcode-amd
   ];
 }

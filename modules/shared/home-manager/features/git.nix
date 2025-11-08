@@ -7,23 +7,12 @@
     enable = true;
 
     # configure username and email in home.nix
-    userName = lib.mkDefault "zhongjis";
-    userEmail = lib.mkDefault "zhongjie.x.shen@gmail.com";
-
-    aliases = {};
-    attributes = [];
-
-    # TODO: fancy signature for commits and tags
-    # signing = {
-    #   format = "ssh";
-    # };
-
-    diff-so-fancy = {
-      enable = true;
-      markEmptyLines = false;
-    };
-
-    extraConfig = {
+    settings = {
+      user = {
+        name = lib.mkDefault "zhongjis";
+        email = lib.mkDefault "zhongjie.x.shen@gmail.com";
+      };
+      alias = {};
       core = {
         compression = 9;
         whitespace = "error";
@@ -58,6 +47,13 @@
       branch.sort = "-committerdate";
       tag.sort = "-taggerdate";
     };
+
+    # settings.attributes = [];
+
+    # TODO: fancy signature for commits and tags
+    # signing = {
+    #   format = "ssh";
+    # };
   };
 
   programs.zsh.shellAliases = {
@@ -74,6 +70,13 @@
     gb = "git branch";
 
     gd = "git diff";
+  };
+
+  programs.diff-so-fancy = {
+    enable = true;
+    enableGitIntegration = true;
+
+    settings.markEmptyLines = false;
   };
 
   home.packages = with pkgs; [

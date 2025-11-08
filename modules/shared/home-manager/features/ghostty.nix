@@ -10,7 +10,7 @@
   programs.ghostty = {
     enable = true;
     enableZshIntegration = true;
-    package = null; # package managed by system
+    # package = null; # package managed by system
     settings = {
       # Cursor
       cursor-style = "block";

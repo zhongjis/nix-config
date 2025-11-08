@@ -4,6 +4,7 @@
   ];
 
   services.xremap = {
+    enable = true;
     withHypr = true;
     userName = "zshen";
     config = {

@@ -16,9 +16,6 @@
   myHomeManager.bundles.general.enable = true;
   myHomeManager.bundles.darwin.enable = true;
 
-  programs.git.userName = "zshen";
-  programs.git.userEmail = "zhongjie.x.shen@gmail.com";
-
   home.username = "zshen";
   home.homeDirectory = lib.mkForce "/Users/zshen";
   home.stateVersion = "23.11"; # Please read the comment before changing.

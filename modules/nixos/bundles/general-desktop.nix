@@ -85,7 +85,7 @@
       neovim
 
       obsidian
-      bitwarden
+      bitwarden-desktop
       fluent-reader
 
       vivaldi
@@ -108,7 +108,7 @@
     corefonts
     noto-fonts
     noto-fonts-cjk-sans
-    noto-fonts-emoji
+    noto-fonts-color-emoji
     liberation_ttf
     mplus-outline-fonts.githubRelease
     dina-font
