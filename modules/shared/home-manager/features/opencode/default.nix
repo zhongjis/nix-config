@@ -3,19 +3,25 @@
   pkgs,
   ...
 }: {
+  imports = [
+    ./lsp.nix
+    ./formatters.nix
+    ./permission.nix
+    ./provider.nix
+  ];
   programs.mcp.servers = {
     "nixos" = {
       command = "nix";
-      args = ["nix" "run" "github:utensils/mcp-nixos"];
+      args = ["run" "github:utensils/mcp-nixos"];
     };
     "mcp_k8s" = {
       command = "nix";
-      args = ["nix" "run" "nixpkgs#mcp-k8s-go"];
+      args = ["run" "nixpkgs#mcp-k8s-go"];
     };
     "flux-operator-mcp" = {
       type = "local";
-      enabled = true;
-      command = ["nix" "run" "nixpkgs#fluxcd-operator-mcp" "serve"];
+      command = "nix";
+      args = ["run" "nixpkgs#fluxcd-operator-mcp" "serve"];
       environment = {
         "KUBECONFIG" = "/home/zshen/.kube/config";
       };

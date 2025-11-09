@@ -11,9 +11,6 @@
 
   environment.systemPackages = with pkgs;
     [
-      # ai
-      claude-code
-
       # nix
       colmena
 
