@@ -2,29 +2,7 @@
   config,
   pkgs,
   ...
-}: let
-  sopsFile = ../../../../secrets/ai-tokens.yaml;
-in {
-  imports = [
-    ./formatters.nix
-    ./lsp.nix
-    ./permission.nix
-    ./provider.nix
-  ];
-
-  sops.secrets = {
-    # github - personal
-    openai_api_key = {
-      inherit sopsFile;
-    };
-    anthropic_api_key = {
-      inherit sopsFile;
-    };
-    openrouter_api_key = {
-      inherit sopsFile;
-    };
-  };
-
+}: {
   programs.mcp.servers = {
     "nixos" = {
       command = "nix";
@@ -57,8 +35,6 @@ in {
     settings = {
       autoshare = false;
       autoupdate = false;
-
-      model = "anthropic/claude-sonnet-4-20250514";
     };
   };
 }
