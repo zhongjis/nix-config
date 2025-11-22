@@ -7,7 +7,7 @@
     ./lsp.nix
     ./formatters.nix
     ./permission.nix
-    ./provider.nix
+    # ./provider.nix
   ];
   programs.mcp.servers = {
     "nixos" = {

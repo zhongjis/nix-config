@@ -3,6 +3,7 @@
   pkgs,
   ...
 }: {
+  home.packages = [pkgs.nodejs];
   programs.claude-code.mcpServers = {
     github = {
       type = "stdio";
@@ -24,6 +25,7 @@
       args = ["run" "nixpkgs#mcp-k8s-go"];
     };
     flux-operator-mcp = {
+      type = "stdio";
       command = "nix";
       args = ["run" "nixpkgs#fluxcd-operator-mcp" "serve"];
       env = {
