@@ -39,6 +39,8 @@
 
   programs.zen-browser.enable = lib.mkDefault true;
 
+  home.packages = with pkgs; [localsend];
+
   home.sessionVariables = {
     FLAKE = "${config.home.homeDirectory}/personal/nix-config";
   };

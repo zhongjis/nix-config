@@ -111,6 +111,7 @@
       "spotify"
       "google-chrome"
       "zen"
+      "localsend"
     ];
 
     masApps = {
