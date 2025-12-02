@@ -13,7 +13,7 @@
 
     nix = {
       enable = true;
-      lsp.server = "nixd";
+      lsp.servers = ["nixd"];
     };
     markdown.enable = true;
     bash.enable = true;
@@ -34,7 +34,7 @@
     ts = {
       enable = true;
       extensions.ts-error-translator.enable = true;
-      format.type = "prettierd";
+      format.type = ["prettierd"];
     };
   };
 }
