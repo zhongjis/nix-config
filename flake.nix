@@ -2,6 +2,7 @@
   description = "Nixos config flake";
 
   inputs = {
+    flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.05";
     nixos-hardware.url = "github:nixos/nixos-hardware/master";
@@ -99,67 +100,148 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs = {
+  outputs = inputs @ {
+    flake-parts,
     nixpkgs,
     nvf,
     ...
-  } @ inputs: let
+  }: let
     overlays = import ./overlays {inherit inputs;};
     myLib = import ./lib/default.nix {inherit overlays nixpkgs inputs;};
-  in
-    with myLib; {
-      nixosConfigurations = {
-        framework-16 = mkSystem "framework-16" {
-          system = "x86_64-linux";
-          hardware = "framework-16-7040-amd";
-          user = "zshen";
-        };
-      };
-
-      darwinConfigurations = {
-        Zs-MacBook-Pro = mkSystem "mac-m1-max" {
-          system = "aarch64-darwin";
-          user = "zshen";
-          darwin = true;
-        };
-      };
-
-      homeConfigurations = {
-        "zshen@Zs-MacBook-Pro" = mkHome "mac-m1-max" {
-          system = "aarch64-darwin";
-          darwin = true;
-        };
-        "zshen@thinkpad-t480" = mkHome "thinkpad-t480" {
-          system = "x86_64-linux";
-        };
-        "zshen@framework-16" = mkHome "framework-16" {
-          system = "x86_64-linux";
-        };
-      };
-
-      packages = forAllSystems (pkgs: {
-        # This 'pkgs' argument here is already nixpkgs.legacyPackages.${system}
-        neovim =
-          (nvf.lib.neovimConfiguration {
-            pkgs = pkgs; # Pass the system-specific pkgs
+    
+    # Common overlays list
+    commonOverlays = [
+      inputs.nixpkgs-terraform.overlays.default
+      overlays.modifications
+      overlays.stable-packages
+    ];
+    
+    # Common nixpkgs config
+    commonNixpkgsConfig = {
+      allowUnfree = true;
+      permittedInsecurePackages = [];
+      allowUnfreePredicate = _: true;
+    };
+    
+    # Common module args for NixOS/Darwin
+    mkModuleArgs = system: hostName: user: darwin: {
+      currentSystem = system;
+      currentSystemName = hostName;
+      currentSystemUser = user;
+      inputs = inputs;
+      isDarwin = darwin;
+    };
+    
+    # Build outputs using flake-parts
+    outputs = flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = ["x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"];
+      
+      perSystem = {system, pkgs, ...}: {
+        packages = {
+          neovim = (nvf.lib.neovimConfiguration {
+            pkgs = pkgs;
             modules = [./modules/shared/home-manager/features/neovim/nvf];
           }).neovim;
-      });
-
-      templates = {
-        java8 = {
-          path = ./templates/java8;
-          description = "nix flake new -t github:zhongjis/nix-config#java8 .";
-        };
-        nodejs22 = {
-          path = ./templates/nodejs22;
-          description = "nix flake new -t github:zhongjis/nix-config#nodejs22 .";
         };
       };
+      
+      flake = {
+        nixosConfigurations = {
+          framework-16 = nixpkgs.lib.nixosSystem {
+            system = "x86_64-linux";
+            specialArgs = {
+              inherit inputs myLib;
+            };
+            modules = [
+              ./hosts/framework-16/configuration.nix
+              inputs.nixos-hardware.nixosModules.framework-16-7040-amd
+              inputs.chaotic.nixosModules.default
+              inputs.determinate.nixosModules.default
+              inputs.sops-nix.nixosModules.sops
+              {
+                nixpkgs.overlays = commonOverlays;
+                nixpkgs.config = commonNixpkgsConfig;
+              }
+              {
+                config._module.args = mkModuleArgs "x86_64-linux" "framework-16" "zshen" false;
+              }
+            ];
+          };
+        };
 
-      nixDarwinModules.default = ./modules/darwin;
-      homeManagerModules.default = ./modules/shared/home-manager;
-      homeManagerModules.linux = ./modules/nixos/home-manager;
-      homeManagerModules.darwin = ./modules/darwin/home-manager;
+        darwinConfigurations = {
+          Zs-MacBook-Pro = inputs.nix-darwin.lib.darwinSystem {
+            system = "aarch64-darwin";
+            specialArgs = {
+              inherit inputs myLib;
+            };
+            modules = [
+              ./hosts/mac-m1-max/configuration.nix
+              inputs.sops-nix.darwinModules.sops
+              {
+                nixpkgs.overlays = commonOverlays;
+                nixpkgs.config = commonNixpkgsConfig;
+              }
+              {
+                config._module.args = mkModuleArgs "aarch64-darwin" "mac-m1-max" "zshen" true;
+              }
+            ];
+          };
+        };
+
+        homeConfigurations = {
+          "zshen@Zs-MacBook-Pro" = inputs.home-manager.lib.homeManagerConfiguration {
+            pkgs = import nixpkgs {
+              system = "aarch64-darwin";
+              overlays = commonOverlays;
+            };
+            extraSpecialArgs = {
+              inherit inputs myLib;
+              currentSystem = "aarch64-darwin";
+              currentSystemName = "mac-m1-max";
+              isDarwin = true;
+            };
+            modules = [
+              ./hosts/mac-m1-max/home.nix
+              inputs.sops-nix.homeManagerModules.sops
+              inputs.stylix.homeModules.stylix
+            ];
+          };
+          "zshen@framework-16" = inputs.home-manager.lib.homeManagerConfiguration {
+            pkgs = import nixpkgs {
+              system = "x86_64-linux";
+              overlays = commonOverlays;
+            };
+            extraSpecialArgs = {
+              inherit inputs myLib;
+              currentSystem = "x86_64-linux";
+              currentSystemName = "framework-16";
+              isDarwin = false;
+            };
+            modules = [
+              ./hosts/framework-16/home.nix
+              inputs.sops-nix.homeManagerModules.sops
+              inputs.stylix.homeModules.stylix
+            ];
+          };
+        };
+
+        templates = {
+          java8 = {
+            path = ./templates/java8;
+            description = "nix flake new -t github:zhongjis/nix-config#java8 .";
+          };
+          nodejs22 = {
+            path = ./templates/nodejs22;
+            description = "nix flake new -t github:zhongjis/nix-config#nodejs22 .";
+          };
+        };
+
+        nixDarwinModules.default = ./modules/darwin;
+        homeManagerModules.default = ./modules/shared/home-manager;
+        homeManagerModules.linux = ./modules/nixos/home-manager;
+        homeManagerModules.darwin = ./modules/darwin/home-manager;
+      };
     };
+  in outputs;
 }

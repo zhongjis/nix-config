@@ -67,8 +67,13 @@ nix flake update
 nix build .#packages.x86_64-linux.neovim
 nix build .#packages.aarch64-darwin.neovim
 
-# Test configurations without switching
-refer back to the 
+# Test configurations without switching (safe dry-run commands)
+nix flake check                    # Validate flake structure
+nix eval .#nixosConfigurations.framework-16.config.system.name
+nix eval .#darwinConfigurations.Zs-MacBook-Pro.config.system.name
+nix eval .#homeConfigurations."zshen@framework-16".config.home.username
+nix build .#packages.x86_64-linux.neovim --no-link
+nix build .#nixosConfigurations.framework-16.config.system.build.toplevel --no-link
 
 # Clean up old generations
 see helps using `nh clean`
@@ -79,8 +84,13 @@ see helps using `nh clean`
 
 ### Core Structure
 
-- `flake.nix` - Main flake configuration defining all systems and inputs
-- `lib/default.nix` - Custom library functions for system building (`mkSystem`, `mkHome`) and module extensions
+- `flake.nix` - Main flake configuration using flake-parts to organize outputs
+  - Uses `flake-parts.lib.mkFlake` to structure outputs
+  - `perSystem` defines packages (e.g., neovim) for each system
+  - `flake` section contains system configurations (NixOS, Darwin, Home Manager)
+- `lib/default.nix` - Custom library functions for module extensions and helpers
+  - `extendModule`/`extendModules` - Extends existing modules with additional options/config
+  - `filesIn`/`dirsIn` - Directory traversal helpers for modular imports
 - `modules/` - Modular configuration split by platform:
   - `modules/shared/` - Common configurations for all platforms
   - `modules/nixos/` - NixOS-specific modules
@@ -145,6 +155,7 @@ Uses sops-nix for secret management:
 ## Flake Inputs & Dependencies
 
 Key external inputs used in this configuration:
+- `flake-parts` - Framework for organizing flake outputs
 - `nixpkgs` (unstable) and `nixpkgs-stable` for packages
 - `home-manager` for user environment management
 - `nix-darwin` for macOS system configuration  
@@ -153,13 +164,35 @@ Key external inputs used in this configuration:
 - `nix-config-private` - Private configuration repository
 - Homebrew taps for macOS apps (aerospace, etc.)
 
+## Flake-Parts Structure
+
+The configuration uses flake-parts to organize outputs:
+
+**Per-System Packages:**
+- Defined in `perSystem` section
+- Automatically available for all systems: `x86_64-linux`, `aarch64-linux`, `x86_64-darwin`, `aarch64-darwin`
+- Example: `packages.x86_64-linux.neovim`
+
+**System Configurations:**
+- NixOS configurations in `nixosConfigurations`
+- Darwin configurations in `darwinConfigurations`
+- Home Manager configurations in `homeConfigurations`
+- All defined explicitly in the `flake` section with:
+  - System specification
+  - specialArgs (inputs, outputs, myLib)
+  - Module lists (host config, hardware modules, SOPS, overlays, etc.)
+
+**Common Helpers:**
+- `commonOverlays` - Shared overlays for all systems
+- `commonNixpkgsConfig` - Shared nixpkgs configuration
+- `mkModuleArgs` - Helper to create module args (_module.args)
+
 ## Custom Library Functions
 
-The `lib/default.nix` provides key abstractions:
-- `mkSystem` - Creates NixOS or Darwin systems with shared configuration
-- `mkHome` - Creates Home Manager configurations
+The `lib/default.nix` provides helper functions:
 - `extendModule`/`extendModules` - Extends existing modules with additional options/config
 - `filesIn`/`dirsIn` - Directory traversal helpers for modular imports
+- `pkgsFor` - Get nixpkgs for a specific system
 
 ## Host-Specific Notes
 
