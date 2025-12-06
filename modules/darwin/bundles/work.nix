@@ -73,6 +73,7 @@ in {
       "cursor"
       "cursor-cli"
       "dbeaver-community"
+      "visual-studio-code"
     ];
   };
 }
