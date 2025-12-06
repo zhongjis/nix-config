@@ -209,7 +209,7 @@ alt-shift-k = ['join-with up', 'mode main']
 alt-shift-l = ['join-with right', 'mode main']
 
 [[on-window-detected]]
-if.app-id = 'com.vivaldi.Vivaldi'
+if.app-id = 'com.zen.zen'
 run = 'move-node-to-workspace Z'          # mnemonics Z - Zen Browser
 
 [[on-window-detected]]

@@ -69,7 +69,7 @@ in {
         windowrule = workspace name:gaming,class:^(steam_proton)$
         windowrule = workspace name:gaming,class:^(gamescope)$
 
-        windowrule = workspace name:zen,class:^(Vivaldi-stable)$
+        # windowrule = workspace name:zen,class:^(Vivaldi-stable)$
         windowrule = workspace name:zen,class:^(zen-beta)$
 
         # Pavucontrol floating
