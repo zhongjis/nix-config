@@ -36,8 +36,7 @@
 
   # for radeon 7700s
   services.ollama = {
-    package = pkgs.stable.ollama;
-    acceleration = "rocm";
+    package = pkgs.ollama-vulkan;
     rocmOverrideGfx = "11.0.2";
   };
 
