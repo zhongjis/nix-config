@@ -14,8 +14,8 @@ in {
         csgo-vulkan-fix
       ]
       ++ [
-        inputs.hy3.packages.${pkgs.stdenv.hostPlatform.system}.hy3
-        inputs.hypr-dynamic-cursors.packages.${pkgs.system}.hypr-dynamic-cursors
+        # inputs.hy3.packages.${pkgs.stdenv.hostPlatform.system}.hy3
+        # inputs.hypr-dynamic-cursors.packages.${pkgs.stdenv.hostPlatform.system}.hypr-dynamic-cursors
       ];
     settings = {
       "plugin:dynamic-cursors" = {
