@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.05";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11";
     nixos-hardware.url = "github:nixos/nixos-hardware/master";
 
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
@@ -71,9 +71,7 @@
       inputs.hyprland.follows = "hyprland";
     };
     hy3 = {
-      # WAITFOR: https://github.com/outfoxxed/hy3/issues/230
-      # url = "github:outfoxxed/hy3?ref=hl0.50.0";
-      url = "github:outfoxxed/hy3?ref=cdcbc57f7e4925bbf8d1589bbb454e660df2b88e";
+      url = "github:outfoxxed/hy3";
       inputs.hyprland.follows = "hyprland";
     };
     hypr-dynamic-cursors = {
