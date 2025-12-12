@@ -62,6 +62,7 @@
 
   services.pipewire = {
     enable = true;
+    package = pkgs.stable.pipewire;
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
@@ -152,6 +153,8 @@
     };
   };
   services.blueman.enable = true;
+
+  programs.localsend.enable = true;
 
   programs.dconf.enable = true;
 

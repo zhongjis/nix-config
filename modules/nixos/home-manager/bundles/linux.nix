@@ -6,7 +6,6 @@
     mpv # media player
     imv # image viewer
     zathura # pdf viewer
-    vivaldi # web browser
   ];
 
   xdg.mimeApps = {

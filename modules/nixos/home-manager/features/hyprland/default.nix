@@ -57,51 +57,34 @@ in {
 
         ${lib.concatLines workspaceToMonitorSetup}
 
-        windowrule = workspace special:default,class:^(vesktop)$
+        windowrule = workspace special:default, match:class vesktop
 
-        windowrule = workspace name:spotify,class:^(spotify)$
+        windowrule = workspace name:spotify, match:class spotify
 
-        windowrule = workspace name:obsidian,class:^(obsidian)$
+        windowrule = workspace name:obsidian, match:class obsidian
 
-        windowrule = workspace name:gaming,class:^(steam)$
-        windowrule = workspace name:gaming,class:^(heroic)$
-        windowrule = workspace name:gaming,class:^(com.usebottles.bottles)$
-        windowrule = workspace name:gaming,class:^(steam_proton)$
-        windowrule = workspace name:gaming,class:^(gamescope)$
+        windowrule = workspace name:gaming, match:class steam
+        windowrule = workspace name:gaming, match:class heroic
+        windowrule = workspace name:gaming, match:class com\.usebottles\.bottles
+        windowrule = workspace name:gaming, match:class steam_proton
+        windowrule = workspace name:gaming, match:class gamescope
 
-        # windowrule = workspace name:zen,class:^(Vivaldi-stable)$
-        windowrule = workspace name:zen,class:^(zen-beta)$
+        windowrule = workspace name:zen, match:class zen-beta
 
-        # Pavucontrol floating
-        windowrule = float,class:(.*org.pulseaudio.pavucontrol.*)
-        windowrule = size 900 800,class:(.*org.pulseaudio.pavucontrol.*)
-        windowrule = center,class:(.*org.pulseaudio.pavucontrol.*)
-        windowrule = pin,class:(.*org.pulseaudio.pavucontrol.*)
+        # Pavucontrol floating - combine effects in one line
+        windowrule = float on, size 900 800, center on, pin on, match:class org\.pulseaudio\.pavucontrol
 
-        # hide xwaylandvideobridge, more detial see
-        # https://wiki.hyprland.org/Useful-Utilities/Screen-Sharing/#xwayland
-        windowrule = opacity 0.0 override, class:^(xwaylandvideobridge)$
-        windowrule = noanim, class:^(xwaylandvideobridge)$
-        windowrule = noinitialfocus, class:^(xwaylandvideobridge)$
-        windowrule = maxsize 1 1, class:^(xwaylandvideobridge)$
-        windowrule = noblur, class:^(xwaylandvideobridge)$
-        windowrule = nofocus, class:^(xwaylandvideobridge)$
-
-        # hope to fix some steam focus issue
-        # NOTE: https://www.reddit.com/r/hyprland/comments/19c53ub/steam_on_hyprland_is_extremely_wonky/
-        # windowrule = stayfocused, title:^()$,class:^(steam)$
-        # windowrule = minsize 1 1, title:^()$,class:^(steam)$
+        # hide xwaylandvideobridge - combine effects
+        windowrule = opacity 0.0 override, no_anim on, no_initial_focus on, max_size 1 1, no_blur on, no_focus on, match:class xwaylandvideobridge
 
         # for fcitx5
-        # reference: https://discourse.nixos.org/t/pinyin-input-method-in-hyprland-wayland-for-simplified-chinese/49186
-        windowrule = pseudo, title:^()$,class:^(fcitx)$
-        exec-once=fcitx5 -d -r
-        exec-once=fcitx5-remote -r
+        windowrule = pseudo on, match:class fcitx, match:title ^()$
 
-        # Browser Picture in Picture
-        windowrule = float, title:^(Picture-in-Picture)$
-        windowrule = pin, title:^(Picture-in-Picture)$
-        windowrule = move 69.5% 4%, title:^(Picture-in-Picture)$
+        exec-once = fcitx5 -d -r
+        exec-once = fcitx5-remote -r
+
+        # Browser Picture in Picture - combine effects
+        windowrule = float on, pin on, move 69.5% 4%, match:title Picture-in-Picture
       '';
   };
 }

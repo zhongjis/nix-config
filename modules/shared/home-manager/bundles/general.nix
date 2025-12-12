@@ -20,7 +20,7 @@
   myHomeManager.direnv.enable = lib.mkDefault true;
   myHomeManager.fzf.enable = lib.mkDefault true;
   myHomeManager.ghostty.enable = lib.mkDefault true;
-  myHomeManager.wezterm.enable = lib.mkDefault true;
+  myHomeManager.wezterm.enable = lib.mkDefault false;
   myHomeManager.git.enable = lib.mkDefault true;
   myHomeManager.kitty.enable = lib.mkDefault true;
   myHomeManager.kubernetes.enable = lib.mkDefault true;
@@ -38,8 +38,6 @@
   programs.btop.enable = lib.mkDefault true;
 
   programs.zen-browser.enable = lib.mkDefault true;
-
-  home.packages = with pkgs; [localsend];
 
   home.sessionVariables = {
     FLAKE = "${config.home.homeDirectory}/personal/nix-config";

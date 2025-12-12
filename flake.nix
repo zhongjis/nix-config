@@ -3,8 +3,10 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.05";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11";
     nixos-hardware.url = "github:nixos/nixos-hardware/master";
+
+    flake-parts.url = "github:hercules-ci/flake-parts";
 
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
 
@@ -57,7 +59,7 @@
     nixpkgs-terraform.url = "github:stackbuilders/nixpkgs-terraform";
     stylix.url = "github:danth/stylix";
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
-    nvf.url = "github:notashelf/nvf/v0.8";
+    nvf.url = "github:notashelf/nvf";
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -71,9 +73,7 @@
       inputs.hyprland.follows = "hyprland";
     };
     hy3 = {
-      # WAITFOR: https://github.com/outfoxxed/hy3/issues/230
-      # url = "github:outfoxxed/hy3?ref=hl0.50.0";
-      url = "github:outfoxxed/hy3?ref=cdcbc57f7e4925bbf8d1589bbb454e660df2b88e";
+      url = "github:outfoxxed/hy3";
       inputs.hyprland.follows = "hyprland";
     };
     hypr-dynamic-cursors = {

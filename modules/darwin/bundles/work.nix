@@ -51,8 +51,6 @@ in {
       gh
 
       charles
-
-      kubelogin
     ]
     ++ stable_pkgs;
 
@@ -60,6 +58,7 @@ in {
     brews = [
       "maven"
       "openjdk@17"
+      "kubelogin"
     ];
 
     casks = [
