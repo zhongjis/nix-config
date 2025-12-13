@@ -18,6 +18,7 @@
   myHomeManager.alacritty.enable = lib.mkDefault false;
   myHomeManager.cht-sh.enable = lib.mkDefault true;
   myHomeManager.direnv.enable = lib.mkDefault true;
+  myHomeManager.distrobox.enable = lib.mkDefault true;
   myHomeManager.fzf.enable = lib.mkDefault true;
   myHomeManager.ghostty.enable = lib.mkDefault true;
   myHomeManager.wezterm.enable = lib.mkDefault false;
