@@ -23,7 +23,6 @@ in {
       height = 2160;
       refreshRate = 240.0;
       scale = 1.5;
-      # refreshRate = 60.;
       # x = 2560
       x = 2560;
       y = 0;
