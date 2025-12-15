@@ -15,6 +15,7 @@
   };
 in {
   environment.systemPackages = with pkgs; [
+    freelens-bin
     fluxcd
 
     kubectl
@@ -25,4 +26,10 @@ in {
     cust-kubernetes-helm
     cust-helmfile
   ];
+
+  services.flatpak = {
+    packages = [
+      "app.freelens.Freelens"
+    ];
+  };
 }

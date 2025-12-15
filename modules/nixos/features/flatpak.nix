@@ -12,7 +12,7 @@
       onCalendar = "weekly"; # Default value
     };
     packages = [
-      "app.freelens.Freelens"
+      # "app.freelens.Freelens"
       "com.spotify.Client"
     ];
 
