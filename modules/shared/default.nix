@@ -13,6 +13,7 @@
     trusted-users = ["root" "@wheel" "zshen"];
     substituters = [
       "https://cache.nixos.org"
+      "https://colmena.cachix.org"
       "https://cuda-maintainers.cachix.org"
       "https://hyprland.cachix.org"
       "https://devenv.cachix.org"
@@ -23,6 +24,7 @@
       "https://zshen-cache-default.cachix.org"
     ];
     trusted-public-keys = [
+      "colmena.cachix.org-1:7BzpDnjjH8ki2CT3f6GdOk7QAzPOl+1t3LvTLXqYcSg="
       "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
       "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
       "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="

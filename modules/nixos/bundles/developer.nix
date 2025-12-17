@@ -11,7 +11,7 @@
   environment.systemPackages = with pkgs;
     [
       # nix
-      colmena
+      inputs.colmena.packages.${pkgs.stdenv.hostPlatform.system}.colmena
 
       # db
       mongosh
