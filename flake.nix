@@ -55,6 +55,10 @@
     };
 
     # programs
+    colmena = {
+      url = "github:zhaofengli/colmena";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     xremap-flake.url = "github:xremap/nix-flake";
     nixpkgs-terraform.url = "github:stackbuilders/nixpkgs-terraform";
     stylix.url = "github:danth/stylix";

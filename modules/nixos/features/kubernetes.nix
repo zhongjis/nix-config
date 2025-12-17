@@ -27,9 +27,9 @@ in {
     cust-helmfile
   ];
 
-  services.flatpak = {
-    packages = [
-      "app.freelens.Freelens"
-    ];
-  };
+  # services.flatpak = {
+  #   packages = [
+  #     "app.freelens.Freelens"
+  #   ];
+  # };
 }
