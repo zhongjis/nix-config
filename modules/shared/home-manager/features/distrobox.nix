@@ -1,6 +1,9 @@
-{...}: {
+{pkgs, ...}: {
   programs.distrobox = {
-    enable = true;
+    enable =
+      if pkgs.stdenv.isDarwin
+      then false
+      else true;
     enableSystemdUnit = true;
     containers = {
       # common-debian = {
