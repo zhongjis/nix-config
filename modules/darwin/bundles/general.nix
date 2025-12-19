@@ -109,9 +109,11 @@
 
       "obsidian"
       "spotify"
-      "google-chrome"
-      "zen"
       "localsend"
+
+      "google-chrome"
+      "helium-browser"
+      "zen"
     ];
 
     masApps = {
