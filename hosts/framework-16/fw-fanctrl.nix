@@ -26,7 +26,7 @@
             }
             {
               temp = 80;
-              speed = 70;
+              speed = 50;
             }
             {
               temp = 85;
