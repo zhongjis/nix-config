@@ -49,7 +49,7 @@
       command = "nix";
       args = ["run" "nixpkgs#fluxcd-operator-mcp" "serve"];
       env = {
-        "KUBECONFIG" = "/home/zshen/.kube/config";
+        KUBECONFIG = "/home/zshen/.kube/config";
       };
     };
     socket = {
