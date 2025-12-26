@@ -19,7 +19,7 @@
   programs.gamemode.enable = true;
   programs.gamescope = {
     enable = true;
-    package = pkgs.gamescope_git;
+    # package = pkgs.gamescope_git;
     capSysNice = true;
   };
 
@@ -39,8 +39,8 @@
   };
 
   environment.systemPackages = with pkgs; [
-    gamescope_git
-    mangohud_git
+    gamescope
+    mangohud
     protonup-qt
     dxvk
 

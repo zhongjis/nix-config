@@ -10,8 +10,6 @@
 
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
 
-    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
-
     nix-config-private = {
       url = "git+ssh://git@github.com/zhongjis/nix-config-private.git";
       inputs.nixpkgs.follows = "nixpkgs";
