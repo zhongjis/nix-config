@@ -54,5 +54,6 @@
     steamtinkerlaunch
   ];
 
-  # dota 2: LD_PRELOAD= gamescope -W 3440 -H 1440 --force-grab-cursor --expose-wayland --rt -r 144 --mangoapp -f -- env LD_PRELOAD="$LD_PRELOAD" gamemoderun %command%
+  # dota 2 - gamescope: LD_PRELOAD= gamescope -W 3840 -H 2160 --force-grab-cursor --expose-wayland --rt -r 144 --mangoapp -f -- env LD_PRELOAD="$LD_PRELOAD" gamemoderun %command%
+  # dota 2 - no gamescope: DRI_PRIME=1 gamemoderun %command%
 }
