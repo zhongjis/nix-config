@@ -19,8 +19,10 @@ in {
     fluxcd
 
     kubectl
+    kubectl-cnpg
     kustomize
     kubectx
+
     yq # format output formatting
 
     cust-kubernetes-helm
