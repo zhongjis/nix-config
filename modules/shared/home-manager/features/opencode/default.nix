@@ -8,6 +8,7 @@
     ./formatters.nix
     ./permission.nix
     ./provider.nix
+    ./openagent.nix
   ];
   programs.opencode = {
     enable = true;
