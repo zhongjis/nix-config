@@ -7,13 +7,13 @@
   ...
 }: {
   programs.opencode.settings.formatter = {
-    nixfmt = {
-      command = [
-        (lib.getExe pkgs.nixfmt)
-        "$FILE"
-      ];
-      extensions = [".nix"];
-    };
+    # nixfmt = {
+    #   command = [
+    #     (lib.getExe pkgs.nixfmt)
+    #     "$FILE"
+    #   ];
+    #   extensions = [".nix"];
+    # };
 
     # csharpier = {
     #   command = [
