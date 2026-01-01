@@ -139,13 +139,20 @@
         };
       };
 
-      packages = forAllSystems (pkgs: {
+      packages = forAllSystems (pkgs: let
+        inherit (pkgs.lib) optionalAttrs;
+      in {
         # This 'pkgs' argument here is already nixpkgs.legacyPackages.${system}
         neovim =
           (nvf.lib.neovimConfiguration {
             pkgs = pkgs; # Pass the system-specific pkgs
             modules = [./modules/shared/home-manager/features/neovim/nvf];
           }).neovim;
+      } // optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+        helium = import ./packages/helium.nix {
+          inherit pkgs;
+          lib = pkgs.lib;
+        };
       });
 
       templates = {
