@@ -94,7 +94,7 @@
     ]
     ++ (
       lib.optional (inputs.self.packages.${pkgs.system} ? helium)
-        inputs.self.packages.${pkgs.system}.helium
+      inputs.self.packages.${pkgs.system}.helium
     )
     ++ [
       # inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default

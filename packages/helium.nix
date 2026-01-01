@@ -22,18 +22,34 @@ let
     sha256 = srcInfo.sha256;
     name = "helium-${version}-${pkgs.system}.AppImage";
   };
+
+  # Extract AppImage contents
+  appimageContents = pkgs.appimageTools.extract {
+    pname = "helium";
+    inherit version src;
+  };
 in
-pkgs.appimageTools.wrapType2 {
+pkgs.appimageTools.wrapType2 rec {
   pname = "helium";
   inherit version src;
   
-  extraPkgs = pkgs: with pkgs; [
-    # Add any missing libraries that might be needed
-    # Most AppImages are self-contained, but we can add dependencies here if needed
-  ];
+  extraPkgs = pkgs: [];
+
+  extraInstallCommands = ''
+    # Install desktop file and icons from extracted AppImage
+    mkdir -p $out/share/applications
+    cp ${appimageContents}/helium.desktop $out/share/applications/
+    
+    mkdir -p $out/share/icons/hicolor/256x256/apps
+    cp ${appimageContents}/helium.png $out/share/icons/hicolor/256x256/apps/
+    
+    # Fix desktop file Exec command
+    substituteInPlace $out/share/applications/${pname}.desktop \
+      --replace-fail 'Exec=AppRun' 'Exec=${pname}'
+  '';
   
   meta = with lib; {
-    description = "Helium Linux - A fast, lightweight Linux distribution";
+    description = "Helium - A fast, lightweight web browser";
     homepage = "https://github.com/imputnet/helium-linux";
     license = licenses.mit;
     platforms = [ "x86_64-linux" "aarch64-linux" ];
