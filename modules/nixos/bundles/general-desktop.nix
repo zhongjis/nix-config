@@ -90,6 +90,7 @@
       fluent-reader
 
       ghostty
+      ungoogled-chromium
     ]
     ++ [
       # inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
