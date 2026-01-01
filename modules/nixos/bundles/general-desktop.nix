@@ -90,7 +90,8 @@
       fluent-reader
 
       ghostty
-      ungoogled-chromium
+
+      netflix
     ]
     ++ (
       lib.optional (inputs.self.packages.${pkgs.system} ? helium)
