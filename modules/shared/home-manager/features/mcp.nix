@@ -34,31 +34,31 @@
         type = "http";
         url = "https://mcp.socket.dev/";
       };
-      mcp_n8n = {
-        type = "stdio";
-        command = "docker";
-        args = [
-          "run"
-          "-i"
-          "--rm"
-          "--init"
-          "-e"
-          "MCP_MODE=stdio"
-          "-e"
-          "LOG_LEVEL=error"
-          "-e"
-          "DISABLE_CONSOLE_OUTPUT=true"
-          "-e"
-          "N8N_API_URL"
-          "-e"
-          "N8N_API_KEY"
-          "ghcr.io/czlonkowski/n8n-mcp:latest"
-        ];
-        env = {
-          N8N_API_URL = "https://n8n.zshen.me";
-          N8N_API_KEY = "$(cat ${config.sops.secrets.n8n_api_key.path})";
-        };
-      };
+      # mcp_n8n = {
+      #   type = "stdio";
+      #   command = "docker";
+      #   args = [
+      #     "run"
+      #     "-i"
+      #     "--rm"
+      #     "--init"
+      #     "-e"
+      #     "MCP_MODE=stdio"
+      #     "-e"
+      #     "LOG_LEVEL=error"
+      #     "-e"
+      #     "DISABLE_CONSOLE_OUTPUT=true"
+      #     "-e"
+      #     "N8N_API_URL"
+      #     "-e"
+      #     "N8N_API_KEY"
+      #     "ghcr.io/czlonkowski/n8n-mcp:latest"
+      #   ];
+      #   env = {
+      #     N8N_API_URL = "https://n8n.zshen.me";
+      #     N8N_API_KEY = "$(cat ${config.sops.secrets.n8n_api_key.path})";
+      #   };
+      # };
     };
   };
 }
