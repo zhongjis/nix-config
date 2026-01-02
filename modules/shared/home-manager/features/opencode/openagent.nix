@@ -1,3 +1,4 @@
+# https://github.com/darrenhinde/OpenAgents
 {
   config,
   pkgs,
