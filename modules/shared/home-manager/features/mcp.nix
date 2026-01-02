@@ -21,10 +21,6 @@
           "KUBECONFIG" = "/home/zshen/.kube/config";
         };
       };
-      socket = {
-        type = "http";
-        url = "https://mcp.socket.dev/";
-      };
     };
   };
 }
