@@ -17,7 +17,7 @@
       flux_operator_mcp = {
         command = "nix";
         args = ["run" "nixpkgs#fluxcd-operator-mcp" "serve"];
-        environment = {
+        env = {
           "KUBECONFIG" = "/home/zshen/.kube/config";
         };
       };
