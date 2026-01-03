@@ -5,6 +5,7 @@
 }: {
   imports = [
     ./lsp.nix
+    ./skills
     ./formatters.nix
     ./permission.nix
     ./provider.nix
