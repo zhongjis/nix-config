@@ -70,6 +70,7 @@ in {
         windowrule = workspace name:gaming, match:class gamescope
 
         windowrule = workspace name:zen, match:class zen-beta
+        windowrule = workspace name:zen, match:class helium
 
         # Pavucontrol floating - combine effects in one line
         windowrule = float on, size 900 800, center on, pin on, match:class org\.pulseaudio\.pavucontrol
