@@ -18,7 +18,18 @@
 
     settings = {
       autoshare = false;
-      autoupdate = false;
+      autoupdate = true;
+
+      tui = {
+        scroll_accelaeration = {
+          enabled = true;
+        };
+      };
+
+      compaction = {
+        auto = false;
+        prune = true;
+      };
     };
   };
 }
