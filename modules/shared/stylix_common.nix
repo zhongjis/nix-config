@@ -10,7 +10,7 @@
 in {
   stylix = {
     enable = lib.mkDefault true;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/tokyo-night-moon.yaml";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/tokyo-night-dark.yaml";
     polarity = "dark";
 
     image = astronaunt;
