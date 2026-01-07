@@ -8,11 +8,11 @@
   srcs = {
     x86_64-linux = {
       url = "https://github.com/imputnet/helium-linux/releases/download/${version}/helium-${version}-x86_64.AppImage";
-      sha256 = "1dxyyp9nh6iva0zh586vpyb7av53n2nhnhmi6j2jrc5h60bx8hd8";
+      sha256 = "sha256-69y8dNJPJk+HgnLzkyYLMdps1Med65yeN+77Nk6jbyM=";
     };
     aarch64-linux = {
       url = "https://github.com/imputnet/helium-linux/releases/download/${version}/helium-${version}-arm64.AppImage";
-      sha256 = "0s05bd0jk2fjgyz41v5a2jm830la0jqgkvr83ky52h3dc96i52m3";
+      sha256 = "sha256-69y8dNJPJk+HgnLzkyYLMdps1Med65yeN+77Nk6jbyM=";
     };
   };
 
@@ -57,4 +57,3 @@ in
       mainProgram = "helium";
     };
   }
-
