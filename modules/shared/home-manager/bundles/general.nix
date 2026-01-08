@@ -38,7 +38,7 @@
   myHomeManager.starship.enable = lib.mkDefault true;
 
   programs.btop.enable = lib.mkDefault true;
-
+  programs.bun.enable = lib.mkDefault true;
   programs.zen-browser.enable = lib.mkDefault true;
 
   home.sessionVariables = {

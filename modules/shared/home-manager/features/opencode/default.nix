@@ -26,10 +26,10 @@
         };
       };
 
-      compaction = {
-        auto = false;
-        prune = true;
-      };
+      # compaction = {
+      #   auto = false;
+      #   prune = true;
+      # };
     };
   };
 }
