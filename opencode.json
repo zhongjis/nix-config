@@ -1,0 +1,11 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "flux_operator_mcp": {
+      "enabled": false
+    },
+    "mcp_k8s": {
+      "enabled": false
+    }
+  }
+}
