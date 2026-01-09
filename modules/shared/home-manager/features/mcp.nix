@@ -8,7 +8,7 @@
     servers = {
       nixos = {
         command = "nix";
-        args = ["run" "github=utensils/mcp-nixos"];
+        args = ["run" "github:utensils/mcp-nixos"];
       };
       mcp_k8s = {
         command = "nix";
