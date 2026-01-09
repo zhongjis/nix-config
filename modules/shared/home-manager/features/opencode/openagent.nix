@@ -6,7 +6,7 @@
 }: let
   openAgentsRepo = fetchGit {
     url = "https://github.com/darrenhinde/OpenAgents.git";
-    rev = "5334df11a03a027d5a771730ce6f0a17e212a320";
+    rev = "7e1a7e5775e3b88cd80e982650db27b9f900d142";
   };
 in {
   home.file = {
