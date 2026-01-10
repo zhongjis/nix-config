@@ -39,7 +39,8 @@
 
   programs.btop.enable = lib.mkDefault true;
   programs.bun.enable = lib.mkDefault true;
-  programs.zen-browser.enable = lib.mkDefault true;
+  programs.zed.enable = lib.mkDefault true;
+  programs.zen-browser.enable = lib.mkDefault false;
 
   home.sessionVariables = {
     FLAKE = "${config.home.homeDirectory}/personal/nix-config";
