@@ -13,6 +13,9 @@
       # nix
       inputs.colmena.packages.${pkgs.stdenv.hostPlatform.system}.colmena
 
+      gh
+      graphite-cli
+
       # db
       mongosh
       postgresql
