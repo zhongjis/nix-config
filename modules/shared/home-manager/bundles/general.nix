@@ -34,12 +34,11 @@
   myHomeManager.ssh.enable = lib.mkDefault true;
   myHomeManager.yazi.enable = lib.mkDefault true;
   myHomeManager.zsh.enable = lib.mkDefault true;
-
   myHomeManager.starship.enable = lib.mkDefault true;
+  myHomeManager.zed.enable = lib.mkDefault true;
 
   programs.btop.enable = lib.mkDefault true;
   programs.bun.enable = lib.mkDefault true;
-  programs.zed.enable = lib.mkDefault true;
   programs.zen-browser.enable = lib.mkDefault false;
 
   home.sessionVariables = {
