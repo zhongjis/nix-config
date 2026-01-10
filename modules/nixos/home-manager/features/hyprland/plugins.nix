@@ -21,7 +21,7 @@ in {
       "plugin:dynamic-cursors" = {
         mode = "none";
         shake = {
-          threadhold = 10.0;
+          threshold = 10.0;
           limit = 4.0;
         };
       };
