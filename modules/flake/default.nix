@@ -14,7 +14,7 @@
     myFlake = {
       hosts = lib.mkOption {
         type = lib.types.listOf lib.types.str;
-        default = ["framework-16" "mac-m1-max" "thinkpad-t480"];
+        default = ["framework-16" "mac-m1-max"];
         description = "List of host names";
       };
 
@@ -22,7 +22,6 @@
         type = lib.types.listOf lib.types.str;
         default = [
           "zshen@framework-16"
-          "zshen@thinkpad-t480"
           "zshen@Zs-MacBook-Pro"
         ];
         description = "List of home profile names";
