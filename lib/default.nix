@@ -1,139 +1,40 @@
+# Simplified Library for Nix-Config
+#
+# Contains helper functions that flake-parts doesn't provide:
+# - File/directory discovery helpers
+# - Module extension system for bundle/feature enable options
+#
+# Functions moved to flake-parts modules:
+# - mkSystem -> modules/flake/nixos.nix and darwin.nix
+# - mkHome -> modules/flake/home.nix
+# - forAllSystems -> perSystem in flake.nix
+#
 {
   inputs,
   nixpkgs,
   overlays,
   ...
 }: let
-  myLib = (import ./default.nix) {inherit inputs nixpkgs overlays;};
-  outputs = inputs.self.outputs;
-in rec {
-  # ================================================================ #
-  # =                            My Lib                            = #
-  # ================================================================ #
-
-  # ======================= Package Helpers ======================== #
-
-  pkgsFor = sys: inputs.nixpkgs.legacyPackages.${sys};
-
-  # ========================== Buildables ========================== #
-
-  mkSystem = hostName: {
-    system,
-    user,
-    hardware ? "",
-    darwin ? false,
-  }: let
-    isDarwin = darwin;
-
-    hostConfiguration = ../hosts/${hostName}/configuration.nix;
-    systemFunc =
-      if isDarwin
-      then inputs.nix-darwin.lib.darwinSystem
-      else nixpkgs.lib.nixosSystem;
-    hardwareConfiguration =
-      if hardware != ""
-      then inputs.nixos-hardware.nixosModules.${hardware}
-      else {};
-    determinateModule =
-      if isDarwin
-      then {}
-      else inputs.determinate.nixosModules.default;
-    sopsModule =
-      if isDarwin
-      then inputs.sops-nix.darwinModules.sops
-      else inputs.sops-nix.nixosModules.sops;
-  in
-    systemFunc {
-      system = system;
-      specialArgs = {
-        inherit inputs outputs myLib;
-      };
-
-      modules = [
-        hostConfiguration
-        hardwareConfiguration
-        determinateModule
-        sopsModule
-
-        {
-          nixpkgs.overlays = [
-            # inputs.nixpkgs-terraform.overlays.default
-            overlays.modifications
-            overlays.stable-packages
-          ];
-          nixpkgs.config = {
-            allowUnfree = true;
-            permittedInsecurePackages = [
-              # "libsoup-2.74.3"
-            ];
-            allowUnfreePredicate = _: true;
-          };
-        }
-
-        {
-          config._module.args = {
-            currentSystem = system;
-            currentSystemName = hostName;
-            currentSystemUser = user;
-            inputs = inputs;
-            isDarwin = darwin;
-          };
-        }
-      ];
-    };
-
-  mkHome = systemName: {
-    system,
-    darwin ? false,
-  }: let
-    currentSystem = system;
-    currentSystemName = systemName;
-    isDarwin = darwin;
-
-    homeConfiguration = ../hosts/${systemName}/home.nix;
-  in
-    inputs.home-manager.lib.homeManagerConfiguration {
-      pkgs = import nixpkgs {
-        inherit system;
-        overlays = [
-          # inputs.nixpkgs-terraform.overlays.default
-          overlays.modifications
-          overlays.stable-packages
-        ];
-      };
-
-      extraSpecialArgs = {
-        inherit
-          inputs
-          outputs
-          myLib
-          currentSystem
-          currentSystemName
-          isDarwin
-          ;
-      };
-
-      modules = [
-        homeConfiguration
-        inputs.sops-nix.homeManagerModules.sops
-        inputs.stylix.homeModules.stylix
-      ];
-    };
-
   # =========================== Helpers ============================ #
 
-  filesIn = dir: (map (fname: dir + "/${fname}")
-    (builtins.attrNames (builtins.readDir dir)));
+  # Get all files in a directory as absolute paths
+  filesIn = dir:
+    map (fname: dir + "/${fname}")
+    (builtins.attrNames (builtins.readDir dir));
 
+  # Get all subdirectories in a directory
   dirsIn = dir:
-    inputs.nixpkgs.lib.filterAttrs (name: value: value == "directory")
+    nixpkgs.lib.filterAttrs (name: value: value == "directory")
     (builtins.readDir dir);
 
-  fileNameOf = path: (builtins.head (builtins.split "\\." (baseNameOf path)));
+  # Get filename without extension
+  fileNameOf = path:
+    (builtins.head (builtins.split "\\." (baseNameOf path)));
 
   # ========================== Extenders =========================== #
 
-  # Evaluates nixos/home-manager module and extends it's options / config
+  # Evaluates a module and extends its options/config
+  # Used by the bundle/feature system to auto-create enable options
   extendModule = {path, ...} @ args: {pkgs, ...} @ margs: let
     eval =
       if (builtins.isString path) || (builtins.isPath path)
@@ -142,7 +43,8 @@ in rec {
     evalNoImports = builtins.removeAttrs eval ["imports" "options"];
 
     extra =
-      if (builtins.hasAttr "extraOptions" args) || (builtins.hasAttr "extraConfig" args)
+      if (builtins.hasAttr "extraOptions" args) ||
+         (builtins.hasAttr "extraConfig" args)
       then [
         ({...}: {
           options = args.extraOptions or {};
@@ -166,23 +68,14 @@ in rec {
       else (eval.config or evalNoImports);
   };
 
-  # Applies extendModules to all modules
-  # modules can be defined in the same way
-  # as regular imports, or taken from "filesIn"
+  # Applies extendModule to all modules in a list
+  # modules can be file paths or taken from "filesIn"
   extendModules = extension: modules:
     map
     (f: let
       name = fileNameOf f;
     in (extendModule ((extension name) // {path = f;})))
     modules;
-
-  # ============================ Shell ============================= #
-  forAllSystems = pkgs:
-    inputs.nixpkgs.lib.genAttrs [
-      "x86_64-linux"
-      "aarch64-linux"
-      "x86_64-darwin"
-      "aarch64-darwin"
-    ]
-    (system: pkgs inputs.nixpkgs.legacyPackages.${system});
+in {
+  inherit filesIn dirsIn fileNameOf extendModule extendModules;
 }

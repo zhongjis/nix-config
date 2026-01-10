@@ -4,9 +4,10 @@
   config,
   inputs,
   currentSystem,
-  isDarwin,
   ...
-}: {
+}: let
+  isDarwin = pkgs.stdenv.isDarwin;
+in {
   programs.ghostty = {
     enable = true;
     enableZshIntegration = true;

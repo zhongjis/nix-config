@@ -1,10 +1,10 @@
 {
   pkgs,
-  isDarwin,
   config,
   inputs,
   ...
 }: let
+  isDarwin = pkgs.stdenv.isDarwin;
   keyboardCmd =
     if isDarwin
     then "xclip -in -selection clipboard"
