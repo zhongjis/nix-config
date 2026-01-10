@@ -16,7 +16,6 @@
 in {
   environment.systemPackages = with pkgs; [
     freelens-bin
-    fluxcd
 
     kubectl
     kubectl-cnpg

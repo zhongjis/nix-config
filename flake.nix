@@ -101,74 +101,133 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs = {
-    nixpkgs,
-    nvf,
-    ...
-  } @ inputs: let
-    overlays = import ./overlays {inherit inputs;};
-    myLib = import ./lib/default.nix {inherit overlays nixpkgs inputs;};
-  in
-    with myLib; {
-      nixosConfigurations = {
-        framework-16 = mkSystem "framework-16" {
-          system = "x86_64-linux";
-          hardware = "framework-16-7040-amd";
-          user = "zshen";
+
+  outputs = inputs:
+    let
+      overlays = import ./overlays { inherit inputs; };
+      myLib = import ./lib/default.nix { inherit inputs overlays; nixpkgs = inputs.nixpkgs; };
+    in
+    (inputs.flake-parts.lib.mkFlake { inherit inputs; }) {
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
+
+      imports = [
+        ./modules/flake/default.nix
+      ];
+
+      perSystem = { pkgs, lib, system, ... }: {
+        packages = {
+          neovim =
+            (inputs.nvf.lib.neovimConfiguration {
+              pkgs = pkgs;
+              modules = [./modules/shared/home-manager/features/neovim/nvf];
+            }).neovim;
+        } // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+          helium = import ./packages/helium.nix {
+            inherit pkgs lib;
+          };
+        };
+
+        devShells = {
+          default = pkgs.mkShell {
+            name = "nix-config-dev";
+            packages = with pkgs; [
+              nix-tree
+              nix-diff
+              nil
+              statix
+              deadnix
+            ];
+          };
+        };
+
+        formatter = pkgs.nixfmt;
+
+        checks = {
+          # Can add validation checks here
         };
       };
 
-      darwinConfigurations = {
-        Zs-MacBook-Pro = mkSystem "mac-m1-max" {
-          system = "aarch64-darwin";
-          user = "zshen";
-          darwin = true;
+      flake = {
+        nixosConfigurations = {
+          framework-16 = inputs.nixpkgs.lib.nixosSystem {
+            system = "x86_64-linux";
+            specialArgs = { inherit inputs myLib; };
+            modules = [
+              ./hosts/framework-16/configuration.nix
+              inputs.determinate.nixosModules.default
+              inputs.sops-nix.nixosModules.sops
+
+              # Apply overlays
+              {
+                nixpkgs.overlays = [
+                  overlays.modifications
+                  overlays.stable-packages
+                ];
+              }
+            ];
+          };
         };
+
+        darwinConfigurations = {
+          "Zs-MacBook-Pro" = inputs.nix-darwin.lib.darwinSystem {
+            system = "aarch64-darwin";
+            specialArgs = { inherit inputs myLib; };
+            modules = [
+              ./hosts/mac-m1-max/configuration.nix
+              inputs.sops-nix.darwinModules.sops
+            ];
+          };
+        };
+
+        homeConfigurations = {
+          "zshen@framework-16" = inputs.home-manager.lib.homeManagerConfiguration {
+            pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
+            extraSpecialArgs = {
+              inherit inputs myLib;
+              currentSystem = "x86_64-linux";
+              currentSystemName = "framework-16";
+            };
+            modules = [
+              ./hosts/framework-16/home.nix
+              inputs.sops-nix.homeManagerModules.sops
+              inputs.stylix.homeModules.stylix
+            ];
+          };
+          "zshen@Zs-MacBook-Pro" = inputs.home-manager.lib.homeManagerConfiguration {
+            pkgs = inputs.nixpkgs.legacyPackages.aarch64-darwin;
+            extraSpecialArgs = {
+              inherit inputs myLib;
+              currentSystem = "aarch64-darwin";
+              currentSystemName = "mac-m1-max";
+            };
+            modules = [
+              ./hosts/mac-m1-max/home.nix
+              inputs.sops-nix.homeManagerModules.sops
+              inputs.stylix.homeModules.stylix
+            ];
+          };
+        };
+
+        templates = {
+          java8 = {
+            path = ./templates/java8;
+            description = "nix flake new -t github:zhongjis/nix-config#java8 .";
+          };
+          nodejs22 = {
+            path = ./templates/nodejs22;
+            description = "nix flake new -t github:zhongjis/nix-config#nodejs22 .";
+          };
+        };
+
+        nixDarwinModules.default = ./modules/darwin;
+        homeManagerModules.default = ./modules/shared/home-manager;
+        homeManagerModules.linux = ./modules/nixos/home-manager;
+        homeManagerModules.darwin = ./modules/darwin/home-manager;
       };
-
-      homeConfigurations = {
-        "zshen@Zs-MacBook-Pro" = mkHome "mac-m1-max" {
-          system = "aarch64-darwin";
-          darwin = true;
-        };
-        "zshen@thinkpad-t480" = mkHome "thinkpad-t480" {
-          system = "x86_64-linux";
-        };
-        "zshen@framework-16" = mkHome "framework-16" {
-          system = "x86_64-linux";
-        };
-      };
-
-      packages = forAllSystems (pkgs: let
-        inherit (pkgs.lib) optionalAttrs;
-      in {
-        # This 'pkgs' argument here is already nixpkgs.legacyPackages.${system}
-        neovim =
-          (nvf.lib.neovimConfiguration {
-            pkgs = pkgs; # Pass the system-specific pkgs
-            modules = [./modules/shared/home-manager/features/neovim/nvf];
-          }).neovim;
-      } // optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
-        helium = import ./packages/helium.nix {
-          inherit pkgs;
-          lib = pkgs.lib;
-        };
-      });
-
-      templates = {
-        java8 = {
-          path = ./templates/java8;
-          description = "nix flake new -t github:zhongjis/nix-config#java8 .";
-        };
-        nodejs22 = {
-          path = ./templates/nodejs22;
-          description = "nix flake new -t github:zhongjis/nix-config#nodejs22 .";
-        };
-      };
-
-      nixDarwinModules.default = ./modules/darwin;
-      homeManagerModules.default = ./modules/shared/home-manager;
-      homeManagerModules.linux = ./modules/nixos/home-manager;
-      homeManagerModules.darwin = ./modules/darwin/home-manager;
     };
 }
