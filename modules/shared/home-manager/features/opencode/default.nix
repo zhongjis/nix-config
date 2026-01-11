@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   pkgs,
   ...
 }: {
@@ -14,11 +15,12 @@
   ];
   programs.opencode = {
     enable = true;
+    package = inputs.opencode.packages.${pkgs.stdenv.hostPlatform.system}.default;
     enableMcpIntegration = true;
 
     settings = {
       autoshare = false;
-      autoupdate = true;
+      autoupdate = false;
 
       tui = {
         scroll_accelaeration = {
