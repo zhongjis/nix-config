@@ -63,16 +63,21 @@ in {
 
     casks = [
       "docker-desktop"
+
+      # util
       "dash"
       "devtoys"
+
+      # ide
       "intellij-idea"
       "phpstorm"
-      "mongodb-compass"
-      "sublime-merge@dev"
       "cursor"
+      "zed"
+
       "cursor-cli"
+
+      "mongodb-compass"
       "dbeaver-community"
-      "visual-studio-code"
     ];
   };
 }
