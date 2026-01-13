@@ -6,11 +6,11 @@
 }: {
   imports = [
     ./lsp.nix
-    ./skills
+    # ./skills
     ./formatters.nix
     ./permission.nix
     ./provider.nix
-    ./openagent.nix
+    # ./openagent.nix
     ./plugin.nix
   ];
   programs.opencode = {

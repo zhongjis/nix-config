@@ -3,6 +3,7 @@
     plugin = [
       "opencode-websearch-cited"
       "@simonwjackson/opencode-direnv"
+      "oh-my-opencode"
     ];
 
     provider.openrouter = {
