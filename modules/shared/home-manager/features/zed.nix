@@ -4,7 +4,7 @@ in {
     enable = true;
 
     # Install Zed remote server for remote connections
-    installRemoteServer = true;
+    installRemoteServer = false;
 
     # Allow user to modify settings through Zed UI
     mutableUserSettings = true;

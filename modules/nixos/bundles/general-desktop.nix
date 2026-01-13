@@ -109,7 +109,7 @@
     nerd-fonts.droid-sans-mono
     nerd-fonts.agave
     font-awesome
-    sketchybar-app-font
+    # sketchybar-app-font
     cm_unicode
     corefonts
     noto-fonts
