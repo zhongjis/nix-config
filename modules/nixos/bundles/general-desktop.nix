@@ -92,6 +92,8 @@
       ghostty
 
       netflix
+
+      google-chrome
     ]
     ++ (
       lib.optional (inputs.self.packages.${pkgs.system} ? helium)

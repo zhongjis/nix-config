@@ -6,6 +6,9 @@ in {
     openrouter_api_key = {
       inherit sopsFile;
     };
+    opencode_zen_api_key = {
+      inherit sopsFile;
+    };
   };
 
   programs.opencode.settings.provider = {
@@ -14,5 +17,6 @@ in {
         apiKey = "{file:${config.sops.secrets.openrouter_api_key.path}}";
       };
     };
+    # TODO: add
   };
 }
