@@ -13,9 +13,9 @@ _: {
         };
       };
     };
+  };
 
-    home.file = {
-      "opencode/oh-my-opencode.json".source = ./oh-my-opencode/v1-cheap-but-not-free.json;
-    };
+  xdg.configFile = {
+    "opencode/oh-my-opencode.json".source = ./oh-my-opencode/v1-cheap-but-not-free.json;
   };
 }
