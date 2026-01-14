@@ -1,5 +1,5 @@
 {...}: {
   programs.opencode.skills = {
-    skill-creator = ./skill-creator.md;
+    # skill-creator = ./skill-creator.md;
   };
 }
