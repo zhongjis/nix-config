@@ -11,6 +11,8 @@
     enableTreesitter = true;
     enableExtraDiagnostics = true;
 
+    vim.treesitter.grammars = with pkgs.vimPlugins.nvim-treesitter.builtGrammars; [gitignore xml];
+
     nix = {
       enable = true;
       lsp.servers = ["nixd"];

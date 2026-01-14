@@ -51,6 +51,8 @@ in {
       gh
 
       charles
+
+      cursor-cli
     ]
     ++ stable_pkgs;
 
@@ -73,8 +75,6 @@ in {
       "phpstorm"
       "cursor"
       "zed"
-
-      "cursor-cli"
 
       "mongodb-compass"
       "dbeaver-community"
