@@ -2,7 +2,6 @@
   sopsFile = ../../../../../secrets/ai-tokens.yaml;
 in {
   sops.secrets = {
-    # github - personal
     openrouter_api_key = {
       inherit sopsFile;
     };
@@ -17,6 +16,5 @@ in {
         apiKey = "{file:${config.sops.secrets.openrouter_api_key.path}}";
       };
     };
-    # TODO: add
   };
 }

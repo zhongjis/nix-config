@@ -6,12 +6,13 @@
 }: {
   imports = [
     ./lsp.nix
-    # ./skills
+    ./skills
+    ./agents
     ./formatters.nix
     ./permission.nix
-    ./provider.nix
+    # ./provider.nix
     # ./openagent.nix
-    ./plugin.nix
+    ./plugins.nix
   ];
   programs.opencode = {
     enable = true;
@@ -26,6 +27,7 @@
         scroll_accelaeration = {
           enabled = true;
         };
+        diff_style = "stacked";
       };
 
       # compaction = {
