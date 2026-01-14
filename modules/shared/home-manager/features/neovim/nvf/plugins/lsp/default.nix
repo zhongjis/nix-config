@@ -7,11 +7,14 @@
   vim.lsp.enable = true;
   vim.lsp.lspkind.enable = true;
 
+  vim.treesitter.grammars = with pkgs.vimPlugins.nvim-treesitter.builtGrammars; [
+    gitignore
+    xml
+  ];
+
   vim.languages = {
     enableTreesitter = true;
     enableExtraDiagnostics = true;
-
-    vim.treesitter.grammars = with pkgs.vimPlugins.nvim-treesitter.builtGrammars; [gitignore xml];
 
     nix = {
       enable = true;
