@@ -3,7 +3,7 @@ _: {
     plugin = [
       "opencode-websearch-cited"
       "@simonwjackson/opencode-direnv"
-      "oh-my-opencode"
+      "oh-my-opencode@v3.0.0-beta.6"
     ];
 
     provider.openrouter = {
@@ -16,6 +16,7 @@ _: {
   };
 
   xdg.configFile = {
-    "opencode/oh-my-opencode.json".source = ./oh-my-opencode/v1-cheap-but-not-free.json;
+    # "opencode/oh-my-opencode.json".source = ./oh-my-opencode/v1-cheap-but-not-free.json;
+    "opencode/oh-my-opencode.json".source = ./oh-my-opencode/v1-cheaper-kimi-thinking.json.json;
   };
 }
