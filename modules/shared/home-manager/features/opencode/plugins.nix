@@ -1,4 +1,4 @@
-{...}: {
+_: {
   programs.opencode.settings = {
     plugin = [
       "opencode-websearch-cited"
