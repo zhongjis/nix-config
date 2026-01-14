@@ -11,9 +11,45 @@ in {
   };
 
   programs.opencode.settings.provider = {
-    openrouter = {
+    # openrouter = {
+    #   options = {
+    #     apiKey = "{file:${config.sops.secrets.openrouter_api_key.path}}";
+    #   };
+    # };
+    ollama = {
+      name = "Ollama (local)";
       options = {
-        apiKey = "{file:${config.sops.secrets.openrouter_api_key.path}}";
+        "baseURL" = "http://localhost:11434/v1";
+      };
+      models = {
+        "qwen3:14b" = {
+          "name" = "qwen2.5-coder:32b";
+          "tools" = true;
+        };
+        "qwen3:32b" = {
+          "name" = "qwen3:32b";
+          "tools" = true;
+        };
+        "qwen2.5-coder:32b" = {
+          "name" = "qwen2.5-coder:32b";
+          "tools" = true;
+        };
+        "phi4:14b" = {
+          "name" = "phi4:14b";
+          "tools" = true;
+        };
+        "llava-llama3" = {
+          "name" = "llava-llama3";
+          "tools" = true;
+        };
+        "gemma3:12b" = {
+          "name" = "gemma3:12b";
+          "tools" = true;
+        };
+        "codestral" = {
+          "name" = "codestral";
+          "tools" = true;
+        };
       };
     };
   };

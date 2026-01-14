@@ -10,7 +10,7 @@
     ./agents
     ./formatters.nix
     ./permission.nix
-    # ./provider.nix
+    ./provider.nix
     ./openagent.nix
     ./plugins.nix
   ];
