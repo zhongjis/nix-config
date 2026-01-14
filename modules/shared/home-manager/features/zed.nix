@@ -30,6 +30,7 @@ in {
       "markdown"
       "dockerfile"
       "bash"
+      "opencode"
     ];
 
     userSettings = {

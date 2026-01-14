@@ -35,7 +35,7 @@
   myHomeManager.yazi.enable = lib.mkDefault true;
   myHomeManager.zsh.enable = lib.mkDefault true;
   myHomeManager.starship.enable = lib.mkDefault true;
-  myHomeManager.zed.enable = lib.mkDefault false;
+  myHomeManager.zed.enable = lib.mkDefault true;
 
   programs.btop.enable = lib.mkDefault true;
   programs.bun.enable = lib.mkDefault true;
