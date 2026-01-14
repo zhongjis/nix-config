@@ -10,8 +10,8 @@
   };
 in {
   home.file = {
-    ".opencode/agent".source = "${openAgentsRepo}/.opencode/agent";
+    # ".opencode/agent".source = "${openAgentsRepo}/.opencode/agent";
     ".opencode/command".source = "${openAgentsRepo}/.opencode/command";
-    ".opencode/context".source = "${openAgentsRepo}/.opencode/context";
+    # ".opencode/context".source = "${openAgentsRepo}/.opencode/context";
   };
 }
