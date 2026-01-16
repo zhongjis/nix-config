@@ -28,6 +28,16 @@ in {
     };
   };
 
+  # temp fix. more details see https://github.com/Mic92/sops-nix/issues/890
+  launchd.agents.sops-nix = pkgs.lib.mkIf pkgs.stdenv.isDarwin {
+    enable = true;
+    config = {
+      EnvironmentVariables = {
+        PATH = pkgs.lib.mkForce "/usr/bin:/bin:/usr/sbin:/sbin";
+      };
+    };
+  };
+
   programs.ssh.enable = true;
   programs.ssh.enableDefaultConfig = false;
   # NOTE: example for entry order
