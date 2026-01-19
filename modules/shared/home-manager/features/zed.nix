@@ -34,12 +34,12 @@ in {
     ];
 
     userSettings = {
-      "agent_servers" = {
-        "OpenCode" = {
-          "command" = "opencode";
-          "args" = ["acp"];
-        };
-      };
+      # "agent_servers" = {
+      #   "OpenCode" = {
+      #     "command" = "opencode";
+      #     "args" = ["acp"];
+      #   };
+      # };
     };
   };
 }
