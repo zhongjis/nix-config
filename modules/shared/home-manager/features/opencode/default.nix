@@ -11,7 +11,7 @@
     ./formatters.nix
     ./permission.nix
     ./provider.nix
-    ./openagent.nix
+    # ./openagent.nix
     ./plugins.nix
   ];
   programs.opencode = {
