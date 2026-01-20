@@ -15,7 +15,7 @@ in {
       ]
       ++ [
         # inputs.hy3.packages.${pkgs.stdenv.hostPlatform.system}.hy3
-        # inputs.hypr-dynamic-cursors.packages.${pkgs.stdenv.hostPlatform.system}.hypr-dynamic-cursors
+        inputs.hypr-dynamic-cursors.packages.${pkgs.stdenv.hostPlatform.system}.hypr-dynamic-cursors
       ];
     settings = {
       "plugin:dynamic-cursors" = {
