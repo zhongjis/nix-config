@@ -14,7 +14,7 @@
       {
         neovim = (inputs.nvf.lib.neovimConfiguration {
           inherit pkgs;
-          modules = [ ../modules/home-manager/neovim/nvf ];
+          modules = [ ../modules/home-manager/features/neovim/nvf ];
         }).neovim;
       }
       // optionalAttrs pkgs.stdenv.hostPlatform.isLinux {

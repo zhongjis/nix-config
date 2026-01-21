@@ -13,7 +13,7 @@
 
   myHomeManager.neovim.enable = lib.mkDefault true;
   myHomeManager.stylix.enable = lib.mkDefault true;
-  myHomeManager.tmux.enable = lib.mkDefault true;
+  myHomeManager.services.tmux.enable = lib.mkDefault true;
   myHomeManager.zellij.enable = lib.mkDefault false;
   myHomeManager.alacritty.enable = lib.mkDefault false;
   myHomeManager.cht-sh.enable = lib.mkDefault true;
