@@ -93,7 +93,8 @@
 
       netflix
 
-      google-chrome
+      chromium
+      jujutsu
     ]
     ++ (
       lib.optional (inputs.self.packages.${pkgs.system} ? helium)
