@@ -1,3 +1,3 @@
 {...}: {
-  myHomeManager.aerospace-darwin.enable = true;
+  myHomeManager.aerospace.enable = true;
 }

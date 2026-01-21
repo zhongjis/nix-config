@@ -2,7 +2,7 @@
   browser = "helium";
   # browser = "zen-beta.desktop";
 in {
-  myHomeManager.pipewire-noise-cancling-input-linux.enable = true;
+  myHomeManager.pipewire-noise-cancling-input.enable = true;
 
   home.packages = with pkgs; [
     nemo-with-extensions # file manager

@@ -1,5 +1,6 @@
 {
   pkgs,
+  lib,
   inputs,
   currentSystem,
   ...
@@ -11,9 +12,10 @@
     pkgs.writeShellScript "hyprland-screenshot"
     (builtins.readFile ./scripts/screenshot.sh);
 in {
-  home.packages = with pkgs; [
-    grimblast
-  ];
+  home.packages = with pkgs;
+    lib.optionals stdenv.isLinux [
+      grimblast
+    ];
 
   ####################
   ### KEYBINDINGSS ###
