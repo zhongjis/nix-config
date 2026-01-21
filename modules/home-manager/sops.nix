@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  lib,
   ...
 }: {
   home.packages = with pkgs; [
@@ -14,5 +15,5 @@
     validateSopsFiles = true;
   };
 
-  systemd.user.services.mbsync.Unit.After = ["sops-nix.service"];
+  systemd.user.services.mbsync.Unit.After = lib.mkIf pkgs.stdenv.isLinux ["sops-nix.service"];
 }
