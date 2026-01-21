@@ -1,15 +1,15 @@
 {lib, ...}: {
-  myHomeManager.hyprland.enable = true;
-  myHomeManager.rofi.enable = true;
-  # myHomeManager.wlogout.enable = true;
-  myHomeManager.hyprlock.enable = true;
-  myHomeManager.hyprpaper.enable = true;
-  myHomeManager.hyprsunset.enable = true;
-  myHomeManager.hypridle.enable = true;
+  myHomeManager.hyprland-linux.enable = true;
+  myHomeManager.rofi-linux.enable = true;
+  # myHomeManager.wlogout-linux.enable = true;
+  myHomeManager.hyprlock-linux.enable = true;
+  myHomeManager.hyprpaper-linux.enable = true;
+  myHomeManager.hyprsunset-linux.enable = true;
+  myHomeManager.hypridle-linux.enable = true;
 
-  # myHomeManager.swaync.enable = true;
-  myHomeManager.dunst.enable = true;
-  myHomeManager.waybar.enable = true;
+  # myHomeManager.swaync-linux.enable = true;
+  myHomeManager.dunst-linux.enable = true;
+  myHomeManager.waybar-linux.enable = true;
 
-  myHomeManager.gtk.enable = true;
+  myHomeManager.gtk-linux.enable = true;
 }
