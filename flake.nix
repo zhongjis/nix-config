@@ -7,6 +7,7 @@
     nixos-hardware.url = "github:nixos/nixos-hardware/master";
 
     flake-parts.url = "github:hercules-ci/flake-parts";
+    import-tree.url = "github:vic/import-tree";
 
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
 
@@ -102,74 +103,21 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs = {
-    nixpkgs,
-    nvf,
-    ...
-  } @ inputs: let
-    overlays = import ./overlays {inherit inputs;};
-    myLib = import ./lib/default.nix {inherit overlays nixpkgs inputs;};
-  in
-    with myLib; {
-      nixosConfigurations = {
-        framework-16 = mkSystem "framework-16" {
-          system = "x86_64-linux";
-          hardware = "framework-16-7040-amd";
-          user = "zshen";
-        };
-      };
+  outputs = inputs @ {flake-parts, ...}:
+    flake-parts.lib.mkFlake {inherit inputs;} {
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
 
-      darwinConfigurations = {
-        Zs-MacBook-Pro = mkSystem "mac-m1-max" {
-          system = "aarch64-darwin";
-          user = "zshen";
-          darwin = true;
-        };
-      };
-
-      homeConfigurations = {
-        "zshen@Zs-MacBook-Pro" = mkHome "mac-m1-max" {
-          system = "aarch64-darwin";
-          darwin = true;
-        };
-        "zshen@thinkpad-t480" = mkHome "thinkpad-t480" {
-          system = "x86_64-linux";
-        };
-        "zshen@framework-16" = mkHome "framework-16" {
-          system = "x86_64-linux";
-        };
-      };
-
-      packages = forAllSystems (pkgs: let
-        inherit (pkgs.lib) optionalAttrs;
-      in
-        {
-          # This 'pkgs' argument here is already nixpkgs.legacyPackages.${system}
-          neovim =
-            (nvf.lib.neovimConfiguration {
-              pkgs = pkgs; # Pass the system-specific pkgs
-              modules = [./modules/home-manager/neovim/nvf];
-            }).neovim;
-        }
-        // optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
-          helium = import ./packages/helium.nix {
-            inherit pkgs;
-            lib = pkgs.lib;
-          };
-        });
-
-      templates = {
-        java8 = {
-          path = ./templates/java8;
-          description = "nix flake new -t github:zhongjis/nix-config#java8 .";
-        };
-        nodejs22 = {
-          path = ./templates/nodejs22;
-          description = "nix flake new -t github:zhongjis/nix-config#nodejs22 .";
-        };
-      };
-
-      nixDarwinModules.default = ./modules/darwin;
-      homeManagerModules.default = ./modules/home-manager;
+      imports = [
+        ./flake-parts/packages.nix
+        ./flake-parts/systems.nix
+        ./flake-parts/overlays.nix
+        ./flake-parts/modules.nix
+        ./flake-parts/templates.nix
+      ];
     };
 }
