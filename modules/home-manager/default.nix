@@ -6,7 +6,9 @@
 }: let
   cfg = config.myHomeManager;
 
-  # Taking all modules in ./features and adding enables to them
+  # Taking all modules in current directory and adding enables to them
+  # This handles both simple .nix files and directories with default.nix
+  # Excludes bundle-*.nix files which are handled separately
   features =
     myLib.extendModules
     (name: {
@@ -16,9 +18,11 @@
 
       configExtension = config: (lib.mkIf cfg.${name}.enable config);
     })
-    (myLib.filesIn ./features);
+    (builtins.filter
+      (path: !(lib.hasPrefix "bundle-" (baseNameOf path)))
+      (myLib.filesIn ./.));
 
-  # Taking all module bundles in ./bundles and adding bundle.enables to them
+  # Taking all bundle-*.nix modules and adding bundle.enables to them
   bundles =
     myLib.extendModules
     (name: {
@@ -28,7 +32,9 @@
 
       configExtension = config: (lib.mkIf cfg.bundles.${name}.enable config);
     })
-    (myLib.filesIn ./bundles);
+    (builtins.filter
+      (path: lib.hasPrefix "bundle-" (baseNameOf path))
+      (myLib.filesIn ./.));
 in {
   imports =
     []

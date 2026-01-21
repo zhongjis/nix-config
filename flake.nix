@@ -148,7 +148,7 @@
           neovim =
             (nvf.lib.neovimConfiguration {
               pkgs = pkgs; # Pass the system-specific pkgs
-              modules = [./modules/shared/home-manager/features/neovim/nvf];
+              modules = [./modules/home-manager/neovim/nvf];
             }).neovim;
         }
         // optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
@@ -170,8 +170,6 @@
       };
 
       nixDarwinModules.default = ./modules/darwin;
-      homeManagerModules.default = ./modules/shared/home-manager;
-      homeManagerModules.linux = ./modules/nixos/home-manager;
-      homeManagerModules.darwin = ./modules/darwin/home-manager;
+      homeManagerModules.default = ./modules/home-manager;
     };
 }
