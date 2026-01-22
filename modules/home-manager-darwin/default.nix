@@ -31,16 +31,22 @@
     (myLib.filesIn ./bundles);
 
   # NEW: Add services support
-  services =
-    myLib.extendModules
-    (name: {
-      extraOptions = {
-        myHomeManager.services.${name}.enable = lib.mkEnableOption "enable ${name} service";
-      };
+  services = let
+    serviceFiles =
+      if builtins.pathExists ./services
+      then myLib.filesIn ./services
+      else [];
+  in
+    if serviceFiles == [] then [] else
+      myLib.extendModules
+      (name: {
+        extraOptions = {
+          myHomeManager.services.${name}.enable = lib.mkEnableOption "enable ${name} service";
+        };
 
-      configExtension = config: (lib.mkIf cfg.services.${name}.enable config);
-    })
-    (myLib.filesIn ./services);
+        configExtension = config: (lib.mkIf cfg.services.${name}.enable config);
+      })
+      serviceFiles;
 in {
   imports =
     []
