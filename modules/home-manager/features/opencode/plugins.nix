@@ -3,6 +3,7 @@ _: {
     plugin = [
       "@simonwjackson/opencode-direnv"
       "oh-my-opencode@v2.14.0"
+      "opencode-google-antigravity-auth"
     ];
   };
 

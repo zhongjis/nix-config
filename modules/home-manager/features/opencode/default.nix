@@ -14,6 +14,11 @@
     # ./openagent.nix
     ./plugins.nix
   ];
+
+  home.packages = with pkgs; [
+    playwright-mcp
+  ];
+
   programs.opencode = {
     enable = true;
     package = inputs.opencode.packages.${pkgs.stdenv.hostPlatform.system}.default;
