@@ -5,6 +5,7 @@
 in {
   imports = [
     ../../modules/home-manager
+    ../../modules/home-manager-linux
   ];
   myHomeManager.bundles.general.enable = true;
   myHomeManager.hyprland.monitors = {

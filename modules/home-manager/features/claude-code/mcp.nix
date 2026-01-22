@@ -7,10 +7,10 @@
   sops.secrets = {
     # github - personal
     n8n_api_key = {
-      sopsFile = ../../../secrets/homelab.yaml;
+      sopsFile = ../../../../secrets/homelab.yaml;
     };
     github_com_zhongjis_mcp = {
-      sopsFile = ../../../secrets/access-tokens.yaml;
+      sopsFile = ../../../../secrets/access-tokens.yaml;
     };
   };
 

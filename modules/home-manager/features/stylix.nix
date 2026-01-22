@@ -1,6 +1,6 @@
 {lib, ...}: {
   imports = [
-    ../shared/stylix_common.nix
+    ../../shared/stylix_common.nix
   ];
 
   stylix.targets = {
