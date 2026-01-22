@@ -175,14 +175,4 @@ in rec {
       name = fileNameOf f;
     in (extendModule ((extension name) // {path = f;})))
     modules;
-
-  # ============================ Shell ============================= #
-  forAllSystems = pkgs:
-    inputs.nixpkgs.lib.genAttrs [
-      "x86_64-linux"
-      "aarch64-linux"
-      "x86_64-darwin"
-      "aarch64-darwin"
-    ]
-    (system: pkgs inputs.nixpkgs.legacyPackages.${system});
 }
