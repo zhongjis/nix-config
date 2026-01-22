@@ -6,7 +6,7 @@
 }: let
   cfg = config.myHomeManager;
 
-  # Taking all modules in ./features and adding enables to them
+  # Scan subdirectories instead of flat structure
   features =
     myLib.extendModules
     (name: {
@@ -18,7 +18,7 @@
     })
     (myLib.filesIn ./features);
 
-  # Taking all module bundles in ./bundles and adding bundle.enables to them
+  # No more bundle- prefix stripping needed
   bundles =
     myLib.extendModules
     (name: {
@@ -29,21 +29,22 @@
       configExtension = config: (lib.mkIf cfg.bundles.${name}.enable config);
     })
     (myLib.filesIn ./bundles);
+
+  # NEW: Add services support
+  services =
+    myLib.extendModules
+    (name: {
+      extraOptions = {
+        myHomeManager.services.${name}.enable = lib.mkEnableOption "enable ${name} service";
+      };
+
+      configExtension = config: (lib.mkIf cfg.services.${name}.enable config);
+    })
+    (myLib.filesIn ./services);
 in {
   imports =
     []
     ++ features
-    ++ bundles;
-
-  xdg.enable = true;
-
-  nixpkgs = {
-    config = {
-      allowUnfree = true;
-      experimental-features = "nix-command flakes";
-    };
-  };
-
-  # Let Home Manager install and manage itself.
-  programs.home-manager.enable = true;
+    ++ bundles
+    ++ services;
 }

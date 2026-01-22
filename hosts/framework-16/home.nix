@@ -4,8 +4,8 @@
   dellMonitor = "desc:Dell Inc. DELL P2419H 78NFR63";
 in {
   imports = [
-    ../../modules/shared/home-manager
-    ../../modules/nixos/home-manager
+    ../../modules/home-manager
+    ../../modules/home-manager-linux
   ];
   myHomeManager.bundles.general.enable = true;
   myHomeManager.hyprland.monitors = {

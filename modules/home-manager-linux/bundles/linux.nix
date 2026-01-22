@@ -1,8 +1,13 @@
-{pkgs, ...}: let
+{
+  pkgs,
+  lib,
+  ...
+}: let
   browser = "helium";
   # browser = "zen-beta.desktop";
 in {
   myHomeManager.pipewire-noise-cancling-input.enable = true;
+  myHomeManager.distrobox.enable = lib.mkDefault true;
 
   home.packages = with pkgs; [
     nemo-with-extensions # file manager

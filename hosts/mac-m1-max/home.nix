@@ -6,8 +6,8 @@
 }: {
   imports =
     [
-      ../../modules/shared/home-manager
-      ../../modules/darwin/home-manager
+      ../../modules/home-manager
+      ../../modules/home-manager-darwin
     ]
     ++ inputs.nix-config-private.homeModules.zshen-nix-config-private;
 

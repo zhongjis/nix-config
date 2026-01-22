@@ -6,7 +6,7 @@
 }: let
   cfg = config.myHomeManager;
 
-  # Taking all modules in ./features and adding enables to them
+  # Scan subdirectories instead of flat structure
   features =
     myLib.extendModules
     (name: {
@@ -18,7 +18,7 @@
     })
     (myLib.filesIn ./features);
 
-  # Taking all module bundles in ./bundles and adding bundle.enables to them
+  # No more bundle- prefix stripping needed
   bundles =
     myLib.extendModules
     (name: {
@@ -29,9 +29,28 @@
       configExtension = config: (lib.mkIf cfg.bundles.${name}.enable config);
     })
     (myLib.filesIn ./bundles);
+
+  # NEW: Add services support
+  services = let
+    serviceFiles =
+      if builtins.pathExists ./services
+      then myLib.filesIn ./services
+      else [];
+  in
+    if serviceFiles == [] then [] else
+      myLib.extendModules
+      (name: {
+        extraOptions = {
+          myHomeManager.services.${name}.enable = lib.mkEnableOption "enable ${name} service";
+        };
+
+        configExtension = config: (lib.mkIf cfg.services.${name}.enable config);
+      })
+      serviceFiles;
 in {
   imports =
     []
     ++ features
-    ++ bundles;
+    ++ bundles
+    ++ services;
 }
