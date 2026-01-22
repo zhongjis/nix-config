@@ -12,15 +12,7 @@
       extensions = [".nix"];
       initialization = {
         formatting = {
-          command = [(lib.getExe pkgs.nixfmt)];
-        };
-        options = {
-          nixos = {
-            expr = "(builtins.getFlake \"/home/khaneliman/khanelinix\").nixosConfigurations.khanelinix.options";
-          };
-          home-manager = {
-            expr = "(builtins.getFlake \"/home/khaneliman/khanelinix\").homeConfigurations.\"khaneliman@khanelinix\".options";
-          };
+          command = [(lib.getExe pkgs.alejandra)];
         };
       };
     };

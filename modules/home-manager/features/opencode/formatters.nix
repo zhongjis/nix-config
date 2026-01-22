@@ -7,30 +7,44 @@
   ...
 }: {
   programs.opencode.settings.formatter = {
-    # nixfmt = {
-    #   command = [
-    #     (lib.getExe pkgs.nixfmt)
-    #     "$FILE"
-    #   ];
-    #   extensions = [".nix"];
-    # };
+    alejandra = {
+      command = [
+        (lib.getExe pkgs.alejandra)
+        "$FILE"
+      ];
+      extensions = [".nix"];
+    };
 
-    # csharpier = {
-    #   command = [
-    #     (lib.getExe pkgs.csharpier)
-    #     "$FILE"
-    #   ];
-    #   extensions = [
-    #     ".cs"
-    #   ];
-    # };
+    black = {
+      command = [
+        (lib.getExe pkgs.black)
+        "--line-length"
+        "85"
+        "$FILE"
+      ];
+      extensions = [".py"];
+    };
 
-    # rustfmt = {
-    #   command = [
-    #     (lib.getExe pkgs.rustfmt)
-    #     "$FILE"
-    #   ];
-    #   extensions = [".rs"];
-    # };
+    prettierd = {
+      command = [
+        (lib.getExe pkgs.prettierd)
+        "$FILE"
+      ];
+      extensions = [
+        ".js"
+        ".jsx"
+        ".ts"
+        ".tsx"
+        ".mjs"
+        ".cjs"
+        ".mts"
+        ".cts"
+        ".json"
+        ".yaml"
+        ".yml"
+        ".md"
+        ".css"
+      ];
+    };
   };
 }
