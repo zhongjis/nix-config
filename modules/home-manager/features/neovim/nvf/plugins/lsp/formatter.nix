@@ -8,6 +8,7 @@
     black
     google-java-format
     xmlstarlet
+    scalafmt
   ];
 
   vim.languages.enableFormat = true;
@@ -46,14 +47,21 @@
         sh = ["shfmt"];
         javascript = ["prettierd"];
         typescript = ["prettierd"];
+        typescriptreact = ["prettierd"];
+        javascriptreact = ["prettierd"];
         yaml = ["prettierd"];
         markdown = ["prettierd"];
         python = ["black"];
         css = ["prettierd"];
+        scss = ["prettierd"];
         terraform = ["terraform_fmt"];
         java = ["google-java-format"];
+        scala = ["scalafmt"];
+        sbt = ["scalafmt"];
         xml = ["xmlstarlet"];
         json = ["prettierd"];
+        html = ["prettierd"];
+        graphql = ["prettierd"];
       };
       format_on_save = {
         _type = "lua-inline";

@@ -1,10 +1,17 @@
 {pkgs, ...}: {
+  # nvim-lint configuration
+  # Note: nvf handles the autocmd setup automatically when nvim-lint is enabled
   vim.diagnostics.nvim-lint = {
     enable = true;
 
     linters_by_ft = {
       markdown = ["markdownlint"];
       terraform = ["tflint" "tfsec"];
+      python = ["ruff"]; # Fast Python linter
+      javascript = ["eslint_d"];
+      typescript = ["eslint_d"];
+      javascriptreact = ["eslint_d"];
+      typescriptreact = ["eslint_d"];
     };
   };
 
@@ -12,44 +19,7 @@
     tflint
     tfsec
     markdownlint-cli
-  ];
-
-  vim.augroups = [
-    {
-      enable = true;
-      clear = true;
-      name = "Lint";
-    }
-  ];
-
-  vim.autocmds = [
-    {
-      enable = true;
-      desc = "Auto lint doc.";
-      event = ["BufEnter" "BufWritePost" "InsertLeave"];
-      group = "Lint";
-      callback = {
-        _type = "lua-inline";
-        expr = ''
-          function()
-            local lint = require("lint")
-            lint.linters_by_ft = {
-              markdown = { "markdownlint" },
-              terraform = { "tflint", "tfsec" },
-            }
-
-            local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
-            vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
-              group = lint_augroup,
-              callback = function()
-                if vim.opt_local.modifiable:get() then
-                  lint.try_lint()
-                end
-              end
-            })
-          end
-        '';
-      };
-    }
+    ruff # Fast Python linter
+    eslint_d # Fast eslint daemon
   ];
 }
