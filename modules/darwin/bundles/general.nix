@@ -105,7 +105,6 @@
       "alfred"
       "bitwarden"
       "ghostty"
-      "claude-code"
 
       "obsidian"
       "spotify"
