@@ -21,7 +21,7 @@
       };
 
       git = {
-        auto-local-bookmark = true;
+        auto-track-bookmarks = true;
         push-bookmark-prefix = "push-";
       };
 
@@ -34,7 +34,6 @@
         d = ["diff"];
         ds = ["diff" "--stat"];
         s = ["status"];
-        show = ["log" "--no-graph" "--color=always" "-r"];
       };
 
       revset-aliases = {
