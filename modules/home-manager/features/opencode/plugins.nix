@@ -1,9 +1,9 @@
 _: {
   programs.opencode.settings = {
     plugin = [
-      "@simonwjackson/opencode-direnv"
-      "oh-my-opencode@v2.14.0"
-      "opencode-google-antigravity-auth"
+      "@simonwjackson/opencode-direnv@latest"
+      "oh-my-opencode@latest"
+      "opencode-google-antigravity-auth@latest"
     ];
   };
 
