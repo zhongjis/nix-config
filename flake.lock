@@ -1745,11 +1745,11 @@
         "nixpkgs": "nixpkgs_10"
       },
       "locked": {
-        "lastModified": 1769135913,
-        "narHash": "sha256-MWIwCRwEPLb2+XrNlMZ/QhV6tW4FnDfqsFbDRS4wdJo=",
+        "lastModified": 1769191179,
+        "narHash": "sha256-/cS5fhbjs6tZk3hLKEky130wzcyNUmUX4XMtOftn09k=",
         "owner": "anomalyco",
         "repo": "opencode",
-        "rev": "2e53697da01d1417845567296774166350e786f1",
+        "rev": "225b72ca36da50467b35a8de7d16a9fc27f38bcf",
         "type": "github"
       },
       "original": {
