@@ -1,8 +1,8 @@
 {lib, ...}: let
   pluginList = [
     "@simonwjackson/opencode-direnv@latest"
-    "oh-my-opencode@latest"
-    "opencode-google-antigravity-auth@latest"
+    "oh-my-opencode@3.0.0-beta.13"
+    # "opencode-google-antigravity-auth@latest"
   ];
 
   hasAntigravityAuth = lib.any (p: builtins.match ".*antigravity-auth.*" p != null) pluginList;
@@ -165,6 +165,6 @@ in {
 
   xdg.configFile = lib.mkIf hasOhMyOpencode {
     # "opencode/oh-my-opencode.json".source = ./oh-my-opencode/cheap-but-not-free.json;
-    "opencode/oh-my-opencode.json".source = ./oh-my-opencode/full-power.json;
+    "opencode/oh-my-opencode.json".source = ./oh-my-opencode/google.json;
   };
 }
