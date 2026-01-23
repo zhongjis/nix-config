@@ -12,7 +12,7 @@
     ./permission.nix
     ./provider.nix
     # ./openagent.nix
-    ./plugins.nix
+    ./plugins
   ];
 
   programs.opencode = {
