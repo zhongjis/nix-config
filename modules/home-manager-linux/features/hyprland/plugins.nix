@@ -11,11 +11,11 @@ in {
     # plugins = with pkgs; [
     plugins = with inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system};
       [
-        csgo-vulkan-fix
+        # csgo-vulkan-fix
       ]
       ++ [
         # inputs.hy3.packages.${pkgs.stdenv.hostPlatform.system}.hy3
-        inputs.hypr-dynamic-cursors.packages.${pkgs.stdenv.hostPlatform.system}.hypr-dynamic-cursors
+        # inputs.hypr-dynamic-cursors.packages.${pkgs.stdenv.hostPlatform.system}.hypr-dynamic-cursors
       ];
     settings = {
       "plugin:dynamic-cursors" = {
