@@ -2,7 +2,7 @@
   pluginList = [
     "@simonwjackson/opencode-direnv@latest"
     "oh-my-opencode@3.0.0-beta.13"
-    # "opencode-google-antigravity-auth@latest"
+    "opencode-google-antigravity-auth@latest"
   ];
 
   hasAntigravityAuth = lib.any (p: builtins.match ".*antigravity-auth.*" p != null) pluginList;

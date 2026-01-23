@@ -10,6 +10,8 @@ in {
     };
   };
 
+  programs.opencode.settings.model = "opencode/glm-4.7-free";
+
   programs.opencode.settings.provider = {
     # openrouter = {
     #   options = {
