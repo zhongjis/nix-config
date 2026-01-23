@@ -3,7 +3,7 @@
   lib,
   ...
 }: let
-  browser = "helium";
+  browser = "helium.desktop";
   # browser = "zen-beta.desktop";
 in {
   myHomeManager.pipewire-noise-cancling-input.enable = true;
