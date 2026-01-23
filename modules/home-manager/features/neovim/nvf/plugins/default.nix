@@ -14,7 +14,6 @@ in {
     ./telescope.nix
     ./todo-comments.nix
     ./toggleterm.nix
-    ./trouble.nix
     ./visual.nix
     ./whichkey.nix
   ];
