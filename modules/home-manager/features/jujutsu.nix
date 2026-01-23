@@ -21,7 +21,6 @@
       };
 
       git = {
-        auto-track-bookmarks = true;
         push-bookmark-prefix = "push-";
       };
 
