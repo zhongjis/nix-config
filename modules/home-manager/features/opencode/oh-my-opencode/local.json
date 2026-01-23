@@ -5,7 +5,7 @@
       "model": "opencode/kimi-k2-thinking"
     },
     "librarian": {
-      "model": "opencode/glm-4.7-free"
+      "model": "opencode/glm-4.7"
     },
     "explore": {
       "model": "opencode/grok-code"
