@@ -22,6 +22,7 @@
   myHomeManager.ghostty.enable = lib.mkDefault true;
   myHomeManager.wezterm.enable = lib.mkDefault false;
   myHomeManager.git.enable = lib.mkDefault true;
+  myHomeManager.jujutsu.enable = lib.mkDefault true;
   myHomeManager.kitty.enable = lib.mkDefault true;
   myHomeManager.kubernetes.enable = lib.mkDefault true;
   myHomeManager.lazygit.enable = lib.mkDefault true;
