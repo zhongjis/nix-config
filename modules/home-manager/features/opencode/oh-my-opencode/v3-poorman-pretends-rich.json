@@ -22,5 +22,14 @@
     "multimodal-looker": {
       "model": "google/gemini-3-flash-preview"
     }
+    "Prometheus": {
+      "model": "opencode/claude-sonnet-4-5"
+    },
+    "Metis": {
+      "model": "opencode/claude-sonnet-4-5"
+    },
+    "Momus": {
+      "model": "opencode/claude-sonnet-4-5"
+    }
   }
 }
