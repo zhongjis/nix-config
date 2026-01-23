@@ -58,6 +58,47 @@ nix run github:zhongjis/nix-update-input # upgrade specific input
 nh search <query> # search nixpkgs
 ```
 
+## Development Templates
+
+This flake provides reusable development environment templates. Use them to quickly set up project-specific dev shells.
+
+### Available Templates
+
+| Template  | Description                       | Includes                |
+| --------- | --------------------------------- | ----------------------- |
+| `java8`   | Java 8 development environment    | JDK 8, Maven, Lombok    |
+| `nodejs22`| Node.js 22 development environment| Node.js 22, pnpm        |
+
+### Using Templates
+
+**Create a new project from a template:**
+
+```bash
+# Create a new directory with the template
+nix flake new -t github:zhongjis/nix-config#nodejs22 ./my-project
+
+# Or initialize in current directory
+nix flake new -t github:zhongjis/nix-config#java8 .
+```
+
+**Enter the development shell:**
+
+```bash
+# After creating from template
+cd my-project
+nix develop
+
+# Or use direnv for automatic activation
+echo "use flake" > .envrc
+direnv allow
+```
+
+**List available templates:**
+
+```bash
+nix flake show github:zhongjis/nix-config
+```
+
 ## Secret Management
 
 I use [sops-nix](https://github.com/Mic92/sops-nix)'s home-manager module.
