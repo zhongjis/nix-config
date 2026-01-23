@@ -165,6 +165,6 @@ in {
 
   xdg.configFile = lib.mkIf hasOhMyOpencode {
     # "opencode/oh-my-opencode.json".source = ./oh-my-opencode/cheap-but-not-free.json;
-    "opencode/oh-my-opencode.json".source = ./oh-my-opencode/google.json;
+    "opencode/oh-my-opencode.json".source = ./oh-my-opencode/poorman-pretends-rich.json;
   };
 }

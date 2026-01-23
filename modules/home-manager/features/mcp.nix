@@ -27,6 +27,10 @@
           CONTEXT7_API_KEY = "{env:CONTEXT7_API_KEY}";
         };
       };
+      playwright = {
+        command = "nix";
+        args = ["run" "nixpkgs#playwright-mcp"];
+      };
     };
   };
 }
