@@ -31,8 +31,6 @@
         command = "nix";
         args = ["run" "nixpkgs#playwright-mcp"];
       };
-      context_engine = {
-      };
     };
   };
 }
