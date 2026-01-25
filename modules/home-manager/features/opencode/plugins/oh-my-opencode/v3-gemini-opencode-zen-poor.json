@@ -2,10 +2,10 @@
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
   "agents": {
     "Sisyphus": {
-      "model": "opencode/claude-sonnet-4-5"
+      "model": "google/antigravity-claude-opus-4-5-thinking"
     },
     "sisyphus-junior": {
-      "model": "opencode/claude-sonnet-4-5"
+      "model": "opencode/claude-opus-4-5"
     },
     "oracle": {
       "model": "opencode/gpt-5.2"
@@ -26,7 +26,7 @@
       "model": "google/antigravity-gemini-3-flash"
     },
     "Prometheus": {
-      "model": "opencode/claude-sonnet-4-5"
+      "model": "google/antigravity-claude-opus-4-5-thinking"
     },
     "Metis": {
       "model": "google/antigravity-claude-sonnet-4-5"
@@ -35,7 +35,7 @@
       "model": "google/antigravity-claude-sonnet-4-5"
     },
     "orchestrator-sisyphus": {
-      "model": "opencode/claude-sonnet-4-5"
+      "model": "google/antigravity-claude-opus-4-5-thinking"
     }
   }
 }
