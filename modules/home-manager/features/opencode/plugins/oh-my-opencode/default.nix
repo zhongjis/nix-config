@@ -6,6 +6,6 @@ _: {
   };
 
   xdg.configFile = {
-    "opencode/oh-my-opencode.json".source = ./v3-gemini-opencode-zen.json;
+    "opencode/oh-my-opencode.json".source = ./v3-gemini-opencode-zen-poor.json;
   };
 }
