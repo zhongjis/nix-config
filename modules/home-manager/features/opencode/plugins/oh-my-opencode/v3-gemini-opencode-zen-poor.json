@@ -7,32 +7,32 @@
     "sisyphus-junior": {
       "model": "opencode/claude-sonnet-4-5"
     },
-    "librarian": {
-      "model": "opencode/glm-4.7"
-    },
     "oracle": {
-      "model": "opencode/glm-4.7"
+      "model": "opencode/gpt-5.2"
+    },
+    "librarian": {
+      "model": "opencode/big-pickle"
     },
     "explore": {
-      "model": "openrouter/x-ai/grok-code-fast-1"
+      "model": "opencode/gpt-5-nano"
     },
     "frontend-ui-ux-engineer": {
-      "model": "google/gemini-3-pro-preview"
+      "model": "google/antigravity-gemini-3-flash"
     },
     "document-writer": {
-      "model": "google/gemini-3-flash-preview"
+      "model": "google/antigravity-gemini-3-flash"
     },
     "multimodal-looker": {
-      "model": "google/gemini-3-flash-preview"
+      "model": "google/antigravity-gemini-3-flash"
     },
-    "Metis (Plan Consultant)": {
+    "Prometheus": {
       "model": "opencode/claude-sonnet-4-5"
     },
-    "Momus (Plan Reviewer)": {
-      "model": "opencode/claude-sonnet-4-5"
+    "Metis": {
+      "model": "google/antigravity-claude-sonnet-4-5"
     },
-    "prometheus": {
-      "model": "opencode/claude-sonnet-4-5"
+    "Momus": {
+      "model": "google/antigravity-claude-sonnet-4-5"
     },
     "orchestrator-sisyphus": {
       "model": "opencode/claude-sonnet-4-5"
