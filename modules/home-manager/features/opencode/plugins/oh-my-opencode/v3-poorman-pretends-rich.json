@@ -4,14 +4,17 @@
     "Sisyphus": {
       "model": "opencode/claude-sonnet-4-5"
     },
+    "sisyphus-junior": {
+      "model": "opencode/claude-sonnet-4-5"
+    },
     "librarian": {
       "model": "opencode/glm-4.7"
     },
-    "explore": {
-      "model": "opencode/grok-code"
-    },
     "oracle": {
-      "model": "opencode/grok-code"
+      "model": "opencode/glm-4.7"
+    },
+    "explore": {
+      "model": "openrouter/x-ai/grok-code-fast-1"
     },
     "frontend-ui-ux-engineer": {
       "model": "google/gemini-3-pro-preview"
@@ -21,14 +24,17 @@
     },
     "multimodal-looker": {
       "model": "google/gemini-3-flash-preview"
-    }
-    "Prometheus": {
+    },
+    "Metis (Plan Consultant)": {
       "model": "opencode/claude-sonnet-4-5"
     },
-    "Metis": {
+    "Momus (Plan Reviewer)": {
       "model": "opencode/claude-sonnet-4-5"
     },
-    "Momus": {
+    "prometheus": {
+      "model": "opencode/claude-sonnet-4-5"
+    },
+    "orchestrator-sisyphus": {
       "model": "opencode/claude-sonnet-4-5"
     }
   }
