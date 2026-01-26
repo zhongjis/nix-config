@@ -1,6 +1,6 @@
 {...}: {
-  programs.opencode.skills = {
-    skill-creator = ./skill-creator.md;
-    # playwright = ./playwright.md;
+  programs.claude-code.skills = {
+    skill-creator = ./skill-creator;
+    playwright = ./playwright;
   };
 }
