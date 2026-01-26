@@ -11,6 +11,7 @@
       "model": "opencode/gpt-5.2"
     },
     "librarian": {
+      "prompt_append": "Always use the nixos-mcp for Nix related documentation lookups.",
       "model": "opencode/big-pickle"
     },
     "explore": {
