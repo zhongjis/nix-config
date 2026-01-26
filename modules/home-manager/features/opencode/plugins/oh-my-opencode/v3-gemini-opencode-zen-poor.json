@@ -38,5 +38,35 @@
       "model": "opencode/glm-4.7"
     }
   },
-  "disabled_skills": ["playwright"]
+  "disabled_skills": ["playwright"],
+  "tmux": {
+    "enabled": true,
+    "layout": "main-vertical",
+    "main_pane_size": 60,
+    "main_pane_min_width": 120,
+    "agent_pane_min_width": 40
+  },
+  "categories": {
+    "visual-engineering": {
+      "model": "google/antigravity-gemini-3-pro"
+    },
+    "ultrabrain": {
+      "model": "opencode/gpt-5.1-codex-max"
+    },
+    "artistry": {
+      "model": "google/antigravity-gemini-3-pro"
+    },
+    "quick": {
+      "model": "opencode/gpt-5-nano"
+    },
+    "unspecified-low": {
+      "model": "google/antigravity-claude-sonnet-4-5-thinking"
+    },
+    "unspecified-hight": {
+      "model": "google/antigravity-claude-opus-4-5-thinking"
+    },
+    "writing": {
+      "model": "google/antigravity-gemini-3-flash"
+    }
+  }
 }
