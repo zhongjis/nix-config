@@ -60,6 +60,7 @@
         sbt = ["scalafmt"];
         xml = ["xmlstarlet"];
         json = ["prettierd"];
+        jsonc = ["prettierd"];
         html = ["prettierd"];
         graphql = ["prettierd"];
       };
