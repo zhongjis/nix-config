@@ -2,42 +2,56 @@
   "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
   "agents": {
     "Sisyphus": {
-      "model": "opencode/glm-4.7"
-    },
-    "sisyphus-junior": {
-      "model": "opencode/claude-sonnet-4-5"
+      "model": "opencode/glm-4.7",
     },
     "oracle": {
-      "model": "opencode/gpt-5.2"
+      "model": "opencode/gpt-5.2",
     },
     "librarian": {
       "prompt_append": "Always use the nixos-mcp for Nix related documentation lookups.",
-      "model": "opencode/big-pickle"
+      "model": "opencode/big-pickle",
     },
     "explore": {
-      "model": "opencode/gpt-5-nano"
-    },
-    "frontend-ui-ux-engineer": {
-      "model": "google/antigravity-gemini-3-pro"
-    },
-    "document-writer": {
-      "model": "google/antigravity-gemini-3-flash"
+      "model": "opencode/gpt-5-nano",
     },
     "multimodal-looker": {
-      "model": "google/antigravity-gemini-3-flash"
+      "model": "google/antigravity-gemini-3-flash",
     },
     "Prometheus": {
-      "model": "opencode/glm-4.7"
+      "model": "opencode/glm-4.7",
     },
     "Metis": {
-      "model": "google/antigravity-claude-sonnet-4-5-thinking"
+      "model": "opencode/claude-sonnet-4-5",
     },
     "Momus": {
-      "model": "google/antigravity-claude-opus-4-5-thinking"
+      "model": "google/antigravity-claude-opus-4-5-thinking",
     },
     "orchestrator-sisyphus": {
-      "model": "opencode/glm-4.7"
-    }
+      "model": "opencode/claude-sonnet-4-5",
+    },
+  },
+  "categories": {
+    "visual-engineering": {
+      "model": "google/antigravity-gemini-3-pro",
+    },
+    "ultrabrain": {
+      "model": "opencode/gpt-5.2-codex",
+    },
+    "artistry": {
+      "model": "google/antigravity-gemini-3-pro",
+    },
+    "quick": {
+      "model": "opencode/gpt-5-nano",
+    },
+    "unspecified-low": {
+      "model": "opencode/claude-haiku-4-5",
+    },
+    "unspecified-hight": {
+      "model": "google/antigravity-claude-opus-4-5-thinking",
+    },
+    "writing": {
+      "model": "google/antigravity-gemini-3-flash",
+    },
   },
   "disabled_skills": ["playwright"],
   "tmux": {
@@ -45,29 +59,6 @@
     "layout": "main-vertical",
     "main_pane_size": 60,
     "main_pane_min_width": 120,
-    "agent_pane_min_width": 40
+    "agent_pane_min_width": 40,
   },
-  "categories": {
-    "visual-engineering": {
-      "model": "google/antigravity-gemini-3-pro"
-    },
-    "ultrabrain": {
-      "model": "opencode/gpt-5.1-codex-max"
-    },
-    "artistry": {
-      "model": "google/antigravity-gemini-3-pro"
-    },
-    "quick": {
-      "model": "opencode/gpt-5-nano"
-    },
-    "unspecified-low": {
-      "model": "google/antigravity-claude-sonnet-4-5-thinking"
-    },
-    "unspecified-hight": {
-      "model": "google/antigravity-claude-opus-4-5-thinking"
-    },
-    "writing": {
-      "model": "google/antigravity-gemini-3-flash"
-    }
-  }
 }

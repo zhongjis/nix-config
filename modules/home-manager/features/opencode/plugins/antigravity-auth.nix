@@ -1,7 +1,7 @@
 {...}: {
   programs.opencode.settings = {
     plugin = [
-      "opencode-antigravity-auth@1.2.8"
+      "opencode-antigravity-auth@latest"
     ];
 
     provider.google = {
