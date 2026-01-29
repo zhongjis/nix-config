@@ -35,6 +35,8 @@
       #   auto = false;
       #   prune = true;
       # };
+
+      instructions = ["https://raw.githubusercontent.com/JRedeker/opencode-shell-strategy/refs/heads/trunk/shell_strategy.md"];
     };
   };
 }
