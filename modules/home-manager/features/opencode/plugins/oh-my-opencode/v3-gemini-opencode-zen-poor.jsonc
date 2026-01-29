@@ -42,7 +42,7 @@
       "model": "google/antigravity-gemini-3-pro",
     },
     "quick": {
-      "model": "opencode/gpt-5-nano",
+      "model": "opencode/claude-haiku-4-5",
     },
     "unspecified-low": {
       "model": "opencode/claude-haiku-4-5",
