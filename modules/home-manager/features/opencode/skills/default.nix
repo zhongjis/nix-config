@@ -8,5 +8,6 @@
     playwright = ./playwright;
     jq = ./jq;
     mermaid-diagram-skill = ./mermaid-diagram-skill;
+    find-skills = ./find-skills;
   };
 }
