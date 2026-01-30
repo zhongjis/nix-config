@@ -6,6 +6,6 @@ _: {
   };
 
   xdg.configFile = {
-    "opencode/oh-my-opencode.jsonc".source = ./v3-copilot-opencode-zen-poor.jsonc;
+    "opencode/oh-my-opencode.jsonc".source = ./copilot-work.jsonc;
   };
 }
