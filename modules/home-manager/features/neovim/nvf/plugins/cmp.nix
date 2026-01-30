@@ -6,7 +6,10 @@
 
     setupOpts = {
       appearance.use_nvim_cmp_as_default = true;
-      cmdline.completion.menu.auto_show = true;
+      cmdline = {
+        completion.menu.auto_show = true;
+        keymap.preset = "inherit"; # Inherit keymaps from default mode (including <C-y> confirm)
+      };
 
       completion = {
         trigger = {
