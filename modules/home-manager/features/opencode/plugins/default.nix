@@ -1,12 +1,32 @@
-{...}: {
+{
+  lib,
+  config,
+  ...
+}: let
+  stripVersion = name: let
+    parts = lib.splitString "@" name;
+  in
+    if lib.length parts > 1 && !(lib.hasPrefix "@" name)
+    then lib.head parts
+    else if lib.length parts > 2
+    then "@" + (lib.elemAt parts 1)
+    else name;
+
+  hasPlugin = pluginId:
+    lib.any (p: stripVersion p == stripVersion pluginId)
+    config.programs.opencode.settings.plugin;
+in {
   imports = [
     ./oh-my-opencode
     ./antigravity-auth.nix
   ];
 
-  # Simple plugins without custom configurations
+  _module.args.hasPlugin = hasPlugin;
+
   programs.opencode.settings = {
     plugin = [
+      "opencode-antigravity-auth@latest"
+      "oh-my-opencode@latest"
       "@simonwjackson/opencode-direnv@latest"
       "@tarquinen/opencode-dcp@latest"
       "@franlol/opencode-md-table-formatter@latest"
