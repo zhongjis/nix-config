@@ -12,9 +12,16 @@
     then "@" + (lib.elemAt parts 1)
     else name;
 
+  plugins = [
+    "opencode-antigravity-auth@latest"
+    "oh-my-opencode@latest"
+    "@simonwjackson/opencode-direnv@latest"
+    "@tarquinen/opencode-dcp@latest"
+    "@franlol/opencode-md-table-formatter@latest"
+  ];
+
   hasPlugin = pluginId:
-    lib.any (p: stripVersion p == stripVersion pluginId)
-    config.programs.opencode.settings.plugin;
+    lib.any (p: stripVersion p == stripVersion pluginId) plugins;
 in {
   imports = [
     ./oh-my-opencode
@@ -24,12 +31,6 @@ in {
   _module.args.hasPlugin = hasPlugin;
 
   programs.opencode.settings = {
-    plugin = [
-      "opencode-antigravity-auth@latest"
-      "oh-my-opencode@latest"
-      "@simonwjackson/opencode-direnv@latest"
-      "@tarquinen/opencode-dcp@latest"
-      "@franlol/opencode-md-table-formatter@latest"
-    ];
+    plugin = plugins;
   };
 }
