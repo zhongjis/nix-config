@@ -144,5 +144,19 @@
       ];
       extensions = [".toml"];
     };
+
+    jdtls = {
+      command = [(lib.getExe pkgs.jdt-language-server)];
+      extensions = [".java"];
+    };
+
+    metals = {
+      command = [(lib.getExe pkgs.metals)];
+      extensions = [
+        ".scala"
+        ".sbt"
+        ".sc"
+      ];
+    };
   };
 }

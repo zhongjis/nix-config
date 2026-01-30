@@ -3,8 +3,6 @@
   lib,
   config,
   inputs,
-  currentSystem,
-  isDarwin,
   ...
 }: {
   programs.wezterm = {

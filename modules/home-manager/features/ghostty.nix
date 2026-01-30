@@ -3,15 +3,13 @@
   lib,
   config,
   inputs,
-  currentSystem,
-  isDarwin,
   ...
 }: {
   programs.ghostty = {
     enable = true;
     enableZshIntegration = true;
     package =
-      if isDarwin
+      if pkgs.stdenv.isDarwin
       then null
       else pkgs.ghostty; # package managed by system
     settings = {

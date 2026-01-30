@@ -72,11 +72,8 @@ in rec {
 
         {
           config._module.args = {
-            currentSystem = system;
             currentSystemName = hostName;
             currentSystemUser = user;
-            inputs = inputs;
-            isDarwin = darwin;
           };
         }
       ];
@@ -86,9 +83,7 @@ in rec {
     system,
     darwin ? false,
   }: let
-    currentSystem = system;
     currentSystemName = systemName;
-    isDarwin = darwin;
 
     homeConfiguration = ../hosts/${systemName}/home.nix;
   in
@@ -107,9 +102,7 @@ in rec {
           inputs
           outputs
           myLib
-          currentSystem
           currentSystemName
-          isDarwin
           ;
       };
 

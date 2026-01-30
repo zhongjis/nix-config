@@ -2,10 +2,8 @@
   pkgs,
   config,
   lib,
-  currentSystemName,
   ...
-}: let
-in {
+}: {
   home.file = {
     ".local/share/zsh/zsh-autosuggestions".source = "${pkgs.zsh-autosuggestions}/share/zsh-autosuggestions";
     ".local/share/zsh/zsh-fast-syntax-highlighting".source = "${pkgs.zsh-fast-syntax-highlighting}/share/zsh/plugins/fast-syntax-highlighting";

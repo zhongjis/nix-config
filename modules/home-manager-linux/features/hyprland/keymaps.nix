@@ -2,7 +2,6 @@
   pkgs,
   lib,
   inputs,
-  currentSystem,
   ...
 }: let
   close-application-sh =
