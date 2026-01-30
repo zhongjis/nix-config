@@ -4,7 +4,6 @@
   ...
 }: {
   imports = [
-    ./settings.nix
   ];
 
   programs.claude-code = {
