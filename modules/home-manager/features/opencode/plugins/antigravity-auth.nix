@@ -1,9 +1,10 @@
-{...}: {
+{
+  lib,
+  hasPlugin,
+  ...
+}:
+lib.mkIf (hasPlugin "opencode-antigravity-auth") {
   programs.opencode.settings = {
-    plugin = [
-      "opencode-antigravity-auth@latest"
-    ];
-
     provider.google = {
       models = {
         "antigravity-gemini-3-pro" = {
