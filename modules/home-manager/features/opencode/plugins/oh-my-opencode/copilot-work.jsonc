@@ -54,6 +54,9 @@
     },
   },
   "disabled_skills": ["playwright"],
+  "browser_automation_engine": {
+    "provider": "agent-browser",
+  },
   "tmux": {
     "enabled": true,
     "layout": "main-vertical",
