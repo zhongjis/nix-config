@@ -1,6 +1,10 @@
 ---
 name: playwright
 description: Browser automation via Playwright MCP tools. Use when AI Agent needs to interact with web browsers for: (1) Web scraping and data extraction, (2) Form interaction and submission, (3) Browser testing and validation, (4) Taking screenshots of web pages, or any browser automation tasks.
+mcp:  
+  playwright:  
+    command: nix
+    args: ["run", "nixpkgs#playwright-mcp"]  
 ---
 
 # Playwright MCP Browser Automation
@@ -56,4 +60,3 @@ navigate → snapshot → interact → snapshot → close
 **Screenshots**: Only use when visual inspection needed. Use `snapshot` for structure.
 
 **Multiple tabs**: Use `tabs(action="new/select/close")` with `index` for close/select.
-
