@@ -28,6 +28,9 @@
       lsp.servers = ["nixd"];
     };
 
+    # Json
+    json.enable = true;
+
     # Markdown
     markdown.enable = true;
 
