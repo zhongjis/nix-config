@@ -260,12 +260,33 @@ At this point, it is time to actually create the skill.
 
 Skip this step only if the skill being developed already exists, and iteration or packaging is needed. In this case, continue to the next step.
 
+#### Determine Skill Location
+
+Before creating a skill, determine where it should be stored. **If the user has not specified a location, ask them:**
+
+> Where would you like to create this skill?
+> 1. **Project/repo level (Recommended)** - Stored in `.opencode/skills/` within the current project. Available only in this project/repository.
+> 2. **Global** - Stored in `~/.config/claude/skills/`. Available across all projects.
+
+**Default to project/repo level** if the user has no preference, as it keeps skills scoped to relevant projects and avoids polluting the global namespace.
+
+| Location | Path | Scope |
+|----------|------|-------|
+| Project/repo (default) | `.opencode/skills/<skill-name>/` | Current project only |
+| Global | `~/.config/claude/skills/<skill-name>/` | All projects |
+
+#### Create the Skill
+
 When creating a new skill from scratch, always run the `init_skill.py` script. The script conveniently generates a new template skill directory that automatically includes everything a skill requires, making the skill creation process much more efficient and reliable.
 
 Usage:
 
 ```bash
-scripts/init_skill.py <skill-name> --path <output-directory>
+# Project/repo level (recommended default)
+scripts/init_skill.py <skill-name> --path .opencode/skills
+
+# Global level
+scripts/init_skill.py <skill-name> --path ~/.config/claude/skills
 ```
 
 The script:
