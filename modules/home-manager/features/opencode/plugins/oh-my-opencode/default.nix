@@ -7,7 +7,7 @@
   configFile =
     if currentSystemName == "mac-m1-max"
     then ./copilot-work.jsonc
-    else ./copilot-personal.jsonc;
+    else ./handoff-personal.jsonc;
 in
   lib.mkIf (hasPlugin "oh-my-opencode") {
     xdg.configFile = {
