@@ -10,6 +10,8 @@
     mermaid-diagram-skill = ./mermaid-diagram-skill;
     find-skills = ./find-skills;
 
+    gh = ./gh;
+
     # knoopx/pi skills - https://github.com/knoopx/pi
     ast-grep = ./ast-grep;
     bun = ./bun;
