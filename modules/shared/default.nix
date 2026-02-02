@@ -4,7 +4,10 @@
   pkgs,
   ...
 }: {
-  imports = [./cachix.nix];
+  imports = [
+    ./cachix.nix
+    ./packages
+  ];
   # set global nix path
   nix.nixPath = ["nixpkgs=${inputs.nixpkgs}"];
 
