@@ -208,10 +208,10 @@ Skill creation involves these steps:
 2. Plan reusable skill contents (scripts, references, assets)
 3. Initialize the skill (run init_skill.py)
 4. Edit the skill (implement resources and write SKILL.md)
-5. Package the skill (run package_skill.py)
+5. **Ask user if they want packaging** (optional - only for distribution)
 6. Iterate based on real usage
 
-Follow these steps in order, skipping only if there is a clear reason why they are not applicable.
+Follow steps 1-4 in order. Step 5 (packaging) is optional—always ask the user before packaging.
 
 ### Step 1: Understanding the Skill with Concrete Examples
 
@@ -339,15 +339,23 @@ Do not include any other fields in YAML frontmatter.
 
 Write instructions for using the skill and its bundled resources.
 
-### Step 5: Packaging a Skill
+### Step 5: Packaging a Skill (OPTIONAL)
 
-Once development of the skill is complete, it must be packaged into a distributable .skill file that gets shared with the user. The packaging process automatically validates the skill first to ensure it meets all requirements:
+Packaging is **optional**. Skills work directly from their folder location—packaging is only needed for distribution to others or archival.
+
+**MANDATORY: Always ask the user before packaging:**
+
+> The skill is ready. Would you like me to package it into a distributable .skill file?
+> - This is optional—the skill already works from its current location
+> - Packaging creates a .skill file for sharing or archival
+
+**If the user wants packaging**, run:
 
 ```bash
 scripts/package_skill.py <path/to/skill-folder>
 ```
 
-Optional output directory specification:
+Optional output directory:
 
 ```bash
 scripts/package_skill.py <path/to/skill-folder> ./dist
@@ -355,15 +363,10 @@ scripts/package_skill.py <path/to/skill-folder> ./dist
 
 The packaging script will:
 
-1. **Validate** the skill automatically, checking:
-   - YAML frontmatter format and required fields
-   - Skill naming conventions and directory structure
-   - Description completeness and quality
-   - File organization and resource references
+1. **Validate** the skill (frontmatter, naming, structure)
+2. **Package** into a .skill file (zip format with .skill extension)
 
-2. **Package** the skill if validation passes, creating a .skill file named after the skill (e.g., `my-skill.skill`) that includes all files and maintains the proper directory structure for distribution. The .skill file is a zip file with a .skill extension.
-
-If validation fails, the script will report the errors and exit without creating a package. Fix any validation errors and run the packaging command again.
+If validation fails, fix errors and retry.
 
 ### Step 6: Iterate
 
