@@ -23,7 +23,7 @@
     sha256 = srcInfo.sha256;
     name = "devtoys-${version}-${pkgs.system}.deb";
   };
-
+in
   pkgs.stdenv.mkDerivation rec {
     pname = "devtoys";
     inherit version src;
@@ -70,6 +70,6 @@
       license = licenses.mit;
       platforms = ["x86_64-linux" "aarch64-linux"];
       mainProgram = "devtoys";
-      sourceProvenance = with sourceTypes; [ binaryNativeCode ];
+      sourceProvenance = with sourceTypes; [binaryNativeCode];
     };
   }
