@@ -4,6 +4,9 @@
   lib,
   ...
 }: {
+  imports = [
+    ../../shared/packages
+  ];
   myNixOS.podman.enable = lib.mkDefault true;
   myNixOS.docker.enable = lib.mkDefault false;
   myNixOS.kubernetes.enable = lib.mkDefault true;
@@ -13,11 +16,9 @@
       # nix
       inputs.colmena.packages.${pkgs.stdenv.hostPlatform.system}.colmena
 
-      gh
       graphite-cli
 
       # db
-      mongosh
       postgresql
 
       # db client

@@ -4,6 +4,10 @@
   lib,
   ...
 }: {
+  imports = [
+    ../../shared/packages
+  ];
+
   myNixOS.nh.enable = lib.mkDefault true;
   myNixOS.sops.enable = lib.mkDefault true;
   myNixOS.power-management.enable = lib.mkDefault true;
@@ -103,28 +107,6 @@
     ++ [
       # inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
     ];
-
-  fonts.packages = with pkgs; [
-    # fonts
-    nerd-fonts.jetbrains-mono
-    nerd-fonts.iosevka
-    nerd-fonts.fira-code
-    nerd-fonts.droid-sans-mono
-    nerd-fonts.agave
-    font-awesome
-    # sketchybar-app-font
-    cm_unicode
-    corefonts
-    noto-fonts
-    noto-fonts-cjk-sans
-    noto-fonts-color-emoji
-    liberation_ttf
-    mplus-outline-fonts.githubRelease
-    dina-font
-    proggyfonts
-    inter
-    font-awesome
-  ];
 
   # battery
   services.upower.enable = true;

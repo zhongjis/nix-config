@@ -6,10 +6,12 @@
   stable_pkgs = with pkgs.stable; [
   ];
 in {
+  imports = [
+    ../../shared/packages
+  ];
+
   environment.systemPackages = with pkgs;
     [
-      mongosh
-
       php
 
       # **java17**
@@ -48,7 +50,8 @@ in {
       # aws
       awscli2
 
-      gh
+      # mongosh removed - now in shared/packages/dev-tools.nix
+      # gh removed - now in shared/packages/dev-tools.nix
 
       charles
 

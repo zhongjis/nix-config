@@ -7,6 +7,7 @@
 }: {
   imports = [
     inputs.nix-homebrew.darwinModules.nix-homebrew
+    ../../shared/packages
   ];
 
   nix.enable = false; # NOTE: use determinate nix
@@ -45,24 +46,8 @@
 
     docker-compose
 
-    # fonts
-    nerd-fonts.jetbrains-mono
-    nerd-fonts.iosevka
-    nerd-fonts.fira-code
-    nerd-fonts.droid-sans-mono
-    nerd-fonts.agave
-    font-awesome
-    sketchybar-app-font
-    cm_unicode
-    corefonts
-    noto-fonts
-    noto-fonts-cjk-sans
-    noto-fonts-color-emoji
-    liberation_ttf
-    mplus-outline-fonts.githubRelease
-    dina-font
-    proggyfonts
-    inter
+    # jc, ast-grep, yt-dlp removed - now in shared/packages/cli-tools.nix
+    # fonts removed - now in shared/packages/fonts.nix
   ];
 
   nix-homebrew = {
