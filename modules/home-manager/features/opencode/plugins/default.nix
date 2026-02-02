@@ -14,7 +14,7 @@
 
   plugins = [
     "opencode-antigravity-auth@latest"
-    "oh-my-opencode@3.1.11"
+    "oh-my-opencode@3.1.10"
     "@simonwjackson/opencode-direnv@latest"
     "@tarquinen/opencode-dcp@latest"
     "@franlol/opencode-md-table-formatter@latest"
