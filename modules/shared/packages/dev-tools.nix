@@ -3,5 +3,11 @@
   lib,
   ...
 }: {
-  # Development tools will be added in subsequent tasks
+  environment.systemPackages = with pkgs; [
+    # GitHub CLI
+    gh
+
+    # MongoDB shell
+    mongosh
+  ];
 }

@@ -3,5 +3,10 @@
   lib,
   ...
 }: {
-  # CLI tools will be added in subsequent tasks
+  environment.systemPackages = with pkgs; [
+    # Cross-platform CLI tools
+    jc
+    ast-grep
+    yt-dlp
+  ];
 }
