@@ -27,5 +27,8 @@
     uv = ./uv;
     vitest = ./vitest;
     yt-dlp = ./yt-dlp;
+
+    # skills.sh skills
+    recharts-patterns = ./recharts-patterns;
   };
 }
