@@ -11,7 +11,6 @@
     ./formatters.nix
     ./permission.nix
     ./provider.nix
-    # ./openagent.nix
     ./plugins
   ];
 
