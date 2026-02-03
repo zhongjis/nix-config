@@ -30,11 +30,6 @@
         diff_style = "stacked";
       };
 
-      # compaction = {
-      #   auto = false;
-      #   prune = true;
-      # };
-
       instructions = [
         "${./instructions/shell-strategy.md}"
         "${./instructions/nix-environment.md}"
