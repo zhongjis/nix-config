@@ -55,6 +55,11 @@
       clear = true;
       name = "WrapSpell";
     }
+    {
+      enable = true;
+      clear = true;
+      name = "GoTemplateFix";
+    }
   ];
 
   vim.autocmds = [
@@ -103,6 +108,22 @@
       event = ["BufNewFile" "BufRead"];
       pattern = ["*.tfstate" "*.tfstate.backup"];
       command = "set filetype=json";
+    }
+
+    # Go template file type detection
+    {
+      desc = "Set file type for Go templates";
+      group = "GoTemplateFix";
+      event = ["BufNewFile" "BufRead"];
+      pattern = ["*.gotmpl" "*.tmpl" "*.tpl"];
+      command = "set filetype=gotmpl";
+    }
+    {
+      desc = "Set file type for YAML Go templates (Helm charts, etc.)";
+      group = "GoTemplateFix";
+      event = ["BufNewFile" "BufRead"];
+      pattern = ["*.yaml.gotmpl" "*.yml.gotmpl" "*.yaml.tpl" "*.yml.tpl"];
+      command = "set filetype=gotmpl";
     }
 
     # Window management
@@ -173,6 +194,7 @@
         "markdown"
         "xml"
         "graphql"
+        "gotmpl"
       ];
       callback = {
         _type = "lua-inline";

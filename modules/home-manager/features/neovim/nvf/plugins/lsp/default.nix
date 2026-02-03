@@ -16,6 +16,7 @@
     gitignore
     xml
     groovy # For Jenkinsfile support
+    gotmpl # For Go template support (.yaml.gotmpl, helm charts, etc.)
   ];
 
   vim.languages = {
