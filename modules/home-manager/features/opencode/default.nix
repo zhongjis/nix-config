@@ -41,4 +41,8 @@
       ];
     };
   };
+
+  home.sessionVariables = {
+    OPENCODE_DISABLE_CLAUDE_CODE_SKILLS = 1;
+  };
 }
