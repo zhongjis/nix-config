@@ -9,7 +9,7 @@
     },
     "librarian": {
       "prompt_append": "Always use the nixos-mcp for Nix related documentation lookups.",
-      "model": "github-copilot/gemini-2.5-pro",
+      "model": "opencode/glm-4.7",
     },
     "explore": {
       "model": "github-copilot/grok-code-fast-1",

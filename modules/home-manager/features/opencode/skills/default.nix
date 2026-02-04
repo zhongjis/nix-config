@@ -6,6 +6,7 @@
   programs.claude-code.skills = {
     skill-creator = ./skill-creator;
     # playwright = ./playwright;
+    agent-browser = ./agent-browser;
     jq = ./jq;
     mermaid-diagram-skill = ./mermaid-diagram-skill;
     find-skills = ./find-skills;
