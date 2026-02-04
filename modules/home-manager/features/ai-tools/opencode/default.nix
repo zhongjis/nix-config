@@ -5,8 +5,9 @@
   ...
 }: {
   imports = [
+    ../shared
+    ../opencode-only
     ./lsp.nix
-    ./skills
     ./agents
     ./formatters.nix
     ./permission.nix
@@ -31,8 +32,8 @@
       };
 
       instructions = [
-        "${./instructions/shell-strategy.md}"
-        "${./instructions/nix-environment.md}"
+        "${../opencode-only/instructions/shell-strategy.md}"
+        "${../shared/instructions/nix-environment.md}"
       ];
     };
   };

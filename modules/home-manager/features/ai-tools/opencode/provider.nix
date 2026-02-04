@@ -1,5 +1,10 @@
-{config, ...}: let
-  sopsFile = ../../../../secrets/ai-tokens.yaml;
+{
+  config,
+  lib,
+  inputs,
+  ...
+}: let
+  sopsFile = inputs.self + "/secrets/ai-tokens.yaml";
 in {
   sops.secrets = {
     openrouter_api_key = {

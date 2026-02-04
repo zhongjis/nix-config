@@ -4,8 +4,9 @@
   ...
 }: {
   imports = [
-    ./mcp.nix
-    ./claude-code
+    ./shared
+    ./claude-code-only
     ./opencode
+    ./claude-code
   ];
 }
