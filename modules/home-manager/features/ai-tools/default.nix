@@ -5,8 +5,7 @@
 }: {
   imports = [
     ./profile-option
-    ./shared
-    ./claude-code-only
+    ./general
     ./opencode
     ./claude-code
   ];

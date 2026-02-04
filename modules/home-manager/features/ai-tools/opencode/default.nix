@@ -5,7 +5,7 @@
   ...
 }: {
   imports = [
-    ../shared
+    ../general
     ../opencode-only
     ./lsp.nix
     ./agents
@@ -33,7 +33,7 @@
 
       instructions = [
         "${../opencode-only/instructions/shell-strategy.md}"
-        "${../shared/instructions/nix-environment.md}"
+        "${../general/instructions/nix-environment.md}"
       ];
     };
   };
