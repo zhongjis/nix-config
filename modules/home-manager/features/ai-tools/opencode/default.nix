@@ -32,7 +32,7 @@
       };
 
       instructions = [
-        "${../opencode-only/instructions/shell-strategy.md}"
+        "${./instructions/shell-strategy.md}"
         "${../general/instructions/nix-environment.md}"
       ];
     };
