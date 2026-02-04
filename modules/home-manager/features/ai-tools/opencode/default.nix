@@ -21,7 +21,7 @@
     enableMcpIntegration = true;
 
     settings = {
-      autoshare = false;
+      share = "disabled";
       autoupdate = false;
 
       tui = {
