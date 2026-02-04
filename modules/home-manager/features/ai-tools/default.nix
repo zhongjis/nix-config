@@ -4,6 +4,7 @@
   ...
 }: {
   imports = [
+    ./profile-option
     ./shared
     ./claude-code-only
     ./opencode

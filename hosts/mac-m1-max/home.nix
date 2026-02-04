@@ -18,6 +18,7 @@
 
   myHomeManager.bundles.general.enable = true;
   myHomeManager.bundles.darwin.enable = true;
+  myHomeManager.aiProfile = "work";
 
   home.username = "zshen";
   home.homeDirectory = lib.mkForce "/Users/zshen";

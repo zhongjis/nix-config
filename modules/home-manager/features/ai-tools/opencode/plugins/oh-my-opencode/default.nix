@@ -6,8 +6,8 @@
 }: let
   configFile =
     if currentSystemName == "mac-m1-max"
-    then ./copilot-work.jsonc
-    else ./copilot-personal.jsonc;
+    then ../../../general/oh-my-opencode/work-oh-my-opencode.jsonc
+    else ../../../general/oh-my-opencode/personal-oh-my-opencode.jsonc;
 in
   lib.mkIf (hasPlugin "oh-my-opencode") {
     xdg.configFile = {
