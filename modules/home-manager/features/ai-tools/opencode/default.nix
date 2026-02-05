@@ -8,7 +8,6 @@
 }: {
   imports = [
     ../general
-    ../opencode-only
     ./lsp.nix
     ./agents
     ./formatters.nix
