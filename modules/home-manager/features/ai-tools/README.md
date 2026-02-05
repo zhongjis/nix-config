@@ -13,7 +13,7 @@ ai-tools/
 │   └── default.nix         # Defines myHomeManager.aiProfile option (work|personal)
 ├── common/                 # Resources shared by ALL AI tools and profiles
 │   ├── default.nix         # Exports skills and mcp
-│   ├── skills/             # 22 general-prefixed skill definitions
+│   ├── skills/             # 22 general-prefixed skill definitions (shared)
 │   ├── mcp/                # MCP server configurations
 │   ├── instructions/       # Shared markdown system prompts (nix-environment.md)
 │   └── oh-my-opencode/     # oh-my-opencode configuration files
@@ -22,6 +22,7 @@ ai-tools/
 │       └── personal-oh-my-opencode.jsonc         # Personal profile config
 ├── opencode/               # OpenCode-specific configuration
 │   ├── default.nix         # Main OpenCode config with profile-based filtering
+│   ├── skills/             # OpenCode-only skills (supports work-*/personal-* prefixes)
 │   ├── instructions/       # OpenCode-specific markdown (shell-strategy.md)
 │   ├── agents/             # Custom OpenCode agent instructions
 │   ├── formatters.nix      # Formatter configurations
@@ -32,9 +33,9 @@ ai-tools/
 │   └── plugins/oh-my-opencode/default.nix
 └── claude-code/            # Claude Code-specific configuration
     ├── default.nix         # Main Claude Code config with Nix-time filtering
+    ├── skills/             # Claude Code-only skills (supports work-*/personal-* prefixes)
     ├── instructions/       # (Subdirectory for future use)
-    ├── agents/             # (Subdirectory for future use)
-    └── skills/             # (Subdirectory for future use)
+    └── agents/             # (Subdirectory for future use)
 ```
 
 ## Import Relationships
@@ -55,9 +56,11 @@ graph TD
     
     Opencode -.->|profile-based<br/>filtering| Common
     Opencode --> OpencodeInst[opencode/instructions/]
+    Opencode --> OpencodeSkills[opencode/skills/ - tool-specific]
     
     ClaudeCode -.->|Nix-time filtering| Common
     ClaudeCode --> ClaudeCodeInst[claude-code/instructions/]
+    ClaudeCode --> ClaudeCodeSkills[claude-code/skills/ - tool-specific]
 ```
 
 ### Architecture Overview
@@ -173,16 +176,46 @@ in {
 
 ## Adding Resources by Profile
 
-### Adding a New General Skill
+### Adding a New General Skill (shared by both tools)
 1. Create a new directory in `common/skills/` with prefix `general-<name>` (e.g., `general-my-tool`)
 2. Add to `common/skills/default.nix` with the same name as the directory
 3. Available to both OpenCode and Claude Code on all profiles
 
-### Adding a Work-Specific Skill
+### Adding a Work-Specific Skill (shared by both tools)
 1. Create a new directory in `common/skills/` with prefix `work-<name>` (e.g., `work-my-tool`)
 2. Add to `common/skills/default.nix` with the same name as the directory
 3. Will only be available when `aiProfile = "work"`
 4. Automatically filtered by both OpenCode (runtime) and Claude Code (Nix-time)
+
+### Adding a Claude Code-Only Skill
+1. Create a new directory in `claude-code/skills/` using the standard prefix convention:
+   - `general-*`: Available on all profiles (e.g., `general-my-skill`)
+   - `work-*`: Only available when `aiProfile = "work"` (e.g., `work-my-skill`)
+   - `personal-*`: Only available when `aiProfile = "personal"` (e.g., `personal-my-skill`)
+2. Add to `claude-code/skills/default.nix`:
+   ```nix
+   programs.claude-code.skills = {
+     general-my-skill = ./general-my-skill;      # All profiles
+     work-my-skill = ./work-my-skill;            # Work profile only
+     personal-my-skill = ./personal-my-skill;    # Personal profile only
+   };
+   ```
+3. Only available to Claude Code, not OpenCode
+
+### Adding an OpenCode-Only Skill
+1. Create a new directory in `opencode/skills/` using the standard prefix convention:
+   - `general-*`: Available on all profiles (e.g., `general-my-skill`)
+   - `work-*`: Only available when `aiProfile = "work"` (e.g., `work-my-skill`)
+   - `personal-*`: Only available when `aiProfile = "personal"` (e.g., `personal-my-skill`)
+2. Add to `opencode/skills/default.nix`:
+   ```nix
+   programs.opencode.skills = {
+     general-my-skill = ./general-my-skill;      # All profiles
+     work-my-skill = ./work-my-skill;            # Work profile only
+     personal-my-skill = ./personal-my-skill;    # Personal profile only
+   };
+   ```
+3. Only available to OpenCode, not Claude Code
 
 ### Adding a Tool-Specific Instruction
 - For **shared instructions** (both tools): Place in `common/instructions/`

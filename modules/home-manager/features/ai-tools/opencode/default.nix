@@ -8,6 +8,7 @@
 }: {
   imports = [
     ../common
+    ./skills
     ./lsp.nix
     ./agents
     ./formatters.nix
@@ -39,6 +40,7 @@
 
       permission.skill =
         {
+          # general-* skills from both common/skills/ and opencode/skills/
           "general-*" = "allow";
         }
         // lib.optionalAttrs aiProfileHelpers.isWork {
