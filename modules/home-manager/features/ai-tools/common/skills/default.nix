@@ -3,7 +3,10 @@
     python3
   ];
 
-  programs.claude-code.skills = {
+  # Skills are exported via _module.args for other modules to consume
+  # This avoids directly setting programs.claude-code.skills which would
+  # bypass the profile-based filtering in claude-code/default.nix
+  _module.args.commonSkills = {
     general-skill-creator = ./general-skill-creator;
     general-agent-browser = ./general-agent-browser;
     general-jq = ./general-jq;

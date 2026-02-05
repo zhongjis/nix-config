@@ -2,13 +2,9 @@
   lib,
   pkgs,
   aiProfileHelpers,
+  commonSkills,
   ...
 }: let
-  # Import skills module to get skill definitions
-  # Call the module with required args to get the config attr set
-  skillsModuleResult = import ../common/skills {inherit pkgs lib;};
-  allSkills = skillsModuleResult.programs.claude-code.skills;
-
   # Filter skills at Nix-time based on profile
   # - Always include general-* skills
   # - Include work-* skills only for work profile
@@ -20,7 +16,20 @@
         || (aiProfileHelpers.isWork && lib.hasPrefix "work-" name)
         || (aiProfileHelpers.isPersonal && lib.hasPrefix "personal-" name)
     )
-    allSkills;
+    commonSkills;
+
+  # Strip profile prefixes from skill names for cleaner output
+  # general-jq -> jq, work-foo -> foo, personal-bar -> bar
+  stripPrefix = name:
+    if lib.hasPrefix "general-" name
+    then lib.removePrefix "general-" name
+    else if lib.hasPrefix "work-" name
+    then lib.removePrefix "work-" name
+    else if lib.hasPrefix "personal-" name
+    then lib.removePrefix "personal-" name
+    else name;
+
+  renamedSkills = lib.mapAttrs' (name: value: lib.nameValuePair (stripPrefix name) value) filteredSkills;
 in {
   imports = [
     ../common/mcp
@@ -35,7 +44,7 @@ in {
     enable = true;
     enableMcpIntegration = true;
 
-    skills = filteredSkills;
+    skills = renamedSkills;
 
     settings = {
       instructions = [
