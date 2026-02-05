@@ -1,15 +1,8 @@
 ---
 name: mermaid-diagram-specialist
 description: |
-  Mermaid diagram specialist for creating 18+ diagram types: Flowchart, Sequence, ERD, State, C4, Gantt, Pie, Git Graph, User Journey, Class, Mindmap, Timeline, Quadrant Chart, Sankey, XY Chart, Block, Kanban, and Architecture visualizations. Use when:
-  (1) Creating technical documentation with diagrams
-  (2) Visualizing workflows and processes
-  (3) Documenting data models with ERDs
-  (4) Explaining sequence flows and API interactions
-  (5) Creating state machines and lifecycles
-  (6) Designing system architecture (C4 diagrams)
-  (7) Adding visual diagrams to markdown documents
-  CRITICAL: Always use Mermaid format for ALL supported diagram types. Do not use other diagramming formats.
+  Create Mermaid diagrams for technical documentation. Supports 18 diagram types including Flowchart, Sequence, ERD, State, C4, Class, Mindmap, Gantt, Git Graph, User Journey, and more.
+  Triggers: diagramming requests, architecture visualization, database schemas, workflow processes, state machines, markdown documentation with visual elements.
 ---
 
 # Mermaid Diagram Specialist
