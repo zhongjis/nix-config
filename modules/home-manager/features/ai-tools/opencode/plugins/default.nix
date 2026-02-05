@@ -1,18 +1,13 @@
 {
   lib,
-  config,
+  aiProfileHelpers,
   ...
 }: let
-  stripVersion = name: let
-    parts = lib.splitString "@" name;
-  in
-    if lib.length parts > 1 && !(lib.hasPrefix "@" name)
-    then lib.head parts
-    else if lib.length parts > 2
-    then "@" + (lib.elemAt parts 1)
-    else name;
+  # Import plugin library
+  pluginLib = import ./lib.nix {inherit lib;};
 
-  plugins = [
+  # Plugins available to all profiles
+  generalPlugins = [
     "opencode-antigravity-auth@latest"
     "oh-my-opencode@latest"
     "@simonwjackson/opencode-direnv@latest"
@@ -20,8 +15,22 @@
     "@franlol/opencode-md-table-formatter@latest"
   ];
 
-  hasPlugin = pluginId:
-    lib.any (p: stripVersion p == stripVersion pluginId) plugins;
+  # Plugins only for work profile
+  workPlugins = [
+  ];
+
+  # Plugins only for personal profile
+  personalPlugins = [
+  ];
+
+  # Build final plugin list based on profile
+  plugins = pluginLib.mkOpenCodePluginList {
+    inherit (aiProfileHelpers) isWork isPersonal;
+    inherit generalPlugins workPlugins personalPlugins;
+  };
+
+  # Version-agnostic plugin lookup bound to current plugin list
+  hasPlugin = pluginLib.hasPlugin plugins;
 in {
   imports = [
     ./oh-my-opencode
