@@ -5,6 +5,7 @@
 - [Context Level](#context-level)
 - [Container Level](#container-level)
 - [Component Level](#component-level)
+- [Accessibility](#accessibility)
 - [Validation Checklist](#validation-checklist)
 
 ## Overview
@@ -64,7 +65,19 @@ C4Component
     Rel(routes, middleware, "Uses")
     Rel(routes, services, "Calls")
     Rel(services, models, "Uses")
-    Rel(models, db, "Queries")
+     Rel(models, db, "Queries")
+```
+
+## Accessibility
+
+For full accessibility patterns, see [accessibility.md](accessibility.md).
+
+Example:
+```mermaid
+C4Context
+    accTitle: System Architecture Overview
+    accDescr: High-level view of users interacting with the platform and external services
+    Person(user, "User")
 ```
 
 ## Validation Checklist
@@ -72,3 +85,4 @@ C4Component
 - [ ] All systems/containers shown
 - [ ] Relationships clear
 - [ ] External systems identified
+- [ ] Accessibility attributes present

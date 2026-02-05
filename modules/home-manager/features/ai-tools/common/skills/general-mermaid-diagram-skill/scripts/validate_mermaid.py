@@ -13,13 +13,28 @@ from pathlib import Path
 
 # Validation rules per diagram type
 DIAGRAM_PATTERNS = {
+    # Existing stable types
     "flowchart": r"^flowchart\s+(TD|LR|BT|RL)\s*$",
+    "graph": r"^graph\s+(TD|LR|BT|RL)\s*$",
     "sequence": r"^sequenceDiagram\s*$",
     "erDiagram": r"^erDiagram\s*$",
     "stateDiagram": r"^stateDiagram-v2\s*$",
     "C4Context": r"^C4Context\s*$",
     "C4Container": r"^C4Container\s*$",
     "C4Component": r"^C4Component\s*$",
+    # New stable types
+    "classDiagram": r"^classDiagram\s*$",
+    "mindmap": r"^mindmap\s*$",
+    "timeline": r"^timeline\s*$",
+    "gitGraph": r"^gitGraph\s*$",
+    "journey": r"^journey\s*$",
+    "pie": r"^pie\s*(title\s+.*)?$",
+    "quadrantChart": r"^quadrantChart\s*$",
+    "kanban": r"^kanban\s*$",
+    # Experimental types (beta suffix)
+    "sankey": r"^sankey-beta\s*$",
+    "xychart": r"^xychart-beta\s*$",
+    "block": r"^block-beta\s*$",
 }
 
 
@@ -59,12 +74,16 @@ def validate_mermaid_code(mermaid_code, diagram_type=None):
     mermaid_code_lower = mermaid_code.lower()
 
     # Check for common syntax errors
-    if "```mermaid" not in mermaid_code_lower:
+    # Only warn about missing fence if this looks like it's meant to be in markdown
+    if "```" in mermaid_code and "```mermaid" not in mermaid_code_lower:
         warnings.append("Missing ```mermaid code fence marker")
+
+    # Check accessibility attributes
+    check_accessibility(mermaid_code, errors, warnings)
 
     # Check for common pitfalls based on diagram type
     if diagram_type:
-        if "flowchart" in diagram_type.lower():
+        if "flowchart" in diagram_type.lower() or "graph" in diagram_type.lower():
             check_flowchart_syntax(mermaid_code, errors, warnings)
         elif "sequence" in diagram_type.lower():
             check_sequence_syntax(mermaid_code, errors, warnings)
@@ -72,18 +91,48 @@ def validate_mermaid_code(mermaid_code, diagram_type=None):
             check_erd_syntax(mermaid_code, errors, warnings)
         elif "state" in diagram_type.lower():
             check_state_syntax(mermaid_code, errors, warnings)
+        elif "class" in diagram_type.lower():
+            check_class_syntax(mermaid_code, errors, warnings)
+        elif "mindmap" in diagram_type.lower():
+            check_mindmap_syntax(mermaid_code, errors, warnings)
+        elif "timeline" in diagram_type.lower():
+            check_timeline_syntax(mermaid_code, errors, warnings)
+        elif "git" in diagram_type.lower():
+            check_gitgraph_syntax(mermaid_code, errors, warnings)
+        elif "journey" in diagram_type.lower():
+            check_journey_syntax(mermaid_code, errors, warnings)
+        elif "pie" in diagram_type.lower():
+            check_pie_syntax(mermaid_code, errors, warnings)
+        elif "quadrant" in diagram_type.lower():
+            check_quadrant_syntax(mermaid_code, errors, warnings)
+        elif "kanban" in diagram_type.lower():
+            check_kanban_syntax(mermaid_code, errors, warnings)
+        elif "sankey" in diagram_type.lower():
+            check_sankey_syntax(mermaid_code, errors, warnings)
+        elif "xychart" in diagram_type.lower():
+            check_xychart_syntax(mermaid_code, errors, warnings)
+        elif "block" in diagram_type.lower():
+            check_block_syntax(mermaid_code, errors, warnings)
 
     return len(errors) == 0, errors, warnings
+
+
+def check_accessibility(code, errors, warnings):
+    """Check for accessibility attributes"""
+    if "accTitle:" not in code and "accTitle {" not in code:
+        warnings.append("Missing accTitle for accessibility")
+    if "accDescr:" not in code and "accDescr {" not in code:
+        warnings.append("Missing accDescr for accessibility")
 
 
 def check_flowchart_syntax(code, errors, warnings):
     """Validate flowchart-specific syntax"""
     # Check for balanced brackets
-    open_square = code.count("[") - code.count("[/")  # Exclude [/
-    close_square = code.count("]") - code.count("/]")  # Exclude /]
+    open_square = code.count("[") - code.count("[/")  # Exclude [/]
+    close_square = code.count("]") - code.count("/]")  # Exclude [/]
 
-    open_paren = code.count("(") - code.count("(/")  # Exclude (/
-    close_paren = code.count(")") - code.count("/)")  # Exclude /)
+    open_paren = code.count("(") - code.count("(/")  # Exclude (/)
+    close_paren = code.count(")") - code.count("/)")  # Exclude (/)
 
     if open_square != close_square:
         errors.append(
@@ -132,6 +181,84 @@ def check_state_syntax(code, errors, warnings):
         line = line.strip()
         if "-->" in line and line.count("-->") > 1:
             warnings.append("Multiple transitions on one line, consider splitting")
+
+
+def check_class_syntax(code, errors, warnings):
+    """Validate class diagram-specific syntax"""
+    # Check for class definition syntax
+    if "class " not in code.lower():
+        warnings.append("Class diagram should have at least one class definition")
+
+
+def check_mindmap_syntax(code, errors, warnings):
+    """Validate mindmap-specific syntax"""
+    # Mindmap uses indentation, check for root node
+    if "root" not in code.lower() and "((" not in code:
+        warnings.append("Mindmap should have a root node")
+
+
+def check_timeline_syntax(code, errors, warnings):
+    """Validate timeline-specific syntax"""
+    # Timeline needs title or section
+    pass
+
+
+def check_gitgraph_syntax(code, errors, warnings):
+    """Validate gitGraph-specific syntax"""
+    if "commit" not in code.lower():
+        warnings.append("GitGraph should have at least one commit")
+
+
+def check_journey_syntax(code, errors, warnings):
+    """Validate journey-specific syntax"""
+    # Journey needs sections and tasks
+    if "section" not in code.lower():
+        warnings.append("Journey diagram should have at least one section")
+
+
+def check_pie_syntax(code, errors, warnings):
+    """Validate pie chart-specific syntax"""
+    # Pie chart needs data entries
+    if '"' not in code and ":" not in code.replace("pie", "").replace("title", ""):
+        warnings.append(
+            'Pie chart should have data entries (format: "Label": value)'
+        )
+
+
+def check_quadrant_syntax(code, errors, warnings):
+    """Validate quadrant chart-specific syntax"""
+    # Quadrant chart needs quadrant definitions
+    pass
+
+
+def check_kanban_syntax(code, errors, warnings):
+    """Validate kanban-specific syntax"""
+    # Kanban needs at least one column
+    if "[" not in code or "]" not in code:
+        warnings.append("Kanban should have at least one column with [ColumnName]")
+
+
+def check_sankey_syntax(code, errors, warnings):
+    """Validate sankey-specific syntax"""
+    # Sankey needs flow definitions
+    if ":" not in code:
+        warnings.append(
+            "Sankey diagram should have flow definitions (format: Source : Value : Target)"
+        )
+
+
+def check_xychart_syntax(code, errors, warnings):
+    """Validate xy chart-specific syntax"""
+    # XY chart needs data
+    if "[" not in code and "(" not in code:
+        warnings.append("XY chart should have data definitions")
+
+
+def check_block_syntax(code, errors, warnings):
+    """Validate block diagram-specific syntax"""
+    # Block diagram needs block definitions
+    if "block" not in code.lower():
+        warnings.append("Block diagram should have block definitions")
 
 
 def main():

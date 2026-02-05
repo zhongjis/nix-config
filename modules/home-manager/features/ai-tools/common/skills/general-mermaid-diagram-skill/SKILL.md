@@ -1,7 +1,7 @@
 ---
 name: mermaid-diagram-specialist
 description: |
-  Mermaid diagram specialist for creating flowcharts, sequence diagrams, ERDs, state machines, and architecture visualizations. Use when:
+  Mermaid diagram specialist for creating 18+ diagram types: Flowchart, Sequence, ERD, State, C4, Gantt, Pie, Git Graph, User Journey, Class, Mindmap, Timeline, Quadrant Chart, Sankey, XY Chart, Block, Kanban, and Architecture visualizations. Use when:
   (1) Creating technical documentation with diagrams
   (2) Visualizing workflows and processes
   (3) Documenting data models with ERDs
@@ -20,15 +20,30 @@ Expert in creating Mermaid diagrams for technical documentation, architecture vi
 
 ## Supported Diagram Types
 
-- Flowcharts: Decision flows, algorithms, processes
-- Sequence Diagrams: API interactions, message flows
-- ERDs: Database schemas, entity relationships
-- State Diagrams: State machines, lifecycles
-- C4 Diagrams: System architecture (context, container, component levels)
+### Stable Types
+- Flowcharts: Decision flows, algorithms, processes (see [flowcharts.md](references/flowcharts.md))
+- Sequence Diagrams: API interactions, message flows (see [sequence-diagrams.md](references/sequence-diagrams.md))
+- ERDs: Database schemas, entity relationships (see [erds.md](references/erds.md))
+- State Diagrams: State machines, lifecycles (see [state-diagrams.md](references/state-diagrams.md))
+- C4 Diagrams: System architecture (context, container, component levels) (see [c4-diagrams.md](references/c4-diagrams.md))
 - Gantt Charts: Project timelines
 - Pie/Bar Charts: Data visualization
 - Git Graphs: Version control flows
 - User Journeys: User experience flows
+- Class Diagrams: Object-oriented structures (see [stable-new-diagrams.md](references/stable-new-diagrams.md))
+- Mindmaps: Hierarchical brainstorming (see [stable-new-diagrams.md](references/stable-new-diagrams.md))
+- Quadrant Charts: 2x2 matrix visualizations (see [stable-new-diagrams.md](references/stable-new-diagrams.md))
+
+### Experimental Types 🔥
+*Use with caution; syntax may be unstable or rendering support may vary.*
+- Timeline: Chronological event mapping
+- Sankey: Flow distribution visualization
+- XY Chart: Generic coordinate plotting
+- Block: High-level architectural blocks
+- Kanban: Workflow board visualization
+- Architecture: Cloud/system component visualization
+
+See [experimental-diagrams.md](references/experimental-diagrams.md) for details on experimental syntax.
 
 ## Workflow
 
@@ -36,14 +51,13 @@ Expert in creating Mermaid diagrams for technical documentation, architecture vi
 
 Choose appropriate diagram type based on requirements:
 
-- Process with decisions → **Flowchart** (see [flowcharts.md](references/flowcharts.md))
-- API/system interactions → **Sequence Diagram** (see [sequence-diagrams.md](references/sequence-diagrams.md))
-- Database structure → **ERD** (see [erds.md](references/erds.md))
-- System architecture → **C4 Diagram** (see [c4-diagrams.md](references/c4-diagrams.md))
-- State transitions → **State Diagram** (see [state-diagrams.md](references/state-diagrams.md))
-- Visual styling → (see [styling.md](references/styling.md))
+- Process with decisions → **Flowchart**
+- API/system interactions → **Sequence Diagram**
+- Database structure → **ERD**
+- System architecture → **C4 Diagram** or **Architecture** 🔥
+- State transitions → **State Diagram**
 
-**Validation**: Diagram type matches content and purpose.
+**Validation**: Ensure chosen diagram type matches the structural nature of the information.
 
 ### Step 2: Create Diagram
 
@@ -51,6 +65,13 @@ Choose appropriate diagram type based on requirements:
 2. Use Mermaid code only - NEVER substitute with other formats
 3. Follow best practices from reference documentation
 4. Apply styling from [styling.md](references/styling.md) if needed
+
+### Step 2.5: Add Accessibility
+
+**MANDATORY**: Include accessibility metadata for screen readers.
+1. Use `accTitle: <Short Title>` to define the diagram's title
+2. Use `accDescr: <Detailed Description>` to describe the diagram's content/flow
+(See [accessibility.md](references/accessibility.md) for details)
 
 ### Step 3: Validate Diagram
 
@@ -65,8 +86,8 @@ Validation checks:
 - Correct diagram type declaration
 - Proper syntax for chosen diagram type
 - Balanced connectors and parentheses
-- Valid arrow notation (for sequence diagrams)
-- Correct relationship syntax (for ERDs)
+- Valid relationship syntax
+- Inclusion of accessibility metadata
 
 If validation fails, fix errors and re-validate.
 
@@ -74,14 +95,24 @@ If validation fails, fix errors and re-validate.
 
 Add to markdown with proper code fencing and follow [common patterns](references/common-patterns.md).
 
+## Experimental Features
+
+The following diagram types are under active development in Mermaid:
+- **Timeline**: Use for project histories or roadmaps.
+- **Sankey**: Use for resource allocation or energy flows.
+- **XY Chart**: Use for line, bar, or scatter plots.
+- **Block**: Use for grouping high-level system components.
+- **Kanban**: Use for visualizing work status.
+- **Architecture**: Use for cloud infrastructure visualization.
+
+**Warning**: These features may have limited rendering support in some Markdown viewers. Always verify the output. See [experimental-diagrams.md](references/experimental-diagrams.md).
+
 ## Enforcement
 
 This skill **MUST NOT** generate diagrams in non-Mermaid formats:
 - ❌ PlantUML, Graphviz DOT, or other diagramming languages
 - ❌ ASCII art or text-based diagrams
 - ❌ Screenshot placeholders
-
-Always use Mermaid with syntax validation.
 
 ## Resources
 
@@ -93,17 +124,16 @@ See [references/](references/) directory for detailed examples and patterns:
 - [state-diagrams.md](references/state-diagrams.md) - State machine patterns
 - [styling.md](references/styling.md) - Theming and customization
 - [common-patterns.md](references/common-patterns.md) - Reusable workflow patterns
-
-## Validation Script
-
-Use [scripts/validate_mermaid.py](scripts/validate_mermaid.py) to verify syntax correctness.
+- [accessibility.md](references/accessibility.md) - Accessibility best practices
+- [experimental-diagrams.md](references/experimental-diagrams.md) - Experimental syntax guides
+- [stable-new-diagrams.md](references/stable-new-diagrams.md) - Class, Mindmap, Quadrant guides
 
 ## Best Practices
 
-1. Simplicity: Keep diagrams focused and uncluttered
-2. Labels: Clear, descriptive labels for all elements
-3. Direction: Consistent flow direction (usually top-down or left-right)
-4. Grouping: Use subgraphs to group related elements
-5. Colors: Use color to highlight important elements
-6. Testing: Verify diagrams render in target platform
-7. Validation: Always validate syntax before finalizing
+1. **Accessibility**: Always include `accTitle` and `accDescr`.
+2. **Init Directives**: Use `%%{init: { 'theme': 'base' } }%%` for granular theme control.
+3. **Multi-line Labels**: Use string quotes `"Label Text"` for labels with special characters or line breaks.
+4. **Subgraphs**: Use subgraphs to group related elements logically.
+5. **Simplicity**: Keep diagrams focused and uncluttered.
+6. **Direction**: Consistent flow direction (usually top-down `TD` or left-right `LR`).
+7. **Validation**: Always validate syntax before finalizing.

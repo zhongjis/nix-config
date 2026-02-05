@@ -3,6 +3,7 @@
 ## Table of Contents
 - [API Request Flow](#api-request-flow)
 - [Error Handling Flow](#error-handling-flow)
+- [Accessibility](#accessibility)
 
 ## API Request Flow
 ```mermaid
@@ -29,5 +30,18 @@ flowchart TD
     DBError --> ErrorHandler
     DB -->|Yes| Success[Success Response]
     ErrorHandler --> LogError[Log Error]
-    LogError --> ErrorResponse[Error Response]
+     LogError --> ErrorResponse[Error Response]
 ```
+
+## Accessibility
+
+For full accessibility patterns, see [accessibility.md](accessibility.md).
+
+Example:
+```mermaid
+flowchart TD
+    accTitle: Request Processing Flow
+    accDescr: Illustrates how requests are validated and processed with error handling
+    Request[Incoming Request] --> Validate{Valid?}
+```
+

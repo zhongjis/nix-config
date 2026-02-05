@@ -4,6 +4,7 @@
 - [Overview](#overview)
 - [Syntax Overview](#syntax-overview)
 - [Example](#example)
+- [Accessibility](#accessibility)
 - [Validation Checklist](#validation-checklist)
 
 ## Overview
@@ -60,7 +61,20 @@ stateDiagram-v2
     note right of Completed
         Review requested
         Payment released
-    end note
+     end note
+```
+
+## Accessibility
+
+For full accessibility patterns, see [accessibility.md](accessibility.md).
+
+Example:
+```mermaid
+stateDiagram-v2
+    accTitle: Booking State Machine
+    accDescr: Shows the lifecycle of a booking from creation through completion
+    [*] --> Pending
+    Pending --> Confirmed : Payment Approved
 ```
 
 ## Validation Checklist
@@ -68,3 +82,4 @@ stateDiagram-v2
 - [ ] Transitions logical
 - [ ] Start/end states marked
 - [ ] Notes explain key states
+- [ ] Accessibility attributes present

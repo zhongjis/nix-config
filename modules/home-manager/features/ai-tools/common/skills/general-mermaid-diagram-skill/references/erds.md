@@ -6,6 +6,7 @@
 - [Relationship Types](#relationship-types)
 - [Cardinality Symbols](#cardinality-symbols)
 - [Example](#example)
+- [Accessibility](#accessibility)
 - [Validation Checklist](#validation-checklist)
 
 ## Overview
@@ -117,8 +118,21 @@ erDiagram
     }
 ```
 
+## Accessibility
+
+For full accessibility patterns, see [accessibility.md](accessibility.md).
+
+Example:
+```mermaid
+erDiagram
+    accTitle: User Database Schema
+    accDescr: Shows relationships between User, Order, and Product entities
+    USER ||--o{ ORDER : places
+```
+
 ## Validation Checklist
 - [ ] All entities defined
 - [ ] Relationships accurate
 - [ ] Cardinality correct
 - [ ] Primary/Foreign keys marked
+- [ ] Accessibility attributes present

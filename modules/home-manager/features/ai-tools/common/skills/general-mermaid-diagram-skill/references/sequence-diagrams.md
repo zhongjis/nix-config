@@ -6,6 +6,8 @@
 - [Participant Types](#participant-types)
 - [Arrow Types](#arrow-types)
 - [Example](#example)
+- [Multi-line Participant Names](#multi-line-participant-names)
+- [Accessibility](#accessibility)
 - [Validation Checklist](#validation-checklist)
 
 ## Overview
@@ -68,11 +70,65 @@ sequenceDiagram
     else Credentials invalid
         Clerk-->>Frontend: Auth error
         Frontend-->>User: Show error
+     end
+```
+
+## Multi-line Participant Names
+Use `<br/>` tags to display participant names across multiple lines. This improves readability for long names or when adding metadata like port numbers or service types.
+
+Example with multi-line participant names:
+```mermaid
+sequenceDiagram
+    participant API as API Server<br/>(Port 8080)
+    participant DB as Database<br/>(PostgreSQL)
+    participant Cache as Cache<br/>(Redis)
+    
+    API->>Cache: Check cached data
+    Cache-->>API: Cache miss
+    API->>DB: Query records
+    DB-->>API: Return data
+    API->>Cache: Store in cache
+```
+
+**Best practices**:
+- Use descriptive aliases (e.g., `API as API Server<br/>(Port 8080)`)
+- Include relevant context like port numbers, database type, or service version
+- Keep lines concise to avoid excessive wrapping
+
+## Accessibility
+Sequence diagrams should include accessibility attributes to ensure diagrams are usable by assistive technologies. See [accessibility.md](accessibility.md) for comprehensive accessibility guidance.
+
+Example with accessibility attributes:
+```mermaid
+sequenceDiagram
+    accTitle: Authentication Flow
+    accDescr: Shows login sequence between user and authentication service
+    
+    actor User
+    participant Auth
+    participant DB
+    
+    User->>Auth: Login request
+    Auth->>DB: Verify credentials
+    DB-->>Auth: User found
+    alt Credentials match
+        Auth-->>User: JWT token
+    else Credentials invalid
+        Auth-->>User: Error 401
     end
 ```
+
+**Accessibility requirements**:
+- Use `accTitle:` for a brief diagram title
+- Use `accDescr:` for a detailed description of the diagram flow
+- Ensure `actor` and `participant` labels are descriptive
+- Test diagrams with screen readers to verify clarity
 
 ## Validation Checklist
 - [ ] All participants identified
 - [ ] Message flow logical
 - [ ] Return messages shown
 - [ ] Alt/loop blocks used correctly
+- [ ] Accessibility attributes present (accTitle, accDescr)
+- [ ] Participant aliases descriptive
+
