@@ -6,7 +6,7 @@
 }: let
   # Import skills module to get skill definitions
   # Call the module with required args to get the config attr set
-  skillsModuleResult = import ../general/skills {inherit pkgs lib;};
+  skillsModuleResult = import ../common/skills {inherit pkgs lib;};
   allSkills = skillsModuleResult.programs.claude-code.skills;
 
   # Filter skills at Nix-time based on profile
@@ -23,7 +23,7 @@
     allSkills;
 in {
   imports = [
-    ../general/mcp
+    ../common/mcp
   ];
 
   # Include python3 dependency from skills module
@@ -39,7 +39,7 @@ in {
 
     settings = {
       instructions = [
-        "${../general/instructions/nix-environment.md}"
+        "${../common/instructions/nix-environment.md}"
       ];
     };
   };

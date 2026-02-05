@@ -7,7 +7,7 @@
   ...
 }: {
   imports = [
-    ../general
+    ../common
     ./lsp.nix
     ./agents
     ./formatters.nix
@@ -34,7 +34,7 @@
 
       instructions = [
         "${./instructions/shell-strategy.md}"
-        "${../general/instructions/nix-environment.md}"
+        "${../common/instructions/nix-environment.md}"
       ];
 
       permission.skill =
