@@ -46,6 +46,17 @@
 
     # other
     general-playwright = ./general-playwright;
+
+    # skills.sh skills (document/media)
+    general-algorithmic-art = ./general-algorithmic-art;
+    general-canvas-design = ./general-canvas-design;
+    general-docx = ./general-docx;
+    general-frontend-design = ./general-frontend-design;
+    general-pdf = ./general-pdf;
+    general-pptx = ./general-pptx;
+    general-theme-factory = ./general-theme-factory;
+    general-webapp-testing = ./general-webapp-testing;
+    general-xlsx = ./general-xlsx;
   };
 
   # Helper function to filter skills by profile

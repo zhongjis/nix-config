@@ -1,8 +1,7 @@
 ---
 name: mermaid-diagram-specialist
 description: |
-  Create Mermaid diagrams for technical documentation. Supports 18 diagram types including Flowchart, Sequence, ERD, State, C4, Class, Mindmap, Gantt, Git Graph, User Journey, and more.
-  Triggers: diagramming requests, architecture visualization, database schemas, workflow processes, state machines, markdown documentation with visual elements.
+Create Mermaid diagrams for technical documentation. Supports 18 diagram types including Flowchart, Sequence, ERD, State, C4, Class, Mindmap, Gantt, Git Graph, User Journey, and more.
 ---
 
 # Mermaid Diagram Specialist
@@ -14,6 +13,7 @@ Expert in creating Mermaid diagrams for technical documentation, architecture vi
 ## Supported Diagram Types
 
 ### Stable Types
+
 - Flowcharts: Decision flows, algorithms, processes (see [flowcharts.md](references/flowcharts.md))
 - Sequence Diagrams: API interactions, message flows (see [sequence-diagrams.md](references/sequence-diagrams.md))
 - ERDs: Database schemas, entity relationships (see [erds.md](references/erds.md))
@@ -28,7 +28,9 @@ Expert in creating Mermaid diagrams for technical documentation, architecture vi
 - Quadrant Charts: 2x2 matrix visualizations (see [stable-new-diagrams.md](references/stable-new-diagrams.md))
 
 ### Experimental Types 🔥
-*Use with caution; syntax may be unstable or rendering support may vary.*
+
+_Use with caution; syntax may be unstable or rendering support may vary._
+
 - Timeline: Chronological event mapping
 - Sankey: Flow distribution visualization
 - XY Chart: Generic coordinate plotting
@@ -62,20 +64,23 @@ Choose appropriate diagram type based on requirements:
 ### Step 2.5: Add Accessibility
 
 **MANDATORY**: Include accessibility metadata for screen readers.
+
 1. Use `accTitle: <Short Title>` to define the diagram's title
 2. Use `accDescr: <Detailed Description>` to describe the diagram's content/flow
-(See [accessibility.md](references/accessibility.md) for details)
+   (See [accessibility.md](references/accessibility.md) for details)
 
 ### Step 3: Validate Diagram
 
 **CRITICAL**: Always validate Mermaid syntax before finalizing.
 
 Use validation script:
+
 ```bash
 scripts/validate_mermaid.py --string "<mermaid_code>"
 ```
 
 Validation checks:
+
 - Correct diagram type declaration
 - Proper syntax for chosen diagram type
 - Balanced connectors and parentheses
@@ -91,6 +96,7 @@ Add to markdown with proper code fencing and follow [common patterns](references
 ## Experimental Features
 
 The following diagram types are under active development in Mermaid:
+
 - **Timeline**: Use for project histories or roadmaps.
 - **Sankey**: Use for resource allocation or energy flows.
 - **XY Chart**: Use for line, bar, or scatter plots.
@@ -103,6 +109,7 @@ The following diagram types are under active development in Mermaid:
 ## Enforcement
 
 This skill **MUST NOT** generate diagrams in non-Mermaid formats:
+
 - ❌ PlantUML, Graphviz DOT, or other diagramming languages
 - ❌ ASCII art or text-based diagrams
 - ❌ Screenshot placeholders
@@ -110,6 +117,7 @@ This skill **MUST NOT** generate diagrams in non-Mermaid formats:
 ## Resources
 
 See [references/](references/) directory for detailed examples and patterns:
+
 - [flowcharts.md](references/flowcharts.md) - Flowchart syntax and examples
 - [sequence-diagrams.md](references/sequence-diagrams.md) - Sequence diagram patterns
 - [erds.md](references/erds.md) - ERD relationship syntax
