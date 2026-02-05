@@ -2,6 +2,8 @@
   config,
   inputs,
   pkgs,
+  lib,
+  aiProfileHelpers,
   ...
 }: {
   imports = [
@@ -35,10 +37,21 @@
         "${./instructions/shell-strategy.md}"
         "${../general/instructions/nix-environment.md}"
       ];
+
+      permission.skill =
+        {
+          "general-*" = "allow";
+        }
+        // lib.optionalAttrs aiProfileHelpers.isWork {
+          "work-*" = "allow";
+        }
+        // lib.optionalAttrs aiProfileHelpers.isPersonal {
+          "personal-*" = "allow";
+        };
     };
   };
 
   home.sessionVariables = {
-    OPENCODE_DISABLE_CLAUDE_CODE_SKILLS = 1;
+    OPENCODE_DISABLE_CLAUDE_CODE = "1";
   };
 }

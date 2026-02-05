@@ -1,17 +1,29 @@
-# TODO: Full profile-based routing logic will be added when Task 1 completes
-# Task 4: This placeholder allows testing the routing system
-# Task 1 (ai-tools-profile-module-creation) will enhance with filtering by profile
-{lib, ...}: {
-  options.myHomeManager = {
-    aiProfile = lib.mkOption {
-      type = lib.types.enum ["personal" "work"];
-      default = "personal";
-      description = "AI tools profile selection (personal or work)";
-    };
+{
+  lib,
+  config,
+  ...
+}: let
+  cfg = config.myHomeManager.aiProfile;
+in {
+  options.myHomeManager.aiProfile = lib.mkOption {
+    type = lib.types.enum ["work" "personal"];
+    description = "AI tools profile: 'work' for work-specific configuration, 'personal' for personal use";
+    example = "work";
   };
 
   config = {
-    # TODO: Profile-based filtering will be added in Task 1
-    # For now, this is a simple placeholder to allow eval to work
+    assertions = [
+      {
+        assertion = !config.myHomeManager.ai-tools.enable || cfg != null;
+        message = "myHomeManager.aiProfile must be set when myHomeManager.ai-tools is enabled";
+      }
+    ];
+
+    # Export helpers via config attribute
+    _module.args.aiProfileHelpers = {
+      profile = cfg;
+      isWork = cfg == "work";
+      isPersonal = cfg == "personal";
+    };
   };
 }
