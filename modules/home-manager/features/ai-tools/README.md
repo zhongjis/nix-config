@@ -11,7 +11,7 @@ ai-tools/
 ├── default.nix             # Root entry point, imports all categories
 ├── profile-option/         # Profile configuration module
 │   └── default.nix         # Defines myHomeManager.aiProfile option (work|personal)
-├── general/                # Resources shared by ALL AI tools and profiles
+├── common/                 # Resources shared by ALL AI tools and profiles
 │   ├── default.nix         # Exports skills and mcp
 │   ├── skills/             # 22 general-prefixed skill definitions
 │   ├── mcp/                # MCP server configurations
@@ -44,19 +44,19 @@ ai-tools/
 ```mermaid
 graph TD
     Root[ai-tools/default.nix] --> ProfileOpt[profile-option/default.nix]
-    Root --> General[general/default.nix]
+    Root --> Common[common/default.nix]
     Root --> Opencode[opencode/default.nix]
     Root --> ClaudeCode[claude-code/default.nix]
 
-    General --> Skills[general/skills/ - 22 general-* skills]
-    General --> MCP[general/mcp/]
-    General --> Instructions[general/instructions/]
-    General --> OhMyOpencode["general/oh-my-opencode/<br/>profiles: general-*, work-*, personal-*"]
+    Common --> Skills[common/skills/ - 22 general-* skills]
+    Common --> MCP[common/mcp/]
+    Common --> Instructions[common/instructions/]
+    Common --> OhMyOpencode["common/oh-my-opencode/<br/>profiles: general-*, work-*, personal-*"]
     
-    Opencode -.->|profile-based<br/>filtering| General
+    Opencode -.->|profile-based<br/>filtering| Common
     Opencode --> OpencodeInst[opencode/instructions/]
     
-    ClaudeCode -.->|Nix-time filtering| General
+    ClaudeCode -.->|Nix-time filtering| Common
     ClaudeCode --> ClaudeCodeInst[claude-code/instructions/]
 ```
 
@@ -72,9 +72,9 @@ graph TD
 - **Claude Code**: Uses Nix-time filtering with `lib.filterAttrs` and `lib.hasPrefix` to include/exclude skills at configuration time
 
 **Shared Resources**:
-- `general/` directory contains resources available to all profiles and tools
+- `common/` directory contains resources available to all profiles and tools
 - 22 general-prefixed skills provide universal functionality
-- oh-my-opencode configurations in `general/oh-my-opencode/` support all profiles
+- oh-my-opencode configurations in `common/oh-my-opencode/` support all profiles
 
 ## Import Conventions
 
@@ -86,7 +86,7 @@ Use relative paths starting with `./`. This is the standard for importing sub-mo
 # modules/home-manager/features/ai-tools/default.nix
 imports = [
   ./profile-option
-  ./general
+  ./common
   ./opencode
   ./claude-code
 ];
@@ -97,7 +97,7 @@ Use `../` to ascend to the parent directory and then descend into the sibling. T
 ```nix
 # modules/home-manager/features/ai-tools/opencode/default.nix
 imports = [
-  ../general         # Access shared resources
+  ../common           # Access shared resources
   ./plugins          # Local tool-specific plugins
 ];
 ```
@@ -108,7 +108,7 @@ When referencing files (like markdown instructions) that are not Nix modules, us
 # modules/home-manager/features/ai-tools/opencode/default.nix
 settings.instructions = [
   "${./instructions/shell-strategy.md}"
-  "${../general/instructions/nix-environment.md}"
+  "${../common/instructions/nix-environment.md}"
 ];
 ```
 
@@ -157,7 +157,7 @@ Claude Code uses `lib.filterAttrs` and `lib.hasPrefix` for filtering at configur
 
 ```nix
 let
-  allSkills = (import ../general/skills {inherit pkgs lib;}).programs.claude-code.skills;
+  allSkills = (import ../common/skills {inherit pkgs lib;}).programs.claude-code.skills;
   
   filteredSkills = lib.filterAttrs (name: _:
     lib.hasPrefix "general-" name
@@ -174,24 +174,24 @@ in {
 ## Adding Resources by Profile
 
 ### Adding a New General Skill
-1. Create a new directory in `general/skills/` with prefix `general-<name>` (e.g., `general-my-tool`)
-2. Add to `general/skills/default.nix` with the same name as the directory
+1. Create a new directory in `common/skills/` with prefix `general-<name>` (e.g., `general-my-tool`)
+2. Add to `common/skills/default.nix` with the same name as the directory
 3. Available to both OpenCode and Claude Code on all profiles
 
 ### Adding a Work-Specific Skill
-1. Create a new directory in `general/skills/` with prefix `work-<name>` (e.g., `work-my-tool`)
-2. Add to `general/skills/default.nix` with the same name as the directory
+1. Create a new directory in `common/skills/` with prefix `work-<name>` (e.g., `work-my-tool`)
+2. Add to `common/skills/default.nix` with the same name as the directory
 3. Will only be available when `aiProfile = "work"`
 4. Automatically filtered by both OpenCode (runtime) and Claude Code (Nix-time)
 
 ### Adding a Tool-Specific Instruction
-- For **shared instructions** (both tools): Place in `general/instructions/`
+- For **shared instructions** (both tools): Place in `common/instructions/`
 - For **OpenCode only**: Place in `opencode/instructions/`
 - For **Claude Code only**: Place in `claude-code/instructions/` (not yet used)
 
 ### Managing oh-my-opencode Configurations
-- **General (Shared)**: `general/oh-my-opencode/general-oh-my-opencode-gemini.jsonc`
-- **Work profile**: `general/oh-my-opencode/work-oh-my-opencode.jsonc` (routed by host: mac-m1-max)
-- **Personal profile**: `general/oh-my-opencode/personal-oh-my-opencode.jsonc` (routed by host: framework-16)
+- **General (Shared)**: `common/oh-my-opencode/general-oh-my-opencode-gemini.jsonc`
+- **Work profile**: `common/oh-my-opencode/work-oh-my-opencode.jsonc` (routed by host: mac-m1-max)
+- **Personal profile**: `common/oh-my-opencode/personal-oh-my-opencode.jsonc` (routed by host: framework-16)
 
 The `opencode/plugins/oh-my-opencode/default.nix` module implements the routing logic based on `currentSystemName`.
