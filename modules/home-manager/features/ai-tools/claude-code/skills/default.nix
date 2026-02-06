@@ -1,22 +1,35 @@
-# Claude Code-specific skills
-# Skills defined here are ONLY available to Claude Code, not OpenCode.
-#
-# Uses the same prefix convention as common/skills/:
-#   - general-*: Available on all profiles
-#   - work-*: Only available when aiProfile = "work"
-#   - personal-*: Only available when aiProfile = "personal"
-#
-# Filtering is applied at Nix evaluation time in the parent module.
-#
-# Example:
-#   general-my-skill = ./general-my-skill;       # All profiles
-#   work-my-skill = ./work-my-skill;             # Work profile only
-#   personal-my-skill = ./personal-my-skill;     # Personal profile only
-#
-# Then create: ./<skill-name>/SKILL.md (and any supporting files)
-{...}: {
-  programs.claude-code.skills = {
-    # Add Claude Code-only skills here
-    # general-example = ./general-example;
-  };
+{
+  lib,
+  aiProfileHelpers,
+  myLib,
+  ...
+}: let
+  # Auto-discover skills from directory structure
+  # Each skill is a directory containing SKILL.md and optional templates/references
+  # Supports disabled-* prefix to skip skills
+  discoverSkills = profileDir: prefix: let
+    dirs = myLib.dirsIn profileDir;
+    enabledDirs = lib.filterAttrs (name: _: !(lib.hasPrefix "disabled-" name)) dirs;
+    skills =
+      lib.mapAttrs' (name: _: {
+        name = "${prefix}-${name}";
+        value = profileDir + "/${name}";
+      })
+      enabledDirs;
+  in
+    skills;
+
+  # Discover Claude Code-only skills from subdirectories
+  localGeneralSkills = discoverSkills ./general "general";
+  localWorkSkills = discoverSkills ./work "work";
+  localPersonalSkills = discoverSkills ./personal "personal";
+
+  # Apply profile-based filtering
+  filteredLocalSkills =
+    localGeneralSkills
+    // lib.optionalAttrs aiProfileHelpers.isWork localWorkSkills
+    // lib.optionalAttrs aiProfileHelpers.isPersonal localPersonalSkills;
+in {
+  # Export filtered local skills via _module.args for use in parent module
+  _module.args.claudeCodeLocalSkills = filteredLocalSkills;
 }
