@@ -3,8 +3,6 @@ name: typescript
 description: Configures TypeScript projects, defines types and interfaces, writes generics, and implements type guards. Use when setting up tsconfig.json, creating type definitions, or ensuring type safety in JS/TS codebases.
 ---
 
-References are relative to /home/knoopx/.pi/agent/skills/typescript.
-
 # TypeScript
 
 Type-safe JavaScript with static typing and modern features.

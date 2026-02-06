@@ -23,7 +23,9 @@ from validators import DOCXSchemaValidator, PPTXSchemaValidator, RedliningValida
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Validate Office document XML files")
+    parser = argparse.ArgumentParser(
+        description="Validate Office document XML files"
+    )
     parser.add_argument(
         "path",
         help="Path to unpacked directory or packed Office file (.docx/.pptx/.xlsx)",
@@ -47,8 +49,8 @@ def main():
     )
     parser.add_argument(
         "--author",
-        default="Claude",
-        help="Author name for redlining validation (default: Claude)",
+        default="AI Assistant",
+        help="Author name for redlining validation (default: AI Assistant)",
     )
     args = parser.parse_args()
 
@@ -59,14 +61,18 @@ def main():
     if args.original:
         original_file = Path(args.original)
         assert original_file.is_file(), f"Error: {original_file} is not a file"
-        assert original_file.suffix.lower() in [".docx", ".pptx", ".xlsx"], (
-            f"Error: {original_file} must be a .docx, .pptx, or .xlsx file"
-        )
+        assert original_file.suffix.lower() in [
+            ".docx",
+            ".pptx",
+            ".xlsx",
+        ], f"Error: {original_file} must be a .docx, .pptx, or .xlsx file"
 
     file_extension = (original_file or path).suffix.lower()
-    assert file_extension in [".docx", ".pptx", ".xlsx"], (
-        f"Error: Cannot determine file type from {path}. Use --original or provide a .docx/.pptx/.xlsx file."
-    )
+    assert file_extension in [
+        ".docx",
+        ".pptx",
+        ".xlsx",
+    ], f"Error: Cannot determine file type from {path}. Use --original or provide a .docx/.pptx/.xlsx file."
 
     if path.is_file() and path.suffix.lower() in [".docx", ".pptx", ".xlsx"]:
         temp_dir = tempfile.mkdtemp()
@@ -80,15 +86,24 @@ def main():
     match file_extension:
         case ".docx":
             validators = [
-                DOCXSchemaValidator(unpacked_dir, original_file, verbose=args.verbose),
+                DOCXSchemaValidator(
+                    unpacked_dir, original_file, verbose=args.verbose
+                ),
             ]
             if original_file:
                 validators.append(
-                    RedliningValidator(unpacked_dir, original_file, verbose=args.verbose, author=args.author)  
+                    RedliningValidator(
+                        unpacked_dir,
+                        original_file,
+                        verbose=args.verbose,
+                        author=args.author,
+                    )
                 )
         case ".pptx":
             validators = [
-                PPTXSchemaValidator(unpacked_dir, original_file, verbose=args.verbose),
+                PPTXSchemaValidator(
+                    unpacked_dir, original_file, verbose=args.verbose
+                ),
             ]
         case _:
             print(f"Error: Validation not supported for file type {file_extension}")

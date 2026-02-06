@@ -29,7 +29,7 @@ equipped with procedural knowledge that no model can fully possess.
 
 The context window is a public good. Skills share the context window with everything else AI Agent needs: system prompt, conversation history, other Skills' metadata, and the actual user request.
 
-**Default assumption: AI Agent is already very smart.** Only add context Claude doesn't already have. Challenge each piece of information: "Does Claude really need this explanation?" and "Does this paragraph justify its token cost?"
+**Default assumption: AI Agent is already very smart.** Only add context AI Agent doesn't already have. Challenge each piece of information: "Does AI Agent really need this explanation?" and "Does this paragraph justify its token cost?"
 
 Prefer concise examples over verbose explanations.
 
@@ -300,7 +300,7 @@ After initialization, customize or remove the generated SKILL.md and example fil
 
 ### Step 4: Edit the Skill
 
-When editing the (newly-generated or existing) skill, remember that the skill is being created for another instance of AI Agent to use. Include information that would be beneficial and non-obvious to Claude. Consider what procedural knowledge, domain-specific details, or reusable assets would help another Claude instance execute these tasks more effectively.
+When editing the (newly-generated or existing) skill, remember that the skill is being created for another instance of AI Agent to use. Include information that would be beneficial and non-obvious to AI Agent. Consider what procedural knowledge, domain-specific details, or reusable assets would help another AI Agent instance execute these tasks more effectively.
 
 #### Learn Proven Design Patterns
 
