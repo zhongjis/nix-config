@@ -1,7 +1,7 @@
-# Shared Skills Template
+# Common Skills Module
 #
 # This module defines skills that are shared between AI tools (Claude Code, OpenCode).
-# Skills are exposed via `_module.args.sharedSkills` for consumption by tool-specific modules.
+# Skills are exposed via `_module.args.commonSkills` for consumption by tool-specific modules.
 #
 # Uses prefix convention for profile-based filtering:
 #   - general-*: Available on all profiles
@@ -14,9 +14,9 @@
   lib,
   ...
 }: let
-  # Define all shared skills as a plain attribute set
+  # Define all common skills as a plain attribute set
   # Paths are relative to this file's directory
-  sharedSkills = {
+  commonSkills = {
     general-skill-creator = ./general-skill-creator;
     general-agent-browser = ./general-agent-browser;
     general-jq = ./general-jq;
@@ -60,7 +60,7 @@
   };
 
   # Helper function to filter skills by profile
-  # Usage: filterSkillsByProfile { isWork = true; isPersonal = false; } sharedSkills
+  # Usage: filterSkillsByProfile { isWork = true; isPersonal = false; } commonSkills
   filterSkillsByProfile = {
     isWork ? false,
     isPersonal ? false,
@@ -73,9 +73,9 @@
     )
     skills;
 in {
-  # Expose shared skills and helper via _module.args for other modules to consume
+  # Expose common skills and helper via _module.args for other modules to consume
   _module.args = {
-    inherit sharedSkills filterSkillsByProfile;
+    inherit commonSkills filterSkillsByProfile;
   };
 
   # Python dependency required by some skills (e.g., general-skill-creator, general-mermaid-diagram-skill)

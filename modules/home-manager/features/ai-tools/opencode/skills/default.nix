@@ -15,14 +15,14 @@
 #   personal-my-skill = ./personal-my-skill;     # Personal profile only
 #
 # Then create: ./<skill-name>/SKILL.md (and any supporting files)
-{sharedSkills, ...}: let
+{commonSkills, ...}: let
   # OpenCode-specific skills (not shared with Claude Code)
   localSkills = {
     # Add OpenCode-only skills here
     # general-example = ./general-example;
   };
 in {
-  # Merge shared skills from common/skills with local OpenCode-specific skills
-  # Local skills override shared skills if there are name conflicts
-  programs.opencode.skills = sharedSkills // localSkills;
+  # Merge common skills from common/skills with local OpenCode-specific skills
+  # Local skills override common skills if there are name conflicts
+  programs.opencode.skills = commonSkills // localSkills;
 }

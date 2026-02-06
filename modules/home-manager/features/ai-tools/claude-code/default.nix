@@ -2,16 +2,16 @@
   lib,
   pkgs,
   aiProfileHelpers,
-  sharedSkills,
+  commonSkills,
   filterSkillsByProfile,
   ...
 }: let
-  # Filter shared skills based on profile
-  filteredSharedSkills =
+  # Filter common skills based on profile
+  filteredCommonSkills =
     filterSkillsByProfile {
       inherit (aiProfileHelpers) isWork isPersonal;
     }
-    sharedSkills;
+    commonSkills;
 
   # Import Claude Code-specific skills (supports general-*, work-*, personal-* prefixes)
   localSkillsResult = import ./skills {inherit pkgs lib;};
@@ -24,11 +24,11 @@
     }
     localSkillsRaw;
 
-  # Merge shared and local skills
-  allSkills = filteredSharedSkills // filteredLocalSkills;
+  # Merge common and local skills
+  allSkills = filteredCommonSkills // filteredLocalSkills;
 in {
   imports = [
-    ../common/skills # Provides sharedSkills and filterSkillsByProfile via _module.args
+    ../common/skills # Provides commonSkills and filterSkillsByProfile via _module.args
     ../common/mcp
     ../common/agents
   ];

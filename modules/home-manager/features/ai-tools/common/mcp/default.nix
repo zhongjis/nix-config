@@ -4,7 +4,7 @@
   ...
 }: let
   # MCPs available to all profiles
-  generalMcps = {
+  commonMcps = {
     nixos = {
       command = "nix";
       args = ["run" "github:utensils/mcp-nixos" "--"];
@@ -39,7 +39,7 @@ in {
   programs.mcp = {
     enable = true;
     servers =
-      generalMcps
+      commonMcps
       // lib.optionalAttrs aiProfileHelpers.isWork workMcps
       // lib.optionalAttrs aiProfileHelpers.isPersonal personalMcps;
   };
