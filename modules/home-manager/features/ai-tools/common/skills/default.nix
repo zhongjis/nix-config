@@ -1,21 +1,21 @@
 # Common Skills Module
 #
 # This module defines skills that are shared between AI tools (Claude Code, OpenCode).
-# Skills are exposed via `_module.args.commonSkills` for consumption by tool-specific modules.
+# Skills are pre-filtered based on aiProfile and exposed via `_module.args.commonSkills`.
 #
 # Uses prefix convention for profile-based filtering:
-#   - general-*: Available on all profiles
-#   - work-*: Only available when aiProfile = "work"
-#   - personal-*: Only available when aiProfile = "personal"
+#   - general-*: Available on all profiles (defined in commonSkills)
+#   - work-*: Only available when aiProfile = "work" (defined in workSkills)
+#   - personal-*: Only available when aiProfile = "personal" (defined in personalSkills)
 #
-# Each tool module imports this and applies skills to its own `programs.*.skills` option.
+# Each tool module imports this and receives already-filtered skills.
 {
   pkgs,
   lib,
+  aiProfileHelpers,
   ...
 }: let
-  # Define all common skills as a plain attribute set
-  # Paths are relative to this file's directory
+  # Skills available to all profiles
   commonSkills = {
     general-skill-creator = ./general-skill-creator;
     general-agent-browser = ./general-agent-browser;
@@ -59,24 +59,26 @@
     general-xlsx = ./general-xlsx;
   };
 
-  # Helper function to filter skills by profile
-  # Usage: filterSkillsByProfile { isWork = true; isPersonal = false; } commonSkills
-  filterSkillsByProfile = {
-    isWork ? false,
-    isPersonal ? false,
-  }: skills:
-    lib.filterAttrs (
-      name: _:
-        lib.hasPrefix "general-" name
-        || (isWork && lib.hasPrefix "work-" name)
-        || (isPersonal && lib.hasPrefix "personal-" name)
-    )
-    skills;
-in {
-  # Expose common skills and helper via _module.args for other modules to consume
-  _module.args = {
-    inherit commonSkills filterSkillsByProfile;
+  # Skills only for work profile
+  workSkills = {
+    # Add work-specific skills here
+    # work-example = ./work-example;
   };
+
+  # Skills only for personal profile
+  personalSkills = {
+    # Add personal-specific skills here
+    # personal-example = ./personal-example;
+  };
+
+  # Pre-filtered skills based on profile
+  filteredSkills =
+    commonSkills
+    // lib.optionalAttrs aiProfileHelpers.isWork workSkills
+    // lib.optionalAttrs aiProfileHelpers.isPersonal personalSkills;
+in {
+  # Expose pre-filtered skills via _module.args for other modules to consume
+  _module.args.commonSkills = filteredSkills;
 
   # Python dependency required by some skills (e.g., general-skill-creator, general-mermaid-diagram-skill)
   home.packages = with pkgs; [

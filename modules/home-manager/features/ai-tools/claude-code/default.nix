@@ -3,32 +3,28 @@
   pkgs,
   aiProfileHelpers,
   commonSkills,
-  filterSkillsByProfile,
   ...
 }: let
-  # Filter common skills based on profile
-  filteredCommonSkills =
-    filterSkillsByProfile {
-      inherit (aiProfileHelpers) isWork isPersonal;
-    }
-    commonSkills;
-
   # Import Claude Code-specific skills (supports general-*, work-*, personal-* prefixes)
   localSkillsResult = import ./skills {inherit pkgs lib;};
   localSkillsRaw = localSkillsResult.programs.claude-code.skills or {};
 
-  # Filter local skills at Nix-time based on profile (same logic as shared skills)
-  filteredLocalSkills =
-    filterSkillsByProfile {
-      inherit (aiProfileHelpers) isWork isPersonal;
-    }
-    localSkillsRaw;
+  # Split local skills by prefix for profile-based filtering
+  localCommonSkills = lib.filterAttrs (n: _: lib.hasPrefix "general-" n) localSkillsRaw;
+  localWorkSkills = lib.filterAttrs (n: _: lib.hasPrefix "work-" n) localSkillsRaw;
+  localPersonalSkills = lib.filterAttrs (n: _: lib.hasPrefix "personal-" n) localSkillsRaw;
 
-  # Merge common and local skills
-  allSkills = filteredCommonSkills // filteredLocalSkills;
+  # Filter local skills based on profile
+  filteredLocalSkills =
+    localCommonSkills
+    // lib.optionalAttrs aiProfileHelpers.isWork localWorkSkills
+    // lib.optionalAttrs aiProfileHelpers.isPersonal localPersonalSkills;
+
+  # Merge pre-filtered common skills and filtered local skills
+  allSkills = commonSkills // filteredLocalSkills;
 in {
   imports = [
-    ../common/skills # Provides commonSkills and filterSkillsByProfile via _module.args
+    ../common/skills # Provides commonSkills via _module.args (already filtered by profile)
     ../common/mcp
     ../common/agents
   ];
