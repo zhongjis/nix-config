@@ -20,53 +20,13 @@
   #   "plugin-name" -> "plugin-name"
   #   "github:user/repo" -> "repo"
   #   "github:user/repo@ref" -> "repo"
-  #   "file:///nix/store/.../node_modules/plugin-name/index.ts" -> "plugin-name"
   normalizePluginName = name: let
-    # Handle file:// paths (Nix store packages)
-    # Extract package name from path like: file:///nix/store/.../node_modules/plugin-name/index.ts
-    withoutFile =
-      if lib.hasPrefix "file://" name
-      then let
-        # Extract path after file://
-        pathAfterFile = lib.removePrefix "file://" name;
-        # Split by / and find the component after node_modules
-        pathParts = lib.splitString "/" pathAfterFile;
-        # Find index of node_modules using foldr
-        findNodeModulesIdx = parts: let
-          result =
-            lib.foldr (
-              part: acc:
-                if part == "node_modules"
-                then {
-                  found = true;
-                  idx = acc.currentIdx;
-                }
-                else {
-                  found = acc.found;
-                  idx = acc.idx;
-                  currentIdx = acc.currentIdx - 1;
-                }
-            ) {
-              found = false;
-              idx = null;
-              currentIdx = lib.length parts - 1;
-            }
-            parts;
-        in
-          result.idx;
-        nodeModulesIdx = findNodeModulesIdx pathParts;
-      in
-        if nodeModulesIdx != null && (lib.length pathParts > nodeModulesIdx + 1)
-        then lib.elemAt pathParts (nodeModulesIdx + 1)
-        else name
-      else name;
-
-    # Handle github: prefix
+    # Handle github: prefix first
     withoutGithub =
-      if lib.hasPrefix "github:" withoutFile
+      if lib.hasPrefix "github:" name
       then let
         # Remove "github:" prefix and extract repo name
-        afterGithub = lib.removePrefix "github:" withoutFile;
+        afterGithub = lib.removePrefix "github:" name;
         # Split by "/" to get user/repo, then by "@" to remove ref
         pathParts = lib.splitString "/" afterGithub;
         repoWithRef =
@@ -77,14 +37,12 @@
         repoParts = lib.splitString "@" repoWithRef;
       in
         lib.head repoParts
-      else withoutFile;
+      else name;
 
     # Now handle @version suffix for non-github plugins
     parts = lib.splitString "@" withoutGithub;
   in
-    if lib.hasPrefix "file://" name
-    then withoutFile
-    else if lib.hasPrefix "github:" name
+    if lib.hasPrefix "github:" name
     then withoutGithub
     else if lib.length parts > 1 && !(lib.hasPrefix "@" withoutGithub)
     then lib.head parts

@@ -13,6 +13,7 @@
 }: let
   sopsFile = inputs.self + "/secrets/ai-tokens.yaml";
   morphPkg = inputs.self.packages.${pkgs.system}.opencode-morph-fast-apply;
+  secretPath = config.sops.secrets.morph_api_key.path;
 in
   lib.mkIf (hasPlugin "opencode-morph-fast-apply") {
     sops.secrets = {
@@ -41,9 +42,13 @@ in
       # MORPH_TIMEOUT = "30000";
     };
 
-    # API key is set via sops-nix in provider.nix
-    # The secret path will be: config.sops.secrets.morph_api_key.path
-    home.sessionVariablesExtra = ''
-      export MORPH_API_KEY="$(cat ${config.sops.secrets.morph_api_key.path} 2>/dev/null || echo "")"
+    # Export MORPH_API_KEY directly in zsh initialization
+    # This reads the sops secret at shell startup, avoiding issues with
+    # sessionVariablesExtra command substitution in non-interactive contexts
+    programs.zsh.initContent = lib.mkOrder 100 ''
+      # Morph Fast Apply API key (from sops-nix)
+      if [[ -r "${secretPath}" ]]; then
+        export MORPH_API_KEY="$(<"${secretPath}")"
+      fi
     '';
   }
