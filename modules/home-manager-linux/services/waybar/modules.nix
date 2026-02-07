@@ -6,6 +6,7 @@
   wlogout-sh = pkgs.writeShellScript "waybar-wlogout" (builtins.readFile ./scripts/wlogout.sh);
   weather-py = pkgs.writers.writePython3 "waybar-weather" {libraries = [pkgs.python3Packages.pyquery];} ./scripts/weather.py;
   memory-usage-sh = pkgs.writeShellScript "memory-usage" (builtins.readFile ./scripts/memory_usage.sh);
+  hyprsunset-sh = pkgs.writeShellScript "waybar-hyprsunset" (builtins.readFile ./scripts/hyprsunset.sh);
 in {
   xdg.configFile."waybar/modules".text =
     /*
@@ -121,6 +122,14 @@ in {
               "on-scroll-down": "${volume-sh} --mic-dec",
               "tooltip-format": "{source_desc}",
               "scroll-step": 5,
+          },
+          "custom/hyprsunset": {
+              "exec": "${hyprsunset-sh}",
+              "return-type": "json",
+              "interval": 5,
+              "format": "<span color='#202020' bgcolor='#d3869b' > 󰛨 </span> {}",
+              "on-click": "${hyprsunset-sh} --toggle",
+              "tooltip": true
           },
           "battery#bat2": {
               "bat": "BAT2"

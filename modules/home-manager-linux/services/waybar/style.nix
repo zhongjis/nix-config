@@ -56,6 +56,9 @@
       #temperature.critical,
       #backlight,
       #custom-memory,
+      #custom-hyprsunset,
+      #custom-hyprsunset.active,
+      #custom-hyprsunset.inactive,
       #pulseaudio,
       #pulseaudio.muted,
       #battery,
@@ -80,6 +83,9 @@
       #temperature.critical,
       #backlight,
       #custom-memory,
+      #custom-hyprsunset,
+      #custom-hyprsunset.active,
+      #custom-hyprsunset.inactive,
       #pulseaudio,
       #pulseaudio.muted,
       #battery,
@@ -205,6 +211,17 @@
 
       #pulseaudio.muted {
         color: #ea6962;
+      }
+
+      /* ================================ */
+      /*          hyprsunset              */
+      /* ================================ */
+      #custom-hyprsunset {
+        color: #d3869b;
+      }
+
+      #custom-hyprsunset.inactive {
+        color: #928374;
       }
 
       /* ================================ */

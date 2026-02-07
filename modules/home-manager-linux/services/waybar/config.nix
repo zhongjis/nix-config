@@ -33,6 +33,7 @@
           "network",
           "backlight",
           "pulseaudio",
+          "custom/hyprsunset",
           "battery",
         ],
       }
