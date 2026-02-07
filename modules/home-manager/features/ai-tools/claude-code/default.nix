@@ -1,6 +1,7 @@
 {
   commonSkills,
   claudeCodeLocalSkills,
+  commonInstructions,
   ...
 }: let
   # Merge pre-filtered common skills and Claude Code-specific skills (from ./skills)
@@ -21,9 +22,7 @@ in {
     skills = allSkills;
 
     settings = {
-      instructions = [
-        "${../common/instructions/nix-environment.md}"
-      ];
+      instructions = commonInstructions;
     };
   };
 }

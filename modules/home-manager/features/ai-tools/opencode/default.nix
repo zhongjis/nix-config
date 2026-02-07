@@ -4,6 +4,7 @@
   pkgs,
   lib,
   aiProfileHelpers,
+  commonInstructions,
   ...
 }: {
   imports = [
@@ -33,10 +34,11 @@
         diff_style = "stacked";
       };
 
-      instructions = [
-        "${./instructions/shell-strategy.md}"
-        "${../common/instructions/nix-environment.md}"
-      ];
+      instructions =
+        commonInstructions
+        ++ [
+          "${./instructions/shell-strategy.md}"
+        ];
 
       permission.skill =
         {

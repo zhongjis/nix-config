@@ -4,6 +4,7 @@
   ...
 }: {
   imports = [
+    ./instructions
     ./skills
     ./mcp
   ];
