@@ -21,7 +21,7 @@
   programs.opencode = {
     enable = true;
     package = inputs.opencode.packages.${pkgs.stdenv.hostPlatform.system}.default;
-    web.enable = true;
+    web.enable = false;
     enableMcpIntegration = true;
 
     settings = {
