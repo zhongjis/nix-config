@@ -22,14 +22,19 @@
       resize_on_border = false;
 
       # Please see https://wiki.hyprland.org/Configuring/Tearing/ before you turn this on
-      allow_tearing = true;
+      # NOTE: Tearing can cause visual glitches on AMD - disabled for stability
+      # allow_tearing = true;
+      allow_tearing = false;
+
+      # Larger grab area for easier window edge resizing (fixes border overlap feeling)
+      extend_border_grab_area = 15;
 
       layout = "dwindle";
     };
 
     # https://wiki.hyprland.org/Configuring/Variables/#decoration
     decoration = {
-      rounding = 0;
+      rounding = 4;
       active_opacity = 1.0;
       inactive_opacity = 1.0;
       fullscreen_opacity = 1.0;
@@ -88,6 +93,9 @@
       disable_splash_rendering = true;
       initial_workspace_tracking = 1;
       middle_click_paste = false;
+
+      # Variable Frame Rate - reduces GPU usage when idle (better for laptop battery)
+      vfr = true;
     };
 
     #############
@@ -107,6 +115,7 @@
       touchpad = {
         natural_scroll = true;
         scroll_factor = 1.0; # Touchpad scroll factor
+        disable_while_typing = true; # Prevents accidental touches while typing
       };
 
       sensitivity = 0; # -1.0 - 1.0, 0 means no modification.
@@ -127,7 +136,8 @@
     };
 
     debug = {
-      full_cm_proto = true;
+      # NOTE: full_cm_proto is experimental and can cause issues on AMD - disabled
+      # full_cm_proto = true;
     };
   };
 }

@@ -18,13 +18,14 @@ in {
         # inputs.hypr-dynamic-cursors.packages.${pkgs.stdenv.hostPlatform.system}.hypr-dynamic-cursors
       ];
     settings = {
-      "plugin:dynamic-cursors" = {
-        mode = "none";
-        shake = {
-          threadhold = 10.0;
-          limit = 4.0;
-        };
-      };
+      # NOTE: dynamic-cursors plugin not loaded - config commented out
+      # "plugin:dynamic-cursors" = {
+      #   mode = "none";
+      #   shake = {
+      #     threadhold = 10.0;
+      #     limit = 4.0;
+      #   };
+      # };
     };
   };
 }

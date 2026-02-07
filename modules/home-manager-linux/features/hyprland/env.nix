@@ -6,49 +6,48 @@
   # for theming
   xdg.configFile."uwsm/env".text = ''
     # CURSOR
-    export XCURSOR_SIZE = 32
-    export HYPRCURSOR_THEME = catppuccin-mocha-light-cursors
-    export HYPRCURSOR_SIZE = 32
+    export XCURSOR_SIZE=32
+    export HYPRCURSOR_THEME=catppuccin-mocha-light-cursors
+    export HYPRCURSOR_SIZE=32
 
     # XDG Desktop Portal
-    export XDG_CURRENT_DESKTOP = Hyprland
-    export XDG_SESSION_TYPE = wayland
-    export XDG_SESSION_DESKTOP = Hyprland
+    export XDG_CURRENT_DESKTOP=Hyprland
+    export XDG_SESSION_TYPE=wayland
+    export XDG_SESSION_DESKTOP=Hyprland
 
     # GSYNC
-    # export __GL_GSYNC_ALLOWED = 1
-    # export __GL_VRR_ALLOWED = 0
+    # export __GL_GSYNC_ALLOWED=1
+    # export __GL_VRR_ALLOWED=0
 
     # NVIDIA https://wiki.hyprland.org/Nvidia/
-    # export LIBVA_DRIVER_NAME = nvidia
-    # export __GLX_VENDOR_LIBRARY_NAME = nvidia
-    # export __GL_VRR_ALLOWED = 1
-    # export WLR_DRM_NO_ATOMIC = 1
+    # export LIBVA_DRIVER_NAME=nvidia
+    # export __GLX_VENDOR_LIBRARY_NAME=nvidia
+    # export __GL_VRR_ALLOWED=1
+    # export WLR_DRM_NO_ATOMIC=1
+
+    # AMD GPU - hardware video acceleration and Vulkan
+    export LIBVA_DRIVER_NAME=radeonsi
+    export AMD_VULKAN_ICD=RADV
 
     # QT
-    export QT_QPA_PLATFORM = wayland;xcb
-    export QT_QPA_PLATFORMTHEME = qt6ct
-    export QT_QPA_PLATFORMTHEME = qt5ct
-    export QT_WAYLAND_DISABLE_WINDOWDECORATION = 1
-    export QT_AUTO_SCREEN_SCALE_FACTOR = 1
+    export QT_QPA_PLATFORM=wayland;xcb
+    export QT_QPA_PLATFORMTHEME=qt6ct
+    # export QT_QPA_PLATFORMTHEME=qt5ct  # duplicate - use qt6ct
+    export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+    export QT_AUTO_SCREEN_SCALE_FACTOR=1
 
     # Mozilla
-    export MOZ_ENABLE_WAYLAND = 1
+    export MOZ_ENABLE_WAYLAND=1
 
     # GDK
-    export GDK_SCALE = 1
+    export GDK_SCALE=1
 
     # Toolkit Backend
-    export GDK_BACKEND = wayland,x11,*
-    export CLUTTER_BACKEND = wayland
+    export GDK_BACKEND=wayland,x11,*
+    export CLUTTER_BACKEND=wayland
 
-    # Toolkit Backend
-    export GDK_BACKEND = wayland,x11,*
-    export CLUTTER_BACKEND = wayland
-
-    export NIXOS_OZONE_WL = 1
-    export SDL_VIDEODRIVER = wayland
-    export CLUTTER_BACKEND = wayland
+    export NIXOS_OZONE_WL=1
+    export SDL_VIDEODRIVER=wayland
   '';
 
   # others?
