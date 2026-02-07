@@ -41,7 +41,7 @@
       "model": "github-copilot/gemini-3-pro-preview",
     },
     "quick": {
-      "model": "github-copilot/claude-haiku-4.6",
+      "model": "github-copilot/claude-haiku-4.5",
     },
     "unspecified-low": {
       "model": "opencode/kimi-k2.5",
