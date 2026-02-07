@@ -123,14 +123,14 @@ in {
               "tooltip-format": "{source_desc}",
               "scroll-step": 5,
           },
-          "custom/hyprsunset": {
-              "exec": "${hyprsunset-sh}",
-              "return-type": "json",
-              "interval": 5,
-              "format": "<span color='#202020' bgcolor='#d3869b' > 󰛨 </span> {}",
-              "on-click": "${hyprsunset-sh} --toggle",
-              "tooltip": true
-          },
+        "custom/hyprsunset": {
+            "exec": "${hyprsunset-sh}",
+            "return-type": "json",
+            "interval": 5,
+            "format": "{}",
+            "on-click": "${hyprsunset-sh} --toggle",
+            "tooltip": true
+        },
           "battery#bat2": {
               "bat": "BAT2"
           },

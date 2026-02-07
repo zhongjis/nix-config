@@ -5,10 +5,12 @@
 get_status() {
   if systemctl --user is-active --quiet hyprsunset.service; then
     # Service is running (blue light filter active)
-    echo '{"text": "ON", "tooltip": "Hyprsunset: Active (blue light filter on)", "class": "active"}'
+    # Color #7da389 matches the CSS text color for active state
+    echo '{"text": "<span color='"'"'#202020'"'"' bgcolor='"'"'#7da389'"'"' > 󰖨 </span> ON", "tooltip": "Hyprsunset: Active (click to disable)", "class": "active"}'
   else
     # Service is stopped (no filter)
-    echo '{"text": "OFF", "tooltip": "Hyprsunset: Inactive (blue light filter off)", "class": "inactive"}'
+    # Color #ea6962 (red) matches the CSS text color for inactive state (same as muted)
+    echo '{"text": "<span color='"'"'#202020'"'"' bgcolor='"'"'#ea6962'"'"' > 󰖨 </span> OFF", "tooltip": "Hyprsunset: Inactive (click to enable)", "class": "inactive"}'
   fi
 }
 

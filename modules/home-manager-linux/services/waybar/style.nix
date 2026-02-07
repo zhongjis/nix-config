@@ -217,11 +217,11 @@
       /*          hyprsunset              */
       /* ================================ */
       #custom-hyprsunset {
-        color: #d3869b;
+        color: #7da389;
       }
 
       #custom-hyprsunset.inactive {
-        color: #928374;
+        color: #ea6962;
       }
 
       /* ================================ */
