@@ -13,9 +13,6 @@ in {
     opencode_zen_api_key = {
       inherit sopsFile;
     };
-    morph_api_key = {
-      inherit sopsFile;
-    };
   };
 
   programs.opencode.settings.model = "opencode/glm-4.7";

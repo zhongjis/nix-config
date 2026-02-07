@@ -27,7 +27,7 @@
   # Plugins only for personal profile
   # Use file:// for Nix-built packages to bypass OpenCode's broken github: handling
   personalPlugins = [
-    # "file://${morphFastApplyPkg}/lib/node_modules/opencode-morph-fast-apply/index.ts"
+    "file://${morphFastApplyPkg}/lib/node_modules/opencode-morph-fast-apply/index.ts"
   ];
 
   # Build final plugin list based on profile

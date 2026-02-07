@@ -3,9 +3,6 @@
 #
 # Environment variable MORPH_API_KEY is provided via sops-nix
 # Get your API key from: https://morphllm.com/dashboard/api-keys
-#
-# NOTE: OpenCode plugins read process.env at load time, not from OpenCode's
-# {env:VAR} syntax. We use a shell alias to inject the secret before exec.
 {
   config,
   lib,
@@ -17,7 +14,6 @@
   sopsFile = inputs.self + "/secrets/ai-tokens.yaml";
   morphPkg = inputs.self.packages.${pkgs.system}.opencode-morph-fast-apply;
   secretPath = config.sops.secrets.morph_api_key.path;
-  opencodeBin = inputs.opencode.packages.${pkgs.system}.default;
 in
   lib.mkIf (hasPlugin "opencode-morph-fast-apply") {
     sops.secrets.morph_api_key = {
@@ -29,7 +25,11 @@ in
       "${morphPkg}/lib/node_modules/opencode-morph-fast-apply/MORPH_INSTRUCTIONS.md"
     ];
 
-    # Shell alias that injects MORPH_API_KEY before launching opencode
-    # This ensures the plugin receives the secret via process.env
-    home.shellAliases.opencode = ''(export MORPH_API_KEY="$(<"${secretPath}")"; exec ${opencodeBin}/bin/opencode "$@")'';
+    # Export MORPH_API_KEY directly in zsh initialization
+    # Reads the sops secret file at shell startup
+    programs.zsh.initContent = lib.mkOrder 100 ''
+      if [[ -r "${secretPath}" ]]; then
+        export MORPH_API_KEY="$(<"${secretPath}")"
+      fi
+    '';
   }
