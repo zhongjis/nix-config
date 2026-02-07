@@ -216,7 +216,8 @@
       /* ================================ */
       /*          hyprsunset              */
       /* ================================ */
-      #custom-hyprsunset {
+      #custom-hyprsunset,
+      #custom-hyprsunset.active {
         color: #7da389;
       }
 
