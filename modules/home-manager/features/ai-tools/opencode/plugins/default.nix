@@ -1,10 +1,15 @@
 {
   lib,
+  pkgs,
+  inputs,
   aiProfileHelpers,
   ...
 }: let
   # Import plugin library
   pluginLib = import ./lib.nix {inherit lib;};
+
+  # Nix-built plugins (for packages not on npm or with github: prefix issues)
+  morphFastApplyPkg = inputs.self.packages.${pkgs.system}.opencode-morph-fast-apply;
 
   # Plugins available to all profiles
   generalPlugins = [
@@ -20,7 +25,9 @@
   ];
 
   # Plugins only for personal profile
+  # Use file:// for Nix-built packages to bypass OpenCode's broken github: handling
   personalPlugins = [
+    "file://${morphFastApplyPkg}/lib/node_modules/opencode-morph-fast-apply/index.ts"
   ];
 
   # Build final plugin list based on profile
@@ -35,6 +42,7 @@ in {
   imports = [
     ./oh-my-opencode
     ./antigravity-auth.nix
+    ./morph-fast-apply.nix
   ];
 
   _module.args.hasPlugin = hasPlugin;

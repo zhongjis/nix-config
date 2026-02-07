@@ -13,19 +13,87 @@
 #     };
 #   in plugins
 {lib}: rec {
-  # Strip version suffix from plugin identifier
+  # Extract the base plugin name from various formats
   # Examples:
   #   "plugin-name@latest" -> "plugin-name"
   #   "@scope/plugin@1.0.0" -> "@scope/plugin"
   #   "plugin-name" -> "plugin-name"
-  stripVersion = name: let
-    parts = lib.splitString "@" name;
+  #   "github:user/repo" -> "repo"
+  #   "github:user/repo@ref" -> "repo"
+  #   "file:///nix/store/.../node_modules/plugin-name/index.ts" -> "plugin-name"
+  normalizePluginName = name: let
+    # Handle file:// paths (Nix store packages)
+    # Extract package name from path like: file:///nix/store/.../node_modules/plugin-name/index.ts
+    withoutFile =
+      if lib.hasPrefix "file://" name
+      then let
+        # Extract path after file://
+        pathAfterFile = lib.removePrefix "file://" name;
+        # Split by / and find the component after node_modules
+        pathParts = lib.splitString "/" pathAfterFile;
+        # Find index of node_modules using foldr
+        findNodeModulesIdx = parts: let
+          result =
+            lib.foldr (
+              part: acc:
+                if part == "node_modules"
+                then {
+                  found = true;
+                  idx = acc.currentIdx;
+                }
+                else {
+                  found = acc.found;
+                  idx = acc.idx;
+                  currentIdx = acc.currentIdx - 1;
+                }
+            ) {
+              found = false;
+              idx = null;
+              currentIdx = lib.length parts - 1;
+            }
+            parts;
+        in
+          result.idx;
+        nodeModulesIdx = findNodeModulesIdx pathParts;
+      in
+        if nodeModulesIdx != null && (lib.length pathParts > nodeModulesIdx + 1)
+        then lib.elemAt pathParts (nodeModulesIdx + 1)
+        else name
+      else name;
+
+    # Handle github: prefix
+    withoutGithub =
+      if lib.hasPrefix "github:" withoutFile
+      then let
+        # Remove "github:" prefix and extract repo name
+        afterGithub = lib.removePrefix "github:" withoutFile;
+        # Split by "/" to get user/repo, then by "@" to remove ref
+        pathParts = lib.splitString "/" afterGithub;
+        repoWithRef =
+          if lib.length pathParts >= 2
+          then lib.elemAt pathParts 1
+          else afterGithub;
+        # Remove @ref suffix if present
+        repoParts = lib.splitString "@" repoWithRef;
+      in
+        lib.head repoParts
+      else withoutFile;
+
+    # Now handle @version suffix for non-github plugins
+    parts = lib.splitString "@" withoutGithub;
   in
-    if lib.length parts > 1 && !(lib.hasPrefix "@" name)
+    if lib.hasPrefix "file://" name
+    then withoutFile
+    else if lib.hasPrefix "github:" name
+    then withoutGithub
+    else if lib.length parts > 1 && !(lib.hasPrefix "@" withoutGithub)
     then lib.head parts
     else if lib.length parts > 2
     then "@" + (lib.elemAt parts 1)
-    else name;
+    else withoutGithub;
+
+  # Backwards compatibility alias
+  stripVersion = normalizePluginName;
 
   # Build the final plugin list based on profile
   # Args:

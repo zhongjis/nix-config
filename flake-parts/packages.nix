@@ -16,6 +16,12 @@
             modules = [../modules/home-manager/features/neovim/nvf];
           }).neovim;
       }
+      // {
+        opencode-morph-fast-apply = import ../packages/opencode-morph-fast-apply.nix {
+          inherit pkgs;
+          lib = pkgs.lib;
+        };
+      }
       // optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
         helium = import ../packages/helium.nix {
           inherit pkgs;
