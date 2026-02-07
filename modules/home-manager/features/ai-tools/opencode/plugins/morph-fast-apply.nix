@@ -3,6 +3,9 @@
 #
 # Environment variable MORPH_API_KEY is provided via sops-nix
 # Get your API key from: https://morphllm.com/dashboard/api-keys
+#
+# NOTE: OpenCode plugins read process.env at load time, not from OpenCode's
+# {env:VAR} syntax. We use a shell alias to inject the secret before exec.
 {
   config,
   lib,
@@ -14,41 +17,19 @@
   sopsFile = inputs.self + "/secrets/ai-tokens.yaml";
   morphPkg = inputs.self.packages.${pkgs.system}.opencode-morph-fast-apply;
   secretPath = config.sops.secrets.morph_api_key.path;
+  opencodeBin = inputs.opencode.packages.${pkgs.system}.default;
 in
   lib.mkIf (hasPlugin "opencode-morph-fast-apply") {
-    sops.secrets = {
-      morph_api_key = {
-        inherit sopsFile;
-      };
+    sops.secrets.morph_api_key = {
+      inherit sopsFile;
     };
 
     # Add morph instructions to opencode
-    programs.opencode.settings = {
-      instructions = [
-        "${morphPkg}/lib/node_modules/opencode-morph-fast-apply/MORPH_INSTRUCTIONS.md"
-      ];
-    };
+    programs.opencode.settings.instructions = [
+      "${morphPkg}/lib/node_modules/opencode-morph-fast-apply/MORPH_INSTRUCTIONS.md"
+    ];
 
-    # Optional: Configure morph settings via environment variables
-    # Uncomment and modify as needed
-    home.sessionVariables = {
-      # Default API URL (usually don't need to change)
-      # MORPH_API_URL = "https://api.morphllm.com";
-
-      # Model selection: morph-v3-fast (default), morph-v3-large, or auto
-      # MORPH_MODEL = "morph-v3-fast";
-
-      # Timeout in milliseconds (default: 30000)
-      # MORPH_TIMEOUT = "30000";
-    };
-
-    # Export MORPH_API_KEY directly in zsh initialization
-    # This reads the sops secret at shell startup, avoiding issues with
-    # sessionVariablesExtra command substitution in non-interactive contexts
-    programs.zsh.initContent = lib.mkOrder 100 ''
-      # Morph Fast Apply API key (from sops-nix)
-      if [[ -r "${secretPath}" ]]; then
-        export MORPH_API_KEY="$(<"${secretPath}")"
-      fi
-    '';
+    # Shell alias that injects MORPH_API_KEY before launching opencode
+    # This ensures the plugin receives the secret via process.env
+    home.shellAliases.opencode = ''(export MORPH_API_KEY="$(<"${secretPath}")"; exec ${opencodeBin}/bin/opencode "$@")'';
   }
