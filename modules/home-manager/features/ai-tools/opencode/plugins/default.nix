@@ -28,7 +28,7 @@
   # Use file:// for Nix-built packages to bypass OpenCode's broken github: handling
   personalPlugins = [
     "file://${morphFastApplyPkg}/lib/node_modules/opencode-morph-fast-apply/index.ts"
-    # "opencode-supermemory@latest"
+    "opencode-supermemory@latest"
   ];
 
   # Build final plugin list based on profile
@@ -41,7 +41,7 @@
   hasPlugin = pluginLib.hasPlugin plugins;
 in {
   imports = [
-    ./oh-my-opencode
+    ./oh-my-opencode.nix
     ./antigravity-auth.nix
     ./morph-fast-apply.nix
     ./supermemory.nix
