@@ -19,11 +19,7 @@ ai-tools/
 │   │   ├── work/           # Skills only for work profile
 │   │   └── personal/       # Skills only for personal profile
 │   ├── mcp/                # MCP server configurations
-│   ├── instructions/       # Shared markdown system prompts (nix-environment.md)
-│   └── oh-my-opencode/     # oh-my-opencode configuration files
-│       ├── general-oh-my-opencode-gemini.jsonc    # Shared config
-│       ├── work-oh-my-opencode.jsonc             # Work profile config
-│       └── personal-oh-my-opencode.jsonc         # Personal profile config
+│   └── instructions/       # Shared markdown system prompts (nix-environment.md)
 ├── opencode/               # OpenCode-specific configuration
 │   ├── default.nix         # Main OpenCode config with profile-based filtering
 │   ├── skills/             # OpenCode-only skills with directory-based auto-discovery
@@ -37,8 +33,8 @@ ai-tools/
 │   ├── permission.nix      # Permission settings
 │   ├── provider.nix        # Provider settings
 │   ├── lsp.nix             # LSP settings
-│   ├── plugins/            # OpenCode-specific plugins (oh-my-opencode routing)
-│   └── plugins/oh-my-opencode/default.nix
+│   ├── plugins/            # OpenCode-specific plugins
+│   └── plugins/oh-my-opencode.nix  # oh-my-opencode config (dynamically generated from Nix attrsets)
 └── claude-code/            # Claude Code-specific configuration
     ├── default.nix         # Main Claude Code config with Nix-time filtering
     ├── skills/             # Claude Code-only skills with directory-based auto-discovery
@@ -67,7 +63,7 @@ graph TD
     Skills --> SkillsPersonal["personal/ (profile-specific)"]
     Common --> MCP[common/mcp/]
     Common --> Instructions[common/instructions/]
-    Common --> OhMyOpencode["common/oh-my-opencode/<br/>profiles: general-*, work-*, personal-*"]
+    Opencode --> OhMyOpencode["plugins/oh-my-opencode.nix<br/>dynamic Nix config generation"]
     
     Opencode -.->|imports commonSkills| Common
     Opencode --> OpencodeInst[opencode/instructions/]
@@ -98,7 +94,6 @@ graph TD
 **Shared Resources**:
 - `common/` directory contains resources available to all profiles and tools
 - 32 general-prefixed skills provide universal functionality via auto-discovery
-- oh-my-opencode configurations in `common/oh-my-opencode/` support all profiles
 
 **Skill Auto-Discovery**:
 - All skill directories (`common/skills/`, `opencode/skills/`, `claude-code/skills/`) use directory-based auto-discovery
@@ -151,15 +146,8 @@ Resources follow a consistent prefix pattern to indicate their scope:
 - **`work-*`**: Available only when `aiProfile = "work"` (reserved for future profile-specific skills)
 - **`personal-*`**: Available only when `aiProfile = "personal"` (reserved for future profile-specific skills)
 
-### Configuration Files
-oh-my-opencode configurations follow the pattern `<profile>-oh-my-opencode<-variant>.jsonc`:
-
-```
-general/oh-my-opencode/
-├── general-oh-my-opencode-gemini.jsonc      # Shared config variant
-├── work-oh-my-opencode.jsonc                # Work profile config
-└── personal-oh-my-opencode.jsonc            # Personal profile config
-```
+### oh-my-opencode Configuration
+The oh-my-opencode config is **dynamically generated from Nix attrsets** in `opencode/plugins/oh-my-opencode.nix`. It defines a custom option `programs.opencode.ohMyOpenCode.settings` using `(pkgs.formats.json {}).type`, allowing other plugin modules (e.g., `supermemory.nix`) to merge additional settings via the NixOS module system. Profile-specific overrides (work vs personal) are applied using `lib.recursiveUpdate`.
 
 ## Profile-Based Filtering
 
@@ -270,8 +258,10 @@ Instructions and documentation...
 - For **Claude Code only**: Place in `claude-code/instructions/` (not yet used)
 
 ### Managing oh-my-opencode Configurations
-- **General (Shared)**: `common/oh-my-opencode/general-oh-my-opencode-gemini.jsonc`
-- **Work profile**: `common/oh-my-opencode/work-oh-my-opencode.jsonc` (routed by host: mac-m1-max)
-- **Personal profile**: `common/oh-my-opencode/personal-oh-my-opencode.jsonc` (routed by host: framework-16)
+The oh-my-opencode configuration is defined as Nix attrsets in `opencode/plugins/oh-my-opencode.nix`:
 
-The `opencode/plugins/oh-my-opencode/default.nix` module implements the routing logic based on `currentSystemName`.
+- **Shared config**: Base attrset with agents, categories, tmux settings (applied to all profiles)
+- **Profile overrides**: Work and personal overrides merged via `lib.recursiveUpdate` based on `aiProfileHelpers.isWork`
+- **Plugin merging**: Other plugins can inject settings via `programs.opencode.ohMyOpenCode.settings` (e.g., `supermemory.nix` adds `disabled_hooks` when active)
+
+The final merged attrset is serialized to JSON and placed at `~/.config/opencode/oh-my-opencode.jsonc`.

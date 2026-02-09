@@ -8,6 +8,7 @@ This document provides guidelines for AI coding agents working in this Nix-based
 - **Purpose**: Personal NixOS and Darwin system configuration management
 - **Structure**: Flake-based Nix configuration with modular organization
 - **Package Manager**: Nix with flakes enabled
+- **Version Control**: [Jujutsu (jj)](https://github.com/jj-vcs/jj) over Git — use `jj` commands, not `git`
 - **Systems**: x86_64-linux, aarch64-darwin (and variants)
 
 ## Build, Test, and Lint Commands
@@ -255,8 +256,68 @@ lib.mkIf condition {...}      # Conditional configuration
 1. Make changes to relevant `.nix` files
 2. Test locally with `nh os switch .` or `nh darwin switch .`
 3. Check for errors with `nix flake check`
-4. Review generation history with `darwin-rebuild --list-generations`
-5. Rollback if needed with `darwin-rebuild switch --switch-generation N`
+4. Review changes with `jj log` and `jj diff`
+5. Describe changes with `jj describe -m "message"`
+6. Create new change with `jj new` after describing
+7. Push with `jj git push`
+
+## Version Control (Jujutsu)
+
+This repo uses **Jujutsu (jj)** as the version control frontend over Git. Always use `jj` commands instead of raw `git`.
+
+### Key Concepts
+
+- **Changes** (not commits): jj uses immutable changes identified by change IDs
+- **Bookmarks** (not branches): `jj bookmark` manages named references
+- **Working copy**: The `@` change is always the working copy — edits are automatically tracked
+- **No staging area**: All file changes are part of the current change immediately
+
+### Common Commands
+
+```bash
+# View history
+jj log
+jj log -r 'all()'
+
+# View current changes
+jj diff
+jj status
+
+# Describe current change
+jj describe -m "feat: add new module"
+
+# Create a new empty change on top of current
+jj new
+
+# Bookmark management
+jj bookmark list
+jj bookmark set <name> -r <revision>
+jj bookmark delete <name>
+
+# Push to remote
+jj git push
+
+# Pull from remote
+jj git fetch
+jj rebase -d main  # rebase onto updated main
+
+# Squash current change into parent
+jj squash
+
+# Abandon a change
+jj abandon <change-id>
+
+# Move to a different change
+jj edit <change-id>
+```
+
+### Important Notes
+
+- **Never use `git` directly** unless jj doesn't support the operation
+- jj auto-tracks file changes — no `git add` needed
+- Use `jj new` after `jj describe` to start a fresh change
+- Bookmarks replace branches: `jj bookmark set main -r @`
+- The `*` after a bookmark name (e.g., `main*`) means it's ahead of the remote
 
 ## Reference Documentation
 
