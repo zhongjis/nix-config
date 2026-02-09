@@ -13,7 +13,6 @@
 
   # Plugins available to all profiles
   generalPlugins = [
-    "opencode-antigravity-auth@latest"
     "oh-my-opencode@latest"
     "@simonwjackson/opencode-direnv@latest"
     "@tarquinen/opencode-dcp@latest"
@@ -29,6 +28,7 @@
   personalPlugins = [
     "file://${morphFastApplyPkg}/lib/node_modules/opencode-morph-fast-apply/index.ts"
     "opencode-supermemory@latest"
+    "opencode-antigravity-auth@latest"
   ];
 
   # Build final plugin list based on profile
