@@ -1,8 +1,13 @@
 {
+  config,
   lib,
+  inputs,
   aiProfileHelpers,
   ...
 }: let
+  sopsFile = inputs.self + "/secrets/ai-tokens.yaml";
+  secretPath = config.sops.secrets.context7_api_key.path;
+
   # MCPs available to all profiles
   commonMcps = {
     nixos = {
@@ -36,6 +41,18 @@
     };
   };
 in {
+  sops.secrets.context7_api_key = {
+    inherit sopsFile;
+  };
+
+  # Export CONTEXT7_API_KEY directly in zsh initialization
+  # Reads the sops secret file at shell startup
+  programs.zsh.initContent = lib.mkOrder 100 ''
+    if [[ -r "${secretPath}" ]]; then
+      export CONTEXT7_API_KEY="$(<"${secretPath}")"
+    fi
+  '';
+
   programs.mcp = {
     enable = true;
     servers =
