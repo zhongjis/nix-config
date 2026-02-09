@@ -2,6 +2,7 @@
   config,
   lib,
   inputs,
+  aiProfileHelpers,
   ...
 }: let
   sopsFile = inputs.self + "/secrets/ai-tokens.yaml";
@@ -16,6 +17,10 @@ in {
   };
 
   programs.opencode.settings.model = "opencode/glm-4.7";
+
+  programs.opencode.settings.enabled_providers =
+    lib.mkIf aiProfileHelpers.isWork
+    ["amazon-bedrock" "github-copilot"];
 
   programs.opencode.settings.provider = {
     # openrouter = {
