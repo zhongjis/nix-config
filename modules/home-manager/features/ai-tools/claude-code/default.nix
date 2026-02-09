@@ -23,6 +23,23 @@ in {
 
     settings = {
       instructions = commonInstructions;
+      model = "opus";
+      includeCoAuthoredBy = false;
+
+      extraKnownMarketplaces = {
+        oh-my-claudecode = {
+          source = {
+            source = "github";
+            repo = "Yeachan-Heo/oh-my-claudecode";
+          };
+        };
+        claude-mem = {
+          source = {
+            source = "github";
+            repo = "thedotmack/claude-mem";
+          };
+        };
+      };
     };
   };
 }
