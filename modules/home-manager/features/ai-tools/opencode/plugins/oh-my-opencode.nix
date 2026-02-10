@@ -60,12 +60,12 @@
         prompt_append = "Always use the nixos-mcp for Nix related documentation lookups.";
         model = "github-copilot/gemini-2.5-pro";
       };
-      explore.model = "github-copilot/claude-haiku-4.6";
-      metis.model = "github-copilot/claude-sonnet-4.6";
-      atlas.model = "github-copilot/claude-sonnet-4.6";
+      explore.model = "github-copilot/claude-haiku-4.5";
+      metis.model = "github-copilot/claude-sonnet-4.5";
+      atlas.model = "github-copilot/claude-sonnet-4.5";
     };
     categories = {
-      unspecified-low.model = "github-copilot/claude-sonnet-4.6";
+      unspecified-low.model = "github-copilot/claude-sonnet-4.5";
     };
   };
 
