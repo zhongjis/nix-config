@@ -11,6 +11,8 @@
   # - Bedtime: 1900K (very warm, minimal blue light)
   services.hyprsunset = {
     enable = true;
+    # UWSM doesn't activate graphical-session.target, so bind to default.target
+    systemdTarget = "default.target";
 
     settings = {
       # Morning - neutral daylight (no color shift)

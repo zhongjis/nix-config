@@ -16,8 +16,7 @@
     };
     context7 = {
       url = "https://mcp.context7.com/mcp";
-      headers = {
-        CONTEXT7_API_KEY = "{env:CONTEXT7_API_KEY}";
+      headers = { CONTEXT7_API_KEY = "{env:CONTEXT7_API_KEY}";
       };
     };
     mcp_k8s = {

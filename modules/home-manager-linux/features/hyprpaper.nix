@@ -1,4 +1,8 @@
-{pkgs, ...}: let
+{
+  pkgs,
+  lib,
+  ...
+}: let
   astronaunt = pkgs.fetchurl {
     url = "https://i.redd.it/mvev8aelh7zc1.png";
     hash = "sha256-lJjIq+3140a5OkNy/FAEOCoCcvQqOi73GWJGwR2zT9w";
@@ -27,4 +31,7 @@ in {
       ];
     };
   };
+
+  # UWSM doesn't activate graphical-session.target, so rebind to default.target
+  systemd.user.services.hyprpaper.Install.WantedBy = lib.mkForce ["default.target"];
 }
