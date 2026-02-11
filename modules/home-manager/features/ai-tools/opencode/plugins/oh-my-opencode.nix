@@ -27,6 +27,17 @@
       unspecified-high.model = "github-copilot/claude-opus-4.6";
       writing.model = "github-copilot/gemini-3-flash-preview";
     };
+    # Disable all Claude Code compatibility features —
+    # prevents oh-my-opencode from loading MCPs, skills, agents,
+    # commands, plugins, and hooks from ~/.claude/
+    claude_code = {
+      mcp = false;
+      skills = true;
+      agents = true;
+      commands = true;
+      plugins = false;
+      hooks = false;
+    };
     disabled_skills = ["playwright"];
     browser_automation_engine.provider = "agent-browser";
     tmux = {

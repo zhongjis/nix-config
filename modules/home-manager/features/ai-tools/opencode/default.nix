@@ -37,9 +37,7 @@
       autoupdate = false;
 
       tui = {
-        scroll_accelaeration = {
-          enabled = true;
-        };
+        scroll_acceleration.enabled = true;
         diff_style = "stacked";
       };
 

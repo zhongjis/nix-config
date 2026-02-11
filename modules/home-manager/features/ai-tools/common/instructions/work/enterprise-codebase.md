@@ -280,8 +280,7 @@ If you cannot run verification:
 
 ### Environment and Configuration
 
-- **Never** modify CI/CD configurations without approval
-- **Never** change build scripts unless that's the explicit task
+- **Never** modify build configurations (CI/CD pipelines, build scripts, Makefiles, bundler configs, task runners, etc.) unless absolutely unavoidable to complete the task. If unavoidable, **MUST get explicit user approval** before making the change — explain why it's necessary and what the impact will be.
 - **Never** alter environment variables or secrets references
 - **Never** modify infrastructure-as-code files casually
 
