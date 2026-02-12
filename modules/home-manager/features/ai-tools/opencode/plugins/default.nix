@@ -21,6 +21,7 @@
 
   # Plugins only for work profile
   workPlugins = [
+    "@knikolov/opencode-plugin-simple-memory"
   ];
 
   # Plugins only for personal profile
