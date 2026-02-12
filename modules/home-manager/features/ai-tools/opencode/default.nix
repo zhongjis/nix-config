@@ -47,17 +47,10 @@
           "${./instructions/shell-strategy.md}"
         ];
 
-      permission.skill =
-        {
-          # general-* skills from both common/skills/ and opencode/skills/
-          "general-*" = "allow";
-        }
-        // lib.optionalAttrs aiProfileHelpers.isWork {
-          "work-*" = "allow";
-        }
-        // lib.optionalAttrs aiProfileHelpers.isPersonal {
-          "personal-*" = "allow";
-        };
+      permission.skill = {
+        # Allow all provisioned skills (filtering is handled by commonSkills based on aiProfile)
+        "*" = "allow";
+      };
     };
   };
 

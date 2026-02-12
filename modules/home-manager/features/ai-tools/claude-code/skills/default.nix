@@ -7,22 +7,19 @@
   # Auto-discover skills from directory structure
   # Each skill is a directory containing SKILL.md and optional templates/references
   # Supports disabled-* prefix to skip skills
-  discoverSkills = profileDir: prefix: let
+  discoverSkills = profileDir: let
     dirs = myLib.dirsIn profileDir;
     enabledDirs = lib.filterAttrs (name: _: !(lib.hasPrefix "disabled-" name)) dirs;
     skills =
-      lib.mapAttrs' (name: _: {
-        name = "${prefix}-${name}";
-        value = profileDir + "/${name}";
-      })
+      lib.mapAttrs (name: _: profileDir + "/${name}")
       enabledDirs;
   in
     skills;
 
   # Discover Claude Code-only skills from subdirectories
-  localGeneralSkills = discoverSkills ./general "general";
-  localWorkSkills = discoverSkills ./work "work";
-  localPersonalSkills = discoverSkills ./personal "personal";
+  localGeneralSkills = discoverSkills ./general;
+  localWorkSkills = discoverSkills ./work;
+  localPersonalSkills = discoverSkills ./personal;
 
   # Apply profile-based filtering
   filteredLocalSkills =

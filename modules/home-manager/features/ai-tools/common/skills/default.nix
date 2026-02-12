@@ -9,9 +9,9 @@
 #   - personal/ : Skills only for aiProfile = "personal"
 #
 # Skill naming:
-#   - Directory name becomes skill name with profile prefix
-#   - general/jq/ → general-jq
-#   - work/foo/   → work-foo
+#   - Directory name becomes skill name as-is
+#   - general/jq/ → jq
+#   - work/foo/   → foo
 #
 # Disabling skills:
 #   - Prefix directory with "disabled-" to skip it
@@ -24,28 +24,25 @@
   ...
 }: let
   # Auto-discover skill directories from a profile directory
-  # Returns attrset: { "prefix-skillname" = ./prefix/skillname; }
-  discoverSkills = profileDir: prefix: let
+  # Returns attrset: { "skillname" = ./profileDir/skillname; }
+  discoverSkills = profileDir: let
     # Get all directories in the profile directory
     dirs = myLib.dirsIn profileDir;
 
     # Filter out disabled skills and build attrset
     enabledDirs = lib.filterAttrs (name: _: !(lib.hasPrefix "disabled-" name)) dirs;
 
-    # Convert to attrset with prefixed names
+    # Convert to attrset with directory name as skill name
     skills =
-      lib.mapAttrs' (name: _: {
-        name = "${prefix}-${name}";
-        value = profileDir + "/${name}";
-      })
+      lib.mapAttrs (name: _: profileDir + "/${name}")
       enabledDirs;
   in
     skills;
 
   # Discover skills from each profile directory
-  generalSkills = discoverSkills ./general "general";
-  workSkills = discoverSkills ./work "work";
-  personalSkills = discoverSkills ./personal "personal";
+  generalSkills = discoverSkills ./general;
+  workSkills = discoverSkills ./work;
+  personalSkills = discoverSkills ./personal;
 
   # Pre-filtered skills based on profile
   filteredSkills =
