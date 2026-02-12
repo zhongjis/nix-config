@@ -22,6 +22,7 @@
     categories = {
       visual-engineering.model = "github-copilot/gemini-3-pro-preview";
       ultrabrain.model = "github-copilot/gpt-5.2-codex";
+      deep.model = "github-copilot/gpt-5.3-codex";
       artistry.model = "github-copilot/gemini-3-pro-preview";
       quick.model = "github-copilot/claude-haiku-4.5";
       unspecified-high.model = "github-copilot/claude-opus-4.6";
