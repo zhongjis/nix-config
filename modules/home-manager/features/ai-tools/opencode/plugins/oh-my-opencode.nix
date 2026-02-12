@@ -13,20 +13,6 @@
   sharedConfig = {
     "$schema" = "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json";
     agents = {
-      sisyphus.model = "github-copilot/claude-opus-4.6";
-      oracle.model = "github-copilot/gpt-5.2";
-      multimodal-looker.model = "github-copilot/gemini-3-flash-preview";
-      prometheus.model = "github-copilot/claude-opus-4.6";
-      momus.model = "github-copilot/claude-opus-4.6";
-    };
-    categories = {
-      visual-engineering.model = "github-copilot/gemini-3-pro-preview";
-      ultrabrain.model = "github-copilot/gpt-5.2-codex";
-      deep.model = "github-copilot/gpt-5.3-codex";
-      artistry.model = "github-copilot/gemini-3-pro-preview";
-      quick.model = "github-copilot/claude-haiku-4.5";
-      unspecified-high.model = "github-copilot/claude-opus-4.6";
-      writing.model = "github-copilot/gemini-3-flash-preview";
     };
     # Disable all Claude Code compatibility features —
     # prevents oh-my-opencode from loading MCPs, skills, agents,
@@ -51,23 +37,18 @@
   };
 
   # Profile-specific overrides
-  personalOverrides = {
-    agents = {
-      librarian = {
-        prompt_append = "Always use the nixos-mcp for Nix related documentation lookups.";
-        model = "opencode/glm-4.7";
-      };
-      explore.model = "github-copilot/grok-code-fast-1";
-      metis.model = "opencode/kimi-k2.5";
-      atlas.model = "opencode/kimi-k2.5";
-    };
-    categories = {
-      unspecified-low.model = "opencode/kimi-k2.5";
-    };
-  };
+  personalOverrides = {};
 
   workOverrides = {
     agents = {
+      # sisyphus.model = "github-copilot/claude-opus-4.6";
+      sisyphus.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
+      oracle.model = "github-copilot/gpt-5.2";
+      multimodal-looker.model = "github-copilot/gemini-3-flash-preview";
+      # prometheus.model = "github-copilot/claude-opus-4.6";
+      prometheus.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
+      # momus.model = "github-copilot/claude-opus-4.6";
+      momus.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
       librarian = {
         prompt_append = "Always use the nixos-mcp for Nix related documentation lookups.";
         model = "github-copilot/gemini-2.5-pro";
@@ -77,7 +58,15 @@
       atlas.model = "github-copilot/claude-sonnet-4.5";
     };
     categories = {
+      visual-engineering.model = "github-copilot/gemini-3-pro-preview";
+      ultrabrain.model = "github-copilot/gpt-5.2-codex";
+      deep.model = "github-copilot/gpt-5.2-codex";
+      artistry.model = "github-copilot/gemini-3-pro-preview";
+      quick.model = "github-copilot/claude-haiku-4.5";
+      # unspecified-high.model = "github-copilot/claude-opus-4.6";
+      unspecified-high.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
       unspecified-low.model = "github-copilot/claude-sonnet-4.5";
+      writing.model = "github-copilot/gemini-3-flash-preview";
     };
   };
 
