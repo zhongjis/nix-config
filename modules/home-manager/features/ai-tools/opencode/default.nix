@@ -20,7 +20,15 @@
 
   programs.opencode = {
     enable = true;
-    package = inputs.opencode.packages.${pkgs.stdenv.hostPlatform.system}.default;
+    package = inputs.opencode.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (oldAttrs: {
+      postPatch =
+        (oldAttrs.postPatch or "")
+        + ''
+          # Patch out bun version check that fails with bun 1.3.8 (requires ^1.3.9)
+          # TODO: remove once upstream opencode updates their nixpkgs to include bun >= 1.3.9
+          sed -i '/semver\.satisfies(process\.versions\.bun/,/^[[:space:]]*}/s/.*//' packages/script/src/index.ts
+        '';
+    });
     web.enable = false;
     enableMcpIntegration = true;
 
