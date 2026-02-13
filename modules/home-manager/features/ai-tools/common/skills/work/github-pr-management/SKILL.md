@@ -5,29 +5,17 @@ description: "(project - Skill) Manage GitHub pull requests: create/update PR de
 
 # GitHub PR Management
 
-## GitHub Enterprise API
+## Prerequisites: Authentication
 
-Use `gh` CLI with `GH_HOST` for enterprise instances:
+Before any PR operation, verify `gh` CLI authentication:
 
 ```bash
-# Set host for enterprise
-export GH_HOST=git.corp.adobe.com
-
-# View PR
-gh pr view <number> --repo <org>/<repo> --json body,title
-
-# Edit PR description
-gh pr edit <number> --repo <org>/<repo> --body "$BODY"
-
-# List PR comments
-gh api repos/<org>/<repo>/issues/<number>/comments --jq '.[] | {id, body: (.body | .[0:100])}'
-
-# Update a specific comment
-gh api repos/<org>/<repo>/issues/comments/<comment_id> -X PATCH -F body="$BODY"
-
-# Add a new comment
-gh api repos/<org>/<repo>/issues/<number>/comments -f body="$BODY"
+gh auth status
 ```
+
+- If authenticated: proceed.
+- If NOT authenticated: **STOP. Prompt the user to configure `gh` CLI first** (`gh auth login`). Do not attempt any PR operations until auth succeeds.
+- For enterprise GitHub instances: the user must have already authed via `gh auth login --hostname <host>`. The `gh` CLI routes to the correct host based on the repo's git remote. Do not manually set `GH_HOST`.
 
 ## PR Description
 
@@ -48,7 +36,7 @@ If a template exists, follow its structure exactly. If not, use the format below
 ### 2. Writing Style
 
 - **Be concise.** Reviewers scan, not read. One-line summary, bullet changes, done.
-- **No duplication.** If info exists in a companion PR or comment, link to it — don't repeat.
+- **No duplication.** If info exists in a companion PR or comment, link to it -- don't repeat.
 - **No prose paragraphs.** Use tables and bullets.
 - **Precise change types.** Use the verb that matches: "Add" = new, "Update" = enhance existing, "Fix" = bug.
 
@@ -64,9 +52,11 @@ If a template exists, follow its structure exactly. If not, use the format below
 - [change_type] Another change
 
 ## Footers:
-- Change: https://jira.corp.adobe.com/browse/<TICKET>
-- Epic: https://jira.corp.adobe.com/browse/<EPIC>
+- Change: <JIRA_BASE_URL>/browse/<TICKET>
+- Epic: <JIRA_BASE_URL>/browse/<EPIC>
 ```
+
+**Variables:** If the user has not provided their JIRA base URL, ticket, or epic, prompt them for these values. If the user defers, use placeholders (`<JIRA_BASE_URL>`, `<TICKET>`, `<EPIC>`) and move on.
 
 ### 4. Change Types
 
@@ -86,10 +76,10 @@ Format: `- [feature] Added X` or `- [bugfix] Fixed Y`
 
 | Footer | Required | Description |
 |--------|----------|-------------|
-| `Change` | **Yes** | JIRA ticket. `Change: https://jira.corp.adobe.com/browse/CET-1234` |
-| `Epic` | **Yes** | JIRA epic. `Epic: https://jira.corp.adobe.com/browse/CET-5678` |
+| `Change` | **Yes** | JIRA ticket. `Change: <JIRA_BASE_URL>/browse/<TICKET>` |
+| `Epic` | **Yes** | JIRA epic. `Epic: <JIRA_BASE_URL>/browse/<EPIC>` |
 | `BREAKING_CHANGE` | No | Presence = major version bump |
-| `REBUILD_DOWNSTREAM` | No | Rebuild listed libs on main. `REBUILD_DOWNSTREAM: akka-common, marketo-core` |
+| `REBUILD_DOWNSTREAM` | No | Rebuild listed libs on main. `REBUILD_DOWNSTREAM: lib-a, lib-b` |
 | `BUMP_DOWNSTREAM` | No | **High risk.** Patch downstream version branches. Only on version branch merges. |
 | `UNSTABLE_VERSIONS` | No | Versions that won't get this fix. `UNSTABLE_VERSIONS: 1.4.X, 1.5.X` |
 
@@ -99,15 +89,15 @@ When changes span multiple repos, link companion PRs:
 
 ```markdown
 ### Companion PR
-[repo-name #N](url) — one-line description
+[repo-name #N](url) -- one-line description
 ```
 
 ## PR Comments
 
 - Use comments for supplementary context (flowcharts, diagrams, design rationale) that doesn't belong in the description.
-- Keep comments self-contained — reader shouldn't need to cross-reference the description to understand the comment.
+- Keep comments self-contained -- reader shouldn't need to cross-reference the description to understand the comment.
 - No duplication with PR description. If the description covers it, don't repeat in comments.
-- Mermaid diagrams are supported — use for flow visualization.
+- Mermaid diagrams are supported -- use for flow visualization.
 
 ## PR Review Comments
 

@@ -54,8 +54,6 @@ in {
       # gh removed - now in shared/packages/dev-tools.nix
 
       charles
-
-      cursor-cli
     ]
     ++ stable_pkgs;
 
@@ -67,6 +65,8 @@ in {
     ];
 
     casks = [
+      "droid"
+
       "docker-desktop"
 
       # util
@@ -76,7 +76,6 @@ in {
       # ide
       "intellij-idea"
       "phpstorm"
-      "cursor"
       "zed"
 
       "mongodb-compass"

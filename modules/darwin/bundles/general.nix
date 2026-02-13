@@ -97,7 +97,6 @@
 
       "google-chrome"
       "helium-browser"
-      "zen"
     ];
 
     masApps = {
