@@ -38,7 +38,58 @@
   };
 
   # Profile-specific overrides
-  personalOverrides = {};
+  # Providers: Gemini, GitHub Copilot, OpenCode Zen
+  # Based on oh-my-opencode official model-requirements.ts recommendations
+  personalOverrides = {
+    agents = {
+      sisyphus = {
+        model = "github-copilot/claude-opus-4.6";
+        variant = "max";
+      };
+      oracle = {
+        model = "github-copilot/gpt-5.2";
+        variant = "high";
+      };
+      prometheus = {
+        model = "github-copilot/claude-opus-4.6";
+        variant = "max";
+      };
+      metis = {
+        model = "github-copilot/claude-opus-4.6";
+        variant = "max";
+      };
+      momus = {
+        model = "github-copilot/gpt-5.2";
+        variant = "medium";
+      };
+      multimodal-looker.model = "google/gemini-3-flash-preview";
+      librarian.model = "opencode/glm-4.7";
+      explore.model = "github-copilot/grok-code-fast-1";
+      atlas.model = "opencode/kimi-k2.5-free";
+    };
+    categories = {
+      visual-engineering.model = "google/gemini-3-pro-preview";
+      ultrabrain = {
+        model = "github-copilot/gpt-5.2-codex";
+        variant = "xhigh";
+      };
+      deep = {
+        model = "github-copilot/gpt-5.2-codex";
+        variant = "medium";
+      };
+      artistry = {
+        model = "google/gemini-3-pro-preview";
+        variant = "high";
+      };
+      quick.model = "github-copilot/claude-haiku-4.5";
+      unspecified-high = {
+        model = "github-copilot/claude-opus-4.6";
+        variant = "max";
+      };
+      unspecified-low.model = "github-copilot/claude-sonnet-4.5";
+      writing.model = "google/gemini-3-flash-preview";
+    };
+  };
 
   workOverrides = {
     agents = {
