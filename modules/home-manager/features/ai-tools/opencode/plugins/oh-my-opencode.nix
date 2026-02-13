@@ -13,6 +13,7 @@
   sharedConfig = {
     "$schema" = "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json";
     agents = {
+      librarian.prompt_append = "Always use the nixos-mcp for Nix related documentation lookups.";
     };
     # Disable all Claude Code compatibility features —
     # prevents oh-my-opencode from loading MCPs, skills, agents,
@@ -41,33 +42,56 @@
 
   workOverrides = {
     agents = {
-      # sisyphus.model = "github-copilot/claude-opus-4.6";
       sisyphus.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
-      oracle.model = "github-copilot/gpt-5.2";
-      multimodal-looker.model = "github-copilot/gemini-3-flash-preview";
-      # prometheus.model = "github-copilot/claude-opus-4.6";
+      oracle.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
+      multimodal-looker.model = "amazon-bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0";
       prometheus.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
-      # momus.model = "github-copilot/claude-opus-4.6";
       momus.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
-      librarian = {
-        prompt_append = "Always use the nixos-mcp for Nix related documentation lookups.";
-        model = "github-copilot/gemini-2.5-pro";
-      };
-      explore.model = "github-copilot/claude-haiku-4.5";
-      metis.model = "github-copilot/claude-sonnet-4.5";
-      atlas.model = "github-copilot/claude-sonnet-4.5";
+      librarian.model = "amazon-bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0";
+      explore.model = "amazon-bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0";
+      metis.model = "amazon-bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0";
+      atlas.model = "amazon-bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0";
     };
     categories = {
-      visual-engineering.model = "github-copilot/gemini-3-pro-preview";
-      ultrabrain.model = "github-copilot/gpt-5.2-codex";
-      deep.model = "github-copilot/gpt-5.2-codex";
-      artistry.model = "github-copilot/gemini-3-pro-preview";
-      quick.model = "github-copilot/claude-haiku-4.5";
-      # unspecified-high.model = "github-copilot/claude-opus-4.6";
+      visual-engineering.model = "amazon-bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0";
+      ultrabrain.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
+      deep.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
+      artistry.model = "amazon-bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0";
+      quick.model = "amazon-bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0";
       unspecified-high.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
-      unspecified-low.model = "github-copilot/claude-sonnet-4.5";
-      writing.model = "github-copilot/gemini-3-flash-preview";
+      unspecified-low.model = "amazon-bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0";
+      writing.model = "amazon-bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0";
     };
+
+    # --- Previous mixed GitHub Copilot + Bedrock configuration ---
+    # agents = {
+    #   sisyphus.model = "github-copilot/claude-opus-4.6";
+    #   sisyphus.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
+    #   oracle.model = "github-copilot/gpt-5.2";
+    #   multimodal-looker.model = "github-copilot/gemini-3-flash-preview";
+    #   prometheus.model = "github-copilot/claude-opus-4.6";
+    #   prometheus.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
+    #   momus.model = "github-copilot/claude-opus-4.6";
+    #   momus.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
+    #   librarian = {
+    #     prompt_append = "Always use the nixos-mcp for Nix related documentation lookups.";
+    #     model = "github-copilot/gemini-2.5-pro";
+    #   };
+    #   explore.model = "github-copilot/claude-haiku-4.5";
+    #   metis.model = "github-copilot/claude-sonnet-4.5";
+    #   atlas.model = "github-copilot/claude-sonnet-4.5";
+    # };
+    # categories = {
+    #   visual-engineering.model = "github-copilot/gemini-3-pro-preview";
+    #   ultrabrain.model = "github-copilot/gpt-5.2-codex";
+    #   deep.model = "github-copilot/gpt-5.2-codex";
+    #   artistry.model = "github-copilot/gemini-3-pro-preview";
+    #   quick.model = "github-copilot/claude-haiku-4.5";
+    #   unspecified-high.model = "github-copilot/claude-opus-4.6";
+    #   unspecified-high.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
+    #   unspecified-low.model = "github-copilot/claude-sonnet-4.5";
+    #   writing.model = "github-copilot/gemini-3-flash-preview";
+    # };
   };
 
   profileOverrides =
