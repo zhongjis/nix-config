@@ -65,7 +65,7 @@
       multimodal-looker.model = "google/gemini-3-flash-preview";
       librarian.model = "opencode/glm-4.7";
       explore.model = "github-copilot/grok-code-fast-1";
-      atlas.model = "opencode/kimi-k2.5-free";
+      atlas.model = "github-copilot/claude-sonnet-4.5";
     };
     categories = {
       visual-engineering.model = "google/gemini-3-pro-preview";
