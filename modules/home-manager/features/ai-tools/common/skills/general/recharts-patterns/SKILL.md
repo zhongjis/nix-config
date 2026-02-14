@@ -303,6 +303,52 @@ import { Brush } from "recharts";
 </LineChart>;
 ```
 
+## Reference Lines and Areas
+
+Mark thresholds, benchmarks, or highlight zones on Cartesian charts:
+
+```tsx
+import { ReferenceLine, ReferenceArea } from "recharts";
+
+// Inside any Cartesian chart (LineChart, BarChart, AreaChart, ComposedChart)
+<LineChart data={data} accessibilityLayer>
+  <CartesianGrid strokeDasharray="3 3" />
+  <XAxis dataKey="name" />
+  <YAxis />
+  <Tooltip />
+  <Line type="monotone" dataKey="value" stroke="#8884d8" />
+
+  {/* Horizontal threshold line */}
+  <ReferenceLine
+    y={800}
+    stroke="#ff4444"
+    strokeDasharray="3 3"
+    label={{ value: "Target", position: "right" }}
+  />
+
+  {/* Vertical event marker */}
+  <ReferenceLine
+    x="March"
+    stroke="#666"
+    strokeDasharray="3 3"
+    label={{ value: "Launch", position: "top" }}
+  />
+
+  {/* Highlighted zone */}
+  <ReferenceArea
+    x1="Feb"
+    x2="Apr"
+    y1={200}
+    y2={600}
+    fill="#8884d8"
+    fillOpacity={0.1}
+    stroke="#8884d8"
+    strokeOpacity={0.3}
+    label="Growth Period"
+  />
+</LineChart>;
+```
+
 ## Synchronized Charts
 
 Use `syncId` to sync tooltip and brush across multiple charts:
@@ -380,10 +426,25 @@ function CustomTooltip({
 />
 ```
 
+### Tooltip Portal (3.x)
+
+Render the tooltip in a custom DOM container to avoid overflow clipping in scrollable/embedded charts:
+
+```tsx
+// Render tooltip outside the chart's SVG container
+<Tooltip
+  portal={document.getElementById("tooltip-root")}
+  wrapperStyle={{ zIndex: 1000 }}
+/>
+
+// Useful when chart is inside overflow:hidden containers
+// or when tooltip gets clipped by parent boundaries
+```
+
 ## Accessibility
 
 ```tsx
-// 1. Use accessibilityLayer prop on chart components (adds keyboard navigation)
+// accessibilityLayer is TRUE by default in Recharts 3.x — explicit prop is optional
 <LineChart data={data} accessibilityLayer>
 
 // 2. Wrap in semantic HTML
@@ -506,6 +567,19 @@ const processedData = useMemo(() => processChartData(rawData), [rawData]);
 | Animation     | **Disabled** for real-time data                     |
 | Tooltip       | **Custom** for branded UX, **formatter** for simple |
 | Data updates  | **Sliding window** for time-series                  |
-| Accessibility | **accessibilityLayer** prop on all charts           |
+| Accessibility | **accessibilityLayer** is default `true` in 3.x — opt out with `accessibilityLayer={false}` |
 | Multi-chart   | **syncId** to coordinate tooltips and brushes       |
 | Stacking      | **stackId** prop on Bar/Area components             |
+
+## Recharts 3.x Migration Notes
+
+Breaking changes from 2.x to 3.x:
+
+| Change | Details |
+|--------|---------|
+| `accessibilityLayer` | Now `true` by default (was `false` in 2.x) |
+| Internal state removed | `Scatter.points`, `Area.points`, `Legend.payload`, `activeIndex` are no longer accessible via external API |
+| `<Customized>` optional | Custom SVG components can be nested directly inside chart components without the `<Customized>` wrapper |
+| Tooltip `portal` prop | New — renders tooltip in a custom DOM location to avoid overflow clipping |
+| Min requirements | React 16.8+, TypeScript 5.x+, Node.js 18+, target ES6 |
+| Keyboard events | No longer propagated through `onMouseMove` — use dedicated keyboard event handlers |
