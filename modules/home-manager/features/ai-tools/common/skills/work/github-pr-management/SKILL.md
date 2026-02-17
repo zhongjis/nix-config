@@ -17,6 +17,23 @@ gh auth status
 - If NOT authenticated: **STOP. Prompt the user to configure `gh` CLI first** (`gh auth login`). Do not attempt any PR operations until auth succeeds.
 - For enterprise GitHub instances: the user must have already authed via `gh auth login --hostname <host>`. The `gh` CLI routes to the correct host based on the repo's git remote. Do not manually set `GH_HOST`.
 
+## Jira URL Parsing
+
+When the user provides a Jira URL, extract the base URL and ticket key for use in Footers. **Do not fetch or interact with the Jira instance.**
+
+Jira URLs follow this pattern: `https://<HOST>/browse/<TICKET_KEY>`
+
+**Parse rules:**
+- **JIRA_BASE_URL** = everything before `/browse/`
+- **TICKET_KEY** = path segment after `/browse/`, stripped of trailing `/`, `?`, `#` and anything after
+- Ticket keys match `<PROJECT>-<NUMBER>` (uppercase letters, hyphen, digits)
+
+| Input URL | JIRA_BASE_URL | TICKET_KEY |
+|-----------|---------------|------------|
+| `https://jira.company.com/browse/PROJ-123` | `https://jira.company.com` | `PROJ-123` |
+| `https://team.atlassian.net/browse/ENG-456?filter=open` | `https://team.atlassian.net` | `ENG-456` |
+| `https://jira.internal.co/browse/PLAT-78/` | `https://jira.internal.co` | `PLAT-78` |
+
 ## PR Description
 
 ### 1. Check for PR Template
@@ -56,7 +73,7 @@ If a template exists, follow its structure exactly. If not, use the format below
 - Epic: <JIRA_BASE_URL>/browse/<EPIC>
 ```
 
-**Variables:** If the user has not provided their JIRA base URL, ticket, or epic, prompt them for these values. If the user defers, use placeholders (`<JIRA_BASE_URL>`, `<TICKET>`, `<EPIC>`) and move on.
+**Variables:** If the user provided a Jira URL, parse it per the "Jira Ticket Integration" section above to extract JIRA_BASE_URL, TICKET_KEY, and EPIC. If no Jira URL was provided, prompt the user. If the user defers, use placeholders (`<JIRA_BASE_URL>`, `<TICKET>`, `<EPIC>`) and move on.
 
 ### 4. Change Types
 
