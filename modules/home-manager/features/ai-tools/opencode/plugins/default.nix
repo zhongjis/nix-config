@@ -29,7 +29,7 @@
   personalPlugins = [
     "file://${morphFastApplyPkg}/lib/node_modules/opencode-morph-fast-apply/index.ts"
     # "opencode-supermemory@latest"
-    "opencode-antigravity-auth@latest"
+    # "opencode-antigravity-auth@latest"
   ];
 
   # Build final plugin list based on profile

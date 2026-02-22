@@ -22,7 +22,7 @@
       mcp = false;
       skills = true;
       agents = true;
-      commands = true;
+      commands = false;
       plugins = false;
       hooks = false;
     };
@@ -38,7 +38,7 @@
   };
 
   # Profile-specific overrides
-  # Providers: Gemini, GitHub Copilot, OpenCode Zen
+  # Providers: GitHub Copilot, OpenCode Zen
   # Based on oh-my-opencode official model-requirements.ts recommendations
   personalOverrides = {
     agents = {
@@ -62,13 +62,13 @@
         model = "github-copilot/gpt-5.2";
         variant = "medium";
       };
-      multimodal-looker.model = "google/gemini-3-flash-preview";
-      librarian.model = "opencode/glm-4.7";
+      multimodal-looker.model = "opencode/kimi-k2.5";
+      librarian.model = "github-copilot/gemini-3-flash-preview";
       explore.model = "github-copilot/grok-code-fast-1";
-      atlas.model = "github-copilot/claude-sonnet-4.5";
+      atlas.model = "opencode/kimi-k2.5";
     };
     categories = {
-      visual-engineering.model = "google/gemini-3-pro-preview";
+      visual-engineering.model = "github-copilot/gemini-3.1-pro-preview";
       ultrabrain = {
         model = "github-copilot/gpt-5.2-codex";
         variant = "xhigh";
@@ -78,7 +78,7 @@
         variant = "medium";
       };
       artistry = {
-        model = "google/gemini-3-pro-preview";
+        model = "github-copilot/gemini-3.1-pro-preview";
         variant = "high";
       };
       quick.model = "github-copilot/claude-haiku-4.5";
@@ -86,8 +86,8 @@
         model = "github-copilot/claude-opus-4.6";
         variant = "max";
       };
-      unspecified-low.model = "github-copilot/claude-sonnet-4.5";
-      writing.model = "google/gemini-3-flash-preview";
+      unspecified-low.model = "github-copilot/claude-sonnet-4.6";
+      writing.model = "github-copilot/gemini-3-flash-preview";
     };
   };
 
@@ -119,7 +119,7 @@
     #   sisyphus.model = "github-copilot/claude-opus-4.6";
     #   sisyphus.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
     #   oracle.model = "github-copilot/gpt-5.2";
-    #   multimodal-looker.model = "github-copilot/gemini-3-flash-preview";
+    #   multimodal-looker.model = "opencode/kimi-k2.5";
     #   prometheus.model = "github-copilot/claude-opus-4.6";
     #   prometheus.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
     #   momus.model = "github-copilot/claude-opus-4.6";
@@ -130,7 +130,7 @@
     #   };
     #   explore.model = "github-copilot/claude-haiku-4.5";
     #   metis.model = "github-copilot/claude-sonnet-4.5";
-    #   atlas.model = "github-copilot/claude-sonnet-4.5";
+    #   atlas.model = "opencode/kimi-k2.5";
     # };
     # categories = {
     #   visual-engineering.model = "github-copilot/gemini-3-pro-preview";
