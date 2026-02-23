@@ -43,16 +43,18 @@
   personalOverrides = {
     agents = {
       sisyphus = {
-        model = "github-copilot/claude-opus-4.6";
-        variant = "max";
+        # model = "github-copilot/claude-opus-4.6";
+        # variant = "max";
+        model = "opencode/kimi-k2.5";
       };
       oracle = {
         model = "github-copilot/gpt-5.2";
         variant = "high";
       };
       prometheus = {
-        model = "github-copilot/claude-opus-4.6";
-        variant = "max";
+        # model = "github-copilot/claude-opus-4.6";
+        # variant = "max";
+        model = "github-copilot/gpt-5.2";
       };
       metis = {
         model = "github-copilot/claude-opus-4.6";
