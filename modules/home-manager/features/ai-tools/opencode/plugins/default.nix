@@ -17,6 +17,7 @@
     "@simonwjackson/opencode-direnv@latest"
     "@tarquinen/opencode-dcp@latest"
     "@franlol/opencode-md-table-formatter@latest"
+    "opencode-pty"
   ];
 
   # Plugins only for work profile
