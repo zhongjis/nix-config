@@ -41,6 +41,7 @@
   # Providers: GitHub Copilot, OpenCode Zen
   # Based on oh-my-opencode official model-requirements.ts recommendations
   personalOverrides = {
+    runtime_fallback.enabled = true;
     agents = {
       sisyphus = {
         # model = "github-copilot/claude-opus-4.6";
