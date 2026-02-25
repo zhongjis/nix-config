@@ -94,6 +94,10 @@
   };
 
   workOverrides = {
+    git_master = {
+      commit_footer = true;
+      include_co_authored_by = true;
+    };
     agents = {
       sisyphus.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
       oracle.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
