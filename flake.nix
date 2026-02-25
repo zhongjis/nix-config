@@ -68,7 +68,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
-    opencode.url = "github:anomalyco/opencode/v1.2.11";
+    opencode.url = "github:anomalyco/opencode/v1.2.14";
 
     ## hyprland
     hyprland.url = "github:hyprwm/Hyprland";
