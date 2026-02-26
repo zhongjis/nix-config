@@ -44,18 +44,16 @@
     runtime_fallback.enabled = true;
     agents = {
       sisyphus = {
-        # model = "github-copilot/claude-opus-4.6";
-        # variant = "max";
-        model = "opencode/kimi-k2.5";
+        model = "github-copilot/claude-opus-4.6";
+        variant = "max";
       };
       oracle = {
         model = "github-copilot/gpt-5.2";
         variant = "high";
       };
       prometheus = {
-        # model = "github-copilot/claude-opus-4.6";
-        # variant = "max";
-        model = "github-copilot/gpt-5.2";
+        model = "github-copilot/claude-opus-4.6";
+        variant = "max";
       };
       metis = {
         model = "github-copilot/claude-opus-4.6";
