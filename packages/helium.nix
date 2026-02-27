@@ -2,17 +2,17 @@
   pkgs,
   lib,
 }: let
-  version = "0.8.4.1";
+  version = "0.9.4.1";
 
   # Map from Nix system to architecture suffix and hash
   srcs = {
     x86_64-linux = {
       url = "https://github.com/imputnet/helium-linux/releases/download/${version}/helium-${version}-x86_64.AppImage";
-      sha256 = "sha256-y4KzR+pkBUuyVU+ALrzdY0n2rnTB7lTN2ZmVSzag5vE=";
+      sha256 = "sha256-N5gdWuxOrIudJx/4nYo4/SKSxakpTFvL4zzByv6Cnug=";
     };
     aarch64-linux = {
       url = "https://github.com/imputnet/helium-linux/releases/download/${version}/helium-${version}-arm64.AppImage";
-      sha256 = "sha256-fTPLZmHAqJqDDxeGgfSji/AY8nCt+dVeCUQIqB80f7M=";
+      sha256 = "sha256-BvU0bHtJMd6e09HY+9Vhycr3J0O2hunRJCHXpzKF8lk=";
     };
   };
 
@@ -43,10 +43,6 @@ in
 
       mkdir -p $out/share/icons/hicolor/256x256/apps
       cp ${appimageContents}/helium.png $out/share/icons/hicolor/256x256/apps/
-
-      # Fix desktop file Exec command
-      substituteInPlace $out/share/applications/${pname}.desktop \
-        --replace-fail 'Exec=AppRun' 'Exec=${pname}'
     '';
 
     meta = with lib; {
