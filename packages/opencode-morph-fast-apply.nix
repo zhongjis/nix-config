@@ -4,13 +4,13 @@
 }:
 pkgs.buildNpmPackage {
   pname = "opencode-morph-fast-apply";
-  version = "1.5.0";
+  version = "1.6.0";
 
   src = pkgs.fetchFromGitHub {
     owner = "JRedeker";
     repo = "opencode-morph-fast-apply";
-    rev = "4ba0d8f12417a9cf9b23a1fde62b47f4e1d18e1e";
-    sha256 = "sha256-0Ex1OnwhkZB9eZz2ZAK8pxGUVGIkIiaaiDhrkG29rN0=";
+    rev = "e663886e8189a21d104a8ac97542a5f4836a2b18";
+    sha256 = "sha256-rls4CHfwfGKT7lApC6ziRYUDj2R/gUMmlZiI6nLaYwU=";
   };
 
   npmDepsHash = "sha256-hn2DAfQGpwoGIzNjrhV+ijU4ZRRvx9HQZcqYdwAqiss=";
