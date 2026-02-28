@@ -43,15 +43,8 @@
   personalOverrides = {
     runtime_fallback.enabled = true;
     agents = {
+      # claude family
       sisyphus = {
-        model = "github-copilot/claude-opus-4.6";
-        variant = "max";
-      };
-      oracle = {
-        model = "github-copilot/gpt-5.2";
-        variant = "high";
-      };
-      prometheus = {
         model = "github-copilot/claude-opus-4.6";
         variant = "max";
       };
@@ -59,23 +52,38 @@
         model = "github-copilot/claude-opus-4.6";
         variant = "max";
       };
+
+      # gpt/claude dual
+      prometheus = {
+        model = "github-copilot/claude-opus-4.6";
+        variant = "max";
+      };
+      atlas.model = "opencode/kimi-k2.5";
+
+      # deep/gpt
+      hephaestus.model = "opencode/gpt-5.3-codex";
+      oracle = {
+        model = "github-copilot/gpt-5.2";
+        variant = "high";
+      };
       momus = {
         model = "github-copilot/gpt-5.2";
         variant = "medium";
       };
+
+      # utility
       multimodal-looker.model = "opencode/kimi-k2.5";
       librarian.model = "github-copilot/gemini-3-flash-preview";
       explore.model = "github-copilot/grok-code-fast-1";
-      atlas.model = "opencode/kimi-k2.5";
     };
     categories = {
       visual-engineering.model = "github-copilot/gemini-3.1-pro-preview";
       ultrabrain = {
-        model = "github-copilot/gpt-5.2-codex";
+        model = "opencode/gpt-5.3-codex";
         variant = "xhigh";
       };
       deep = {
-        model = "github-copilot/gpt-5.2-codex";
+        model = "opencode/gpt-5.3-codex";
         variant = "medium";
       };
       artistry = {
