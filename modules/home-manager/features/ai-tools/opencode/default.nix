@@ -24,8 +24,8 @@
       postPatch =
         (oldAttrs.postPatch or "")
         + ''
-          # Patch out bun version check that fails with bun 1.3.8 (requires ^1.3.9)
-          # TODO: remove once upstream opencode updates their nixpkgs to include bun >= 1.3.9
+          # Patch out bun version check - opencode v1.2.15 packageManager requires ^1.3.10
+          # but nixpkgs only has bun 1.3.9. Remove once nixpkgs bun >= 1.3.10
           sed -i '/semver\.satisfies(process\.versions\.bun/,/^[[:space:]]*}/s/.*//' packages/script/src/index.ts
         '';
     });
