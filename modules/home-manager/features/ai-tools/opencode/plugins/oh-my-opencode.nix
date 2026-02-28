@@ -74,7 +74,7 @@
       # utility
       multimodal-looker.model = "opencode/kimi-k2.5";
       librarian.model = "github-copilot/gemini-3-flash-preview";
-      explore.model = "github-copilot/grok-code-fast-1";
+      explore.model = "github-copilot/claude-haiku-4.5";
     };
     categories = {
       visual-engineering.model = "github-copilot/gemini-3.1-pro-preview";
