@@ -31,8 +31,14 @@ in {
 
   programs.claude-code = {
     enable = true;
-    enableMcpIntegration = true;
-    package = pkgs.claude-code;
+    enableMcpIntegration =
+      if pkgs.stdenv.isDarwin
+      then false
+      else true;
+    package =
+      if pkgs.stdenv.isDarwin
+      then null
+      else pkgs.claude-code;
 
     skills = allSkills;
 

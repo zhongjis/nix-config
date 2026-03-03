@@ -91,6 +91,8 @@
       "bitwarden"
       "ghostty"
 
+      "claude-code"
+
       "obsidian"
       "spotify"
       "localsend"
