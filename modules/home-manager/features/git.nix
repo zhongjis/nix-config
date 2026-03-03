@@ -12,10 +12,9 @@
         name = lib.mkDefault "zhongjis";
         email = lib.mkDefault "zhongjie.x.shen@gmail.com";
       };
-      alias = {};
       core = {
         compression = 9;
-        whitespace = "error";
+        whitespace = "trailing-space,space-before-tab";
         preloadindex = true;
       };
       init = {
@@ -27,7 +26,6 @@
         showUntrackedFiles = "all";
       };
       diff = {
-        context = 3;
         renames = "copies";
         interHunkContext = 10;
       };
@@ -37,15 +35,33 @@
         followTags = true;
       };
       pull = {
-        default = "current";
         rebase = true;
       };
       rebase = {
         autoStash = true;
-        missingCommitsCheck = true;
+        missingCommitsCheck = "warn";
       };
       branch.sort = "-committerdate";
       tag.sort = "-taggerdate";
+      fetch = {
+        prune = true;
+        prunetags = true;
+      };
+      merge = {
+        conflictstyle = "zdiff3";
+      };
+      rerere = {
+        enabled = true;
+      };
+      commit = {
+        verbose = true;
+      };
+      help = {
+        autocorrect = "prompt";
+      };
+      transfer = {
+        fsckobjects = true;
+      };
     };
 
     # settings.attributes = [];
