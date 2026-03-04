@@ -58,7 +58,8 @@
         model = "github-copilot/claude-opus-4.6";
         variant = "max";
       };
-      atlas.model = "opencode/kimi-k2.5";
+      # atlas.model = "opencode/kimi-k2.5";
+      atlas.model = "kimi-for-coding/k2p5";
 
       # deep/gpt
       hephaestus.model = "opencode/gpt-5.3-codex";
@@ -72,7 +73,8 @@
       };
 
       # utility
-      multimodal-looker.model = "opencode/kimi-k2.5";
+      # multimodal-looker.model = "opencode/kimi-k2.5";
+      multimodal-looker.model = "kimi-for-coding/k2p5";
       librarian.model = "github-copilot/gemini-3-flash-preview";
       explore.model = "github-copilot/claude-haiku-4.5";
     };
