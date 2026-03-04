@@ -16,12 +16,12 @@
     };
   };
 
-  srcInfo = srcs.${pkgs.system} or (throw "Unsupported system: ${pkgs.system}");
+  srcInfo = srcs.${pkgs.stdenv.hostPlatform.system} or (throw "Unsupported system: ${pkgs.stdenv.hostPlatform.system}");
 
   src = pkgs.fetchurl {
     url = srcInfo.url;
     sha256 = srcInfo.sha256;
-    name = "devtoys-${version}-${pkgs.system}.deb";
+    name = "devtoys-${version}-${pkgs.stdenv.hostPlatform.system}.deb";
   };
 in
   pkgs.stdenv.mkDerivation rec {

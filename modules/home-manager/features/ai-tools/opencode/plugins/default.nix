@@ -9,7 +9,7 @@
   pluginLib = import ./lib.nix {inherit lib;};
 
   # Nix-built plugins (for packages not on npm or with github: prefix issues)
-  morphFastApplyPkg = inputs.self.packages.${pkgs.system}.opencode-morph-fast-apply;
+  morphFastApplyPkg = inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.opencode-morph-fast-apply;
 
   # Plugins available to all profiles
   generalPlugins = [

@@ -12,7 +12,7 @@
   ...
 }: let
   sopsFile = inputs.self + "/secrets/ai-tokens.yaml";
-  morphPkg = inputs.self.packages.${pkgs.system}.opencode-morph-fast-apply;
+  morphPkg = inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.opencode-morph-fast-apply;
   secretPath = config.sops.secrets.morph_api_key.path;
 in
   lib.mkIf (hasPlugin "opencode-morph-fast-apply") {
