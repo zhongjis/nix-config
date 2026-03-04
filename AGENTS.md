@@ -319,6 +319,74 @@ jj edit <change-id>
 - Bookmarks replace branches: `jj bookmark set main -r @`
 - The `*` after a bookmark name (e.g., `main*`) means it's ahead of the remote
 
+## AI Skills Guidelines
+
+This repository manages AI agent skills that are installed system-wide via Home Manager. Skills live at `modules/home-manager/features/ai-tools/common/skills/` and are auto-discovered by the Nix module.
+
+### Skill Locations
+
+| Location | Path | Purpose |
+|----------|------|---------|
+| General (shared) | `modules/home-manager/features/ai-tools/common/skills/general/` | Skills available to all systems |
+| Work | `modules/home-manager/features/ai-tools/common/skills/work/` | Work-specific skills |
+| Personal | `modules/home-manager/features/ai-tools/common/skills/personal/` | Personal skills |
+| Project-specific | `.agents/skills/` | Skills for this repo only (not installed system-wide) |
+
+### Skill Structure
+
+Each skill is a directory containing at minimum a `SKILL.md` file with YAML frontmatter:
+
+```yaml
+---
+name: skill-name
+description: "What the skill does and when to trigger it."
+upstream: "https://github.com/org/repo/tree/main/skills/skill-name"  # only for skills from external sources
+---
+```
+
+### Frontmatter Convention
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `name` | Yes | Skill identifier |
+| `description` | Yes | What the skill does and when to trigger it |
+| `upstream` | No | URL to the upstream source. **Present = sourced externally.** Absent = locally created. |
+
+The `upstream` field is the canonical way to track skill provenance. If a skill was installed from an external repository (e.g., `github.com/anthropics/skills`), it must have an `upstream` field pointing to the source directory. Locally created skills must NOT have this field.
+
+### Genericization Rules (MANDATORY)
+
+**All skills in this repository must be vendor-neutral.** Skills must not be locked to any specific AI model provider. They should work with any AI agent, not just one vendor's tools.
+
+| Replace | With |
+|---------|------|
+| "Claude", "Claude Code" | "AI Agent" or "the model" |
+| "Anthropic" (as branding) | "default branding" or remove |
+| ".claude/skills/" | ".opencode/skills/" |
+| "claude.ai" | remove or make generic |
+| "Cowork", "Claude.ai's VM" | remove section entirely |
+| Vendor-specific eval tooling (e.g., `claude -p`) | remove or genericize |
+
+**When updating skills from upstream:**
+
+1. Fetch the latest content from the `upstream` URL
+2. Compare with local version to identify new/changed content
+3. Apply content updates (new sections, fixes, improvements)
+4. Genericize all vendor-specific references per the table above
+5. Preserve any local customizations not present upstream
+6. Verify with `nix flake check --no-build`
+
+**Exceptions:**
+- Filesystem paths like `~/.config/claude/` may remain when they are actual config paths
+- Code examples showing XML/API responses may contain vendor names as data values
+- The `upstream` URL itself naturally references vendor repos — this is expected
+
+### Adding New Skills
+
+- **From external source**: Create skill directory, add `upstream` field, genericize all content
+- **Locally created**: Create skill directory, omit `upstream` field
+- **Disabling a skill**: Prefix directory name with `disabled-` (e.g., `disabled-my-skill/`)
+
 ## Reference Documentation
 
 - [Nix Manual](https://nixos.org/manual/nix/stable/)

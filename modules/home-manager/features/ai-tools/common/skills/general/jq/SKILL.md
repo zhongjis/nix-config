@@ -1,7 +1,7 @@
 ---
 name: jq
 description: Extract specific fields from JSON files efficiently using jq instead of reading entire files, saving 80-95% context.
-source: https://github.com/benchflow-ai/skillsbench/tree/47e9ce24f24dfe2c53bd8437d4f2eb54d715490b/registry/terminal_bench_2.0/full_batch_reviewed/terminal_bench_2_0_build-pmars/environment/skills/jq
+upstream: https://github.com/benchflow-ai/skillsbench/tree/47e9ce24f24dfe2c53bd8437d4f2eb54d715490b/registry/terminal_bench_2.0/full_batch_reviewed/terminal_bench_2_0_build-pmars/environment/skills/jq
 ---
 
 # jq: JSON Data Extraction Tool

@@ -1,8 +1,7 @@
 ---
 name: skill-creator
 description: Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends AI Agent's capabilities with specialized knowledge, workflows, or tool integrations.
-license: Complete terms in LICENSE.txt
-source: https://github.com/anthropics/skills#
+upstream: "https://github.com/anthropics/skills/tree/main/skills/skill-creator"
 ---
 
 # Skill Creator
@@ -111,6 +110,10 @@ A skill should only contain essential files that directly support its functional
 - etc.
 
 The skill should only contain the information needed for an AI agent to do the job at hand. It should not contain auxilary context about the process that went into creating it, setup and testing procedures, user-facing documentation, etc. Creating additional documentation files just adds clutter and confusion.
+
+#### Principle of Lack of Surprise
+
+Skills must not contain malware, exploit code, or misleading content. The skill's name, description, and behavior should all align — a skill called "pdf-editor" should edit PDFs, not exfiltrate data. When reviewing or creating skills, verify that scripts do what they claim and that no hidden functionality exists.
 
 ### Progressive Disclosure Design Principle
 
@@ -331,6 +334,8 @@ Write the YAML frontmatter with `name` and `description`:
 - `description`: This is the primary triggering mechanism for your skill, and helps AI Agent understand when to use the skill.
   - Include both what the Skill does and specific triggers/contexts for when to use it.
   - Include all "when to use" information here - Not in the body. The body is only loaded after triggering, so "When to Use This Skill" sections in the body are not helpful to AI Agent.
+  - Be slightly "pushy" in the description to combat undertriggering — err on the side of triggering too often rather than too rarely. It's better for the skill to activate and provide guidance even when marginally relevant.
+  - Include example trigger phrases or user queries that should activate the skill (e.g., "Triggers on 'create a deck', 'make slides', 'build a presentation'").
   - Example description for a `docx` skill: "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. Use when AI Agent needs to work with professional documents (.docx files) for: (1) Creating new documents, (2) Modifying or editing content, (3) Working with tracked changes, (4) Adding comments, or any other document tasks"
 
 Do not include any other fields in YAML frontmatter.
@@ -378,3 +383,10 @@ After testing the skill, users may request improvements. Often this happens righ
 2. Notice struggles or inefficiencies
 3. Identify how SKILL.md or bundled resources should be updated
 4. Implement changes and test again
+
+**Principles for improving skills:**
+
+- **Generalize from feedback** - When a skill fails on a specific case, fix the root cause rather than adding a special case. If a docx skill fails on tracked changes, improve the tracked changes guidance generally rather than adding a fix for one document.
+- **Keep the prompt lean** - After iteration, review the full SKILL.md and remove content that isn't pulling its weight. If a section is never relevant to real usage, cut it. Token cost should be justified by value.
+- **Explain the why, not just the what** - Instead of rigid "MUST DO X" rules, explain the reasoning. An AI Agent that understands *why* a step matters can adapt when circumstances change. Heavy-handed constraints often backfire in edge cases.
+- **Look for repeated work** - If the AI Agent keeps writing similar helper code across different uses of the skill, that's a signal to bundle it into `scripts/`. Convert common patterns into reusable scripts to save tokens and ensure consistency.
