@@ -1,11 +1,53 @@
 ---
 name: jujutsu
-description: Manages version control with Jujutsu (jj), including rebasing, conflict resolution, and Git interop. Use when tracking changes, navigating history, squashing/splitting commits, or pushing to Git remotes.
+description: "Manages version control with Jujutsu (jj), including rebasing, conflict resolution, and Git interop. Use when tracking changes, navigating history, squashing/splitting commits, or pushing to Git remotes. Triggers on 'commit', 'commit my changes', 'save changes', 'push', 'rebase', 'squash', 'jj', 'describe changes', 'create PR', or any version control request in a jj-managed repository."
 ---
 
 # Jujutsu
 
 Git-compatible VCS focused on concurrent development and ease of use.
+
+**Trigger**: `commit`, `save changes`, `push`, `rebase`, `squash`, `describe`, `jj`, or any VCS operation when `.jj/` directory exists.
+
+## ⚠️ Precedence Rule
+
+**When a repository contains a `.jj/` directory, this skill takes precedence over git-based workflows.** Never use `git add`, `git commit`, or `git push` in a jj-managed repo. All version control operations MUST use `jj` commands.
+
+**Detection**: Check for `.jj/` directory at repo root. If present → use jj. If absent → fall back to git.
+
+## Git Mental Model Translation
+
+| User Says | Git Equivalent | Jj Command |
+| --- | --- | --- |
+| "commit" / "commit my changes" | `git add . && git commit -m "msg"` | `jj desc -m "msg"` (changes are already tracked) |
+| "save and start new work" | `git commit -m "msg"` | `jj desc -m "msg" && jj new` |
+| "push" | `git push` | `jj git push` |
+| "create a branch" | `git checkout -b name` | `jj bookmark create name -r @` |
+| "stash" | `git stash` | Not needed — just `jj new` and come back later |
+| "amend" / "add to last commit" | `git commit --amend` | `jj squash` |
+| "rebase" | `git rebase` | `jj rebase -d destination` |
+| "see what changed" | `git diff` / `git status` | `jj diff` / `jj st` |
+| "log" / "history" | `git log` | `jj log` |
+
+## Commit Workflow (When User Says "Commit")
+
+Jujutsu has **no staging area**. All file changes are automatically part of the current change. The "commit" workflow is:
+
+```bash
+# Step 1: Describe the current change (this IS the "commit")
+jj desc -m "feat: add new feature"
+
+# Step 2: Create a new empty change to continue working
+jj new
+
+# That's it. No `add`, no `stage`, no `commit`.
+```
+
+**Important behaviors:**
+- `jj desc` on the working copy (`@`) is the equivalent of `git commit`
+- After `jj desc`, always run `jj new` to start fresh work (otherwise you'll keep editing the same change)
+- If user says "commit" without a message, ask for one — then use `jj desc -m "message" && jj new`
+- Use conventional commits format: `type(scope): description`
 
 ## Key Commands
 
@@ -99,12 +141,13 @@ jj metaedit -r @ -m "new message"  # Edit metadata only
 
 ## Tips
 
-- No staging: changes are immediate
+- No staging: changes are immediate — never use `git add` in a jj repo
 - Use conventional commits: `type(scope): desc`
 - `jj undo` to revert operations
 - `jj op log` to see operation history
 - Bookmarks are like branches
 - `jj absorb` is powerful for fixing up commits in a stack
+- When user says "commit", always use `jj desc -m "msg" && jj new`
 
 ## Related Skills
 
