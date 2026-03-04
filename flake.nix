@@ -71,7 +71,7 @@
     opencode.url = "github:anomalyco/opencode/v1.2.16";
 
     ## hyprland
-    hyprland.url = "github:hyprwm/Hyprland";
+    hyprland.url = "github:hyprwm/Hyprland/v0.54.1";
     hyprland-plugins = {
       url = "github:hyprwm/hyprland-plugins";
       inputs.hyprland.follows = "hyprland";
