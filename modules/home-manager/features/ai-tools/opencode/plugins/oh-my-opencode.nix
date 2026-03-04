@@ -29,7 +29,7 @@
     disabled_skills = ["playwright"];
     browser_automation_engine.provider = "agent-browser";
     tmux = {
-      enabled = true;
+      enabled = false;
       layout = "main-vertical";
       main_pane_size = 60;
       main_pane_min_width = 120;
