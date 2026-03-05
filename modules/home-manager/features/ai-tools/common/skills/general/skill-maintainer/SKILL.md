@@ -1,20 +1,61 @@
 ---
 name: skill-maintainer
-description: "Maintain AI agent skills in this Nix config repository. Use when the user wants to add new skills from external repositories, update skills from upstream sources, check which skills need updates, sync skills with their upstream, or manage skill provenance tracking. Triggers on requests like 'add skill from [URL]', 'update skills', 'sync skills from upstream', 'check for skill updates', 'which skills are from upstream?', or 'update the anthropic skills'."
+description: "Maintain AI agent skills — add from upstream repositories, update from upstream sources, check for updates, sync with upstream, and manage skill provenance. Works in any project. Triggers on 'add skill from [URL]', 'install skill', 'update skills', 'sync skills from upstream', 'check for skill updates', 'which skills are from upstream?', 'compare skill with upstream', or 'update the anthropic skills'."
 ---
 
 # Skill Maintainer
 
-Maintain AI agent skills installed in this nix-config repository via Home Manager. Handles adding new skills from external sources, updating existing skills from upstream, and managing skill provenance.
+Maintain AI agent skills — add new skills from external sources, update existing skills from upstream, and manage skill provenance tracking. Works in any project context.
 
-## Skill Locations
+## Context Detection
 
-| Location | Path | Purpose |
-|----------|------|---------|
-| General (shared) | `modules/home-manager/features/ai-tools/common/skills/general/` | Skills installed on all systems |
-| Work | `modules/home-manager/features/ai-tools/common/skills/work/` | Work-specific skills |
-| Personal | `modules/home-manager/features/ai-tools/common/skills/personal/` | Personal skills |
-| Project-specific | `.agents/skills/` | Skills for this repo only (not installed system-wide) |
+Before performing any operation, detect the environment:
+
+```bash
+# Check if this is a Nix config repo with Home Manager skill infrastructure
+if [ -f "flake.nix" ] && [ -d "modules/home-manager/features/ai-tools" ]; then
+  echo "nix-config-repo"
+else
+  echo "generic-project"
+fi
+```
+
+- **Nix config repo detected** → Offer Nix-managed skill paths as an install target
+- **Generic project** → Offer project-level and tool-specific paths
+
+## Install Target Selection
+
+**Always ask the user where to install.** Present applicable options based on context:
+
+### If Nix Config Repo Detected
+
+> Where would you like to install this skill?
+>
+> 1. **This Nix config** — System-wide via Home Manager (persists across rebuilds)
+>    - `modules/home-manager/features/ai-tools/common/skills/general/` (all systems)
+>    - `modules/home-manager/features/ai-tools/common/skills/work/` (work profile)
+>    - `modules/home-manager/features/ai-tools/common/skills/personal/` (personal profile)
+> 2. **Project-level** — `.agents/skills/` (this repo only)
+> 3. **Specific coding tool** — directly into a tool's config directory
+
+### If Generic Project
+
+> Where would you like to install this skill?
+>
+> 1. **Project-level** — `.agents/skills/` (this repo only)
+> 2. **Specific coding tool** — directly into a tool's config directory
+
+### Tool-Specific Paths
+
+When the user chooses "specific coding tool", ask which tool:
+
+| Tool | Skill Path |
+|------|-----------|
+| OpenCode | `~/.config/opencode/skills/` |
+| Claude Code | `~/.claude/skills/` |
+| Factory.ai | `~/.factory/skills/` |
+
+If the user's tool is not listed, ask them for the path.
 
 ## Upstream Tracking Convention
 
@@ -33,19 +74,17 @@ upstream: "https://github.com/org/repo/tree/main/skills/skill-name"
 
 ### Identifying Skills by Provenance
 
-```bash
-# Find all upstream-sourced skills
-grep -rl '^upstream:' modules/home-manager/features/ai-tools/common/skills/
+Adapt the search path based on the detected context:
 
-# Find local-only skills (no upstream field)
-for d in modules/home-manager/features/ai-tools/common/skills/general/*/; do
-  skill=$(basename "$d")
-  file="$d/SKILL.md"
-  [ ! -f "$file" ] && file="$d/*/SKILL.md"
-  if ! grep -q '^upstream:' $file 2>/dev/null; then
-    echo "$skill (local)"
-  fi
-done
+```bash
+# In a Nix config repo — search Nix-managed skills
+grep -rl '^upstream:' modules/home-manager/features/ai-tools/common/skills/ --include="SKILL.md"
+
+# In any project — search project-level skills
+grep -rl '^upstream:' .agents/skills/ --include="SKILL.md"
+
+# In a tool-specific directory
+grep -rl '^upstream:' ~/.config/opencode/skills/ --include="SKILL.md"
 ```
 
 ## URL Parsing
@@ -104,11 +143,11 @@ The skill directory should contain at minimum a `SKILL.md`. It may also contain 
 ### Step 3: Copy to Target
 
 ```bash
-# Copy the entire skill directory
+# Copy the entire skill directory to the user's chosen install target
 cp -r /tmp/{repo}/{path/to/skill} {target-location}/{skill-name}
 ```
 
-Where `{target-location}` is one of the skill locations from the table above (usually `modules/home-manager/features/ai-tools/common/skills/general/`).
+Where `{target-location}` is the path chosen by the user during Install Target Selection.
 
 ### Step 4: Clean Up
 
@@ -122,23 +161,25 @@ rm -rf /tmp/{repo}
 
 When adding a skill from an external source for the first time:
 
-1. **Parse the URL** to extract clone URL, branch, and skill path (see URL Parsing above)
-2. **Clone and copy** using the Clone-to-/tmp Workflow above
-3. **Fix the frontmatter** in the copied SKILL.md:
+1. **Detect context** and **ask the user** for the install target (see Context Detection and Install Target Selection above)
+2. **Parse the URL** to extract clone URL, branch, and skill path (see URL Parsing above)
+3. **Clone and copy** using the Clone-to-/tmp Workflow above
+4. **Fix the frontmatter** in the copied SKILL.md:
    - Add the `upstream` field set to the original GitHub tree URL
    - Remove any `license`, `source`, or other non-standard tracking fields — `upstream` is the canonical provenance field
    - Verify `name` and `description` are present and accurate
-4. **Genericize** all vendor-specific references (see Genericize section below)
-5. **Verify** with `nix flake check --no-build`
+5. **Genericize** all vendor-specific references (see Genericize section below)
+6. **Verify** — if in a Nix config repo, run `nix flake check --no-build`
 
 ## Update Workflow
 
 ### Step 1: Identify Skills to Update
 
-List all skills with `upstream` fields and their source URLs:
+Search for skills with `upstream` fields in the relevant location:
 
 ```bash
-grep -r '^upstream:' modules/home-manager/features/ai-tools/common/skills/ --include="SKILL.md"
+# Adapt the search path to context (Nix-managed, project-level, or tool-specific)
+grep -r '^upstream:' {skills-directory} --include="SKILL.md"
 ```
 
 ### Step 2: Clone and Compare
@@ -182,7 +223,7 @@ For surgical updates where only specific sections changed, prefer using `edit` t
 # Remove the clone
 rm -rf /tmp/{repo}
 
-# Verify the flake
+# If in a Nix config repo, verify the flake
 nix flake check --no-build
 ```
 
@@ -217,5 +258,5 @@ Example: An upstream eval framework requiring `claude -p` to spawn test runs sho
 ## When NOT to Use This Skill
 
 - Modifying **local-only skills** (no `upstream` field) — those are custom and not synced from anywhere
-- Editing **project-specific skills** in `.agents/skills/` — those serve this repo specifically
 - Creating **brand new skills from scratch** — use the `skill-creator` skill instead
+- **Discovering** what skills exist in the ecosystem — use the `find-skills` skill instead
