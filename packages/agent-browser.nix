@@ -2,25 +2,27 @@
   pkgs,
   lib,
 }: let
-  pnpm = pkgs.pnpm_9;
   nodejs = pkgs.nodejs_22;
 
   # Build the Rust CLI separately
   rustCli = pkgs.rustPlatform.buildRustPackage {
     pname = "agent-browser-cli";
-    version = "0.8.5";
+    version = "0.16.3";
 
     src = pkgs.fetchFromGitHub {
       owner = "vercel-labs";
       repo = "agent-browser";
-      tag = "v0.8.5";
-      hash = "sha256-RPtCzOk4ugnMpocp+hFL0JleClaSp1YgTESnJfA1s6s=";
+      tag = "v0.16.3";
+      hash = "sha256-JGPKL9dtsO+kukBxuVJRQAggJVstmAPWEHUWIpRRFrM=";
     };
 
     sourceRoot = "source/cli";
 
-    useFetchCargoVendor = true;
-    cargoHash = "sha256-dUaytYA/5CciW4mpj2T3BKJGg9bGV+vZ8i87EA+x9Qo=";
+    cargoHash = "sha256-WbvfAhSwFPR/pHrlPQIWVw2kx+YgbIicVhvWugv9mxc=";
+
+    # Auth/credential tests require real filesystem access (home dir, keyring)
+    # which is unavailable in the Nix sandbox
+    doCheck = false;
 
     meta = with lib; {
       description = "Native CLI for agent-browser";
@@ -32,24 +34,25 @@
 in
   pkgs.stdenv.mkDerivation (finalAttrs: {
     pname = "agent-browser";
-    version = "0.8.5";
+    version = "0.16.3";
 
     src = pkgs.fetchFromGitHub {
       owner = "vercel-labs";
       repo = "agent-browser";
       tag = "v${finalAttrs.version}";
-      hash = "sha256-RPtCzOk4ugnMpocp+hFL0JleClaSp1YgTESnJfA1s6s=";
+      hash = "sha256-JGPKL9dtsO+kukBxuVJRQAggJVstmAPWEHUWIpRRFrM=";
     };
 
-    pnpmDeps = pnpm.fetchDeps {
+    pnpmDeps = pkgs.fetchPnpmDeps {
       inherit (finalAttrs) pname version src;
       fetcherVersion = 2;
-      hash = "sha256-epxxIA0uIB8T8Y/BPhUcIWDLvrxuC/FmAQLqwM8RMEc=";
+      hash = "sha256-zoADdGTlawFGGxC1DMnBUD7U3ayPcHRR/MwN5jMbDl8=";
     };
 
     nativeBuildInputs = [
       nodejs
-      pnpm.configHook
+      pkgs.pnpm_9
+      pkgs.pnpmConfigHook
       pkgs.makeWrapper
     ];
 
