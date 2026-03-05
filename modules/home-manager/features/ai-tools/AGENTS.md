@@ -1,0 +1,86 @@
+# AI TOOLS MODULE
+
+Profile-based, tool-agnostic configuration for OpenCode, Claude Code, and Factory.ai. Manages skills, plugins, agents, instructions, MCP servers, and permissions.
+
+## PROFILE SYSTEM
+
+`myHomeManager.aiProfile` (enum: `"work"` | `"personal"`) → `aiProfileHelpers` exposed via `_module.args`:
+- `aiProfileHelpers.profile` — current profile string
+- `aiProfileHelpers.isWork` / `aiProfileHelpers.isPersonal` — boolean guards
+
+Set per host in `hosts/{name}/home.nix`. Used for filtering skills, instructions, MCP servers, and plugins.
+
+## STRUCTURE
+
+```
+ai-tools/
+├── default.nix              # Imports common + tool modules, defines aiProfile option
+├── profile-option.nix       # aiProfile enum + helpers
+├── common/                  # Shared across all tools
+│   ├── skills/              # Auto-discovered skill directories
+│   │   ├── general/         # All systems (~35 skills)
+│   │   ├── work/            # Work profile only
+│   │   └── personal/        # Personal profile only
+│   ├── instructions/        # Markdown instruction files
+│   │   ├── general/         # All systems
+│   │   ├── work/            # Work profile only
+│   │   └── personal/        # Personal profile only
+│   ├── mcp/                 # MCP server definitions
+│   └── agents/              # Agent configuration
+├── opencode/                # OpenCode-specific
+│   ├── plugins/             # oh-my-opencode plugins
+│   ├── skills/              # OpenCode-only skills
+│   ├── agents/              # Agent definitions
+│   ├── instructions/        # OpenCode-only instructions
+│   ├── permission.nix       # Runtime permission wildcards
+│   ├── provider.nix         # LLM provider config
+│   ├── formatters.nix       # Code formatters
+│   └── lsp.nix              # LSP server config
+├── claude-code/             # Claude Code-specific (skills, agents, instructions)
+└── factory/                 # Factory.ai-specific (skills only, via home.file symlinks)
+```
+
+## SKILL AUTO-DISCOVERY
+
+Skills are directories containing `SKILL.md`. Auto-discovered at Nix eval time:
+
+```nix
+discoverSkills = profileDir: let
+  dirs = myLib.dirsIn profileDir;
+  enabledDirs = lib.filterAttrs (name: _: !(lib.hasPrefix "disabled-" name)) dirs;
+in lib.mapAttrs (name: _: profileDir + "/${name}") enabledDirs;
+```
+
+- **Disable a skill**: prefix directory with `disabled-` (e.g., `disabled-find-skills/`)
+- **Merge order**: common skills → tool-specific skills (tool overrides common on name collision)
+- **Exposed via**: `_module.args.commonSkills`, merged into `programs.opencode.skills` / `programs.claude-code.skills` / `home.file` (factory)
+
+## SKILL CONVENTIONS
+
+- Each skill: directory with `SKILL.md` + optional supporting files
+- YAML frontmatter: `name`, `description`, optional `upstream` (external source URL)
+- **`upstream` present** → sourced externally, can be updated via skill-maintainer
+- **`upstream` absent** → locally created, do not attempt upstream sync
+- **ALL skills must be vendor-neutral** — see Genericize rules in skill-maintainer skill
+
+## OPENCODE PLUGIN SYSTEM
+
+Plugins configured via `pluginLib` helpers in `opencode/plugins/`:
+
+- `pluginLib.normalizePluginName` — extracts name from `@scope/plugin@version`, `github:user/repo@ref`, `file:///path`
+- `pluginLib.mkOpenCodePluginList` — builds plugin list from generalPlugins + profile-filtered lists
+- `pluginLib.hasPlugin` — conditional config based on plugin presence
+
+**oh-my-opencode**: Nix attrsets → JSON generation. Profile overrides via `recursiveUpdate`. Plugins inject settings via `programs.opencode.ohMyOpenCode.settings`.
+
+## MCP SERVERS
+
+Defined in `common/mcp/default.nix`. General: nixos-docs, context7, mcp-k8s. Personal: flux-operator-mcp.
+
+## ADDING NEW SKILLS
+
+1. Create directory in appropriate location (general/work/personal, common or tool-specific)
+2. Add `SKILL.md` with YAML frontmatter (`name`, `description`)
+3. If from external source, add `upstream` field
+4. Genericize all vendor-specific content
+5. `nh darwin switch .` to apply (auto-discovered, no registration needed)
