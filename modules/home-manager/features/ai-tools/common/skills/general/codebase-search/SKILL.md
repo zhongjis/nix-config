@@ -1,476 +1,383 @@
 ---
 name: codebase-search
 description: |
-  Search and navigate large codebases efficiently. Use when finding specific
-  code patterns, tracing function calls, understanding code structure, or
-  locating bugs. Handles semantic search, grep patterns, AST analysis.
+  Search and navigate codebases — both local and remote. Use when finding specific
+  code patterns, tracing function calls, understanding code structure, locating bugs,
+  or searching GitHub repositories for implementations and examples. Handles semantic
+  search, grep patterns, AST analysis, and remote code search via GitHub CLI and API.
+  Also use when the user asks "how do other projects do X", "find examples of Y on GitHub",
+  "search repo Z for", or wants to explore code in repositories they haven't cloned.
+companions: [gh]
 upstream: https://github.com/supercent-io/skills-template/blob/a6d8358b4343a65059531af7656749275926052d/.agent-skills/codebase-search/SKILL.md
 ---
 
 # Codebase Search
 
 ## When to use this skill
+
+**Local search** (code you have checked out):
 - Finding specific functions or classes
 - Tracing function calls and dependencies
 - Understanding code structure and architecture
-- Finding usage examples
-- Identifying code patterns
+- Finding usage examples and code patterns
 - Locating bugs or issues
 - Code archaeology (understanding legacy code)
 - Impact analysis before changes
 
-## Instructions
+**Remote search** (code on GitHub you may not have locally):
+- Finding real-world usage patterns of a library or API
+- Searching a specific GitHub repository without cloning it
+- Exploring how other projects solve a similar problem
+- Looking up implementation examples across open-source projects
+- Investigating code in upstream dependencies or forks
 
-### Step 1: Understand what you're looking for
+## Step 1: Understand what you're looking for
 
-**Feature implementation**:
-- Where is feature X implemented?
-- How does feature Y work?
-- What files are involved in feature Z?
+Classify the question before choosing tools:
 
-**Bug location**:
-- Where is this error coming from?
-- What code handles this case?
-- Where is this data being modified?
+| Category | Example questions |
+|----------|-------------------|
+| **Feature implementation** | Where is feature X implemented? How does Y work? |
+| **Bug location** | Where is this error thrown? What handles this case? |
+| **API usage** | How is this function called? Show me examples. |
+| **Configuration** | Where are settings defined? What are the options? |
+| **Cross-project patterns** | How do other projects handle auth? What's the convention for X? |
 
-**API usage**:
-- How is this API used?
-- Where is this function called?
-- What are examples of using this?
+## Step 2: Decide scope — local, remote, or both
 
-**Configuration**:
-- Where are settings defined?
-- How is this configured?
-- What are the config options?
-
-### Step 2: Choose search strategy
-
-**Semantic search** (for conceptual questions):
 ```
-Use when: You understand what you're looking for conceptually
-Examples:
-- "How do we handle user authentication?"
-- "Where is email validation implemented?"
-- "How do we connect to the database?"
-
-Benefits:
-- Finds relevant code by meaning
-- Works with unfamiliar codebases
-- Good for exploratory searches
+Is the code checked out locally?
+├── YES → Do you also need external examples or patterns?
+│   ├── YES → Combined (local + remote)
+│   └── NO  → Local only
+└── NO
+    ├── Specific repo on GitHub? → Remote (targeted)
+    └── General pattern search?  → Remote (broad)
 ```
 
-**Grep** (for exact text/patterns):
-```
-Use when: You know exact text or patterns
-Examples:
-- Function names: "def authenticate"
-- Class names: "class UserManager"
-- Error messages: "Invalid credentials"
-- Specific strings: "API_KEY"
+**Local only** — The code is on disk. Use grep, glob, semantic search, AST analysis, LSP.
 
-Benefits:
-- Fast and precise
-- Works with regex patterns
-- Good for known terms
-```
+**Remote (targeted)** — You know which repo. Use `gh search code --repo owner/repo` or `gh api` to read files directly.
 
-**Glob** (for file discovery):
-```
-Use when: You need to find files by pattern
-Examples:
-- "**/*.test.js" (all test files)
-- "**/config*.yaml" (config files)
-- "src/**/*Controller.py" (controllers)
+**Remote (broad)** — You're looking for patterns across many repos. Use `gh search code` with language/qualifier filters, or `gh search repos` to find high-quality repos first.
 
-Benefits:
-- Quickly find files by type
-- Discover file structure
-- Locate related files
-```
+**Combined** — Start local to understand the current codebase, then go remote to find how others approach the same problem, compare patterns, or check upstream behavior.
 
-### Step 3: Search workflow
+## Step 3: Local search strategies
 
-**1. Start broad, then narrow**:
-```
-Step 1: Semantic search "How does authentication work?"
-Result: Points to auth/ directory
+Three complementary approaches — start with whichever fits, combine as needed.
 
-Step 2: Grep in auth/ for specific function
-Pattern: "def verify_token"
-Result: Found in auth/jwt.py
+**Semantic search** — for conceptual questions ("How do we handle authentication?"):
+- Finds code by meaning, not exact text
+- Best for unfamiliar codebases and exploratory work
 
-Step 3: Read the file
-File: auth/jwt.py
-Result: Understand implementation
-```
+**Grep** — for exact text and patterns ("def verify_token", "API_KEY"):
+- Fast, precise, supports regex
+- Best when you know specific terms
 
-**2. Use directory targeting**:
-```
-# Start without target (search everywhere)
-Query: "Where is user login implemented?"
-Target: []
+**Glob** — for file discovery ("**/*.test.js", "**/config*.yaml"):
+- Find files by name/type patterns
+- Map out directory structure
 
-# Refine with specific directory
-Query: "Where is login validated?"
-Target: ["backend/auth/"]
-```
+**AST search** — for structural code patterns (`console.log($MSG)`, `def $FUNC($$$):`):
+- Language-aware, ignores formatting differences
+- Best for refactoring and pattern matching across syntax variations
 
-**3. Combine searches**:
-```
-# Find where feature is implemented
-Semantic: "user registration flow"
+**LSP** — for symbol-level navigation:
+- Go to definition, find all references, rename across workspace
+- Best when you already know the symbol name
 
-# Find all files involved
-Grep: "def register_user"
+For detailed grep/glob patterns by language and workflow examples, see `references/local-patterns.md`.
 
-# Find test files
-Glob: "**/*register*test*.py"
+## Step 4: Remote search strategies
 
-# Understand the implementation
-Read: registration.py, test_registration.py
-```
+Remote search uses the `gh` companion skill for GitHub CLI commands (`gh search code`, `gh api`, `gh repo clone`).
 
-### Step 4: Common search patterns
+### Search a specific repository
 
-**Find function definition**:
+When you know which repo to search:
+
 ```bash
-# Python
-grep -n "def function_name" --type py
+# Search for a pattern in a specific repo
+gh search code "pattern" --repo owner/repo
 
-# JavaScript
-grep -n "function functionName" --type js
-grep -n "const functionName = " --type js
+# Search with language filter
+gh search code "useAuth" --repo vercel/next.js --language typescript
 
-# TypeScript
-grep -n "function functionName" --type ts
-grep -n "export const functionName" --type ts
-
-# Go
-grep -n "func functionName" --type go
-
-# Java
-grep -n "public.*functionName" --type java
+# Read a specific file from a remote repo without cloning
+gh api repos/{owner}/{repo}/contents/{path} \
+  --jq '.content' | base64 -d
 ```
 
-**Find class definition**:
+### Search across GitHub (broad)
+
+When looking for patterns across open-source projects:
+
 ```bash
-# Python
-grep -n "class ClassName" --type py
+# Search all of GitHub with language filter
+gh search code "pattern" --language python --limit 20
 
-# JavaScript/TypeScript
-grep -n "class ClassName" --type js,ts
+# Narrow by filename
+gh search code "pattern" --filename config.yaml
 
-# Java
-grep -n "public class ClassName" --type java
-
-# C++
-grep -n "class ClassName" --type cpp
+# Filter by repo qualities (stars, forks, etc.)
+gh search code "pattern" --language go --limit 10
 ```
 
-**Find class/function usage**:
+### grep.app (optional, environment-specific)
+
+Some agent environments provide a `grep_app_searchGitHub` tool that searches over a million public GitHub repos. If available, it's excellent for finding real-world usage patterns:
+
+```
+# Find how people use a specific API
+grep_app_searchGitHub(query="useAuth(", language=["TypeScript", "TSX"])
+
+# Find patterns with regex
+grep_app_searchGitHub(query="(?s)try {.*await", useRegexp=true, language=["TypeScript"])
+
+# Search within a specific repo
+grep_app_searchGitHub(query="handleError", repo="vercel/next.js")
+```
+
+This is literal code search (like grep), not keyword search. Search for actual code patterns, not descriptions.
+
+**If `grep_app_searchGitHub` is NOT available**, use `gh search code` instead — it provides similar functionality via GitHub's code search API.
+
+### Tiered Remote Search Strategy
+
+**CRITICAL**: Use the right approach based on investigation depth. Local tooling (grep, AST, LSP) is dramatically more powerful than API search — but cloning has overhead. Follow this decision tree:
+
+```
+Remote search request
+    │
+    ├─ Quick lookup (single symbol, single file, simple question)?
+    │   └─ Use gh api / gh search code (fast, lightweight)
+    │       └─ Insufficient results? → Escalate to clone
+    │
+    ├─ Deep investigation (call graph, multi-file, architecture)?
+    │   └─ Clone to /tmp (shallow, --depth 1)
+    │       └─ Clone fails? → Fallback to gh api / gh search code
+    │
+    └─ Broad pattern search (find examples across many repos)?
+        └─ gh search code with broad qualifiers
+            └─ Found interesting repo? → Clone it for deep dive
+```
+
+#### Tier 1: API Search (quick lookups)
+
+For simple, targeted questions — "what does function X return?", "find this config key":
+
 ```bash
-# Python
-grep -n "ClassName(" --type py
-grep -n "function_name(" --type py
+# Read a specific file
+gh api repos/{owner}/{repo}/contents/{path} --jq '.content' | base64 -d
 
-# JavaScript
-grep -n "new ClassName" --type js
-grep -n "functionName(" --type js
+# Search for a symbol
+gh search code "functionName" --repo owner/repo --language typescript
 ```
 
-**Find imports/requires**:
+**Use when**: Single symbol lookup, known file path, quick answer needed.
+**Escalate to Tier 2 when**: Results are truncated, you need surrounding context, or you need to trace across files.
+
+#### Tier 2: Clone to /tmp (deep investigation)
+
+For thorough exploration — call graph tracing, multi-file analysis, architecture understanding:
+
 ```bash
-# Python
-grep -n "from.*import.*ModuleName" --type py
-grep -n "import.*ModuleName" --type py
+# 1. Check repo size BEFORE cloning (skip clone for repos >500MB)
+gh api repos/{owner}/{repo} --jq '.size'
 
-# JavaScript
-grep -n "import.*from.*module-name" --type js
-grep -n "require.*module-name" --type js
+# 2. Clone shallow to /tmp
+gh repo clone owner/repo /tmp/agent-repos/owner-repo -- --depth 1
 
-# Go
-grep -n "import.*package-name" --type go
+# 3. Use full local search tooling on the clone
+#    (grep, glob, AST-grep, LSP — all available)
+
+# 4. Cleanup when done (MANDATORY)
+rm -rf /tmp/agent-repos/owner-repo
 ```
 
-**Find configuration**:
+**Size guard**: Check `gh api repos/{owner}/{repo} --jq '.size'` first. If size >500000 (KB, ~500MB), skip clone and use API-only. For very large repos, use sparse checkout:
+
 ```bash
-# Config files
-glob "**/*config*.{json,yaml,yml,toml,ini}"
-
-# Environment variables
-grep -n "process\\.env\\." --type js
-grep -n "os\\.environ" --type py
-
-# Constants
-grep -n "^[A-Z_]+\\s*=" --type py
-grep -n "const [A-Z_]+" --type js
+# Sparse clone for huge repos — only fetch relevant directories
+git clone --depth 1 --filter=blob:none --sparse \
+  https://github.com/owner/repo.git /tmp/agent-repos/owner-repo
+git -C /tmp/agent-repos/owner-repo sparse-checkout set src/relevant/path
 ```
 
-**Find TODO/FIXME**:
+**Cache policy**: If the same repo was recently cloned to `/tmp/agent-repos/`, reuse it with a pull:
 ```bash
-grep -n "TODO|FIXME|HACK|XXX" -i
+# Reuse existing clone
+git -C /tmp/agent-repos/owner-repo pull --ff-only 2>/dev/null || \
+  gh repo clone owner/repo /tmp/agent-repos/owner-repo -- --depth 1
 ```
 
-**Find error handling**:
+**Cleanup policy**: Always clean up cloned repos after analysis. For long-running sessions, periodically remove stale clones:
 ```bash
-# Python
-grep -n "try:|except|raise" --type py
-
-# JavaScript
-grep -n "try|catch|throw" --type js
-
-# Go
-grep -n "if err != nil" --type go
+# Remove clones older than 60 minutes
+find /tmp/agent-repos -maxdepth 1 -mmin +60 -type d -exec rm -rf {} +
 ```
 
-### Step 5: Advanced techniques
+**Fallback**: If clone fails (auth, network, repo too large), fall back to Tier 1 (API search via `gh search code` + `gh api`).
 
-**Trace data flow**:
-```
-1. Find where data is created
-   Semantic: "Where is user object created?"
+#### Tier 3: Broad search (cross-repo patterns)
 
-2. Search for variable usage
-   Grep: "user\\." with context lines
+For "how do other projects do X?" — use `gh search code` to cast a wide net, then clone the best results:
 
-3. Follow transformations
-   Read: Files that modify user
-
-4. Find where it's consumed
-   Grep: "user\\." in relevant files
-```
-
-**Find all callsites of a function**:
-```
-1. Find function definition
-   Grep: "def process_payment"
-   Result: payments/processor.py:45
-
-2. Find all imports of that module
-   Grep: "from payments.processor import"
-   Result: Multiple files
-
-3. Find all calls to the function
-   Grep: "process_payment\\("
-   Result: All callsites
-
-4. Read each callsite for context
-   Read: Each file with context
-```
-
-**Understand a feature end-to-end**:
-```
-1. Find API endpoint
-   Semantic: "Where is user registration endpoint?"
-   Result: routes/auth.py
-
-2. Trace to controller
-   Read: routes/auth.py
-   Find: Calls to AuthController.register
-
-3. Trace to service
-   Read: controllers/auth.py
-   Find: Calls to UserService.create_user
-
-4. Trace to database
-   Read: services/user.py
-   Find: Database operations
-
-5. Find tests
-   Glob: "**/*auth*test*.py"
-   Read: Test files for examples
-```
-
-**Find related files**:
-```
-1. Start with known file
-   Example: models/user.py
-
-2. Find imports of this file
-   Grep: "from models.user import"
-
-3. Find files this imports
-   Read: models/user.py
-   Note: Import statements
-
-4. Build dependency graph
-   Map: All related files
-```
-
-**Impact analysis**:
-```
-Before changing function X:
-
-1. Find all callsites
-   Grep: "function_name\\("
-
-2. Find all tests
-   Grep: "test.*function_name" -i
-
-3. Check related functionality
-   Semantic: "What depends on X?"
-
-4. Review each usage
-   Read: Each file using function
-
-5. Plan changes
-   Document: Impact and required updates
-```
-
-### Step 6: Search optimization
-
-**Use appropriate context**:
 ```bash
-# See surrounding context
-grep -n "pattern" -C 5  # 5 lines before and after
-grep -n "pattern" -B 3  # 3 lines before
-grep -n "pattern" -A 3  # 3 lines after
+# 1. Search broadly across GitHub
+gh search code "pattern" --language typescript --limit 20
+
+# 2. Narrow to high-quality repos (check stars, activity)
+gh search repos "topic" --language typescript --sort stars --limit 10
+
+# 3. Search within top repos
+gh search code "pattern" --repo owner/top-repo --language typescript
+
+# 4. Clone top 2-3 repos to /tmp for deep analysis (Tier 2)
+gh repo clone owner/top-repo /tmp/agent-repos/owner-top-repo -- --depth 1
+
+# 5. Full local tooling on each clone
+# 6. Compare approaches, synthesize findings
+# 7. Cleanup all clones when done
+rm -rf /tmp/agent-repos/owner-top-repo
 ```
 
-**Case sensitivity**:
-```bash
-# Case insensitive
-grep -n "pattern" -i
+**Use when**: Pattern discovery across OSS, finding best practices, comparing approaches.
 
-# Case sensitive (default)
-grep -n "Pattern"
+> **Note**: If the agent environment provides specialized broad-search tools (e.g., `grep_app_searchGitHub`), those may be used to supplement `gh search code` for wider coverage. The strategy above works universally with just `gh` CLI.
+
+## Step 5: Combined workflows
+
+### Pattern: Compare local implementation to OSS
+
+```
+1. Understand local approach
+   Local grep: "def authenticate" → read implementation
+
+2. Find how others do it
+   gh search code "def authenticate" --language python
+   (or grep_app_searchGitHub if available in your environment)
+
+3. Compare approaches
+   Read both, note differences, decide if local approach should change
 ```
 
-**File type filtering**:
-```bash
-# Specific type
-grep -n "pattern" --type py
+### Pattern: Trace a dependency's behavior
 
-# Multiple types
-grep -n "pattern" --type py,js,ts
+```
+1. Find local usage of the dependency
+   Local grep: "import some_library" → find all callsites
 
-# Exclude types
-grep -n "pattern" --glob "!*.test.js"
+2. Look at the library's source
+   gh api repos/{owner}/{lib}/contents/src/module.py | base64 -d
+   or: gh repo clone owner/lib -- --depth 1
+
+3. Understand the behavior
+   Read the relevant source, check for edge cases
 ```
 
-**Regex patterns**:
-```bash
-# Any character: .
-grep -n "function.*Name"
+### Pattern: Find examples before implementing
 
-# Start of line: ^
-grep -n "^class"
+```
+1. Check if a similar feature exists locally
+   Local semantic: "How do we handle webhooks?"
 
-# End of line: $
-grep -n "TODO$"
+2. If not, find OSS examples
+   gh search code "verify_webhook" --language python
+   gh search code "webhook" "verify_signature" --language python
 
-# Optional: ?
-grep -n "function_name_?()"
+3. Read the best examples
+   Pick repos with high stars, read their implementation
 
-# One or more: +
-grep -n "[A-Z_]+"
+4. Implement locally following both local conventions and proven patterns
+```
 
-# Zero or more: *
-grep -n "import.*"
+## Step 6: Advanced techniques
 
-# Alternatives: |
-grep -n "TODO|FIXME"
+### Trace data flow (local)
+```
+1. Find where data is created → Semantic: "Where is user object created?"
+2. Search for variable usage → Grep: "user\\." with context lines
+3. Follow transformations → Read files that modify user
+4. Find where it's consumed → Grep: "user\\." in relevant files
+```
 
-# Groups: ()
-grep -n "(get|set)_user"
+### Find all callsites (local)
+```
+1. Find definition → Grep: "def process_payment"
+2. Find imports → Grep: "from payments.processor import"
+3. Find calls → Grep: "process_payment\\("
+4. Read each for context
+```
 
-# Escape special chars: \
-grep -n "function\(\)"
+### Understand a feature end-to-end (local)
+```
+1. Find API endpoint → Semantic: "user registration endpoint?"
+2. Trace: route → controller → service → database
+3. Find tests → Glob: "**/*auth*test*.py"
+```
+
+### Cross-repo investigation (remote)
+```
+1. Start with a GitHub issue or PR reference
+   gh issue view 123 --repo owner/repo
+   gh pr view 456 --repo owner/repo --comments
+
+2. Find the relevant code changes
+   gh pr diff 456 --repo owner/repo
+
+3. Search for related patterns
+   gh search code "the_function_name" --repo owner/repo
 ```
 
 ## Best practices
 
-1. **Start with semantic search**: For unfamiliar code or conceptual questions
-2. **Use grep for precision**: When you know exact terms
-3. **Combine multiple searches**: Build understanding incrementally
-4. **Read surrounding context**: Don't just look at matching lines
-5. **Check file history**: Use `git blame` for context
-6. **Document findings**: Note important discoveries
-7. **Verify assumptions**: Read actual code, don't assume
-8. **Use directory targeting**: Narrow scope when possible
-9. **Follow the data**: Trace data flow through the system
-10. **Check tests**: Tests often show usage examples
+1. **Start broad, then narrow** — semantic search first, grep to refine
+2. **Use the right scope** — don't search all of GitHub when you need one repo
+3. **Combine local + remote** — local for "how do we do it", remote for "how should we do it"
+4. **Read surrounding context** — don't just look at matching lines
+5. **Check tests** — tests often show usage examples (locally and in OSS)
+6. **Use directory targeting** — narrow scope when possible
+7. **Follow the data** — trace data flow through the system
+8. **Use AST search for structure** — when grep is too noisy due to formatting variation
+9. **Shallow clone for deep dives** — `--depth 1` when gh search isn't enough
+10. **Verify assumptions** — read actual code, don't assume from function names
 
-## Common search scenarios
+## Troubleshooting
 
-### Scenario 1: Understanding a bug
-```
-1. Find error message
-   Grep: "exact error message"
+### Local search issues
 
-2. Find where it's thrown
-   Read: File with error
+**No results found**:
+- Check spelling and case sensitivity (`-i` for case insensitive)
+- Try semantic search instead of grep
+- Broaden scope (remove directory target)
+- Try different terms — check if files are in .gitignore
 
-3. Find what triggers it
-   Semantic: "What causes X error?"
+**Too many results**:
+- Add directory targeting
+- Use more specific patterns or filter by file type
+- Use exact phrases
 
-4. Find related code
-   Grep: Related function names
+### Remote search issues
 
-5. Check tests
-   Glob: "**/*test*.py"
-   Look: For related test cases
-```
+**gh search returns nothing**:
+- GitHub code search requires exact token matches, not fuzzy
+- Try shorter or more general patterns
+- Check if the repo is public (private repos need authentication)
+- Clone the repo and search locally instead (see Tiered Remote Search Strategy)
 
-### Scenario 2: Learning a new codebase
-```
-1. Find entry point
-   Semantic: "Where does the application start?"
-   Common files: main.py, index.js, app.py
+**Rate limited by GitHub API**:
+- Add `--limit` to reduce result count
+- Space out requests
+- Clone the repo and search locally instead
 
-2. Find main routes/endpoints
-   Grep: "route|endpoint|@app\\."
+**Can't read remote file content**:
+- Use `gh api repos/{owner}/{repo}/contents/{path}` — content is base64-encoded
+- For large files, clone the repo instead (API has a 1MB file limit)
 
-3. Find data models
-   Semantic: "Where are data models defined?"
-   Common: models/, entities/
+## Git integration
 
-4. Find configuration
-   Glob: "**/*config*"
-
-5. Read README and docs
-   Read: README.md, docs/
-```
-
-### Scenario 3: Refactoring preparation
-```
-1. Find all usages
-   Grep: "function_to_change"
-
-2. Find tests
-   Grep: "test.*function_to_change"
-
-3. Find dependencies
-   Semantic: "What does X depend on?"
-
-4. Check imports
-   Grep: "from.*import.*X"
-
-5. Document scope
-   List: All affected files
-```
-
-### Scenario 4: Adding a feature
-```
-1. Find similar features
-   Semantic: "How is similar feature implemented?"
-
-2. Find where to add code
-   Semantic: "Where should new feature go?"
-
-3. Check patterns
-   Read: Similar implementations
-
-4. Find tests to emulate
-   Glob: Test files for similar features
-
-5. Check documentation
-   Grep: "TODO.*new feature" -i
-```
-
-## Tools integration
-
-**Git integration**:
 ```bash
 # Who changed this line?
 git blame filename
@@ -485,41 +392,9 @@ git log -S "function_name" --source --all
 git log --grep="feature name"
 ```
 
-**IDE integration**:
-- Use "Go to Definition" for quick navigation
-- Use "Find References" for usage
-- Use "Find in Files" for broad search
-- Use symbol search for classes/functions
-
-**Documentation**:
-- Check inline comments
-- Look for docstrings
-- Read README files
-- Check architecture docs
-
-## Troubleshooting
-
-**No results found**:
-- Check spelling and case sensitivity
-- Try semantic search instead of grep
-- Broaden search scope (remove directory target)
-- Try different search terms
-- Check if files are in .gitignore
-
-**Too many results**:
-- Add directory targeting
-- Use more specific patterns
-- Filter by file type
-- Use exact phrases (quotes)
-
-**Wrong results**:
-- Be more specific in query
-- Use grep instead of semantic for exact terms
-- Add context to semantic queries
-- Check file types
-
 ## References
 
+- `references/local-patterns.md` — detailed grep/glob patterns by language, workflow examples, common scenarios
 - [Ripgrep User Guide](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md)
-- [Regular Expressions Tutorial](https://regexone.com/)
+- [GitHub Code Search Syntax](https://docs.github.com/en/search-github/github-code-search/understanding-github-code-search-syntax)
 - [Git Blame Guide](https://git-scm.com/docs/git-blame)
