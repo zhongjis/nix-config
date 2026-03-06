@@ -19,8 +19,8 @@ Git-compatible VCS focused on concurrent development and ease of use.
 
 | User Says | Git Equivalent | Jj Command |
 | --- | --- | --- |
-| "commit" / "commit my changes" | `git add . && git commit -m "msg"` | `jj desc -m "msg"` (changes are already tracked) |
-| "save and start new work" | `git commit -m "msg"` | `jj desc -m "msg" && jj new` |
+| "commit" / "commit my changes" | `git add . && git commit -m "msg"` | `jj commit -m "msg"` (changes are already tracked) |
+| "save and start new work" | `git commit -m "msg"` | `jj commit -m "msg"` |
 | "push" | `git push` | `jj git push` |
 | "create a branch" | `git checkout -b name` | `jj bookmark create name -r @` |
 | "stash" | `git stash` | Not needed — just `jj new` and come back later |
@@ -34,19 +34,16 @@ Git-compatible VCS focused on concurrent development and ease of use.
 Jujutsu has **no staging area**. All file changes are automatically part of the current change. The "commit" workflow is:
 
 ```bash
-# Step 1: Describe the current change (this IS the "commit")
-jj desc -m "feat: add new feature"
+# This describes the current change AND creates a new empty change to continue working
+jj commit -m "feat: add new feature"
 
-# Step 2: Create a new empty change to continue working
-jj new
-
-# That's it. No `add`, no `stage`, no `commit`.
+# That's it. No `add`, no `stage`. One command.
 ```
 
 **Important behaviors:**
-- `jj desc` on the working copy (`@`) is the equivalent of `git commit`
-- After `jj desc`, always run `jj new` to start fresh work (otherwise you'll keep editing the same change)
-- If user says "commit" without a message, ask for one — then use `jj desc -m "message" && jj new`
+- `jj commit -m "msg"` = describe current change + create new empty change (equivalent of `git commit`)
+- `jj desc -m "msg"` = only update description, stay on same change (use when user says "describe", not "commit")
+- If user says "commit" without a message, ask for one — then use `jj commit -m "message"`
 - Use conventional commits format: `type(scope): description`
 
 ## Key Commands
@@ -57,7 +54,8 @@ jj new
 | `jj log`                   | Show change log                              |
 | `jj diff`                  | Show changes in working copy                 |
 | `jj new`                   | Create new change                            |
-| `jj desc`                  | Edit change description                      |
+| `jj desc`                  | Edit change description (stay on same change) |
+| `jj commit`                | Describe + create new change (= git commit)   |
 | `jj squash`                | Move changes to parent                       |
 | `jj split`                 | Split current change                         |
 | `jj rebase -s src -d dest` | Rebase changes                               |
@@ -147,7 +145,7 @@ jj metaedit -r @ -m "new message"  # Edit metadata only
 - `jj op log` to see operation history
 - Bookmarks are like branches
 - `jj absorb` is powerful for fixing up commits in a stack
-- When user says "commit", always use `jj desc -m "msg" && jj new`
+- When user says "commit", always use `jj commit -m "msg"`
 
 ## Related Skills
 
