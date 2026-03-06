@@ -22,7 +22,7 @@ in
 
     # Add morph instructions to opencode
     programs.opencode.settings.instructions = [
-      "${morphPkg}/lib/node_modules/opencode-morph-fast-apply/MORPH_INSTRUCTIONS.md"
+      "${morphPkg}/lib/node_modules/opencode-morph-fast-apply/instructions/morph-tools.md"
     ];
 
     # Export MORPH_API_KEY directly in zsh initialization

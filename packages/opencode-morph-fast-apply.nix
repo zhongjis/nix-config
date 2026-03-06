@@ -10,10 +10,10 @@ pkgs.buildNpmPackage {
     owner = "JRedeker";
     repo = "opencode-morph-fast-apply";
     rev = "f67e0a8ade191fe57f491dbad526a253eac4df2d";
-    sha256 = lib.fakeHash;
+    sha256 = "sha256-m7CIvl9izv5m2eCKijcaIrokVYAs5OEgavEsyMD4VrQ=";
   };
 
-  npmDepsHash = lib.fakeHash;
+  npmDepsHash = "sha256-hn2DAfQGpwoGIzNjrhV+ijU4ZRRvx9HQZcqYdwAqiss=";
 
   # This is a TypeScript plugin that runs directly via Bun
   # No build step needed - just install deps
