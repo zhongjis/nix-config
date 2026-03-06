@@ -62,7 +62,7 @@
       atlas.model = "kimi-for-coding/k2p5";
 
       # deep/gpt
-      hephaestus.model = "opencode/gpt-5.3-codex";
+      hephaestus.model = "openai/gpt-5.3-codex";
       oracle = {
         model = "github-copilot/gpt-5.2";
         variant = "high";
@@ -81,11 +81,11 @@
     categories = {
       visual-engineering.model = "github-copilot/gemini-3.1-pro-preview";
       ultrabrain = {
-        model = "opencode/gpt-5.3-codex";
+        model = "openai/gpt-5.3-codex";
         variant = "xhigh";
       };
       deep = {
-        model = "opencode/gpt-5.3-codex";
+        model = "openai/gpt-5.3-codex";
         variant = "medium";
       };
       artistry = {
