@@ -173,4 +173,10 @@ lib.mkIf (hasPlugin "opencode-antigravity-auth") {
       };
     };
   };
+  xdg.configFile."opencode/antigravity.json".text = builtins.toJSON {
+    "$schema" = "https://raw.githubusercontent.com/NoeFabris/opencode-antigravity-auth/main/assets/antigravity.schema.json";
+    account_selection_strategy = "round-robin";
+    switch_on_first_rate_limit = true;
+    pid_offset_enabled = true;
+  };
 }

@@ -44,61 +44,38 @@
     runtime_fallback.enabled = true;
     agents = {
       # claude family
-      sisyphus = {
-        model = "github-copilot/claude-opus-4.6";
-        variant = "max";
-      };
-      metis = {
-        model = "github-copilot/claude-opus-4.6";
-        variant = "max";
-      };
+      sisyphus.model = "github-copilot/claude-opus-4.6";
+      metis.model = "github-copilot/claude-opus-4.6";
 
       # gpt/claude dual
-      prometheus = {
-        model = "github-copilot/claude-opus-4.6";
-        variant = "max";
-      };
-      # atlas.model = "opencode/kimi-k2.5";
+      prometheus.model = "github-copilot/claude-opus-4.6";
       atlas.model = "kimi-for-coding/k2p5";
+      # atlas.model = "opencode/kimi-k2.5";
 
       # deep/gpt
       hephaestus.model = "openai/gpt-5.3-codex";
-      oracle = {
-        model = "github-copilot/gpt-5.2";
-        variant = "high";
-      };
-      momus = {
-        model = "github-copilot/gpt-5.2";
-        variant = "medium";
-      };
+      oracle.model = "openai/gpt-5.4";
+      momus.model = "openai/gpt-5.4";
 
       # utility
       # multimodal-looker.model = "opencode/kimi-k2.5";
-      multimodal-looker.model = "kimi-for-coding/k2p5";
+      multimodal-looker.model = "openai/gpt-5.3-codex";
       librarian.model = "github-copilot/gemini-3-flash-preview";
+      # librarian.model = "google/antigravity-gemini-3-flash";
       explore.model = "github-copilot/claude-haiku-4.5";
     };
     categories = {
       visual-engineering.model = "github-copilot/gemini-3.1-pro-preview";
-      ultrabrain = {
-        model = "openai/gpt-5.3-codex";
-        variant = "xhigh";
-      };
-      deep = {
-        model = "openai/gpt-5.3-codex";
-        variant = "medium";
-      };
-      artistry = {
-        model = "github-copilot/gemini-3.1-pro-preview";
-        variant = "high";
-      };
+      # visual-engineering.model = "google/antigravity-3.1-pro-preview";
+      ultrabrain.model = "openai/gpt-5.3-codex";
+      deep.model = "openai/gpt-5.3-codex";
+      artistry.model = "github-copilot/gemini-3.1-pro-preview";
+      # artistry.model = "google/antigravity-3.1-pro-preview";
       quick.model = "github-copilot/claude-haiku-4.5";
-      unspecified-high = {
-        model = "github-copilot/claude-opus-4.6";
-        variant = "max";
-      };
+      unspecified-high.model = "openai/gpt-5.4";
       unspecified-low.model = "github-copilot/claude-sonnet-4.6";
       writing.model = "github-copilot/gemini-3-flash-preview";
+      # writing.model = "google/antigravity-gemini-3-flash";
     };
   };
 
