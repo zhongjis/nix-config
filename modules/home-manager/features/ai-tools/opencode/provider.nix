@@ -25,7 +25,7 @@ in {
   # NOTE: work profile
   programs.opencode.settings.enabled_providers =
     lib.mkIf aiProfileHelpers.isWork
-    ["amazon-bedrock" "github-copilot"];
+    ["amazon-bedrock" "github-copilot" "ollama"];
 
   programs.zsh.initContent =
     lib.mkOrder
