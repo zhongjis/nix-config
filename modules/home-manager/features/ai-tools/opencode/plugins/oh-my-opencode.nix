@@ -60,22 +60,22 @@
       # utility
       # multimodal-looker.model = "opencode/kimi-k2.5";
       multimodal-looker.model = "openai/gpt-5.3-codex";
-      librarian.model = "github-copilot/gemini-3-flash-preview";
-      # librarian.model = "google/antigravity-gemini-3-flash";
+      # librarian.model = "github-copilot/gemini-3-flash-preview";
+      librarian.model = "google/antigravity-gemini-3-flash";
       explore.model = "github-copilot/claude-haiku-4.5";
     };
     categories = {
-      visual-engineering.model = "github-copilot/gemini-3.1-pro-preview";
-      # visual-engineering.model = "google/antigravity-3.1-pro-preview";
+      # visual-engineering.model = "github-copilot/gemini-3.1-pro-preview";
+      visual-engineering.model = "google/antigravity-3.1-pro-preview";
       ultrabrain.model = "openai/gpt-5.3-codex";
       deep.model = "openai/gpt-5.3-codex";
-      artistry.model = "github-copilot/gemini-3.1-pro-preview";
-      # artistry.model = "google/antigravity-3.1-pro-preview";
+      # artistry.model = "github-copilot/gemini-3.1-pro-preview";
+      artistry.model = "google/antigravity-3.1-pro-preview";
       quick.model = "github-copilot/claude-haiku-4.5";
       unspecified-high.model = "openai/gpt-5.4";
       unspecified-low.model = "github-copilot/claude-sonnet-4.6";
-      writing.model = "github-copilot/gemini-3-flash-preview";
-      # writing.model = "google/antigravity-gemini-3-flash";
+      # writing.model = "github-copilot/gemini-3-flash-preview";
+      writing.model = "google/antigravity-gemini-3-flash";
     };
   };
 
