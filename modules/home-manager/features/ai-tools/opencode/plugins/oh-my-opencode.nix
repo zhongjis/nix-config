@@ -108,25 +108,31 @@
     #   writing.model = "amazon-bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0";
     # };
 
-    # --- mixed GitHub Copilot + Bedrock configuration ---
+    # --- mixed GitHub Copilot + Bedrock (Anthropic) + openai configuration ---
     agents = {
       sisyphus.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
-      oracle.model = "github-copilot/gpt-5.2";
-      multimodal-looker.model = "github-copilot/gemini-3-flash-preview";
+      metis.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
+
       prometheus.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
-      momus.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
+      atlas.model = "amazon-bedrock/us.anthropic.claude-sonnet-4-6";
+
+      hephaestus.model = "openai/gpt-5.3-codex";
+      oracle.model = "openai/gpt-5.4";
+      momus.model = "openai/gpt-5.4";
+
+      multimodal-looker.model = "openai/gpt-5.3-codex";
       librarian.model = "github-copilot/gemini-3-flash-preview";
       explore.model = "amazon-bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0";
-      metis.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
-      atlas.model = "amazon-bedrock/us.anthropic.claude-sonnet-4-6";
     };
     categories = {
-      visual-engineering.model = "github-copilot/gemini-3-pro-preview";
-      ultrabrain.model = "github-copilot/gpt-5.2-codex";
-      deep.model = "github-copilot/gpt-5.2-codex";
-      artistry.model = "github-copilot/gemini-3-pro-preview";
+      visual-engineering.model = "github-copilot/gemini-3.1-pro-preview";
+
+      ultrabrain.model = "openai/gpt-5.3-codex";
+      deep.model = "openai/gpt-5.3-codex";
+
+      artistry.model = "github-copilot/gemini-3.1-pro-preview";
       quick.model = "amazon-bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0";
-      unspecified-high.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
+      unspecified-high.model = "openai/gpt-5.4";
       unspecified-low.model = "amazon-bedrock/us.anthropic.claude-sonnet-4-6";
       writing.model = "github-copilot/gemini-3-flash-preview";
     };

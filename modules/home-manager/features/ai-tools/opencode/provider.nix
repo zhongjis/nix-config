@@ -20,12 +20,15 @@ in {
     };
   };
 
-  programs.opencode.settings.model = "opencode/glm-4.7";
+  programs.opencode.settings.model =
+    if aiProfileHelpers.isWork
+    then "amazon-bedrock/us.anthropic.claude-opus-4-6-v1"
+    else "opencode/glm-4.7";
 
   # NOTE: work profile
   programs.opencode.settings.enabled_providers =
     lib.mkIf aiProfileHelpers.isWork
-    ["amazon-bedrock" "github-copilot" "ollama"];
+    ["amazon-bedrock" "github-copilot" "openai" "ollama"];
 
   programs.zsh.initContent =
     lib.mkOrder
