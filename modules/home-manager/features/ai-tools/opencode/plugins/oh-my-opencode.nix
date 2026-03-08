@@ -59,7 +59,7 @@
 
       # utility
       # multimodal-looker.model = "opencode/kimi-k2.5";
-      multimodal-looker.model = "openai/gpt-5.3-codex";
+      multimodal-looker.model = "openai/gpt-5.4";
       # librarian.model = "github-copilot/gemini-3-flash-preview";
       librarian.model = "google/antigravity-gemini-3-flash";
       explore.model = "github-copilot/claude-haiku-4.5";
