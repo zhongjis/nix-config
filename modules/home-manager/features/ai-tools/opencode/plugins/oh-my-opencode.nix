@@ -85,29 +85,6 @@
       include_co_authored_by = false;
     };
 
-    # --- Bedrock configuration ---
-    # agents = {
-    #   sisyphus.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
-    #   oracle.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
-    #   multimodal-looker.model = "amazon-bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0";
-    #   prometheus.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
-    #   momus.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
-    #   librarian.model = "amazon-bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0";
-    #   explore.model = "amazon-bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0";
-    #   metis.model = "amazon-bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0";
-    #   atlas.model = "amazon-bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0";
-    # };
-    # categories = {
-    #   visual-engineering.model = "amazon-bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0";
-    #   ultrabrain.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
-    #   deep.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
-    #   artistry.model = "amazon-bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0";
-    #   quick.model = "amazon-bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0";
-    #   unspecified-high.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
-    #   unspecified-low.model = "amazon-bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0";
-    #   writing.model = "amazon-bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0";
-    # };
-
     # --- mixed GitHub Copilot + Bedrock (Anthropic) + openai configuration ---
     agents = {
       sisyphus.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
