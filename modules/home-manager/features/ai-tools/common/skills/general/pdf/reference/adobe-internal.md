@@ -219,5 +219,26 @@ After generating an Adobe internal PDF, verify with the `look_at` tool:
 5. Cross-reference links are blue and functional (see `reference/cross-references.md`)
 6. Tables render with proper formatting and severity colors
 7. Code blocks use monospace font with Unicode characters preserved
-8. Headers show "ADOBE CONFIDENTIAL" on every page (except cover)
-9. Footers show page numbers and "Adobe - Internal Use Only"
+8. ASCII art / box-drawing diagrams preserve spatial alignment (see `reference/diagrams-and-charts.md`)
+9. Charts and diagrams render as proper graphical elements (see `reference/diagrams-and-charts.md`)
+10. Headers show "ADOBE CONFIDENTIAL" on every page (except cover)
+11. Footers show page numbers and "Adobe - Internal Use Only"
+
+## Diagrams in Adobe Reports
+
+Use the standard diagram rendering approaches from `reference/diagrams-and-charts.md`, but apply Adobe brand colors:
+
+```python
+# Override the neutral palette with Adobe brand colors for internal reports
+ADOBE_DIAGRAM_COLORS = {
+    "node_fill": HexColor("#FFF5F5"),       # Light red tint
+    "node_stroke": HexColor("#EB1000"),      # Adobe Red
+    "node_text": HexColor("#111827"),        # Near-black
+    "arrow": HexColor("#374151"),            # Gray 700
+    "highlight_fill": HexColor("#FEE2E2"),   # Red 100
+    "highlight_stroke": HexColor("#EB1000"), # Adobe Red
+    "label": HexColor("#6B7280"),            # Gray 500
+}
+```
+
+For score bars and accent bars, continue using the `Drawing`/`Rect`/`String` patterns defined in this file. For flowcharts, architecture diagrams, and data charts, follow the tiered approach in `reference/diagrams-and-charts.md`.

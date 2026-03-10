@@ -159,16 +159,56 @@ squared = Paragraph("x<super>2</super> + y<super>2</super>", styles['Normal'])
 
 For canvas-drawn text (not Paragraph objects), manually adjust the font size and position.
 
+## ASCII Art & Box-Drawing Rendering (CRITICAL)
+
+**Problem**: ReportLab's `Paragraph` (used in Platypus code blocks) reflows text to fit column width. This **destroys horizontal alignment** of side-by-side boxes, connectors, and any content where character position matters — box-drawing diagrams collapse into broken single-line text.
+
+**Solution**: Bypass Platypus entirely. Use `canvas.beginText()` to place each line at exact coordinates with a guaranteed fixed-width font.
+
+```python
+def draw_ascii_art(canvas, x, y, art_text, font_size=10, leading=12):
+    """
+    Render ASCII art / box-drawing diagrams with exact spatial alignment.
+
+    Uses canvas text object (NOT Paragraph) to preserve character positions.
+    Courier is a Core 14 font — guaranteed available, no registration needed.
+
+    Args:
+        canvas: ReportLab canvas object
+        x: Left edge x-coordinate (points)
+        y: TOP of first line y-coordinate (points) — text draws downward
+        art_text: Multi-line string with the ASCII art
+        font_size: Font size in points (default 10)
+        leading: Line spacing in points (default 12)
+    """
+    textobject = canvas.beginText(x, y)
+    textobject.setFont("Courier", font_size)
+    textobject.setCharSpace(0)  # Critical: no extra spacing between characters
+    textobject.setLeading(leading)
+    for line in art_text.split('\n'):
+        textobject.textLine(line)
+    canvas.drawText(textobject)
+```
+
+**Key rules:**
+- **ALWAYS** use `Courier` for ASCII art — Core 14 font, guaranteed fixed-width, zero registration
+- **ALWAYS** set `setCharSpace(0)` — prevents extra inter-character spacing
+- **NEVER** use `Paragraph` for content where character position matters
+- **NEVER** apply `normalize_text()` to ASCII art — use `normalize_code_text()` or no normalization
+
+For background boxes, Platypus integration (spacer reservations), and the full diagram rendering decision tree, see `reference/diagrams-and-charts.md`.
+
 ## Quick Reference
 
-| Text Type | Font | Normalizer | Unicode Handling |
-|-----------|------|------------|------------------|
-| Body paragraphs | Helvetica | `normalize_text()` | Replace with ASCII |
-| Bullet points | Helvetica | `normalize_text()` | Replace with ASCII |
-| Table cells | Helvetica | `normalize_text()` | Replace with ASCII |
-| Headings | Helvetica-Bold | `normalize_text()` | Replace with ASCII |
-| Code blocks | Menlo/TTF | `normalize_code_text()` | Preserve Unicode |
-| Inline code | Courier (in Paragraph) | Parent normalizer | Inherited |
+| Text Type | Font | Normalizer | Unicode Handling | Rendering |
+|-----------|------|------------|------------------|-----------|
+| Body paragraphs | Helvetica | `normalize_text()` | Replace with ASCII | `Paragraph` |
+| Bullet points | Helvetica | `normalize_text()` | Replace with ASCII | `Paragraph` |
+| Table cells | Helvetica | `normalize_text()` | Replace with ASCII | `Paragraph` |
+| Headings | Helvetica-Bold | `normalize_text()` | Replace with ASCII | `Paragraph` |
+| Code blocks | Menlo/TTF | `normalize_code_text()` | Preserve Unicode | `Paragraph` |
+| ASCII art / diagrams | Courier | `normalize_code_text()` or none | Preserve Unicode | `canvas.beginText()` |
+| Inline code | Courier (in Paragraph) | Parent normalizer | Inherited | `Paragraph` |
 
 ## Troubleshooting
 
@@ -179,6 +219,10 @@ For canvas-drawn text (not Paragraph objects), manually adjust the font size and
 ### Degraded ASCII Art in Code Blocks
 **Cause**: `replace_unicode()` was applied to code blocks, converting `┌─┐│` to `+--|`.
 **Fix**: Ensure code blocks use `normalize_code_text()` (NOT `normalize_text()`). Register a Unicode-capable TTF font for code.
+
+### ASCII Art / Box-Drawing Alignment Broken
+**Cause**: ASCII art rendered via `Paragraph` which reflows text to fit column width.
+**Fix**: Use `canvas.beginText()` with `Courier` font and `setCharSpace(0)`. See the ASCII Art section above and `reference/diagrams-and-charts.md` for the full pattern.
 
 ### Menlo Font Not Found
 **Cause**: Running on Linux or font path changed.

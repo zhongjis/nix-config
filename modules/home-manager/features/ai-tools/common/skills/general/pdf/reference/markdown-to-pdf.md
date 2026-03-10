@@ -205,17 +205,24 @@ styles.add(ParagraphStyle(
 ### Code Block Detection State Machine
 
 ```python
+import re
+
 in_code_block = False
 code_lines = []
+code_lang = None  # Track language hint from opening fence
 
 for line in markdown_lines:
     if line.strip().startswith("```"):
         if in_code_block:
-            # End of code block — render accumulated lines
-            story.append(render_code_block(code_lines, styles))
+            # End of code block — route based on content type
+            story.extend(render_code_or_diagram(code_lines, code_lang, styles))
             code_lines = []
+            code_lang = None
             in_code_block = False
         else:
+            # Extract language hint: ```python, ```mermaid, etc.
+            fence_match = re.match(r'^```(\w+)?', line.strip())
+            code_lang = fence_match.group(1) if fence_match and fence_match.group(1) else None
             in_code_block = True
         continue
 
@@ -225,6 +232,64 @@ for line in markdown_lines:
 
     # ... handle other Markdown elements ...
 ```
+
+### Diagram-Aware Code Block Routing
+
+Detect Mermaid blocks and ASCII art, routing them to appropriate renderers instead of treating all fenced blocks as plain code.
+
+```python
+def is_ascii_art(lines):
+    """Detect if code block contains ASCII art / box-drawing characters."""
+    BOX_CHARS = set("┌┐└┘├┤┬┴┼─│═║╔╗╚╝╠╣╦╩╬")
+    ASCII_ART_CHARS = set("+|\\/-")
+    total_chars = sum(len(line) for line in lines)
+    if total_chars == 0:
+        return False
+    box_count = sum(1 for line in lines for ch in line if ch in BOX_CHARS)
+    ascii_art_count = sum(1 for line in lines for ch in line if ch in ASCII_ART_CHARS)
+    # Heuristic: >10% box-drawing chars, or >20% ASCII art chars with alignment patterns
+    if box_count / max(total_chars, 1) > 0.10:
+        return True
+    if ascii_art_count / max(total_chars, 1) > 0.20:
+        # Check for alignment patterns (multiple lines with chars at same column positions)
+        return any(line.count('+') >= 2 or line.count('|') >= 2 for line in lines)
+    return False
+
+def render_code_or_diagram(code_lines, lang, styles):
+    """
+    Route a fenced code block to the appropriate renderer.
+
+    Returns a list of Flowables.
+    """
+    from reportlab.platypus import Spacer
+
+    # Mermaid diagrams → SVG → embedded Drawing
+    if lang == "mermaid":
+        # See reference/diagrams-and-charts.md for render_mermaid_to_flowable()
+        try:
+            from diagrams_and_charts import render_mermaid_to_flowable
+            mermaid_code = "\n".join(code_lines)
+            drawing = render_mermaid_to_flowable(mermaid_code)
+            return [drawing, Spacer(1, 8)]
+        except Exception:
+            # Fallback: render as plain code block with a note
+            fallback = render_code_block(code_lines, styles)
+            return [fallback]
+
+    # ASCII art → canvas text object (spatial alignment preserved)
+    if is_ascii_art(code_lines):
+        # See reference/diagrams-and-charts.md for draw_ascii_art_with_background()
+        # In Platypus flow, reserve space with a Spacer and draw in afterPage hook
+        # Simplified: render as code block with Courier font forced
+        return [render_code_block(code_lines, styles)]
+        # NOTE: For perfect alignment, use canvas.beginText() approach from
+        # reference/diagrams-and-charts.md Tier 1 and reference/unicode-and-fonts.md
+
+    # Regular code → standard code block rendering
+    return [render_code_block(code_lines, styles)]
+```
+
+**Important**: The ASCII art detection is a heuristic. For guaranteed alignment, use the `canvas.beginText()` approach from `reference/diagrams-and-charts.md` (Tier 1) when building the PDF directly (not through the Markdown pipeline). The Markdown pipeline provides best-effort detection and routing.
 
 ## Bullet List Rendering
 
@@ -273,18 +338,23 @@ def build_story(markdown_text: str, styles) -> list:
     i = 0
     in_code_block = False
     code_lines = []
+    code_lang = None
     first_heading_seen = False
 
     while i < len(lines):
         line = lines[i]
 
-        # Code block toggle
+        # Code block toggle (with language detection)
         if line.strip().startswith("```"):
             if in_code_block:
-                story.append(render_code_block(code_lines, styles))
+                # Route based on content type (mermaid, ASCII art, or plain code)
+                story.extend(render_code_or_diagram(code_lines, code_lang, styles))
                 code_lines = []
+                code_lang = None
                 in_code_block = False
             else:
+                fence_match = re.match(r'^```(\w+)?', line.strip())
+                code_lang = fence_match.group(1) if fence_match and fence_match.group(1) else None
                 in_code_block = True
             i += 1
             continue
@@ -349,6 +419,14 @@ def build_story(markdown_text: str, styles) -> list:
 ### Code Block Background Not Showing
 **Cause**: Using `Canvas.drawString()` instead of `Paragraph` with `backColor`.
 **Fix**: Always use Platypus `Paragraph` objects for code blocks. The `backColor` style property handles the background.
+
+### ASCII Art / Flowchart Alignment Broken in Code Block
+**Cause**: `Paragraph`-based code blocks reflow text to fit column width, destroying spatial alignment.
+**Fix**: Use `canvas.beginText()` with `Courier` and `setCharSpace(0)` for ASCII art. See `reference/diagrams-and-charts.md` (Tier 1) and `reference/unicode-and-fonts.md` (ASCII Art section) for the full pattern.
+
+### Mermaid Block Not Rendering as Diagram
+**Cause**: Missing mermaid-cli (`mmdc`) or `svglib` not installed.
+**Fix**: Install `@mermaid-js/mermaid-cli` (npm) and `svglib` (pip). The pipeline falls back to rendering Mermaid as a plain code block when tools are unavailable. See `reference/diagrams-and-charts.md` (Tier 3).
 
 ### Bullet Points Misaligned
 **Cause**: `firstLineIndent` not set or wrong sign.
