@@ -87,11 +87,12 @@
 
     # --- mixed GitHub Copilot + Bedrock (Anthropic) + openai configuration ---
     agents = {
-      sisyphus.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
-      metis.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
+      sisyphus.model = "openai/gpt-5.4";
+      metis.model = "openai/gpt-5.4";
 
-      prometheus.model = "amazon-bedrock/us.anthropic.claude-opus-4-6-v1";
-      atlas.model = "amazon-bedrock/us.anthropic.claude-sonnet-4-6";
+      prometheus.model = "openai/gpt-5.4";
+      atlas.model = "github-copilot/claude-sonnet-4.6";
+      unspecified-low.model = "github-copilot/claude-sonnet-4.6";
 
       hephaestus.model = "openai/gpt-5.3-codex";
       oracle.model = "openai/gpt-5.4";
@@ -99,7 +100,7 @@
 
       multimodal-looker.model = "openai/gpt-5.3-codex";
       librarian.model = "github-copilot/gemini-3-flash-preview";
-      explore.model = "amazon-bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0";
+      explore.model = "github-copilot/claude-haiku-4.5";
     };
     categories = {
       visual-engineering.model = "github-copilot/gemini-3.1-pro-preview";
@@ -108,9 +109,9 @@
       deep.model = "openai/gpt-5.3-codex";
 
       artistry.model = "github-copilot/gemini-3.1-pro-preview";
-      quick.model = "amazon-bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0";
+      quick.model = "github-copilot/claude-haiku-4.5";
       unspecified-high.model = "openai/gpt-5.4";
-      unspecified-low.model = "amazon-bedrock/us.anthropic.claude-sonnet-4-6";
+      unspecified-low.model = "github-copilot/claude-sonnet-4.6";
       writing.model = "github-copilot/gemini-3-flash-preview";
     };
   };
