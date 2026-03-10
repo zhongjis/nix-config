@@ -8,7 +8,7 @@ upstream: "https://github.com/anthropics/skills/tree/main/skills/pdf"
 
 ## Overview
 
-This guide covers essential PDF processing operations using Python libraries and command-line tools. For advanced features, JavaScript libraries, and detailed examples, see REFERENCE.md. If you need to fill out a PDF form, read FORMS.md and follow its instructions.
+This guide covers essential PDF processing operations using Python libraries and command-line tools. For advanced features, JavaScript libraries, and detailed examples, see `reference/advanced.md`. If you need to fill out a PDF form, read FORMS.md and follow its instructions.
 
 ## Quick Start
 
@@ -166,25 +166,26 @@ story.append(Paragraph("Content for page 2", styles['Normal']))
 doc.build(story)
 ```
 
-#### Subscripts and Superscripts
+#### Unicode & Font Rendering (CRITICAL)
 
-**IMPORTANT**: Never use Unicode subscript/superscript characters (₀₁₂₃₄₅₆₇₈₉, ⁰¹²³⁴⁵⁶⁷⁸⁹) in ReportLab PDFs. The built-in fonts do not include these glyphs, causing them to render as solid black boxes.
+ReportLab's built-in fonts (Helvetica, Courier) **cannot render** most Unicode characters — box-drawing (`┌─┐│`), arrows (`→←`), dashes (`—–`), smart quotes (`''""`), block elements (`█▓`), and subscript/superscript digits (`₀¹²³`) all render as **solid black boxes**.
 
-Instead, use ReportLab's XML markup tags in Paragraph objects:
+**Two-track solution:**
+- **Body text** (Helvetica): Replace all Unicode with ASCII equivalents before rendering
+- **Code blocks**: Register a TrueType font (Menlo on macOS, DejaVu Sans Mono on Linux) that supports Unicode glyphs
+
+**You MUST maintain two separate normalizer functions** — one for body text (replaces Unicode) and one for code blocks (preserves Unicode). Using the wrong one causes either black boxes or degraded ASCII art.
+
+For the full Unicode replacement map, font registration code, and normalizer implementations, see `reference/unicode-and-fonts.md`.
+
+**Subscripts/Superscripts**: Never use Unicode sub/superscript characters. Use ReportLab's XML tags instead:
 ```python
-from reportlab.platypus import Paragraph
-from reportlab.lib.styles import getSampleStyleSheet
-
-styles = getSampleStyleSheet()
-
 # Subscripts: use <sub> tag
 chemical = Paragraph("H<sub>2</sub>O", styles['Normal'])
 
 # Superscripts: use <super> tag
 squared = Paragraph("x<super>2</super> + y<super>2</super>", styles['Normal'])
 ```
-
-For canvas-drawn text (not Paragraph objects), manually adjust font the size and position rather than using Unicode subscripts/superscripts.
 
 ## Command-Line Tools
 
@@ -308,7 +309,9 @@ with open("encrypted.pdf", "wb") as output:
 
 ## Next Steps
 
-- For advanced pypdfium2 usage, see REFERENCE.md
-- For JavaScript libraries (pdf-lib), see REFERENCE.md
+- For advanced pypdfium2 usage and JavaScript libraries, see `reference/advanced.md`
 - If you need to fill out a PDF form, follow the instructions in FORMS.md
-- For troubleshooting guides, see REFERENCE.md
+- For Unicode/font rendering details and the full replacement map, see `reference/unicode-and-fonts.md`
+- For internal cross-references and bookmarks in PDFs, see `reference/cross-references.md`
+- For Markdown-to-PDF conversion (tables, code blocks, page breaks, TOC), see `reference/markdown-to-pdf.md`
+- For Adobe-branded internal reports, see `reference/adobe-internal.md`

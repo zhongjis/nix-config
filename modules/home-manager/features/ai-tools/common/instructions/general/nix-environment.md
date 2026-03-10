@@ -59,6 +59,156 @@
 | Multiple packages | `nix shell nixpkgs#pkg1 nixpkgs#pkg2 -c ...` |
 | Development environment | Check for `flake.nix` and use `nix develop` |
 
+## Ad-hoc Python with Libraries
+
+Python is the most common case where agents need packages beyond the base interpreter. The standard `pip install` approach conflicts with Nix isolation.
+
+### Option 1: `uv` (Preferred when available)
+
+`uv` handles ephemeral Python environments automatically:
+
+```bash
+# Check if uv is available
+command -v uv && echo "uv is installed"
+
+# Run script with ad-hoc dependencies
+uv run --with pandas --with requests python3 script.py
+
+# One-liner execution
+uv run --with requests python3 -c "import requests; print(requests.get('https://example.com').status_code)"
+
+# Multiple packages
+uv run --with pandas --with matplotlib --with numpy python3 analyze.py
+```
+
+For self-contained scripts, use PEP 723 inline metadata:
+
+```python
+#!/usr/bin/env -S uv run
+# /// script
+# dependencies = ["pandas", "requests"]
+# ///
+import pandas as pd
+import requests
+# ... script body
+```
+
+### Option 2: `nix shell` with `python3.withPackages`
+
+Pure Nix approach — works anywhere Nix is installed:
+
+```bash
+# Python with specific packages
+nix shell --impure --expr 'with import <nixpkgs> {}; python3.withPackages (ps: with ps; [pandas requests])' -c python3 script.py
+
+# Interactive Python with packages
+nix shell --impure --expr 'with import <nixpkgs> {}; python3.withPackages (ps: with ps; [numpy matplotlib])'
+```
+
+> **Note:** Nixpkgs Python package names may differ from PyPI names. Use `nix search nixpkgs python3Packages.<name>` to find the correct attribute.
+
+### What to Avoid with Python
+
+| Action | Issue |
+|--------|-------|
+| `pip install <package>` | Breaks Nix isolation, may not persist |
+| `pip install --user <package>` | Pollutes user site-packages, conflicts with Nix |
+| `python -m venv && pip install` | Manual venvs bypass Nix dependency tracking |
+| `sudo pip install` | System-wide install, breaks Nix-managed Python |
+
+### Decision Tree for Python
+
+```
+Need Python with libraries?
+    │
+    ├─► Is `uv` available? (`command -v uv`)
+    │       │
+    │       ├─► YES: uv run --with <pkg1> --with <pkg2> python3 script.py
+    │       │
+    │       └─► NO: Is `nix` available?
+    │               │
+    │               ├─► YES: nix shell --impure --expr 'with import <nixpkgs> {};
+    │               │        python3.withPackages (ps: with ps; [pkg1 pkg2])' -c python3 script.py
+    │               │
+    │               └─► NO: python -m venv .venv && source .venv/bin/activate && pip install ...
+    │
+    └─► For project work: Check for flake.nix/pyproject.toml first → use `nix develop` or `uv sync`
+```
+
+## Ad-hoc Node.js / npm Packages
+
+Running Node.js tools and scripts with npm dependencies without polluting the global environment.
+
+### Option 1: `npx` (Preferred when Node.js is available)
+
+`npx` runs packages without global install:
+
+```bash
+# Run a CLI tool once
+npx cowsay "hello"
+npx ts-node script.ts
+npx tsx script.ts
+
+# Run with a specific package version
+npx create-react-app@latest my-app
+npx prettier --write .
+```
+
+### Option 2: `nix shell` + `npx`
+
+When Node.js itself is not installed:
+
+```bash
+# Get Node.js via Nix, then use npx
+nix shell nixpkgs#nodejs -c npx cowsay "hello"
+nix shell nixpkgs#nodejs -c npx ts-node script.ts
+
+# Get Node.js + specific global tools
+nix shell nixpkgs#nodejs nixpkgs#nodePackages.typescript -c tsc --version
+nix shell nixpkgs#nodejs nixpkgs#nodePackages.prettier -c prettier --write .
+
+# Interactive shell with Node.js
+nix shell nixpkgs#nodejs
+```
+
+### Running Scripts with Dependencies
+
+For scripts that need npm packages:
+
+```bash
+# If package.json exists in the project
+nix shell nixpkgs#nodejs -c sh -c "npm install && node script.js"
+
+# For a quick one-off with a dependency
+nix shell nixpkgs#nodejs -c npx -p axios -p cheerio node -e "const axios = require('axios'); ..."
+```
+
+### What to Avoid with Node.js
+
+| Action | Issue |
+|--------|-------|
+| `npm install -g <package>` | Global installs may not persist, conflicts with Nix |
+| `sudo npm install -g` | System-wide install, breaks Nix-managed Node.js |
+| `corepack enable` without Nix | May conflict with Nix-managed package managers |
+
+### Decision Tree for Node.js
+
+```
+Need to run a Node.js tool or script?
+    │
+    ├─► Is `node`/`npx` available? (`command -v npx`)
+    │       │
+    │       ├─► YES: npx <tool> or npm install (local to project)
+    │       │
+    │       └─► NO: Is `nix` available?
+    │               │
+    │               ├─► YES: nix shell nixpkgs#nodejs -c npx <tool>
+    │               │
+    │               └─► NO: Install Node.js via system package manager
+    │
+    └─► For project work: Check for flake.nix first → use `nix develop`
+```
+
 ## Quick Reference
 
 ### Ad-hoc Command Execution
