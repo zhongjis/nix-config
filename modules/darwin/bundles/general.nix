@@ -77,6 +77,7 @@
 
     brews = [
       "bitwarden-cli"
+      "sshuttle"
     ];
 
     casks = [
