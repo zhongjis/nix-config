@@ -4,16 +4,16 @@
 }:
 pkgs.rustPlatform.buildRustPackage rec {
   pname = "agent-of-empires";
-  version = "0.15.1";
+  version = "0.16.1";
 
   src = pkgs.fetchFromGitHub {
     owner = "njbrake";
     repo = "agent-of-empires";
     rev = "v${version}";
-    hash = "sha256-lhIUVjb8J6C2VOTXt/0/rTEYv/N/ICxYyyWPHtiDAko=";
+    hash = "sha256-MSvvGYvSi0dc7CAUI9ComAerptq8uEdE//3f03tC7S0=";
   };
 
-  cargoHash = "sha256-OflpOKSelzX5lku6dpsHuX/YjkBZymFCbA7aZv9BS5g=";
+  cargoHash = "sha256-wW8mnEUJ3LyzkeBFP3qdfwpuPsqIZmLOxi/lGIj5On8=";
 
   doCheck = false;
 

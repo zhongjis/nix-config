@@ -1,6 +1,7 @@
 {
   pkgs,
   config,
+  inputs,
   lib,
   ...
 }: {
@@ -42,4 +43,9 @@
   home.sessionVariables = {
     FLAKE = "${config.home.homeDirectory}/personal/nix-config";
   };
+
+  home.packages =
+    lib.optional
+    (inputs.self.packages.${pkgs.stdenv.hostPlatform.system} ? agent-of-empires)
+    inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.agent-of-empires;
 }
