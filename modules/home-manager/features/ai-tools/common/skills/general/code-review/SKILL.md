@@ -66,9 +66,24 @@ Full GitHub pull request workflow with structured feedback.
 
 1. **Gather context**: `gh pr view <number>` — read title, body, author, labels, linked issues.
 2. **Fetch diff**: `gh pr diff <number>` — get the full changeset.
-3. **Understand codebase**: Read files surrounding the changes. Use `rg` to find related usages of changed functions/variables across the repo.
-4. **Systematic review**: Follow the Review Process below.
-5. **Post results**:
+3. **Collect existing feedback first**: review existing PR discussion before drafting anything new.
+
+```bash
+# General PR conversation
+gh pr view <number> --comments
+
+# Line-specific review comments
+gh api repos/{owner}/{repo}/pulls/{number}/comments --paginate
+
+# Review summaries / states
+gh api repos/{owner}/{repo}/pulls/{number}/reviews --paginate
+```
+
+Build a quick list of issues other reviewers already raised. Treat those points as already covered unless you have materially different evidence, a different root cause, or a more precise remediation.
+
+4. **Understand codebase**: Read files surrounding the changes. Use `rg` to find related usages of changed functions/variables across the repo.
+5. **Systematic review**: Follow the Review Process below.
+6. **Post results**:
 
 ```bash
 # Summary comment
@@ -99,6 +114,7 @@ gh api repos/{owner}/{repo}/pulls/{number}/comments \
 - Understand the problem being solved and the proposed approach.
 - Map out which files changed and how they interact with the broader system.
 - Check for linked issues, related PRs, or migration dependencies.
+- Read existing PR comments and reviews before drafting feedback. Note which concerns are already raised, who raised them, and whether they are still unresolved.
 
 ### Phase 2: High-Level Architecture (5-10 min)
 
@@ -124,6 +140,7 @@ gh api repos/{owner}/{repo}/pulls/{number}/comments \
 ### Phase 4: Summary and Verdict (2-3 min)
 
 - Compile findings into the structured output template.
+- Filter out duplicate findings that are already present in the PR discussion unless your comment adds materially new information.
 - Assign a confidence score.
 - Render verdict: APPROVE, REQUEST_CHANGES, or COMMENT.
 
@@ -149,6 +166,14 @@ gh api repos/{owner}/{repo}/pulls/{number}/comments \
 - **Explain the Why**: Provide rationale, not just the what. "This should be private to prevent external mutation" explains the benefit.
 - **Acknowledge Good Work**: Use `[KUDOS]` to highlight well-written sections. Reinforces high standards and builds trust.
 - **Be Specific**: Include code snippets in suggestions. Reduce the author's cognitive load when implementing fixes.
+
+### De-duplicate Against Existing Comments
+
+- Read existing review threads before posting any new summary or inline comment.
+- Do not post the same issue again just because you found it independently.
+- If another reviewer already raised the same underlying problem, prefer replying in that thread or omit the comment entirely.
+- Add a new comment only when you have something materially new: a different root cause, a higher-severity impact, a more accurate file/line, or a concrete fix that the existing thread lacks.
+- When in doubt, collapse duplicates. The goal is signal, not vote-counting.
 
 ---
 
@@ -318,6 +343,8 @@ For inline comments posted via `gh api`:
     ```
 ```
 
+Before posting, verify this comment is net-new relative to existing PR comments and replies. If the same issue is already present, extend that thread instead of creating another top-level comment.
+
 ---
 
 ## Guidelines
@@ -331,6 +358,7 @@ For inline comments posted via `gh api`:
 - Focus on correctness, security, and maintainability over style
 - Keep review scope to the actual changes
 - Adjust depth based on change risk (auth change > typo fix)
+- Check existing PR comments first and avoid repeating points already made by others
 
 **DON'T:**
 - Rubber-stamp with "LGTM" without real inspection
@@ -341,3 +369,4 @@ For inline comments posted via `gh api`:
 - Demand a complete rewrite of the author's valid approach
 - Ignore test coverage gaps
 - Mix unrelated feedback or feature requests into the review
+- Post duplicate comments when the same concern is already captured elsewhere in the PR
