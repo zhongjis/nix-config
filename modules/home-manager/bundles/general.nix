@@ -3,6 +3,7 @@
   config,
   inputs,
   lib,
+  inputs,
   ...
 }: {
   nixpkgs = {
@@ -39,6 +40,10 @@
   programs.btop.enable = lib.mkDefault true;
   programs.bun.enable = lib.mkDefault true;
   programs.zen-browser.enable = lib.mkDefault false;
+
+  home.packages = [
+    inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.openkanban
+  ];
 
   home.sessionVariables = {
     FLAKE = "${config.home.homeDirectory}/personal/nix-config";
