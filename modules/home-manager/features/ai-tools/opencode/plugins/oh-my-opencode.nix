@@ -66,17 +66,18 @@
     };
     categories = {
       # visual-engineering.model = "github-copilot/gemini-3.1-pro-preview";
-      visual-engineering.model = "google/antigravity-3.1-pro-preview";
+      visual-engineering.model = "google/antigravity-gemini-3.1-pro";
       ultrabrain.model = "openai/gpt-5.3-codex";
       deep.model = "openai/gpt-5.3-codex";
       # artistry.model = "github-copilot/gemini-3.1-pro-preview";
-      artistry.model = "google/antigravity-3.1-pro-preview";
+      artistry.model = "google/antigravity-gemini-3.1-pro";
       quick.model = "github-copilot/claude-haiku-4.5";
       unspecified-high.model = "openai/gpt-5.4";
       unspecified-low.model = "github-copilot/claude-sonnet-4.6";
       # writing.model = "github-copilot/gemini-3-flash-preview";
       writing.model = "google/antigravity-gemini-3-flash";
     };
+    google_auth = false;
   };
 
   workOverrides = {

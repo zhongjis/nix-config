@@ -40,12 +40,13 @@
   programs.bun.enable = lib.mkDefault true;
   programs.zen-browser.enable = lib.mkDefault false;
 
-  home.packages = [
-    inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.openkanban
-    (lib.optional
+  home.packages =
+    [
+      inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.openkanban
+    ]
+    ++ (lib.optional
       (inputs.self.packages.${pkgs.stdenv.hostPlatform.system} ? agent-of-empires)
-      inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.agent-of-empires)
-  ];
+      inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.agent-of-empires);
 
   home.sessionVariables = {
     FLAKE = "${config.home.homeDirectory}/personal/nix-config";
