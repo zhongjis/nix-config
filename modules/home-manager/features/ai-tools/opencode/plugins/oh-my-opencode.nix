@@ -43,38 +43,30 @@
   personalOverrides = {
     runtime_fallback.enabled = true;
     agents = {
-      # claude family
-      sisyphus.model = "github-copilot/claude-opus-4.6";
-      metis.model = "github-copilot/claude-opus-4.6";
+      sisyphus.model = "openai/gpt-5.4";
+      metis.model = "openai/gpt-5.4";
 
-      # gpt/claude dual
-      prometheus.model = "github-copilot/claude-opus-4.6";
-      atlas.model = "kimi-for-coding/k2p5";
-      # atlas.model = "opencode/kimi-k2.5";
+      prometheus.model = "openai/gpt-5.4";
+      # atlas.model = "kimi-for-coding/k2p5";
+      atlas.model = "openai/gpt-5.4";
 
-      # deep/gpt
       hephaestus.model = "openai/gpt-5.3-codex";
       oracle.model = "openai/gpt-5.4";
       momus.model = "openai/gpt-5.4";
 
-      # utility
-      # multimodal-looker.model = "opencode/kimi-k2.5";
       multimodal-looker.model = "openai/gpt-5.4";
-      # librarian.model = "github-copilot/gemini-3-flash-preview";
       librarian.model = "google/antigravity-gemini-3-flash";
       explore.model = "github-copilot/claude-haiku-4.5";
     };
     categories = {
-      # visual-engineering.model = "github-copilot/gemini-3.1-pro-preview";
       visual-engineering.model = "google/antigravity-gemini-3.1-pro";
       ultrabrain.model = "openai/gpt-5.3-codex";
       deep.model = "openai/gpt-5.3-codex";
-      # artistry.model = "github-copilot/gemini-3.1-pro-preview";
+
       artistry.model = "google/antigravity-gemini-3.1-pro";
       quick.model = "github-copilot/claude-haiku-4.5";
       unspecified-high.model = "openai/gpt-5.4";
       unspecified-low.model = "github-copilot/claude-sonnet-4.6";
-      # writing.model = "github-copilot/gemini-3-flash-preview";
       writing.model = "google/antigravity-gemini-3-flash";
     };
     google_auth = false;
@@ -93,7 +85,6 @@
 
       prometheus.model = "openai/gpt-5.4";
       atlas.model = "github-copilot/claude-sonnet-4.6";
-      unspecified-low.model = "github-copilot/claude-sonnet-4.6";
 
       hephaestus.model = "openai/gpt-5.3-codex";
       oracle.model = "openai/gpt-5.4";
