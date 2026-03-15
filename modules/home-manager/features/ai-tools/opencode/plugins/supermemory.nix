@@ -28,6 +28,6 @@ in
     # When oh-my-opencode is also active, disable its built-in context compaction
     # hook since supermemory handles compaction itself (preemptive at 80% capacity)
     programs.opencode.ohMyOpenCode.settings = lib.mkIf (hasPlugin "oh-my-opencode") {
-      disabled_hooks = ["anthropic-context-window-limit-recovery" "compaction-context-injector"];
+      disabled_hooks = ["anthropic-context-window-limit-recovery"];
     };
   }
