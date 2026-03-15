@@ -59,4 +59,10 @@ in {
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
+
+  manual = {
+    html.enable = false;
+    manpages.enable = false;
+    json.enable = false;
+  };
 }
