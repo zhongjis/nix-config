@@ -1282,11 +1282,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1773192291,
-        "narHash": "sha256-koOFFUB36zr1P4KhTI5wO0tRfWDaPxqSdXM/XI3G9wY=",
+        "lastModified": 1773693416,
+        "narHash": "sha256-qsmTsVxUd/tul6ds4uuFM1d9bEA7YsuGZkQIvEADvio=",
         "ref": "refs/heads/main",
-        "rev": "d0584f9117cebab8296d1973122d1957f97e2337",
-        "revCount": 50,
+        "rev": "c332a913bdaf3129f08594cf1c85021bd478aa43",
+        "revCount": 51,
         "type": "git",
         "url": "ssh://git@github.com/zhongjis/nix-config-private.git"
       },
