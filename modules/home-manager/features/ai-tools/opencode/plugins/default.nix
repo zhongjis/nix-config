@@ -18,6 +18,7 @@
     "@tarquinen/opencode-dcp@latest"
     "@franlol/opencode-md-table-formatter@latest"
     "opencode-pty@latest"
+    "@tarquinen/opencode-smart-title"
   ];
 
   # Plugins only for work profile
@@ -32,6 +33,7 @@
     "opencode-supermemory@latest"
     "opencode-antigravity-auth@latest"
     "@nick-vi/opencode-type-inject@latest"
+    "@slkiser/opencode-quota@latest"
   ];
 
   # Build final plugin list based on profile
