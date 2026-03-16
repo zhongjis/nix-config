@@ -20,8 +20,8 @@
     # commands, plugins, and hooks from ~/.claude/
     claude_code = {
       mcp = false;
-      skills = true;
-      agents = true;
+      skills = false;
+      agents = false;
       commands = false;
       plugins = false;
       hooks = false;
