@@ -17,12 +17,12 @@
     "@simonwjackson/opencode-direnv@latest"
     "@tarquinen/opencode-dcp@latest"
     "@franlol/opencode-md-table-formatter@latest"
-    "opencode-pty"
+    "opencode-pty@latest"
   ];
 
   # Plugins only for work profile
   workPlugins = [
-    "@knikolov/opencode-plugin-simple-memory"
+    "@knikolov/opencode-plugin-simple-memory@latest"
   ];
 
   # Plugins only for personal profile
@@ -31,7 +31,7 @@
     # "file://${morphFastApplyPkg}/lib/node_modules/opencode-morph-fast-apply/index.ts"
     "opencode-supermemory@latest"
     "opencode-antigravity-auth@latest"
-    "@nick-vi/opencode-type-inject"
+    "@nick-vi/opencode-type-inject@latest"
   ];
 
   # Build final plugin list based on profile
