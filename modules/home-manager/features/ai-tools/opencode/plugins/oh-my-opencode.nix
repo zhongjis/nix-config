@@ -55,19 +55,19 @@
       momus.model = "openai/gpt-5.4";
 
       multimodal-looker.model = "openai/gpt-5.4";
-      librarian.model = "google/antigravity-gemini-3-flash";
+      librarian.model = "github-copilot/gemini-3-flash-preview";
       explore.model = "github-copilot/claude-haiku-4.5";
     };
     categories = {
-      visual-engineering.model = "google/antigravity-gemini-3.1-pro";
+      visual-engineering.model = "github-copilot/gemini-3.1-pro-preview";
       ultrabrain.model = "openai/gpt-5.3-codex";
       deep.model = "openai/gpt-5.3-codex";
 
-      artistry.model = "google/antigravity-gemini-3.1-pro";
+      artistry.model = "github-copilot/gemini-3.1-pro-preview";
       quick.model = "github-copilot/claude-haiku-4.5";
       unspecified-high.model = "openai/gpt-5.4";
       unspecified-low.model = "github-copilot/claude-sonnet-4.6";
-      writing.model = "google/antigravity-gemini-3-flash";
+      writing.model = "github-copilot/gemini-3-flash-preview";
     };
     google_auth = false;
   };
