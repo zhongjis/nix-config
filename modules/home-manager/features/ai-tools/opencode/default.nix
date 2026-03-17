@@ -36,11 +36,6 @@
       share = "disabled";
       autoupdate = false;
 
-      tui = {
-        scroll_acceleration.enabled = true;
-        diff_style = "stacked";
-      };
-
       instructions =
         commonInstructions
         ++ [
