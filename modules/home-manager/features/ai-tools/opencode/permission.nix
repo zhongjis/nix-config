@@ -95,6 +95,9 @@ _: {
       "kill*" = "ask";
       "killall*" = "ask";
       "pkill*" = "ask";
+
+      # Misc
+      "agent-browser*" = "allow";
     };
     read = "allow";
     list = "allow";
