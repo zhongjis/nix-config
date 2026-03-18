@@ -49,6 +49,9 @@
     };
   };
 
+  xdg.configFile."opencode/skills".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.xdg.configHome}/opencode/skill";
+
   home.sessionVariables = {
     OPENCODE_DISABLE_CLAUDE_CODE = "1";
   };
