@@ -16,8 +16,7 @@
     "oh-my-opencode@latest"
     "@simonwjackson/opencode-direnv@latest"
     "@tarquinen/opencode-dcp@latest"
-    "@franlol/opencode-md-table-formatter@latest"
-    "opencode-pty@latest"
+    "opencode-pty@late"
     "@tarquinen/opencode-smart-title"
   ];
 
