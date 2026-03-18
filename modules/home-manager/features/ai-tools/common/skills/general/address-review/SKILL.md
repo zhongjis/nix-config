@@ -38,10 +38,6 @@ gh auth status
 gh pr checkout <PR_NUMBER>
 ```
 
-3. Detect the repository's version control workflow before giving commit or push guidance:
-   - If the repo contains a `.jj/` directory, use `jj` for commit and push operations.
-   - Otherwise, use git.
-
 If authentication fails or the PR branch cannot be checked out, stop and report the issue.
 
 ## Workflow
@@ -73,14 +69,15 @@ Do not classify or act on a thread until you have read this context.
 
 For each unresolved thread, classify it as:
 
-| Verdict | Action |
-|---------|--------|
-| **fix** | Make a code change that addresses the concern |
+| Verdict      | Action                                                                      |
+| ------------ | --------------------------------------------------------------------------- |
+| **fix**      | Make a code change that addresses the concern                               |
 | **disagree** | Reply with a concise technical explanation for keeping the current approach |
 
 A narrower or partial code change is still a **fix** if it addresses the core valid concern.
 
 **Evaluation heuristics:**
+
 - Unused imports, duplicate calls, outdated docs, stale mocks -> usually **fix**
 - Performance suggestions -> evaluate if impact is meaningful before changing code
 - Refactoring suggestions -> evaluate against KISS/YAGNI and existing local patterns
@@ -153,6 +150,7 @@ The resolution flow is always: comment first, then resolve.
 Use the available GitHub tooling (`gh`, MCP, or equivalent) to post replies in the existing thread.
 
 Keep replies brief:
+
 - Fix: "Fixed" or "Fixed - [note if approach differs]"
 - Disagree: "Not changing this - [brief technical reason]"
 
@@ -170,9 +168,9 @@ Provide a final summary that includes:
 
 Summary table of all reviewed threads:
 
-| # | File:Line | Issue | Action | Reply |
-|---|-----------|-------|--------|-------|
-| 1 | path.py:42 | Unused import | Fixed | Fixed |
-| 2 | test.py:100 | Incorrect mock | Fixed | Fixed |
-| 3 | utils.py:50 | Suggested refactor | Disagreed | Not changing - not needed per YAGNI |
-| 4 | api.py:88 | Broader redesign request | Left open | Needs user decision on scope |
+| #   | File:Line   | Issue                    | Action    | Reply                               |
+| --- | ----------- | ------------------------ | --------- | ----------------------------------- |
+| 1   | path.py:42  | Unused import            | Fixed     | Fixed                               |
+| 2   | test.py:100 | Incorrect mock           | Fixed     | Fixed                               |
+| 3   | utils.py:50 | Suggested refactor       | Disagreed | Not changing - not needed per YAGNI |
+| 4   | api.py:88   | Broader redesign request | Left open | Needs user decision on scope        |
