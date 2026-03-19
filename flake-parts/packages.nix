@@ -17,10 +17,6 @@
           }).neovim;
       }
       // {
-        agent-of-empires = import ../packages/agent-of-empires.nix {
-          inherit pkgs;
-          lib = pkgs.lib;
-        };
         opencode-morph-fast-apply = import ../packages/opencode-morph-fast-apply.nix {
           inherit pkgs;
           lib = pkgs.lib;

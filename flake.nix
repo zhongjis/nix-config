@@ -58,9 +58,15 @@
       url = "github:zhaofengli/colmena";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    xremap-flake.url = "github:xremap/nix-flake";
+    xremap-flake = {
+      url = "github:xremap/nix-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixpkgs-terraform.url = "github:stackbuilders/nixpkgs-terraform";
-    stylix.url = "github:danth/stylix";
+    stylix = {
+      url = "github:danth/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     nvf.url = "github:notashelf/nvf";
     zen-browser = {
@@ -68,7 +74,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
-    opencode.url = "github:anomalyco/opencode/v1.2.27";
+    opencode = {
+      url = "github:anomalyco/opencode/v1.2.27";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    agent-of-empires = {
+      url = "github:njbrake/agent-of-empires";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     ## hyprland
     hyprland.url = "github:hyprwm/Hyprland/v0.54.1";
