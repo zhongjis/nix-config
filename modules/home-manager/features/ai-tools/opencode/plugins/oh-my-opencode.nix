@@ -56,7 +56,7 @@
 
       multimodal-looker.model = "openai/gpt-5.4";
       librarian.model = "github-copilot/gemini-3-flash-preview";
-      explore.model = "github-copilot/claude-haiku-4.5";
+      explore.model = "github-copilot/grok-code-fast-1";
     };
     categories = {
       visual-engineering.model = "github-copilot/gemini-3.1-pro-preview";
@@ -64,7 +64,7 @@
       deep.model = "openai/gpt-5.3-codex";
 
       artistry.model = "github-copilot/gemini-3.1-pro-preview";
-      quick.model = "github-copilot/claude-haiku-4.5";
+      quick.model = "github-copilot/gpt-5.4-mini";
       unspecified-high.model = "openai/gpt-5.4";
       unspecified-low.model = "github-copilot/claude-sonnet-4.6";
       writing.model = "github-copilot/gemini-3-flash-preview";
@@ -101,7 +101,7 @@
       deep.model = "openai/gpt-5.3-codex";
 
       artistry.model = "github-copilot/gemini-3.1-pro-preview";
-      quick.model = "github-copilot/claude-haiku-4.5";
+      quick.model = "github-copilot/gpt-5.4-mini";
       unspecified-high.model = "openai/gpt-5.4";
       unspecified-low.model = "github-copilot/claude-sonnet-4.6";
       writing.model = "github-copilot/gemini-3-flash-preview";
