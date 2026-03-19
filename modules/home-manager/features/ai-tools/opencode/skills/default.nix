@@ -3,6 +3,7 @@
   aiProfileHelpers,
   commonSkills,
   myLib,
+  config,
   ...
 }: let
   # Auto-discover skills from directory structure
@@ -30,4 +31,8 @@
 in {
   # Merge common skills (from common/skills/) with OpenCode-only skills
   programs.opencode.skills = commonSkills // filteredLocalSkills;
+
+  # TODO: to be removed after merge of https://github.com/nix-community/home-manager/pull/8926
+  xdg.configFile."opencode/skills".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.xdg.configHome}/opencode/skill";
 }
