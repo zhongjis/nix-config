@@ -4,8 +4,8 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     systems.url = "github:nix-systems/default";
-    nix-config = {
-      url = "github:zhongjis/nix-config";
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
     };
     flake-utils = {
       url = "github:numtide/flake-utils";
@@ -16,13 +16,13 @@
   outputs = {
     nixpkgs,
     flake-utils,
-    nix-config,
+    llm-agents,
     ...
   }:
     flake-utils.lib.eachDefaultSystem (
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
-        agent-browser = nix-config.packages.${system}.agent-browser;
+        agent-browser = llm-agents.packages.${system}.agent-browser;
 
         cleanupScript =
           pkgs.writeShellScript "cleanup-stale-agent-browser"

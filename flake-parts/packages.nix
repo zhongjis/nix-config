@@ -31,10 +31,6 @@
           inherit pkgs;
           lib = pkgs.lib;
         };
-        agent-browser = import ../packages/agent-browser.nix {
-          inherit pkgs;
-          lib = pkgs.lib;
-        };
       };
   };
 }

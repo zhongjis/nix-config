@@ -20,7 +20,7 @@ nix-config/
 │   ├── home-manager-linux/   # Linux-only HM (hyprland, waybar, swaync)
 │   └── shared/            # Cross-platform: cachix, packages, stylix
 ├── overlays/              # modifications (overrides) + stable-packages (nixos-25.11)
-├── packages/              # Custom derivations (helium, devtoys, agent-browser, opencode-morph-fast-apply)
+├── packages/              # Custom derivations (helium, devtoys, opencode-morph-fast-apply)
 ├── scripts/               # Input update scripts (homebrew, hyprland, nixos)
 ├── secrets/               # sops-encrypted YAML
 └── templates/             # Dev shells: java8, nodejs22, nextjs
