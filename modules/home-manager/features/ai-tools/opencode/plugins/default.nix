@@ -18,7 +18,6 @@
     "@simonwjackson/opencode-direnv@latest"
     "@tarquinen/opencode-dcp@latest"
     "opencode-pty@latest"
-    "@tarquinen/opencode-smart-title@latest"
   ];
 
   # Plugins only for work profile
