@@ -82,6 +82,10 @@
       url = "github:njbrake/agent-of-empires";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    impeccable = {
+      url = "github:pbakaus/impeccable";
+      flake = false;
+    };
 
     ## hyprland
     hyprland.url = "github:hyprwm/Hyprland/v0.54.1";

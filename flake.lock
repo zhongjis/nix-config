@@ -1181,6 +1181,22 @@
         "type": "github"
       }
     },
+    "impeccable": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1773873237,
+        "narHash": "sha256-xt9oIszoAwprFe3UKf4id+DLPoObWj0BRlIuTAldlvc=",
+        "owner": "pbakaus",
+        "repo": "impeccable",
+        "rev": "d6b1a56bc5b79e9375be0f8508b4daa1678fb058",
+        "type": "github"
+      },
+      "original": {
+        "owner": "pbakaus",
+        "repo": "impeccable",
+        "type": "github"
+      }
+    },
     "import-tree": {
       "locked": {
         "lastModified": 1772999353,
@@ -1885,6 +1901,7 @@
         "hypr-dynamic-cursors": "hypr-dynamic-cursors",
         "hyprland": "hyprland",
         "hyprland-plugins": "hyprland-plugins",
+        "impeccable": "impeccable",
         "import-tree": "import-tree",
         "minimal-tmux": "minimal-tmux",
         "neovim-nightly-overlay": "neovim-nightly-overlay",
