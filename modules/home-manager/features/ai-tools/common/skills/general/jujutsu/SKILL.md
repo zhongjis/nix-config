@@ -1,13 +1,13 @@
 ---
 name: jujutsu
-description: "Manages version control with Jujutsu (jj), including rebasing, conflict resolution, and Git interop. Use when tracking changes, navigating history, squashing/splitting commits, or pushing to Git remotes. Triggers on 'commit', 'commit my changes', 'save changes', 'push', 'rebase', 'squash', 'jj', 'describe changes', 'create PR', or any version control request in a jj-managed repository."
+description: "Manages version control with Jujutsu (jj), including rebasing, conflict resolution, and Git interop. Use only when the user explicitly mentions Jujutsu or `jj`, or when the current repository is jj-managed and contains a `.jj/` directory. Do not trigger for plain git repositories."
 ---
 
 # Jujutsu
 
 Git-compatible VCS focused on concurrent development and ease of use.
 
-**Trigger**: `commit`, `save changes`, `push`, `rebase`, `squash`, `describe`, `jj`, or any VCS operation when `.jj/` directory exists.
+**Trigger**: **DO NOT trigger for plain git repositories.** Trigger only for explicit `jj` or `Jujutsu` requests, or for general VCS operations after confirming a `.jj/` directory exists at the repo root.
 
 ## ⚠️ Precedence Rule
 
