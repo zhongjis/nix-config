@@ -56,7 +56,7 @@
 
       multimodal-looker.model = "openai/gpt-5.4";
       librarian.model = "github-copilot/gemini-3-flash-preview";
-      explore.model = "github-copilot/grok-code-fast-1";
+      explore.model = "opencode/minimax-m2.5-free";
     };
     categories = {
       visual-engineering.model = "github-copilot/gemini-3.1-pro-preview";
