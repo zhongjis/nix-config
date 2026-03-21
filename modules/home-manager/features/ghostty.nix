@@ -30,6 +30,10 @@
       initial-command = "zsh -l -c 'tmux attach || tmux new-session -d -s home \"${pkgs.fastfetch}/bin/fastfetch; exec $SHELL\" && tmux attach -t home'";
       confirm-close-surface = false;
       background-opacity = 0.9;
+      keybind = [
+        "alt+backspace=text:\\x1b\\x7f"
+        "shift+enter=text:\\n"
+      ];
     };
   };
 }
