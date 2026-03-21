@@ -82,6 +82,14 @@
       url = "github:njbrake/agent-of-empires";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    oh-my-pi = {
+      url = "github:can1357/oh-my-pi";
+      flake = false;
+    };
     impeccable = {
       url = "github:pbakaus/impeccable";
       flake = false;

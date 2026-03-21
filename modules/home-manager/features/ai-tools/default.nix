@@ -10,6 +10,7 @@ in {
     ./opencode
     ./claude-code
     ./factory
+    ./pi
   ];
 
   options.myHomeManager.aiProfile = lib.mkOption {
