@@ -1,20 +1,22 @@
 {
+  inputs,
   lib,
   aiProfileHelpers,
-  myLib,
   ...
 }: let
   # Auto-discover skills from directory structure
   # Each skill is a directory containing SKILL.md and optional templates/references
   # Supports disabled-* prefix to skip skills
   discoverSkills = profileDir: let
-    dirs = myLib.dirsIn profileDir;
-    enabledDirs = lib.filterAttrs (name: _: !(lib.hasPrefix "disabled-" name)) dirs;
+    dirs = builtins.readDir profileDir;
+    enabledDirs = lib.filterAttrs (name: type: type == "directory" && !(lib.hasPrefix "disabled-" name)) dirs;
     skills =
       lib.mapAttrs (name: _: profileDir + "/${name}")
       enabledDirs;
   in
     skills;
+
+  impeccableClaudeSkills = discoverSkills (inputs.impeccable + "/.claude/skills");
 
   # Discover Claude Code-only skills from subdirectories
   localGeneralSkills = discoverSkills ./general;
@@ -28,5 +30,5 @@
     // lib.optionalAttrs aiProfileHelpers.isPersonal localPersonalSkills;
 in {
   # Export filtered local skills via _module.args for use in parent module
-  _module.args.claudeCodeLocalSkills = filteredLocalSkills;
+  _module.args.claudeCodeLocalSkills = impeccableClaudeSkills // filteredLocalSkills;
 }

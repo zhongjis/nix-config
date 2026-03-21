@@ -1,8 +1,8 @@
 {
+  inputs,
   lib,
   aiProfileHelpers,
   commonSkills,
-  myLib,
   config,
   ...
 }: let
@@ -10,13 +10,15 @@
   # Each skill is a directory containing SKILL.md and optional templates/references
   # Supports disabled-* prefix to skip skills
   discoverSkills = profileDir: let
-    dirs = myLib.dirsIn profileDir;
-    enabledDirs = lib.filterAttrs (name: _: !(lib.hasPrefix "disabled-" name)) dirs;
+    dirs = builtins.readDir profileDir;
+    enabledDirs = lib.filterAttrs (name: type: type == "directory" && !(lib.hasPrefix "disabled-" name)) dirs;
     skills =
       lib.mapAttrs (name: _: profileDir + "/${name}")
       enabledDirs;
   in
     skills;
+
+  impeccableOpenCodeSkills = discoverSkills (inputs.impeccable + "/.opencode/skills");
 
   # Discover OpenCode-only skills from subdirectories
   localGeneralSkills = discoverSkills ./general;
@@ -30,5 +32,5 @@
     // lib.optionalAttrs aiProfileHelpers.isPersonal localPersonalSkills;
 in {
   # Merge common skills (from common/skills/) with OpenCode-only skills
-  programs.opencode.skills = commonSkills // filteredLocalSkills;
+  programs.opencode.skills = commonSkills // impeccableOpenCodeSkills // filteredLocalSkills;
 }
