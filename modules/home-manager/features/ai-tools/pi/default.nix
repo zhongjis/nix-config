@@ -15,13 +15,22 @@
 
   sharedConfig = {
     modelRoles = {
-      smol = "github-copilot/gemini-3-flash-preview";
-      slow = "openai/gpt-5.4";
-      plan = "openai/gpt-5.4";
+      default = "openai-codex/gpt-5.4:high";
+      vision = "openai-codex/gpt-5.3-codex:low";
+      smol = "github-copilot/claude-haiku-4.5:off";
+      slow = "openai-codex/gpt-5.4:high";
+      plan = "openai-codex/gpt-5.4:high";
+      commit = "github-copilot/claude-haiku-4.5:high";
+      task = "openai-codex/gpt-5.4:high";
     };
   };
 
-  workOverrides = {};
+  workOverrides = {
+    modelRoles = {
+      task = "github-copilot/claude-sonnet-4.6";
+      vision = "openai/gpt-5.3-codex";
+    };
+  };
 
   personalOverrides = {};
 
@@ -45,6 +54,11 @@ in {
   home.file =
     lib.mapAttrs' (name: path: {
       name = ".omp/agent/skills/${name}";
+      value = {source = path;};
+    })
+    allSkills
+    // lib.mapAttrs' (name: path: {
+      name = ".pi/skills/${name}";
       value = {source = path;};
     })
     allSkills
