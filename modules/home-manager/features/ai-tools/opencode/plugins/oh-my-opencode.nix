@@ -26,7 +26,7 @@
       plugins = false;
       hooks = false;
     };
-    disabled_skills = ["playwright"];
+    disabled_skills = ["playwright" "frontend-ui-ux"];
     browser_automation_engine.provider = "agent-browser";
     tmux = {
       enabled = false;
