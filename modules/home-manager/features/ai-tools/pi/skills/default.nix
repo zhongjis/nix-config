@@ -13,8 +13,7 @@
   in
     skills;
 
-  ohMyPiSkills = discoverSkills (inputs.oh-my-pi + "/.omp/skills");
-  impeccablePiSkills = discoverSkills (inputs.impeccable + "/.pi/skills");
+  impeccableOmpSkills = discoverSkills (inputs.impeccable + "/.pi/skills");
   localGeneralSkills = discoverSkills ./general;
   localWorkSkills = discoverSkills ./work;
   localPersonalSkills = discoverSkills ./personal;
@@ -24,5 +23,5 @@
     // lib.optionalAttrs aiProfileHelpers.isWork localWorkSkills
     // lib.optionalAttrs aiProfileHelpers.isPersonal localPersonalSkills;
 in {
-  _module.args.piLocalSkills = ohMyPiSkills // impeccablePiSkills // filteredLocalSkills;
+  _module.args.ompLocalSkills = impeccableOmpSkills // filteredLocalSkills;
 }

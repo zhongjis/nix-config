@@ -1334,11 +1334,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1774104280,
-        "narHash": "sha256-kQeR1qqTFleJzMWsOttJMWUxMsykcKrUA2ttPIg2O4k=",
+        "lastModified": 1774365699,
+        "narHash": "sha256-21NlHCjd8kA6fD1gec43BKMcFGwRABTkUHJNs9eOx+M=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "4f6fca6b05c5b59b6bbb442a262596ddf86661e8",
+        "rev": "3b7caac99cca84bc0e7f05758e5d52f46fd3c244",
         "type": "github"
       },
       "original": {
@@ -1961,22 +1961,6 @@
         "type": "github"
       }
     },
-    "oh-my-pi": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1774110887,
-        "narHash": "sha256-d0izla5Vk65hF4RNIFcA6reLKsVyE7wUcmRwoUQHvG0=",
-        "owner": "can1357",
-        "repo": "oh-my-pi",
-        "rev": "d405fefbd753a9be4e95c96a9916b640d1805c75",
-        "type": "github"
-      },
-      "original": {
-        "owner": "can1357",
-        "repo": "oh-my-pi",
-        "type": "github"
-      }
-    },
     "opencode": {
       "inputs": {
         "nixpkgs": [
@@ -2052,7 +2036,6 @@
         "nixpkgs-stable": "nixpkgs-stable",
         "nixpkgs-terraform": "nixpkgs-terraform",
         "nvf": "nvf",
-        "oh-my-pi": "oh-my-pi",
         "opencode": "opencode",
         "sops-nix": "sops-nix",
         "stylix": "stylix",

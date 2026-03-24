@@ -3,7 +3,7 @@
   pkgs,
   lib,
   commonSkills,
-  piLocalSkills,
+  ompLocalSkills,
   commonInstructions,
   aiProfileHelpers,
   ...
@@ -11,7 +11,7 @@
   yamlFormat = pkgs.formats.yaml {};
   system = pkgs.stdenv.hostPlatform.system;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
-  allSkills = commonSkills // piLocalSkills;
+  allSkills = commonSkills // ompLocalSkills;
 
   sharedConfig = {
     modelRoles = {
@@ -34,7 +34,7 @@
 
   personalOverrides = {};
 
-  piConfig = lib.recursiveUpdate sharedConfig (
+  ompConfig = lib.recursiveUpdate sharedConfig (
     if aiProfileHelpers.isWork
     then workOverrides
     else personalOverrides
@@ -47,7 +47,6 @@ in {
   ];
 
   home.packages = [
-    llmAgentsPackages.pi
     llmAgentsPackages.omp
   ];
 
@@ -57,15 +56,8 @@ in {
       value = {source = path;};
     })
     allSkills
-    // lib.mapAttrs' (name: path: {
-      name = ".pi/skills/${name}";
-      value = {source = path;};
-    })
-    allSkills
     // {
-      ".omp/agent/commands".source = inputs.oh-my-pi + "/.omp/commands";
-      ".omp/agent/rules".source = inputs.oh-my-pi + "/.omp/rules";
-      ".omp/agent/config.yml".source = yamlFormat.generate "pi-config.yml" piConfig;
+      ".omp/agent/config.yml".source = yamlFormat.generate "omp-config.yml" ompConfig;
       ".omp/agent/AGENTS.md".text = builtins.concatStringsSep "\n\n" (
         map builtins.readFile commonInstructions
       );
