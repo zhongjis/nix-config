@@ -101,7 +101,7 @@
       deep.model = "openai/gpt-5.3-codex";
 
       artistry.model = "github-copilot/gemini-3.1-pro-preview";
-      quick.model = "github-copilot/gpt-5.4-mini";
+      quick.model = "openai/gpt-5.4-mini";
       unspecified-high.model = "openai/gpt-5.4";
       unspecified-low.model = "github-copilot/claude-sonnet-4.6";
       writing.model = "github-copilot/gemini-3-flash-preview";
