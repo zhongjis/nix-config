@@ -14,10 +14,10 @@ nix-config/
 ├── lib/                   # myLib: mkSystem, mkHome, filesIn, dirsIn, extendModules
 ├── modules/
 │   ├── nixos/             # → see modules/nixos/AGENTS.md
-│   ├── darwin/            # myNixDarwin.* — mirrors nixos pattern, Nix+Homebrew
-│   ├── home-manager/      # Cross-platform HM features (ai-tools, neovim, zsh, etc.)
+│   ├── darwin/            # → see modules/darwin/AGENTS.md
+│   ├── home-manager/      # → see modules/home-manager/AGENTS.md
 │   ├── home-manager-darwin/  # macOS-only HM (aerospace)
-│   ├── home-manager-linux/   # Linux-only HM (hyprland, waybar, swaync)
+│   ├── home-manager-linux/   # → see modules/home-manager-linux/AGENTS.md
 │   └── shared/            # Cross-platform: cachix, packages, stylix
 ├── overlays/              # modifications (overrides) + stable-packages (nixos-25.11)
 ├── packages/              # Custom derivations (helium, devtoys, opencode-morph-fast-apply)
@@ -30,8 +30,10 @@ nix-config/
 
 | Task | Location | Notes |
 |------|----------|-------|
-| Add system feature | `modules/nixos/features/` or `modules/darwin/features/` | Auto-discovered, gets `myNixOS.{name}.enable` |
-| Add HM feature | `modules/home-manager/features/` | Gets `myHomeManager.{name}.enable` |
+| Add NixOS system feature | `modules/nixos/features/` | Auto-discovered, gets `myNixOS.{name}.enable` |
+| Add cross-platform HM feature | `modules/home-manager/features/` | See `modules/home-manager/AGENTS.md` |
+| Add Linux desktop HM feature | `modules/home-manager-linux/features/` or `modules/home-manager-linux/services/` | See `modules/home-manager-linux/AGENTS.md` |
+| Add Darwin system feature | `modules/darwin/features/` | See `modules/darwin/AGENTS.md` |
 | Add AI skill | `modules/home-manager/features/ai-tools/common/skills/general/` | See ai-tools/AGENTS.md |
 | Add neovim plugin | `modules/home-manager/features/neovim/nvf/plugins/` | See neovim/AGENTS.md |
 | Add custom package | `packages/` | See nix-package-creator skill |
@@ -92,7 +94,6 @@ All features auto-discovered via `myLib.extendModules`:
 - **NEVER** forget trailing commas in attribute sets/lists
 - **NEVER** mix tabs and spaces
 - **NEVER** skip `nix flake check` after changes
-- **NEVER** add vendor-specific content to AI skills (see ai-tools/AGENTS.md)
 
 ## VERSION CONTROL (JUJUTSU)
 
@@ -125,5 +126,10 @@ sops-nix with age encryption. Key: `~/.config/sops/age/keys.txt`. Edit: `nix run
 | Path | AGENTS.md | Focus |
 |------|-----------|-------|
 | `modules/home-manager/features/ai-tools/` | ✅ | Skills, plugins, profiles, MCP |
+| `modules/home-manager/` | ✅ | Cross-platform HM features, bundles, services |
+| `modules/home-manager-linux/` | ✅ | Linux desktop stack: hyprland, waybar, swaync |
+| `modules/darwin/` | ✅ | nix-darwin features, bundles, Homebrew integration |
 | `modules/nixos/` | ✅ | Bundles, features, services, option namespaces |
 | `modules/home-manager/features/neovim/` | ✅ | NVF framework, plugin patterns |
+
+For AI skill rules, follow `modules/home-manager/features/ai-tools/AGENTS.md`.

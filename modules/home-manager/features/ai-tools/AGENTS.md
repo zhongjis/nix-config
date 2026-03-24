@@ -61,7 +61,9 @@ in lib.mapAttrs (name: _: profileDir + "/${name}") enabledDirs;
 - YAML frontmatter: `name`, `description`, optional `upstream` (external source URL)
 - **`upstream` present** → sourced externally, can be updated via skill-maintainer
 - **`upstream` absent** → locally created, do not attempt upstream sync
-- **ALL skills must be vendor-neutral** — see Genericize rules in skill-maintainer skill
+- Locally authored shared skills must be vendor-neutral — see Genericize rules in skill-maintainer skill
+- Default leaf contract is `SKILL.md`; do **not** add a skill-local `AGENTS.md` unless upstream tooling or generated reference packaging clearly requires it
+- If a skill leaf keeps `AGENTS.md`, use it for navigation/compatibility only and keep contributor/build workflow in `README.md`
 
 ## OPENCODE PLUGIN SYSTEM
 
@@ -82,5 +84,7 @@ Defined in `common/mcp/default.nix`. General: nixos-docs, context7, mcp-k8s. Per
 1. Create directory in appropriate location (general/work/personal, common or tool-specific)
 2. Add `SKILL.md` with YAML frontmatter (`name`, `description`)
 3. If from external source, add `upstream` field
-4. Genericize all vendor-specific content
+4. Genericize vendor-specific content for local/shared skills; preserve intentional upstream/generated packaging when that structure is the source artifact
 5. `nh darwin switch .` to apply (auto-discovered, no registration needed)
+
+For contributor-oriented build, validation, or generation steps inside a skill directory, document them in that skill's `README.md`, not here.

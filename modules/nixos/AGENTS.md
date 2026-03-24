@@ -1,12 +1,11 @@
 # NIXOS MODULES
 
-NixOS and nix-darwin system configuration via auto-discovered features, bundles, and services.
+NixOS system configuration via auto-discovered features, bundles, and services. Darwin lives in the sibling `modules/darwin/` subtree.
 
 ## AUTO-DISCOVERY
 
 `myLib.extendModules` scans each directory for `.nix` files and wraps them with:
-- `myNixOS.{features|bundles|services}.{name}.enable` option (NixOS)
-- `myNixDarwin.{features|bundles}.{name}.enable` option (Darwin)
+- `myNixOS.{features|bundles|services}.{name}.enable` option
 
 **No manual registration.** Drop a `.nix` file → it's auto-discovered → enable in host config.
 
@@ -15,14 +14,9 @@ NixOS and nix-darwin system configuration via auto-discovered features, bundles,
 ```
 nixos/
 ├── default.nix       # Imports features/, bundles/, services/ via extendModules
-├── features/         # 20 individual capabilities
-├── bundles/          # 7 feature compositions
-└── services/         # 3 hardware-specific (nvidia, amdgpu, amdcpu)
-
-darwin/
-├── default.nix
-├── features/         # 6 features (yabai, sketchybar, skhd, macos-system, determinate, nh)
-└── bundles/          # 2 bundles (general, work)
+├── features/         # Individual capabilities
+├── bundles/          # Feature compositions
+└── services/         # Hardware-specific layers (nvidia, amdgpu, amdcpu)
 ```
 
 ## BUNDLES → FEATURE MAPPINGS
@@ -59,9 +53,9 @@ myNixOS.bundles.developer.enable = true;
 myNixOS.services.amdgpu.enable = true;
 ```
 
-## DARWIN DIFFERENCES
+## GOTCHAS
 
-- Namespace: `myNixDarwin.*` (not `myNixOS.*`)
-- No services layer (no hardware specialisation)
-- Uses Homebrew casks alongside Nix packages
-- Features: yabai (tiling WM), sketchybar (bar), skhd (hotkeys), macos-system (defaults), determinate (Nix installer), nh
+- Services are hardware-specialized; do not enable multiple GPU service modules on the same host
+- Bundles compose features with `lib.mkDefault`; use host config for final overrides
+- Host `system.stateVersion` is effectively immutable after first install
+- For nix-darwin rules, use `../darwin/AGENTS.md` instead of adding Darwin detail here
