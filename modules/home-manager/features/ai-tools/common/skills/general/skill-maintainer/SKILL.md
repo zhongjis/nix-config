@@ -69,8 +69,13 @@ upstream: "https://github.com/org/repo/tree/main/skills/skill-name"
 ---
 ```
 
-- **`upstream` present** → Sourced from an external repository. Can be updated from the URL.
+- **`upstream` present** → Single canonical sync source. Sourced from an external repository. Can be updated from this URL. Must be a singular string — never a list.
 - **`upstream` absent** → Locally created. Do NOT attempt to update from external sources.
+- **`adaptedFrom` present** → Informational lineage only. Lists prior or merged sources. Do NOT treat these URLs as additional upstreams during sync or update operations. Example:
+  ```yaml
+  adaptedFrom:
+    - "https://github.com/previous-org/repo/tree/main/skills/skill-name"
+  ```
 
 ### Identifying Skills by Provenance
 
@@ -165,7 +170,8 @@ When adding a skill from an external source for the first time:
 2. **Parse the URL** to extract clone URL, branch, and skill path (see URL Parsing above)
 3. **Clone and copy** using the Clone-to-/tmp Workflow above
 4. **Fix the frontmatter** in the copied SKILL.md:
-   - Add the `upstream` field set to the original GitHub tree URL
+   - Add the `upstream` field set to the original GitHub tree URL (singular string)
+   - If this skill adapts or merges content from a prior source, add `adaptedFrom` as a YAML list of informational lineage URLs — these are NOT synced automatically
    - Remove any `license`, `source`, or other non-standard tracking fields — `upstream` is the canonical provenance field
    - Verify `name` and `description` are present and accurate
 5. **Genericize** all vendor-specific references (see Genericize section below)

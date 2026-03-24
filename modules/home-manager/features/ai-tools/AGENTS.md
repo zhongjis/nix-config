@@ -58,9 +58,10 @@ in lib.mapAttrs (name: _: profileDir + "/${name}") enabledDirs;
 ## SKILL CONVENTIONS
 
 - Each skill: directory with `SKILL.md` + optional supporting files
-- YAML frontmatter: `name`, `description`, optional `upstream` (external source URL)
-- **`upstream` present** → sourced externally, can be updated via skill-maintainer
-- **`upstream` absent** → locally created, do not attempt upstream sync
+- YAML frontmatter: `name`, `description`, optional `upstream`, optional `adaptedFrom`
+- **`upstream` present** → single canonical sync source; can be updated via skill-maintainer. Must be a singular URL string, never a list.
+- **`upstream` absent** → locally created; do not attempt upstream sync
+- **`adaptedFrom` present** → informational lineage only (e.g., a previous upstream or manually merged source); not used for automated sync or update checks
 - Locally authored shared skills must be vendor-neutral — see Genericize rules in skill-maintainer skill
 - Default leaf contract is `SKILL.md`; do **not** add a skill-local `AGENTS.md` unless upstream tooling or generated reference packaging clearly requires it
 - If a skill leaf keeps `AGENTS.md`, use it for navigation/compatibility only and keep contributor/build workflow in `README.md`
@@ -83,7 +84,7 @@ Defined in `common/mcp/default.nix`. General: nixos-docs, context7, mcp-k8s. Per
 
 1. Create directory in appropriate location (general/work/personal, common or tool-specific)
 2. Add `SKILL.md` with YAML frontmatter (`name`, `description`)
-3. If from external source, add `upstream` field
+3. If from external source, add `upstream` field (singular canonical URL). If adapting from a prior source alongside a new canonical upstream, add `adaptedFrom` as a YAML list of informational-only lineage URLs.
 4. Genericize vendor-specific content for local/shared skills; preserve intentional upstream/generated packaging when that structure is the source artifact
 5. `nh darwin switch .` to apply (auto-discovered, no registration needed)
 
