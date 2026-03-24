@@ -1,6 +1,8 @@
 ---
 name: address-review
-upstream: "https://github.com/v1-io/v1tamins/tree/main/claude/skills/address-review"
+upstream: "https://github.com/openai/skills/tree/main/skills/.curated/gh-address-comments"
+adaptedFrom:
+  - "https://github.com/v1-io/v1tamins/tree/main/claude/skills/address-review"
 description: >
   Use when addressing unresolved PR review comments or threads from Copilot, bots, or humans.
   Triggers on "fix review comments", "address Copilot feedback", "respond to PR comments",
@@ -38,13 +40,21 @@ gh auth status
 gh pr checkout <PR_NUMBER>
 ```
 
+3. To retrieve structured comment and thread context, run:
+
+```bash
+python3 scripts/fetch_comments.py
+```
+
+This outputs a JSON blob with `pull_request`, `conversation_comments`, `reviews`, and `review_threads`. The script requires `gh` CLI to be authenticated.
+
 If authentication fails or the PR branch cannot be checked out, stop and report the issue.
 
 ## Workflow
 
 ### 1. Discover Unresolved Threads
 
-Use available GitHub tooling (`gh`, MCP, or equivalent) to identify unresolved review threads on the PR.
+Identify unresolved review threads on the PR. The preferred method is running `python3 scripts/fetch_comments.py`, which provides a structured JSON view of all comments and threads. Alternatively, use `gh pr view --json reviewThreads` as a fallback.
 
 If there are no unresolved threads, report that and stop.
 
