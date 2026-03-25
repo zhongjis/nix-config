@@ -35,6 +35,7 @@
       main_pane_min_width = 120;
       agent_pane_min_width = 40;
     };
+    disabled_hooks = ["gpt-permission-continuation"];
   };
 
   # Profile-specific overrides
