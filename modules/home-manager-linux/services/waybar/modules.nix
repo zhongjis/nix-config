@@ -54,7 +54,7 @@ in {
               "format": "<span color='#202020' bgcolor='#e78a4e' >  </span> {usage}%",
               "tooltip": false,
               "interval": 1,
-              "on-click-right": "kitty --title btop sh -c 'btop'"
+              "on-click-right": "${pkgs.ghostty}/bin/ghostty --title=btop -e btop"
           },
           "temperature": {
               "tooltip": false,
@@ -63,7 +63,7 @@ in {
               "critical-threshold": 70,
               "format": "<span color='#202020' bgcolor='#d8a657' >  </span> {temperatureC}°C",
               "format-critical": "<span color='#202020' bgcolor='#cc241d' >  </span> {temperatureC}°C",
-              "on-click-right": "${pkgs.kitty}/bin/kitty --title nvtop sh -c 'nvtop'"
+              "on-click-right": "${pkgs.ghostty}/bin/ghostty --title=nvtop -e nvtop"
           },
           "backlight": {
               // "device": "acpi_video1",
@@ -90,7 +90,7 @@ in {
                   "󰤥",
                   "󰤨"
               ],
-              "on-click": "kitty --title nmtui sh -c 'nmtui'"
+              "on-click": "${pkgs.ghostty}/bin/ghostty --title=nmtui -e nmtui"
           },
           "custom/memory": {
               "exec": "${memory-usage-sh}",
