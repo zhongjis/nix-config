@@ -106,7 +106,7 @@ Do not commit, push, comment, or resolve threads before the user approves.
 
 ### 5. Approval Boundary
 
-After presenting the plan, ask for approval before any external side effects. Do not commit, push, comment in a thread, or resolve any thread before the user approves.
+After presenting the plan, you MUST ask for approval (use ask tool if exist) before any external side effects. Do not commit, push, comment in a thread, or resolve any thread before the user approves.
 
 ### 6. Apply Fixes
 
@@ -148,6 +148,30 @@ Do not use dismissive or vague replies.
 
 If no code changes were required, this commenting step is the first external action after approval.
 
+**Posting replies via gh CLI:**
+
+For general PR comments (not thread-specific):
+
+```bash
+gh pr comment <PR_NUMBER> --body "Fixed in commit <SHA>"
+```
+
+For replying to specific review threads (requires GraphQL API):
+
+```bash
+# Reply to a review thread using GraphQL
+gh api graphql -f query='
+  mutation($body: String!, $threadId: ID!) {
+    addPullRequestReviewThreadReply(input: {body: $body, pullRequestReviewThreadId: $threadId}) {
+      comment {
+        id
+        body
+      }
+    }
+  }
+' -f body="Fixed" -f threadId="<THREAD_ID>"
+```
+
 ### 9. Resolve Addressed Threads
 
 After the thread has a closing comment:
@@ -163,6 +187,26 @@ Keep replies brief:
 
 - Fix: "Fixed" or "Fixed - [note if approach differs]"
 - Disagree: "Not changing this - [brief technical reason]"
+
+Do not use dismissive or vague replies.
+
+**Resolving threads via gh CLI:**
+
+Resolving a review thread requires the GraphQL API:
+
+```bash
+# Resolve a review thread
+gh api graphql -f query='
+  mutation($threadId: ID!) {
+    resolveReviewThread(input: {threadId: $threadId}) {
+      thread {
+        id
+        isResolved
+      }
+    }
+  }
+' -f threadId="<THREAD_ID>"
+```
 
 ## Output
 
