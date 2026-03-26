@@ -75,7 +75,7 @@
       inputs.home-manager.follows = "home-manager";
     };
     opencode = {
-      url = "github:anomalyco/opencode/v1.3.2";
+      url = "github:anomalyco/opencode/v1.3.3";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     agent-of-empires = {
