@@ -1,6 +1,6 @@
 # TypeScript Reference
 
-Detailed information about TypeScript features and patterns.
+Detailed supporting material for the TypeScript skill. Treat `SKILL.md` as the primary guidance and use this file for examples, language features, and deeper background.
 
 ## Configuration
 
@@ -9,21 +9,27 @@ Detailed information about TypeScript features and patterns.
 ```json
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "ES2022",
     "module": "ESNext",
-    "lib": ["ESNext"],
+    "moduleResolution": "bundler",
+    "lib": ["ES2022"],
     "strict": true,
+    "rootDir": "./src",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "esModuleInterop": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "verbatimModuleSyntax": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "isolatedModules": true,
-    "baseUrl": ".",
-    "paths": { "@/*": ["src/*"] }
+    "isolatedModules": true
   }
 }
 ```
+
+If you are on TypeScript 6.x, remember that `types` now defaults to `[]`. Add entries like `"node"`, `"bun"`, or your test-runner types explicitly when you need ambient globals.
 
 ### Strict Mode Options
 
@@ -618,13 +624,19 @@ tsc --diagnostic
 ```json
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "ES2022",
     "module": "ESNext",
-    "lib": ["ESNext"],
+    "moduleResolution": "bundler",
+    "lib": ["ES2022"],
     "strict": true,
+    "rootDir": "./src",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "esModuleInterop": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "verbatimModuleSyntax": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -637,9 +649,8 @@ tsc --diagnostic
 
 - `tsc --noEmit` for fast type checking
 - Gradual adoption with `allowJs: true`
-- Path mapping for clean imports: `"@/*": ["src/*"]`
+- Prefer runtime-aligned resolution first; add `paths` or package `imports` deliberately instead of treating them as a default baseline
 - Declaration files: `"declaration": true`
 - Source maps: `"sourceMap": true`
-- Use `// @ts-ignore` for rare cases
-- Use `// @ts-expect-error` with error messages
-- Use `// @ts-nocheck` for entire files
+- Prefer fixing the types over suppressing compiler errors
+- Use narrowing, helper types, and boundary validation before reaching for assertions

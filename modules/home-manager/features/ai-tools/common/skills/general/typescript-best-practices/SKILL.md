@@ -1,11 +1,16 @@
 ---
 name: typescript
-description: Configures TypeScript projects, defines types and interfaces, writes generics, and implements type guards. Use when setting up tsconfig.json, creating type definitions, or ensuring type safety in JS/TS codebases.
+description: Provides TypeScript patterns for type-first development, making illegal states unrepresentable, exhaustive handling, and runtime validation. Use when setting up tsconfig.json, creating type definitions, or ensuring type safety in JS/TS codebases.
+upstream: https://github.com/0xBigBoss/claude-code/tree/main/.claude/skills/typescript-best-practices
 ---
 
-# TypeScript
+# TypeScript Best Practices
 
-Type-safe JavaScript with static typing and modern features.
+Type-first JavaScript with strict typing, explicit boundaries, and maintainable module design.
+
+## Pair with React Best Practices
+
+When working with React components (`.tsx`, `.jsx`, or files importing React APIs), load `react-best-practices` alongside this skill. This skill covers TypeScript fundamentals; React-specific guidance belongs in the dedicated React skill.
 
 ## Quick Start
 
@@ -20,216 +25,257 @@ bunx tsc --noEmit
 vitest run
 ```
 
-## Configuration
+## Contents
 
-### tsconfig.json (Strict)
+- Start here: `Quick Start`, `Version Coverage`, `Project Quick Picks`
+- Core design: `Type-First Workflow`, `Make Illegal States Unrepresentable`, `Exhaustive Control Flow`
+- Runtime boundaries: `Runtime Validation with Zod`, `Configuration`
+- Compiler setup: `TypeScript 5.x Guidance`, `TypeScript 6.x Guidance`, `tsconfig Baseline`
+- Deep examples: `REFERENCE.md`
+
+## Version Coverage
+
+This skill now covers both major branches you are likely to encounter:
+
+- **TypeScript 5.x**: common in existing codebases and still relevant for migration and maintenance work.
+- **TypeScript 6.x**: current stable line as of March 2026, with new defaults and several deprecations that materially affect tsconfig guidance.
+
+The core design guidance in this skill applies to both. The main differences are compiler defaults, module-resolution expectations, and deprecated configuration paths.
+
+## Project Quick Picks
+
+| Scenario | Start here |
+| --- | --- |
+| New Bun app or bundled frontend | Use `moduleResolution: "bundler"`, then follow the TS6 guidance and baseline config. |
+| Direct Node.js app or published package | Use `moduleResolution: "nodenext"`, add explicit `types`, and keep runtime resolution aligned with actual Node behavior. |
+| Existing TS5 codebase | Keep `strict` explicit, adopt `satisfies` and `const` type parameters where they improve inference, and migrate deprecated config deliberately. |
+
+## Type-First Workflow
+
+Start with the contract, then implement to satisfy it:
+
+1. Define the data model first
+2. Define function inputs and outputs before logic
+3. Let the compiler guide missing cases
+4. Validate untrusted data at runtime
+
+## Make Illegal States Unrepresentable
+
+Prefer types that prevent invalid combinations at compile time.
+
+### Discriminated unions
+
+```ts
+// Good: only valid combinations are representable
+type RequestState<T> =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "success"; data: T }
+  | { status: "error"; error: Error };
+
+// Bad: allows invalid combinations
+// { loading: true, error: Error } is possible
+type LooseRequestState<T> = {
+  loading: boolean;
+  data?: T;
+  error?: Error;
+};
+```
+
+### Branded domain primitives
+
+```ts
+type UserId = string & { readonly __brand: "UserId" };
+type OrderId = string & { readonly __brand: "OrderId" };
+```
+
+### Literal unions from constants
+
+```ts
+const ROLES = ["admin", "user", "guest"] as const;
+type Role = typeof ROLES[number];
+```
+
+### Explicit create/update/read models
+
+```ts
+type CreateUser = {
+  email: string;
+  name: string;
+};
+
+type UpdateUser = Partial<CreateUser>;
+
+type User = CreateUser & {
+  id: UserId;
+  createdAt: Date;
+};
+```
+
+## Practical Rules
+
+- Enable `strict` mode and keep types close to the code they protect.
+- Prefer `unknown` over `any` at boundaries.
+- Prefer `satisfies` when checking object shapes without widening useful literal inference.
+- Use `const`, `readonly`, and immutable updates by default.
+- Avoid mutating function parameters; return new values instead.
+- Keep modules focused. Split files once they mix concerns or become hard to scan.
+- Add or update focused tests when changing logic.
+
+## TypeScript 5.x Guidance
+
+TypeScript 5.x projects usually need more explicit compiler guidance.
+
+- Keep `strict: true` explicit in `tsconfig.json`.
+- Prefer `moduleResolution: "bundler"` for Bun or bundled web apps, and `moduleResolution: "nodenext"` for direct Node.js packages and apps.
+- Use `satisfies` for config objects and lookup tables so shape checking does not widen literals unnecessarily.
+- Use `const` type parameters when authoring helpers that should preserve narrow literal inference.
+- Prefer `verbatimModuleSyntax: true` and `import type` for type-only imports when you care about predictable emitted JavaScript.
+
+```ts
+const routes = {
+  home: "/",
+  settings: "/settings",
+} satisfies Record<string, `/${string}`>;
+
+function tupleOf<const T extends readonly string[]>(value: T): T {
+  return value;
+}
+```
+
+## TypeScript 6.x Guidance
+
+TypeScript 6.0 keeps the same core type-system practices, but the official defaults and deprecations changed enough that they deserve separate guidance.
+
+- Do not assume old defaults: TS6 now defaults `strict` to `true`, `module` to `esnext`, and `types` to `[]`.
+- Prefer explicit compiler settings anyway when you want reproducible behavior across TS5 and TS6.
+- Add a `types` array intentionally in Node, Bun, and test projects instead of relying on ambient discovery.
+- Set `rootDir` explicitly if you expect output rooted at `src/`.
+- Expect `noUncheckedSideEffectImports` to be on by default and fix missing or mistyped side-effect imports instead of relying on silent resolution.
+- Avoid `target: "es5"`; TS6 deprecates it.
+- Avoid `moduleResolution: "node"` / `"node10"`; use `bundler` or `nodenext` instead.
+- Avoid recommending `baseUrl` as a default path-alias baseline; prefer runtime-aligned module resolution and only add path mapping deliberately.
 
 ```json
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "rootDir": "./src",
+    "types": ["node"]
+  }
+}
+```
+
+## Exhaustive Control Flow
+
+Every code path should return or throw. Use exhaustive `switch` statements so new cases fail at compile time instead of runtime.
+
+```ts
+type Status = "active" | "inactive";
+
+export function processStatus(status: Status): string {
+  switch (status) {
+    case "active":
+      return "processing";
+    case "inactive":
+      return "skipped";
+    default: {
+      const exhaustiveCheck: never = status;
+      throw new Error(`Unhandled status: ${exhaustiveCheck}`);
+    }
+  }
+}
+```
+
+## Runtime Validation with Zod
+
+Use schemas as the source of truth for untrusted input and inferred types for the rest of the code.
+
+```ts
+import { z } from "zod";
+
+const UserSchema = z.object({
+  id: z.string().uuid(),
+  email: z.string().email(),
+  name: z.string().min(1),
+  createdAt: z.string().transform((value) => new Date(value)),
+});
+
+type User = z.infer<typeof UserSchema>;
+```
+
+### Boundary rules
+
+- Use `safeParse` when validation failure is expected and needs UI handling.
+- Use `parse` at trust boundaries where invalid data means a broken contract.
+- Compose schemas with `.extend()`, `.pick()`, `.omit()`, `.merge()`, and `.partial()` instead of duplicating them.
+
+```ts
+export async function fetchUser(id: string): Promise<User> {
+  const response = await fetch(`/api/users/${id}`);
+  if (!response.ok) {
+    throw new Error(`fetch user ${id} failed: ${response.status}`);
+  }
+
+  const payload: unknown = await response.json();
+  return UserSchema.parse(payload);
+}
+```
+
+## Configuration
+
+Load configuration once at startup, validate it, and pass around a typed config object instead of reading from `process.env` throughout the codebase.
+
+```ts
+import { z } from "zod";
+
+const ConfigSchema = z.object({
+  PORT: z.coerce.number().default(3000),
+  DATABASE_URL: z.string().url(),
+  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+});
+
+export const config = ConfigSchema.parse(process.env);
+```
+
+## Module Structure
+
+- Prefer one component, hook, or utility per file.
+- Colocate tests with implementation (`foo.ts` and `foo.test.ts`).
+- Group by feature before grouping by file type.
+- Move verbose examples and deep reference material into `REFERENCE.md` instead of bloating the skill entrypoint.
+
+## tsconfig Baseline
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
     "module": "ESNext",
-    "lib": ["ESNext"],
+    "moduleResolution": "bundler",
+    "lib": ["ES2022"],
     "strict": true,
+    "rootDir": "./src",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "esModuleInterop": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "verbatimModuleSyntax": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "isolatedModules": true,
-    "baseUrl": ".",
-    "paths": { "@/*": ["src/*"] }
+    "isolatedModules": true
   },
   "include": ["src"],
   "exclude": ["node_modules"]
 }
 ```
 
-## Type Definitions
-
-### Basic Types
-
-```typescript
-let str: string = "hello";
-let num: number = 42;
-let bool: boolean = true;
-let arr: number[] = [1, 2, 3];
-let tuple: [string, number] = ["age", 25];
-let obj: { name: string; age: number } = { name: "John", age: 30 };
-```
-
-### Interfaces vs Types
-
-```typescript
-// Interface for object shapes
-interface User {
-  id: number;
-  name: string;
-  email: string;
-}
-
-// Type for function signatures
-type CreateUser = (data: Partial<User>) => Promise<User>;
-
-// Discriminated union (branded types)
-type Result<T> = { ok: true; value: T } | { ok: false; error: Error };
-```
-
-## Functions
-
-### Function Declaration
-
-```typescript
-function add(a: number, b: number): number {
-  return a + b;
-}
-
-// Arrow function
-const add = (a: number, b: number): number => a + b;
-
-// Optional parameters
-function greet(name: string, title?: string): string {
-  return title ? `${title} ${name}` : name;
-}
-
-// Rest parameters
-function sum(...nums: number[]): number {
-  return nums.reduce((a, b) => a + b, 0);
-}
-
-// Function overloads
-function format(input: string): string;
-function format(input: number): string;
-function format(input: string | number): string {
-  return String(input);
-}
-```
-
-## Classes
-
-```typescript
-class Person {
-  name: string;
-  private age: number;
-
-  constructor(name: string, age: number) {
-    this.name = name;
-    this.age = age;
-  }
-
-  greet(): string {
-    return `Hello, ${this.name}`;
-  }
-}
-
-// Inheritance
-class Employee extends Person {
-  role: string;
-
-  constructor(name: string, age: number, role: string) {
-    super(name, age);
-    this.role = role;
-  }
-}
-```
-
-## Generics
-
-```typescript
-// Generic function
-function wrap<T>(value: T): { value: T } {
-  return { value };
-}
-
-// Generic class
-class Container<T> {
-  constructor(private value: T) {}
-
-  get(): T {
-    return this.value;
-  }
-}
-
-// Generic constraints
-function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
-  return obj[key];
-}
-```
-
-## Type Guards
-
-```typescript
-function isString(value: unknown): value is string {
-  return typeof value === "string";
-}
-
-function process(value: unknown) {
-  if (isString(value)) {
-    console.log(value.toUpperCase()); // value is string here
-  }
-}
-```
-
-## Error Handling
-
-### Custom Errors
-
-```typescript
-class ValidationError extends Error {
-  constructor(
-    public field: string,
-    message: string,
-  ) {
-    super(message);
-    this.name = "ValidationError";
-  }
-}
-```
-
-### Result Type
-
-```typescript
-type Result<T, E = Error> = { ok: true; value: T } | { ok: false; error: E };
-
-function safeParse(json: string): Result<unknown> {
-  try {
-    return { ok: true, value: JSON.parse(json) };
-  } catch (error) {
-    return { ok: false, error: error as Error };
-  }
-}
-```
-
-## Best Practices
-
-- Use `strict: true` in tsconfig
-- Avoid `any` - use `unknown` or specific types
-- Prefer interfaces for object shapes
-- Use branded types for primitives needing validation
-- Make invalid states unrepresentable
-- Type at boundaries (API inputs/outputs)
-
-## Compilation
-
-```bash
-tsc                    # Compile
-tsc --noEmit          # Type check only
-tsc --project tsconfig.json  # Specific config
-
-# Watch mode (use tmux for background)
-tmux new -d -s tsc 'tsc --watch'
-```
-
-## Tips
-
-- `tsc --noEmit` for fast type checking
-- Gradual adoption with `allowJs: true`
-- Path mapping for clean imports: `"@/*": ["src/*"]`
-- Declaration files: `"declaration": true`
-- Source maps: `"sourceMap": true`
+If you are on TS6 and need ambient globals, add a `types` array explicitly, for example `"types": ["node"]`, `"types": ["bun"]`, or test-runner types as needed.
 
 ## Related Skills
 
+- **react-best-practices**: React-specific effects, hooks, refs, and component patterns
 - **vitest**: Test utilities and mocking
 - **bun**: Package management and scripting
 - **ast-grep**: Pattern matching for refactoring
