@@ -1,9 +1,6 @@
 {
-  config,
   inputs,
   pkgs,
-  lib,
-  aiProfileHelpers,
   commonInstructions,
   ...
 }: {
@@ -20,15 +17,7 @@
 
   programs.opencode = {
     enable = true;
-    package = inputs.opencode.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (oldAttrs: {
-      postPatch =
-        (oldAttrs.postPatch or "")
-        + ''
-          # Patch out bun version check - opencode v1.2.15 packageManager requires ^1.3.10
-          # but nixpkgs only has bun 1.3.9. Remove once nixpkgs bun >= 1.3.10
-          sed -i '/semver\.satisfies(process\.versions\.bun/,/^[[:space:]]*}/s/.*//' packages/script/src/index.ts
-        '';
-    });
+    package = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.opencode;
     web.enable = false;
     enableMcpIntegration = true;
 
