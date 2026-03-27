@@ -85,7 +85,7 @@
       metis.model = "openai/gpt-5.4";
 
       prometheus.model = "openai/gpt-5.4";
-      atlas.model = "github-copilot/claude-sonnet-4.6";
+      atlas.model = "openai/gpt-5.4";
 
       hephaestus.model = "openai/gpt-5.3-codex";
       oracle.model = "openai/gpt-5.4";
