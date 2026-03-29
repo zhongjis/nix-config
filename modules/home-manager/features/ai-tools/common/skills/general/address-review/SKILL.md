@@ -40,13 +40,14 @@ gh auth status
 gh pr checkout <PR_NUMBER>
 ```
 
-3. To retrieve structured comment and thread context, run:
+3. To retrieve structured comment and thread context, stay in the checked-out repository and run the bundled script via this skill's base directory (the directory containing this `SKILL.md`):
 
 ```bash
-python3 scripts/fetch_comments.py
+SKILL_DIR="<base directory for this skill>"
+python3 "$SKILL_DIR/scripts/fetch_comments.py"
 ```
 
-This outputs a JSON blob with `pull_request`, `conversation_comments`, `reviews`, and `review_threads`. The script requires `gh` CLI to be authenticated.
+This outputs a JSON blob with `pull_request`, `conversation_comments`, `reviews`, and `review_threads`. The script requires `gh` CLI to be authenticated. Do not `cd` into the skill directory before running it; the script must execute while your current working directory is the PR repository so `gh pr view` can resolve the checked-out branch correctly.
 
 If authentication fails or the PR branch cannot be checked out, stop and report the issue.
 
@@ -54,7 +55,7 @@ If authentication fails or the PR branch cannot be checked out, stop and report 
 
 ### 1. Discover Unresolved Threads
 
-Identify unresolved review threads on the PR. The preferred method is running `python3 scripts/fetch_comments.py`, which provides a structured JSON view of all comments and threads. Alternatively, use `gh pr view --json reviewThreads` as a fallback.
+Identify unresolved review threads on the PR. The preferred method is running `python3 "$SKILL_DIR/scripts/fetch_comments.py"`, which provides a structured JSON view of all comments and threads while preserving the PR repository as the current working directory. Alternatively, use `gh pr view --json reviewThreads` as a fallback.
 
 If there are no unresolved threads, report that and stop.
 
