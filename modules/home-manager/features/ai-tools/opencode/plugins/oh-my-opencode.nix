@@ -24,7 +24,7 @@
     };
 
     # skills and hooks
-    disabled_skills = ["playwright" "playwright-cli" "dev-browser" "frontend-ui-ux"];
+    disabled_skills = ["playwright" "frontend-ui-ux"];
     disabled_hooks = ["comment-checker" "startup-toast"];
 
     # agent
