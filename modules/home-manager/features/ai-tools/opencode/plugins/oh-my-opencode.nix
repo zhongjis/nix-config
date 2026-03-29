@@ -12,12 +12,8 @@
   # Base oh-my-opencode configuration shared between profiles
   sharedConfig = {
     "$schema" = "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json";
-    agents = {
-      librarian.prompt_append = "Always use the nixos-mcp for Nix related documentation lookups.";
-    };
-    # Disable all Claude Code compatibility features —
-    # prevents oh-my-opencode from loading MCPs, skills, agents,
-    # commands, plugins, and hooks from ~/.claude/
+
+    # Disable all Claude Code compatibility features
     claude_code = {
       mcp = false;
       skills = false;
@@ -26,16 +22,30 @@
       plugins = false;
       hooks = false;
     };
-    disabled_skills = ["playwright" "frontend-ui-ux"];
-    disabled_hooks = ["comment-checker"];
-    browser_automation_engine.provider = "agent-browser";
-    tmux = {enabled = false;};
+
+    # skills and hooks
+    disabled_skills = ["playwright" "playwright-cli" "dev-browser" "frontend-ui-ux"];
+    disabled_hooks = ["comment-checker" "startup-toast"];
+
+    # agent
     sisyphus_agent = {
       disabled = false;
       default_builder_enabled = false;
       planner_enabled = true;
       replace_plan = true;
     };
+    sisyphus = {
+      tasks = {
+        enabled = true;
+        claude_code_compat = false;
+      };
+    };
+
+    # others
+    browser_automation_engine.provider = "agent-browser";
+    tmux = {enabled = false;};
+    google_auth = false;
+    hashline_edit = true;
   };
 
   # Profile-specific overrides
@@ -48,7 +58,6 @@
       metis.model = "openai/gpt-5.4";
 
       prometheus.model = "openai/gpt-5.4";
-      # atlas.model = "kimi-for-coding/k2p5";
       atlas.model = "openai/gpt-5.4";
 
       hephaestus.model = "openai/gpt-5.3-codex";
@@ -56,8 +65,8 @@
       momus.model = "openai/gpt-5.4";
 
       multimodal-looker.model = "openai/gpt-5.4";
-      librarian.model = "github-copilot/gemini-3-flash-preview";
-      explore.model = "opencode/minimax-m2.5-free";
+      librarian.model = "opencode/minimax-m2.7-highspeed";
+      explore.model = "opencode/grok-code-fast-1";
     };
     categories = {
       visual-engineering.model = "github-copilot/gemini-3.1-pro-preview";
@@ -70,15 +79,9 @@
       unspecified-low.model = "github-copilot/claude-sonnet-4.6";
       writing.model = "github-copilot/gemini-3-flash-preview";
     };
-    google_auth = false;
   };
 
   workOverrides = {
-    git_master = {
-      commit_footer = false;
-      include_co_authored_by = false;
-    };
-
     # --- mixed GitHub Copilot + Bedrock (Anthropic) + openai configuration ---
     agents = {
       sisyphus.model = "openai/gpt-5.4";
@@ -87,7 +90,7 @@
       prometheus.model = "openai/gpt-5.4";
       atlas.model = "openai/gpt-5.4";
 
-      hephaestus.model = "openai/gpt-5.3-codex";
+      hephaestus.model = "openai/gpt-5.4";
       oracle.model = "openai/gpt-5.4";
       momus.model = "openai/gpt-5.4";
 
@@ -106,6 +109,11 @@
       unspecified-high.model = "openai/gpt-5.4";
       unspecified-low.model = "github-copilot/claude-sonnet-4.6";
       writing.model = "github-copilot/gemini-3-flash-preview";
+    };
+
+    git_master = {
+      commit_footer = false;
+      include_co_authored_by = false;
     };
   };
 
