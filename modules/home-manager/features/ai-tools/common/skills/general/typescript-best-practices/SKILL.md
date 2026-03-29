@@ -1,5 +1,5 @@
 ---
-name: typescript
+name: typescript-best-practices
 description: Provides TypeScript patterns for type-first development, making illegal states unrepresentable, exhaustive handling, and runtime validation. Use when setting up tsconfig.json, creating type definitions, or ensuring type safety in JS/TS codebases.
 upstream: https://github.com/0xBigBoss/claude-code/tree/main/.claude/skills/typescript-best-practices
 ---
