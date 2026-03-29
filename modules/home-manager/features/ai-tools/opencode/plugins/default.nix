@@ -14,7 +14,6 @@
   # Plugins available to all profiles
   generalPlugins = [
     "oh-my-opencode@latest"
-    "@code-yeongyu/comment-checker@latest"
     "@simonwjackson/opencode-direnv@latest"
     "@tarquinen/opencode-dcp@latest"
     "opencode-pty@latest"

@@ -27,15 +27,15 @@
       hooks = false;
     };
     disabled_skills = ["playwright" "frontend-ui-ux"];
+    disabled_hooks = ["comment-checker"];
     browser_automation_engine.provider = "agent-browser";
-    tmux = {
-      enabled = false;
-      layout = "main-vertical";
-      main_pane_size = 60;
-      main_pane_min_width = 120;
-      agent_pane_min_width = 40;
+    tmux = {enabled = false;};
+    sisyphus_agent = {
+      disabled = false;
+      default_builder_enabled = false;
+      planner_enabled = true;
+      replace_plan = true;
     };
-    disabled_hooks = ["gpt-permission-continuation"];
   };
 
   # Profile-specific overrides
