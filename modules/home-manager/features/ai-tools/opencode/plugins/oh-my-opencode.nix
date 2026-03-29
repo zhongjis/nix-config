@@ -65,12 +65,12 @@
       momus.model = "openai/gpt-5.4";
 
       multimodal-looker.model = "openai/gpt-5.4";
-      librarian.model = "opencode/minimax-m2.7-highspeed";
-      explore.model = "opencode/grok-code-fast-1";
+      librarian.model = "opencode/minimax-m2.5";
+      explore.model = "github-copilot/grok-code-fast-1";
     };
     categories = {
       visual-engineering.model = "github-copilot/gemini-3.1-pro-preview";
-      ultrabrain.model = "openai/gpt-5.3-codex";
+      ultrabrain.model = "openai/gpt-5.4";
       deep.model = "openai/gpt-5.3-codex";
 
       artistry.model = "github-copilot/gemini-3.1-pro-preview";
