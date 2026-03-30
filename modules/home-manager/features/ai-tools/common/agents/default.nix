@@ -1,11 +1,7 @@
 {...}: {
   # OpenCode agents
-  programs.opencode.agents = {
-    code-simplifier = ./general-code-simplifier.md;
-  };
+  programs.opencode.agents = {};
 
   # Claude Code agents
-  programs.claude-code.agents = {
-    code-simplifier = ./general-code-simplifier.md;
-  };
+  programs.claude-code.agents = {};
 }

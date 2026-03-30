@@ -16,7 +16,6 @@ The instruction management system uses a tiered approach to organize and deliver
 | :--- | :--- | :--- | :--- | :--- |
 | `general/instructions/nix-environment.md` | Shared | All | Nix environment awareness and ad-hoc package usage. | Applies to any AI tool running in this Nix-managed configuration. |
 | `opencode/instructions/shell-strategy.md` | OpenCode-specific | All | Non-interactive shell strategy and cognitive standards. | Specific to OpenCode's unique non-interactive runtime environment. |
-| `opencode/agents/code-simplifier.md` | Agent | All | Persona for simplifying complex code patterns. | A specialized agent definition used by OpenCode. |
 
 ## Decision Framework
 
