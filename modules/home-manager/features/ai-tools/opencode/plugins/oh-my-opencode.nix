@@ -11,7 +11,7 @@
 
   # Base oh-my-opencode configuration shared between profiles
   sharedConfig = {
-    "$schema" = "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json";
+    "$schema" = "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json";
 
     # Disable all Claude Code compatibility features
     claude_code = {
@@ -25,19 +25,10 @@
 
     # skills and hooks
     disabled_skills = ["playwright" "frontend-ui-ux"];
-    disabled_hooks = ["comment-checker" "startup-toast"];
-
-    sisyphus = {
-      tasks = {
-        enabled = true;
-        claude_code_compat = false;
-      };
-    };
+    disabled_hooks = ["comment-checker"];
 
     # others
     browser_automation_engine.provider = "agent-browser";
-    tmux = {enabled = false;};
-    google_auth = false;
     hashline_edit = true;
   };
 
