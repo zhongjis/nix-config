@@ -28,12 +28,12 @@
     disabled_hooks = ["comment-checker" "startup-toast"];
 
     # agent
-    sisyphus_agent = {
-      disabled = false;
-      default_builder_enabled = false;
-      planner_enabled = true;
-      replace_plan = true;
-    };
+    # sisyphus_agent = {
+    #   disabled = false;
+    #   default_builder_enabled = false;
+    #   planner_enabled = true;
+    #   replace_plan = true;
+    # };
     sisyphus = {
       tasks = {
         enabled = true;
@@ -45,7 +45,7 @@
     browser_automation_engine.provider = "agent-browser";
     tmux = {enabled = false;};
     google_auth = false;
-    hashline_edit = true;
+    # hashline_edit = true;
   };
 
   # Profile-specific overrides
