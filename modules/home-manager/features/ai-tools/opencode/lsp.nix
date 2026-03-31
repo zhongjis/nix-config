@@ -40,7 +40,10 @@
     };
 
     pyright = {
-      command = [(lib.getExe pkgs.pyright)];
+      command = [
+        (lib.getExe' pkgs.basedpyright "basedpyright-langserver")
+        "--stdio"
+      ];
       extensions = [
         ".py"
         ".pyi"

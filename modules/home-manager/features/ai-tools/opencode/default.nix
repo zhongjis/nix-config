@@ -40,5 +40,6 @@
 
   home.sessionVariables = {
     OPENCODE_DISABLE_CLAUDE_CODE = "1";
+    OPENCODE_DISABLE_LSP_DOWNLOAD = "true";
   };
 }
