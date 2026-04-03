@@ -16,8 +16,11 @@
   # Enable sops-nix secrets (you have the age key at ~/.config/sops/age/keys.txt)
   zshen-private-flake.enableSecrets = true;
 
-  myHomeManager.bundles.general.enable = true;
-  myHomeManager.bundles.darwin.enable = true;
+  myHomeManager.bundles = {
+    general.enable = true;
+    python.enable = true;
+    darwin.enable = true;
+  };
   myHomeManager.aiProfile = "work";
 
   home.username = "zshen";
