@@ -16,7 +16,7 @@
   sharedConfig = {
     modelRoles = {
       default = "openai-codex/gpt-5.4:high";
-      vision = "openai-codex/gpt-5.3-codex:low";
+      vision = "openai-codex/gpt-5.4:high";
       smol = "github-copilot/claude-haiku-4.5:off";
       slow = "openai-codex/gpt-5.4:high";
       plan = "openai-codex/gpt-5.4:high";
@@ -44,6 +44,7 @@ in {
     ../common/skills
     ../common/instructions
     ./skills
+    ./lsp.nix
   ];
 
   home.packages = [
