@@ -11,8 +11,6 @@
   yamlFormat = pkgs.formats.yaml {};
   system = pkgs.stdenv.hostPlatform.system;
 
-  rtkPluginName = "@sherif-fanous/pi-rtk";
-
   defaultOmpPackage =
     if inputs ? llm-agents
     then inputs.llm-agents.packages.${system}.omp
@@ -23,14 +21,7 @@
     then inputs.llm-agents.packages.${system}.rtk
     else null;
 
-  defaultRtkPlugin = {
-    version = "0.3.0";
-    versionConstraint = "^0.3.0";
-    source = pkgs.fetchzip {
-      url = "https://github.com/sherif-fanous/pi-rtk/archive/refs/tags/v0.3.0.tar.gz";
-      hash = "sha256-05X2QT4GZI4hWT7u1hWcB4V1IQsrq0OgHBwVVokHNT0=";
-    };
-  };
+  defaultRtkExtension = ./extensions/rtk.ts;
 
   pluginType = types.submodule ({...}: {
     options = {
@@ -51,12 +42,12 @@
     };
   });
 
-  hasManualRtkPlugin = builtins.hasAttr rtkPluginName cfg.plugins;
+  effectivePlugins = cfg.plugins;
 
-  effectivePlugins =
-    cfg.plugins
-    // lib.optionalAttrs (cfg.rtk.enable && !hasManualRtkPlugin) {
-      ${rtkPluginName} = cfg.rtk.plugin;
+  effectiveExtensions =
+    cfg.extensions
+    // lib.optionalAttrs cfg.rtk.enable {
+      "rtk.ts" = cfg.rtk.extension;
     };
 
   pluginPackageManifest = {
@@ -82,19 +73,20 @@
     lib.mapAttrs' (name: path: {
       name = "${targetDir}/${name}";
       value = {source = path;};
-    }) entries;
+    })
+    entries;
 
   mkMarkdownFiles = targetDir: entries:
     lib.mapAttrs' (name: path: {
       name = "${targetDir}/${name}.md";
       value = {source = path;};
-    }) entries;
+    })
+    entries;
 
-  mkPluginFiles =
-    lib.mapAttrs' (name: plugin: {
-      name = ".omp/plugins/node_modules/${name}";
-      value = {source = plugin.source;};
-    });
+  mkPluginFiles = lib.mapAttrs' (name: plugin: {
+    name = ".omp/plugins/node_modules/${name}";
+    value = {source = plugin.source;};
+  });
 
   markdownNameAssertion = optionName: entries: let
     invalidNames = lib.filter (name: lib.hasSuffix ".md" name) (builtins.attrNames entries);
@@ -123,9 +115,9 @@ in {
     };
 
     models = lib.mkOption {
-      type = yamlFormat.type;
-      default = {};
-      description = "YAML data written to ~/.omp/agent/models.yml.";
+      type = types.nullOr yamlFormat.type;
+      default = null;
+      description = "Optional YAML data written to ~/.omp/agent/models.yml when custom providers/models are configured.";
     };
 
     skills = lib.mkOption {
@@ -158,10 +150,15 @@ in {
       description = "Markdown files concatenated into ~/.omp/agent/AGENTS.md.";
     };
 
+    extensions = lib.mkOption {
+      type = types.attrsOf types.path;
+      default = {};
+      description = "Files or directories exposed under ~/.omp/agent/extensions/.";
+    };
+
     impeccable = {
       enable = lib.mkEnableOption "Impeccable-provided Oh My Pi skills";
     };
-
 
     plugins = lib.mkOption {
       type = types.attrsOf pluginType;
@@ -188,10 +185,11 @@ in {
         description = "RTK runtime package installed when programs.\"oh-my-pi\".rtk.enable is true.";
       };
 
-      plugin = lib.mkOption {
-        type = types.nullOr pluginType;
-        default = defaultRtkPlugin;
-        description = "Plugin definition used for declarative RTK provisioning when no manual RTK plugin entry is supplied.";
+      extension = lib.mkOption {
+        type = types.path;
+        default = defaultRtkExtension;
+        defaultText = lib.literalExpression "./oh-my-pi/extensions/rtk.ts";
+        description = "Extension file exposed as ~/.omp/agent/extensions/rtk.ts when programs.\"oh-my-pi\".rtk.enable is true.";
       };
     };
   };
@@ -220,13 +218,6 @@ in {
             If you import this module outside this flake, pass the package explicitly or provide inputs.llm-agents.
           '';
         }
-        {
-          assertion = !cfg.rtk.enable || hasManualRtkPlugin || cfg.rtk.plugin != null;
-          message = ''
-            programs."oh-my-pi".rtk.plugin must be set when programs."oh-my-pi".rtk.enable is true,
-            unless plugins.${rtkPluginName} is already defined explicitly.
-          '';
-        }
         (markdownNameAssertion "commands" cfg.commands)
         (markdownNameAssertion "rules" cfg.rules)
         (markdownNameAssertion "agents" cfg.agents)
@@ -239,17 +230,20 @@ in {
 
       home.file =
         mkPathFiles ".omp/agent/skills" cfg.skills
+        // mkPathFiles ".omp/agent/extensions" effectiveExtensions
         // mkMarkdownFiles ".omp/agent/commands" cfg.commands
         // mkMarkdownFiles ".omp/agent/rules" cfg.rules
         // mkMarkdownFiles ".omp/agent/agents" cfg.agents
         // mkPluginFiles effectivePlugins
         // {
           ".omp/agent/config.yml".source = yamlFormat.generate "omp-config.yml" cfg.settings;
-          ".omp/agent/models.yml".source = yamlFormat.generate "omp-models.yml" cfg.models;
           ".omp/agent/AGENTS.md".text = instructionsText;
           ".omp/agent/lsp.yaml".source = yamlFormat.generate "omp-lsp.yaml" cfg.lsp;
           ".omp/plugins/package.json".source = jsonFormat.generate "omp-plugins-package.json" pluginPackageManifest;
           ".omp/plugins/omp-plugins.lock.json".source = jsonFormat.generate "omp-plugins.lock.json" pluginLock;
+        }
+        // lib.optionalAttrs (cfg.models != null) {
+          ".omp/agent/models.yml".source = yamlFormat.generate "omp-models.yml" cfg.models;
         };
     })
   ];

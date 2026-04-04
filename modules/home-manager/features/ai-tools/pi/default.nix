@@ -37,7 +37,7 @@ in {
   imports = [
     ../common/skills
     ../common/instructions
-    ../../../../../custom-home-manager-options/oh-my-pi.nix
+    ../../../../../custom-home-manager-options/oh-my-pi
     ./skills
     ./lsp.nix
   ];
@@ -49,13 +49,12 @@ in {
     impeccable.enable = true;
 
     settings = ompConfig;
-    models = {};
+    # models = {};
     skills = allSkills;
     commands = {};
     rules = {};
     agents = {};
     instructions = commonInstructions;
-    plugins = {};
 
     rtk.enable = true;
   };
