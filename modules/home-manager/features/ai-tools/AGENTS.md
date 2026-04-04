@@ -10,6 +10,20 @@ Profile-based, tool-agnostic configuration for OpenCode, Claude Code, and Factor
 
 Set per host in `hosts/{name}/home.nix`. Used for filtering skills, instructions, MCP servers, and plugins.
 
+
+## COMMANDS
+
+Run from the repo root:
+
+- `nh darwin switch .`
+- `nh os switch .`
+- `nix flake check`
+
+## BOOTSTRAP AND MAINTENANCE
+
+- Set `myHomeManager.aiProfile` in `hosts/{name}/home.nix` before enabling ai-tools; profile helpers and profile-filtered content depend on it
+- Skills and `common/instructions/*` files are auto-discovered from the correct profile subtree; place them in the right directory and do not add manual registration. Tool-specific instructions, MCP servers, and shared agents stay defined in their respective `default.nix` files
+- For upstream/shared skill sync and update policy, follow the `skill-maintainer` workflow instead of inventing ad hoc local conventions here
 ## STRUCTURE
 
 ```
@@ -86,6 +100,5 @@ Defined in `common/mcp/default.nix`. General: nixos-docs, context7, mcp-k8s. Per
 2. Add `SKILL.md` with YAML frontmatter (`name`, `description`)
 3. If from external source, add `upstream` field (singular canonical URL). If adapting from a prior source alongside a new canonical upstream, add `adaptedFrom` as a YAML list of informational-only lineage URLs.
 4. Genericize vendor-specific content for local/shared skills; preserve intentional upstream/generated packaging when that structure is the source artifact
-5. `nh darwin switch .` to apply (auto-discovered, no registration needed)
-
+5. Apply from the repo root with `nh darwin switch .` or `nh os switch .`, then run `nix flake check` (auto-discovered, no registration needed)
 For contributor-oriented build, validation, or generation steps inside a skill directory, document them in that skill's `README.md`, not here.
