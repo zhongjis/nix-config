@@ -16,7 +16,5 @@ in {
   home.packages = [rtkPkg];
 
   xdg.configFile."opencode/plugins/rtk.ts".source =
-    # Future RTK layout once llm-agents ships a newer version.
-    # rtkPluginSrc + "/hooks/opencode/rtk.ts";
-    rtkPluginSrc + "/hooks/opencode-rtk.ts";
+    rtkPluginSrc + "/hooks/opencode/rtk.ts";
 }
