@@ -10,6 +10,14 @@
 }: let
   system = pkgs.stdenv.hostPlatform.system;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
+  piAgentKitExtensions =
+    (pkgs.fetchFromGitHub {
+      owner = "aldoborrero";
+      repo = "pi-agent-kit";
+      rev = "a307560a447da0efc8cdfa672e49ca5ae4aa554d";
+      hash = "sha256-aYikbALMzZZLQADNPAsr77qk2762iH4w5x3laII8obA=";
+    })
+    + "/extensions";
   allSkills = commonSkills // ompLocalSkills;
 
   sharedConfig = {
@@ -51,6 +59,11 @@ in {
     settings = ompConfig;
     # models = {};
     skills = allSkills;
+    extensions = {
+      # The upstream direnv extension imports shared helpers from ../_shared.
+      _shared = piAgentKitExtensions + "/_shared";
+      direnv = piAgentKitExtensions + "/direnv";
+    };
     commands = {};
     rules = {};
     agents = {};

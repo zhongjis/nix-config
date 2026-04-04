@@ -20,10 +20,10 @@
         CONTEXT7_API_KEY = "{env:CONTEXT7_API_KEY}";
       };
     };
-    mcp_k8s = {
-      command = "nix";
-      args = ["run" "nixpkgs#mcp-k8s-go"];
-    };
+    # mcp_k8s = {
+    #   command = "nix";
+    #   args = ["run" "nixpkgs#mcp-k8s-go"];
+    # };
   };
 
   # MCPs only for work profile
