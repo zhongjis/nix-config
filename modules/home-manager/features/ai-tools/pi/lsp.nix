@@ -3,8 +3,6 @@
   pkgs,
   ...
 }: let
-  yamlFormat = pkgs.formats.yaml {};
-
   mkServer = {
     command,
     extensions,
@@ -190,5 +188,5 @@
     };
   };
 in {
-  home.file.".omp/agent/lsp.yaml".source = yamlFormat.generate "omp-lsp.yaml" lspConfig;
+  programs."oh-my-pi".lsp = lspConfig;
 }

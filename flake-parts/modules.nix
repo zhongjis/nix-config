@@ -34,6 +34,6 @@ in
     # Home Manager modules
     homeManagerModules = {
       default = ../modules/home-manager;
-    };
+    } // import ../custom-home-manager-options;
   };
 }
