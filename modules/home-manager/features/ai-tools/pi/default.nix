@@ -63,10 +63,19 @@ in {
       # The upstream direnv extension imports shared helpers from ../_shared.
       _shared = piAgentKitExtensions + "/_shared";
       direnv = piAgentKitExtensions + "/direnv";
+      "ultrawork.ts" = ./extensions/ultrawork.ts;
     };
-    commands = {};
-    rules = {};
-    agents = {};
+    commands = {
+      plan-prometheus = ./commands/plan-prometheus.md;
+    };
+    rules = {
+      sisyphus-protocol = ./rules/sisyphus-protocol.md;
+    };
+    agents = {
+      prometheus = ./agents/prometheus.md;
+      metis = ./agents/metis.md;
+      momus = ./agents/momus.md;
+    };
     instructions = commonInstructions;
 
     rtk.enable = true;

@@ -20,10 +20,6 @@
         CONTEXT7_API_KEY = "{env:CONTEXT7_API_KEY}";
       };
     };
-    # mcp_k8s = {
-    #   command = "nix";
-    #   args = ["run" "nixpkgs#mcp-k8s-go"];
-    # };
   };
 
   # MCPs only for work profile
@@ -32,13 +28,17 @@
 
   # MCPs only for personal profile
   personalMcps = {
-    flux_operator_mcp = {
-      command = "nix";
-      args = ["run" "nixpkgs#fluxcd-operator-mcp" "serve"];
-      env = {
-        "KUBECONFIG" = "/home/zshen/.kube/config";
-      };
-    };
+    # mcp_k8s = {
+    #   command = "nix";
+    #   args = ["run" "nixpkgs#mcp-k8s-go"];
+    # };
+    # flux_operator_mcp = {
+    #   command = "nix";
+    #   args = ["run" "nixpkgs#fluxcd-operator-mcp" "serve"];
+    #   env = {
+    #     "KUBECONFIG" = "/home/zshen/.kube/config";
+    #   };
+    # };
   };
 in {
   sops.secrets.context7_api_key = {
