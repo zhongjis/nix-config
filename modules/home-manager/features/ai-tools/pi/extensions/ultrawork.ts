@@ -3,17 +3,7 @@ const FENCED_CODE_PATTERN = /(^|\n)[ \t]*(```|~~~)[\s\S]*?\n[ \t]*\2[^\n]*(?=\n|
 const INLINE_CODE_PATTERN = /`[^`\n]+`/g;
 
 const ULTRAWORK_PROMPT = `<ultrawork-mode>
-Certainty first. Do not implement until you understand the request, the affected code paths, and the verification path.
-
-Requirements:
-- For any non-trivial task, create a concrete plan through task(agent="prometheus", ...) before implementation.
-- Prometheus must follow OMP plan mode: use local://prometheus-draft.md as the draft, keep the approved plan in local://PLAN.md, use ask only for unresolved requirements you cannot answer from repo context, track execution with todo_write, and call exit_plan_mode when the plan is ready.
-- Run task(agent="explore", ...) and task(agent="librarian", ...) in parallel whenever codebase context or official documentation is missing.
-- Consult task(agent="oracle", ...) before guessing on hard architecture, debugging, or design problems.
-- Use task(agent="reviewer", ...), task(agent="designer", ...), task(agent="task", ...), or task(agent="quick_task", ...) only when they materially improve correctness or speed.
-- If the work is itself a planning-only request and Prometheus is not the active planner, use task(agent="plan", ...) to refine the plan.
-- Partial completion is failure. Do not ship approximations, placeholders, or speculative fixes.
-- Before reporting completion, produce verification proof with the narrow test, command, or observed scenario that covers the change.
+Maximum rigor for this task. Bias strongly toward Prometheus planning for anything non-trivial. Consult explore/librarian/oracle in parallel when context or docs are missing. Partial completion is failure — do not stop until all work is verified complete.
 </ultrawork-mode>`;
 
 type MessageContentPart = {

@@ -64,7 +64,7 @@ in {
       _shared = piAgentKitExtensions + "/_shared";
       direnv = piAgentKitExtensions + "/direnv";
       "ultrawork.ts" = ./extensions/ultrawork.ts;
-      "plan-prometheus.ts" = ./extensions/plan-prometheus.ts;
+      "plan.ts" = ./extensions/plan.ts;
     };
     commands = {};
     rules = {

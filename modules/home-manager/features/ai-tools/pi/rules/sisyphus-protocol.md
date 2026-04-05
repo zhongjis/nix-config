@@ -49,7 +49,6 @@ Default posture: delegate to the narrowest agent that can improve correctness or
 | External docs or library behavior | `librarian` | API usage, version behavior, official guidance |
 | Architecture or debugging second opinion | `oracle` | Hard tradeoffs, dead ends, subtle bugs |
 | Strategic planning with plan artifact | `prometheus` | Complex tasks, unclear scope, architecture impact, or explicit plan request |
-| Quick read-only planning | `plan` | Multi-file reasoning that does not need a plan artifact |
 | UI/UX implementation | `designer` | Frontend, interaction, layout, or visual polish work |
 | Code review | `reviewer` | Changed-code quality, bug-finding, security review |
 | Bounded implementation | `task` | Multi-step work with explicit file scope |
@@ -57,68 +56,23 @@ Default posture: delegate to the narrowest agent that can improve correctness or
 | Pre-plan gap analysis | `metis` | Need sharper scope, exclusions, or anti-slop guardrails |
 | Plan executability review | `momus` | Need approval-biased blocker review of a plan |
 
-Rules:
-- Work directly only when the task is trivially simple and you already have the needed context.
-- Prefer `task`/`quick_task` for independent execution; prefer `plan`/`prometheus` when the main risk is choosing the wrong work.
-- `momus` reviews plans only; `reviewer` reviews code only.
+## Complexity Escalation
 
-## Planning Orchestration
+For implementation requests, assess complexity before starting:
 
-Use one planner at a time for one reason.
+| Complexity | Signals | Action |
+|---|---|---|
+| Trivial | One file, obvious change, no ambiguity | Work directly |
+| Medium | 2-3 files, mild ambiguity, sequencing needed | Create a brief inline plan (`todo_write`), then execute |
+| Complex | 3+ files, cross-subsystem, unclear scope, architecture tradeoffs | Delegate to `prometheus` via `/plan` or `task(agent="prometheus", ...)` |
 
-### Use built-in `plan` when
-- you need read-only sequencing or architecture help
-- the scope is modest and clear
-- no `local://PLAN.md` artifact is required
+When in doubt, bias toward the next tier up. A brief plan that turns out unnecessary costs less than a botched implementation.
 
-### Use `prometheus` when
-- the task spans 3+ meaningful files or multiple components
-- requirements or boundaries are unclear
-- you need interview mode, `metis`, or `momus`
-- the goal is an approved plan in `local://PLAN.md` via `exit_plan_mode`
+## Verification
 
-### Prometheus coexistence protocol
-1. Use `plan` for private architectural reasoning when that is sufficient.
-2. Use `prometheus` when the output must become the authoritative OMP plan artifact.
-3. If the user invokes `/plan-prometheus`, route to `prometheus` unless the task is truly trivial.
-4. Do not run both planners unless there is a real gap that one cannot cover.
+Before reporting completion:
+- Run the narrowest test, command, or scenario that proves the change.
+- Verify against the original request, not a reduced interpretation.
+- Report observed evidence, not predictions.
 
-## Verification Discipline
-
-Nothing is done without proof.
-
-Before delegating implementation:
-- define concrete target files and non-goals
-- define observable acceptance criteria
-- specify the verification command, tool, or scenario the executor must run
-
-Before reporting implementation complete:
-- run `lsp diagnostics` on modified files when available
-- run the narrowest real command, test, or scenario that proves the behavior
-- perform manual QA when the change is user-visible or behavioral
-- verify against the original request, not a reduced interpretation
-- report actual observed evidence, not predictions
-
-For plans:
-- every plan must name concrete files or discovery targets
-- every plan must include executable verification steps
-- Prometheus handoff ends with `exit_plan_mode`, not a plain-text approval request
-
-## Anti-Patterns
-
-Do not do any of the following:
-- Delegate before understanding the request well enough to write a truthful task assignment.
-- Use `prometheus` as a synonym for "think harder."
-- Use built-in `plan` as a substitute for the OMP plan-mode lifecycle.
-- Tell the user to manage `local://PLAN.md` or call `exit_plan_mode` themselves.
-- Forward this primary-agent rule into subagents as if it overrides their own system prompts.
-- Ask `momus` or `reviewer` to implement changes.
-- Spawn broad "figure it out" tasks when a narrow assignment is possible.
-- Shrink scope silently to avoid hard work or difficult verification.
-- Declare success from clean types or lint alone without functional evidence.
-
-## Default Posture
-
-Stay on the main agent unless delegation clearly reduces risk or latency.
-
-When you do delegate, pick one agent for one reason, give it a bounded assignment, and verify the result before trusting it.
+For plans: name concrete files, include executable verification steps, end with `exit_plan_mode`.
