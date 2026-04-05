@@ -20,6 +20,7 @@
     package = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.opencode;
     web.enable = false;
     enableMcpIntegration = true;
+    rtk.enable = true;
 
     settings = {
       share = "disabled";
