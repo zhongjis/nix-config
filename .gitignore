@@ -7,3 +7,12 @@ result-*
 
 # Ignore oh my opencode plans
 .sisyphus
+
+# Ignore Oh My Pi runtime databases and indexes
+modules/home-manager/features/ai-tools/pi/agent.db
+modules/home-manager/features/ai-tools/pi/agent.db-shm
+modules/home-manager/features/ai-tools/pi/agent.db-wal
+modules/home-manager/features/ai-tools/pi/models.db
+modules/home-manager/features/ai-tools/pi/models.db-shm
+modules/home-manager/features/ai-tools/pi/models.db-wal
+modules/home-manager/features/ai-tools/pi/search-db/*.mdb

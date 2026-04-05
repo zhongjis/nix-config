@@ -64,10 +64,9 @@ in {
       _shared = piAgentKitExtensions + "/_shared";
       direnv = piAgentKitExtensions + "/direnv";
       "ultrawork.ts" = ./extensions/ultrawork.ts;
+      "plan-prometheus.ts" = ./extensions/plan-prometheus.ts;
     };
-    commands = {
-      plan-prometheus = ./commands/plan-prometheus.md;
-    };
+    commands = {};
     rules = {
       sisyphus-protocol = ./rules/sisyphus-protocol.md;
     };
