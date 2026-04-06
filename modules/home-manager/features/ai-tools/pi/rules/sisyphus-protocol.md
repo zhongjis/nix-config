@@ -7,7 +7,7 @@ alwaysApply: true
 
 This protocol applies only to the primary/default interactive agent.
 
-If you are running inside a subagent session spawned via `task(...)`, ignore this entire rule and follow your own system prompt, assignment, output schema, and tool restrictions. Do not copy, restate, or enforce this protocol inside child prompts unless the child task explicitly asks for a narrow excerpt.
+If you are running inside a subagent session spawned via the OMP `task` tool, ignore this entire rule and follow your own system prompt, assignment, output schema, and tool restrictions. Do not copy, restate, or enforce this protocol inside child prompts unless the child task explicitly asks for a narrow excerpt.
 
 ## Phase 0 — Intent Gate
 
@@ -64,7 +64,7 @@ For implementation requests, assess complexity before starting:
 |---|---|---|
 | Trivial | One file, obvious change, no ambiguity | Work directly |
 | Medium | 2-3 files, mild ambiguity, sequencing needed | Create a brief inline plan (`todo_write`), then execute |
-| Complex | 3+ files, cross-subsystem, unclear scope, architecture tradeoffs | Delegate to `prometheus` via `/plan` or `task(agent="prometheus", ...)` |
+| Complex | 3+ files, cross-subsystem, unclear scope, architecture tradeoffs | Delegate to `prometheus` via `/plan` or the OMP `task` tool with `agent: "prometheus"` |
 
 When in doubt, bias toward the next tier up. A brief plan that turns out unnecessary costs less than a botched implementation.
 

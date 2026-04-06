@@ -18,9 +18,14 @@ type ExtensionApiLike = {
 };
 
 const PLAN_PATTERN = /^\/plan(?:\s+([\s\S]+))?$/;
-const DELEGATION_MARKER = 'Invoke task(agent="prometheus"';
+const DELEGATION_MARKER = 'Use the OMP task tool with {"agent":"prometheus"';
 
-const PROMETHEUS_SESSION_PROMPT = `You are in Prometheus plan mode. ${DELEGATION_MARKER}, ...) to create a concrete, reviewed plan. When the user describes their goal, pass the full context to Prometheus.
+const PROMETHEUS_SESSION_PROMPT = `You are in Prometheus plan mode. Use the OMP task tool with {"agent":"prometheus","tasks":[...]} to create a concrete, reviewed plan. When the user describes their goal, pass the full context to Prometheus.
+
+Tool shape reminders:
+- task uses {"agent":"prometheus","context":"...","tasks":[...]}
+- if clarification is truly required, ask uses a `questions` array payload
+- exit_plan_mode requires {"title":"FEATURE_PLAN"}
 
 Prometheus will:
 - Use local://prometheus-draft.md as scratch space when helpful
@@ -30,7 +35,7 @@ Prometheus will:
 
 Drive the Prometheus lifecycle end to end.`;
 
-const PROMETHEUS_DELEGATION_PROMPT = `Invoke task(agent="prometheus", ...) to create a concrete plan for the following request.
+const PROMETHEUS_DELEGATION_PROMPT = `Use the OMP task tool with {"agent":"prometheus","tasks":[...]} to create a concrete plan for the following request.
 
 User request:
 
@@ -39,6 +44,12 @@ $USER_REQUEST
 Pass the user goal above to Prometheus. Include the active scope, constraints, non-goals,
 and any critical file paths already known.
 
+Tool shape reminders:
+- task uses {"agent":"prometheus","context":"...","tasks":[...]}
+- if clarification is truly required, ask uses a `questions` array payload
+- todo_write uses {"ops":[...]}
+- exit_plan_mode requires {"title":"FEATURE_PLAN"}
+
 Prometheus will:
 - Use local://prometheus-draft.md as scratch space when helpful
 - Converge on the authoritative plan at local://PLAN.md
@@ -46,8 +57,7 @@ Prometheus will:
 - Use todo_write for its planning workflow when useful
 - Call exit_plan_mode when the plan is ready
 
-Prometheus may delegate focused planning or discovery work with task(agent="...", ...)
-when it improves plan quality.
+Prometheus may delegate focused planning or discovery work with the OMP task tool by setting the target `agent` field appropriately.
 
 Do not ask the user to manually run planning tools or manually exit plan mode.
 Drive the Prometheus lifecycle end to end.`;
