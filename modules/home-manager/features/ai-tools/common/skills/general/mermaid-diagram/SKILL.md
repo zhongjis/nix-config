@@ -1,5 +1,5 @@
 ---
-name: mermaid-diagram-specialist
+name: mermaid-diagram
 description: |
 Create Mermaid diagrams for technical documentation. Supports 18 diagram types including Flowchart, Sequence, ERD, State, C4, Class, Mindmap, Gantt, Git Graph, User Journey, and more.
 ---
