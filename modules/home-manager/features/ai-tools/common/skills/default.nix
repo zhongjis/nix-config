@@ -80,6 +80,6 @@ in {
 
   # Python dependency required by some skills (e.g., skill-creator, mermaid-diagram-skill)
   home.packages = with pkgs; [
-    python3
+    python312
   ];
 }

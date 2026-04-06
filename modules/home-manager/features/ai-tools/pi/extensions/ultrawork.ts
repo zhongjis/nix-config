@@ -78,6 +78,32 @@ function buildMessageKey(message: MessageLike, index: number, text: string): str
   return `${timestampPart}:${text}`;
 }
 
+function stripTriggerFromText(text: string): string {
+  return text
+    .replace(/\b(?:ultrawork|ulw)\b/gi, "")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
+}
+
+function stripTriggerFromMessage(message: MessageLike): MessageLike {
+  const { content } = message;
+  if (typeof content === "string") {
+    return { ...message, content: stripTriggerFromText(content) };
+  }
+  if (!Array.isArray(content)) {
+    return message;
+  }
+  return {
+    ...message,
+    content: content.map(part => {
+      if (part.type === "text" && typeof part.text === "string") {
+        return { ...part, text: stripTriggerFromText(part.text) };
+      }
+      return part;
+    }),
+  };
+}
+
 export default function ultraworkExtension(pi: ExtensionApiLike): void {
   const activatedMessageKeys = new Set<string>();
 
@@ -122,7 +148,8 @@ export default function ultraworkExtension(pi: ExtensionApiLike): void {
           content: ULTRAWORK_PROMPT,
           timestamp: lastUserMessage.timestamp,
         },
-        ...event.messages.slice(lastUserIndex),
+        stripTriggerFromMessage(lastUserMessage),
+        ...event.messages.slice(lastUserIndex + 1),
       ],
     };
   });
