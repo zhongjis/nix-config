@@ -1,5 +1,5 @@
 ---
-name: gh-cli
+name: gh
 description: GitHub CLI (gh) comprehensive reference for repositories, issues, pull requests, Actions, projects, releases, gists, codespaces, organizations, extensions, and all GitHub operations from the command line. Use when creating PRs, managing issues, running workflows, checking CI status, managing releases, or making GitHub API calls. Triggers on "create PR", "list issues", "gh command", "merge PR", "run workflow", "check status", "create release", "download artifacts", "set secret".
 upstream: https://github.com/github/awesome-copilot/blob/main/skills/gh-cli/SKILL.md
 ---
