@@ -47,7 +47,6 @@ in {
     ./oh-my-opencode.nix
     ./antigravity-auth.nix
     ./morph-fast-apply.nix
-    ./rtk.nix
     ./supermemory.nix
   ];
 

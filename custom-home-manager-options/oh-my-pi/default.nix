@@ -16,13 +16,6 @@
     then inputs.llm-agents.packages.${system}.omp
     else null;
 
-  defaultRtkPackage =
-    if inputs ? llm-agents
-    then inputs.llm-agents.packages.${system}.rtk
-    else null;
-
-  defaultRtkExtension = ./extensions/rtk.ts;
-
   pluginType = types.submodule ({...}: {
     options = {
       version = lib.mkOption {
@@ -44,11 +37,7 @@
 
   effectivePlugins = cfg.plugins;
 
-  effectiveExtensions =
-    cfg.extensions
-    // lib.optionalAttrs cfg.rtk.enable {
-      "rtk.ts" = cfg.rtk.extension;
-    };
+  effectiveExtensions = cfg.extensions;
 
   pluginPackageManifest = {
     name = "omp-plugins";
@@ -175,23 +164,6 @@ in {
       description = "YAML data written to ~/.omp/agent/lsp.yaml.";
     };
 
-    rtk = {
-      enable = lib.mkEnableOption "RTK integration for Oh My Pi";
-
-      package = lib.mkOption {
-        type = types.nullOr types.package;
-        default = defaultRtkPackage;
-        defaultText = lib.literalExpression "inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.rtk";
-        description = "RTK runtime package installed when programs.\"oh-my-pi\".rtk.enable is true.";
-      };
-
-      extension = lib.mkOption {
-        type = types.path;
-        default = defaultRtkExtension;
-        defaultText = lib.literalExpression "./oh-my-pi/extensions/rtk.ts";
-        description = "Extension file exposed as ~/.omp/agent/extensions/rtk.ts when programs.\"oh-my-pi\".rtk.enable is true.";
-      };
-    };
   };
 
   config = lib.mkMerge [
@@ -211,22 +183,13 @@ in {
             If you import this module outside this flake, pass the input explicitly or disable impeccable.
           '';
         }
-        {
-          assertion = !cfg.rtk.enable || cfg.rtk.package != null;
-          message = ''
-            programs."oh-my-pi".rtk.package must be set when programs."oh-my-pi".rtk.enable is true.
-            If you import this module outside this flake, pass the package explicitly or provide inputs.llm-agents.
-          '';
-        }
         (markdownNameAssertion "commands" cfg.commands)
         (markdownNameAssertion "rules" cfg.rules)
         (markdownNameAssertion "agents" cfg.agents)
       ];
     }
     (lib.mkIf cfg.enable {
-      home.packages =
-        [cfg.package]
-        ++ lib.optionals cfg.rtk.enable [cfg.rtk.package];
+      home.packages = [cfg.package];
 
       home.file =
         mkPathFiles ".omp/agent/skills" cfg.skills
