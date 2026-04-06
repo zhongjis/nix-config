@@ -32,7 +32,18 @@
     };
   };
 
-  workOverrides = {};
+  workOverrides = {
+    # Anthropic ULW (ultra-large-window, 1M context) models
+    modelRoles = {
+      default = "anthropic/claude-sonnet-4-6";
+      vision = "github-copilot/gpt-5.4:high";
+      smol = "anthropic/claude-haiku-4-5:off";
+      slow = "anthropic/claude-opus-4-6:high";
+      plan = "anthropic/claude-opus-4-6:high";
+      commit = "anthropic/claude-haiku-4-5:off";
+      task = "anthropic/claude-sonnet-4-6";
+    };
+  };
 
   personalOverrides = {};
 
@@ -49,6 +60,8 @@ in {
     ./skills
     ./lsp.nix
   ];
+
+  home.packages = [llmAgentsPackages.pi];
 
   programs."oh-my-pi" = {
     enable = true;
