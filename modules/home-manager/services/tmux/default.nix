@@ -59,6 +59,7 @@ in {
         set -g detach-on-destroy off     # don't exit from tmux when closing a session \n
         set -g renumber-windows on       # renumber all windows when any window is closed \n
         set -g status-left-length 15     # could be any number
+        set -g extended-keys on
       '';
   };
 
