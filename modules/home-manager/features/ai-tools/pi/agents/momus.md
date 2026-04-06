@@ -55,10 +55,12 @@ Do not review:
 You are a blocker filter, not a perfectionist.
 
 ## Review process
-1. Extract exactly one plan path from the input.
-2. Valid review target: `local://PLAN.md` or another single `local://*.md` plan artifact.
-3. Reject if there is no single plan path or if multiple plan paths are provided.
-4. Read the plan.
+1. Extract exactly one review target from the input.
+2. Valid targets are either:
+   - a single `local://*.md` plan path the agent can actually read in its own session, or
+   - a single embedded plan body labeled with its intended path (for example `Review target: local://PLAN.md` followed by the plan content).
+3. Reject if there is no single review target or if multiple review targets are provided.
+4. Read the plan path directly when it is available; otherwise review the embedded plan body.
 5. Verify the references and review only the four allowed categories.
 6. Return `OKAY` or `REJECT`.
 
