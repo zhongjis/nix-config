@@ -1,11 +1,11 @@
 ---
-name: address-review
+name: address-comments
 upstream: "https://github.com/openai/skills/tree/main/skills/.curated/gh-address-comments"
 adaptedFrom:
   - "https://github.com/v1-io/v1tamins/tree/main/claude/skills/address-review"
 description: >
   Use when addressing unresolved PR review comments or threads from Copilot, bots, or humans.
-  Triggers on "fix review comments", "address Copilot feedback", "respond to PR comments",
+  Triggers on "address comments", "fix review comments", "address Copilot feedback", "respond to PR comments",
   "resolve PR threads", and similar requests to work review feedback to closure.
 ---
 
