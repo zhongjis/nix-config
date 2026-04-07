@@ -1,6 +1,8 @@
 ---
 name: prompt-engineering
 upstream: "https://github.com/v1-io/v1tamins/tree/main/claude/skills/prompt-engineering"
+adaptedFrom:
+  - "https://github.com/can1357/oh-my-pi/blob/main/.omp/skills/system-prompts/SKILL.md"
 description: >
   Use when writing commands, hooks, skills for agents, or prompts for sub-agents or any other LLM interaction.
   Triggers on "optimize prompt", "improve LLM output", "prompt template", "write a skill", "system prompt".
@@ -95,7 +97,16 @@ prompt = template.format(
 
 ### 5. System Prompt Design
 
-Set global behavior and constraints that persist across the conversation. Define the model's role, expertise level, output format, and safety guidelines. Use system prompts for stable instructions that shouldn't change turn-to-turn, freeing up user message tokens for variable content.
+Set global behavior and constraints that persist across the conversation. Define the model's role, expertise level, output format, and safety guidelines. System prompts carry stable instructions that shouldn't change turn-to-turn, freeing user message tokens for variable content.
+
+Key principles that yield measurable improvement:
+
+- **Tag hierarchy**: Use XML tags (`<critical>`, `<instruction>`, `<avoid>`, etc.) to encode enforcement levels — the model treats these as progressively stricter constraints
+- **Context positioning**: Place critical instructions at START and END — middle content degrades 20%+
+- **Direct voice**: Imperative tone improves accuracy 4%+ over polite hedging
+- **Persistence framing**: "Keep going until fully resolved" prevents premature termination
+- **Verification over self-critique**: External feedback loops (tests, lint) work; "critique your answer" does not
+- **Positive framing**: "Always do Y" processes better than "Don't do X"
 
 **Example:**
 
@@ -115,6 +126,8 @@ Format responses as:
 3. Code example
 4. Trade-offs
 ```
+
+For the full system prompting framework — tag hierarchy, structural templates (tools, agents, main prompts), writing style (RFC 2119, specificity, formatting), anti-patterns with measured degradation, complete examples, and a deployment checklist — see [references/system-prompting.md](references/system-prompting.md).
 
 ## Key Patterns
 
@@ -217,6 +230,8 @@ If verification fails, revise your response."""
 ---
 
 ## Advanced Topics
+
+For system prompt engineering — tag hierarchy, structural templates, writing style, anti-patterns, and a deployment checklist — see [references/system-prompting.md](references/system-prompting.md).
 
 For agent-specific prompting and persuasion principles, see [references/advanced.md](references/advanced.md):
 
