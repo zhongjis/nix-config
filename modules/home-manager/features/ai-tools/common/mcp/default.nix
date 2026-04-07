@@ -6,7 +6,8 @@
   ...
 }: let
   sopsFile = inputs.self + "/secrets/ai-tokens.yaml";
-  secretPath = config.sops.secrets.context7_api_key.path;
+  secretPath_context7 = config.sops.secrets.context7_api_key.path;
+  secretPath_exa = config.sops.secrets.exa_api_key.path;
 
   # MCPs available to all profiles
   commonMcps = {
@@ -48,9 +49,14 @@ in {
   # Export CONTEXT7_API_KEY directly in zsh initialization
   # Reads the sops secret file at shell startup
   programs.zsh.initContent = lib.mkOrder 100 ''
-    if [[ -r "${secretPath}" ]]; then
-      export CONTEXT7_API_KEY="$(<"${secretPath}")"
+    if [[ -r "${secretPath_context7}" ]]; then
+      export CONTEXT7_API_KEY="$(<"${secretPath_context7}")"
     fi
+
+    if [[ -r "${secretPath_exa}" ]]; then
+      export EXA_API_KEY="$(<"${secretPath_exa}")"
+    fi
+
   '';
 
   programs.mcp = {
