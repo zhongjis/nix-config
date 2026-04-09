@@ -45,6 +45,9 @@ in {
   sops.secrets.context7_api_key = {
     inherit sopsFile;
   };
+  sops.secrets.exa_api_key = {
+    inherit sopsFile;
+  };
 
   # Export CONTEXT7_API_KEY directly in zsh initialization
   # Reads the sops secret file at shell startup
@@ -56,7 +59,6 @@ in {
     if [[ -r "${secretPath_exa}" ]]; then
       export EXA_API_KEY="$(<"${secretPath_exa}")"
     fi
-
   '';
 
   programs.mcp = {
