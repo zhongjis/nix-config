@@ -31,8 +31,7 @@
       confirm-close-surface = false;
       background-opacity = 0.9;
       keybind = [
-        "alt+backspace=text:\\x1b\\x7f"
-        "shift+enter=text:\\n"
+        "alt+backspace=text:\x1b\x7f"
       ];
     };
   };
