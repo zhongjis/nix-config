@@ -37,14 +37,12 @@
       "git:github.com/aliou/pi-guardrails"
       {
         source = "git:github.com/backnotprop/plannotator";
-        extensions = [];
-        skills = [];
+        extensions = ["git/github.com/backnotprop/plannotator/apps/pi-extension"];
+        skills = ["git/github.com/backnotprop/plannotator/apps/pi-extension/skills"];
         prompts = [];
         themes = [];
       }
     ];
-    extensions = ["git/github.com/backnotprop/plannotator/apps/pi-extension"];
-    skills = ["git/github.com/backnotprop/plannotator/apps/pi-extension/skills"];
     permissionLevel = "high";
   };
 
