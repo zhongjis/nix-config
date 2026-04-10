@@ -11,6 +11,7 @@ in {
     ./opencode
     ./claude-code
     ./factory
+    ./omp
     ./pi
   ];
 

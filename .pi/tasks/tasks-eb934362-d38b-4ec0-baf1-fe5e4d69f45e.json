@@ -1,0 +1,51 @@
+{
+  "nextId": 4,
+  "tasks": [
+    {
+      "id": "1",
+      "subject": "Research: Understand Bedrock auth, error shapes, and extension state persistence",
+      "description": "Explore pi's Bedrock provider, Anthropic error responses for quota exhaustion, extension state persistence (appendEntry), and existing examples to ground the plan.",
+      "status": "completed",
+      "activeForm": "Researching codebase for plan grounding",
+      "metadata": {
+        "_piWorkflowPhase": "planning",
+        "_piOriginMode": "fuxi",
+        "_piOriginSessionId": "eb934362-d38b-4ec0-baf1-fe5e4d69f45e"
+      },
+      "blocks": [],
+      "blockedBy": [],
+      "createdAt": 1775854949605,
+      "updatedAt": 1775856413024
+    },
+    {
+      "id": "2",
+      "subject": "Draft execution-ready plan for Anthropic→Bedrock fallback extension",
+      "description": "Write the full plan with file targets, approach, UX, caching, and verification steps.",
+      "status": "completed",
+      "metadata": {
+        "_piWorkflowPhase": "planning",
+        "_piOriginMode": "fuxi",
+        "_piOriginSessionId": "eb934362-d38b-4ec0-baf1-fe5e4d69f45e"
+      },
+      "blocks": [],
+      "blockedBy": [],
+      "createdAt": 1775854953431,
+      "updatedAt": 1775856504330
+    },
+    {
+      "id": "3",
+      "subject": "Di Renjie gap review on saved draft",
+      "description": "Run direnjie on the saved plan draft to find hidden gaps before finalize.",
+      "status": "in_progress",
+      "metadata": {
+        "_piWorkflowPhase": "planning",
+        "_piOriginMode": "fuxi",
+        "_piOriginSessionId": "eb934362-d38b-4ec0-baf1-fe5e4d69f45e"
+      },
+      "blocks": [],
+      "blockedBy": [],
+      "createdAt": 1775854956755,
+      "updatedAt": 1775856507308
+    }
+  ]
+}
