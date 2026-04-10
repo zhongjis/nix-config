@@ -1,6 +1,6 @@
 ---
 name: nix-ad-hoc-execution
-description: Chooses the right ad-hoc execution path in this Nix environment. Use when a command is missing, when you need a one-off CLI, or when Python/Node work needs temporary dependencies without mutating the host.
+description: Chooses the right ad-hoc execution path in this Nix environment. Use when a command is missing, when you need to run a tool without installing it, when you need a one-off CLI, or when Python/Node work needs temporary dependencies without mutating the host.
 ---
 
 # Nix Ad-hoc Execution
@@ -15,17 +15,17 @@ Use this skill to choose the narrowest temporary execution path without pollutin
 
 2. **Choose the narrowest tool**
    - Need the repo's development environment -> `nix develop`
-   - Need one package's default executable -> `nix run`
-   - Need ad-hoc tools, arbitrary commands, shell pipelines, or multiple packages -> `nix shell`
+   - Need one package's default executable with direct arguments -> `nix run`
+   - Need ad-hoc tools, arbitrary commands, shell pipelines, non-default executables, or multiple packages -> `nix shell`
    - Need temporary Python libraries -> `uv run --with ...`; otherwise use `nix shell` with a Python environment
-   - Need a Node.js tool in project context -> `npx ...`; if Node.js is missing, use `nix shell nixpkgs#nodejs -c npx ...`
+   - Need a Node.js tool in project context -> `npx ...`; if Node.js is missing, use `nix shell nixpkgs#nodejs --command npx ...`
 
 ## Quick Examples
 
 ```bash
 nix develop
 nix run nixpkgs#hello
-nix shell nixpkgs#jq nixpkgs#yq -c "jq ... | yq ..."
+nix shell nixpkgs#jq nixpkgs#yq --command sh -c 'jq ... | yq ...'
 uv run --with requests python3 script.py
 npx tsx script.ts
 ```
