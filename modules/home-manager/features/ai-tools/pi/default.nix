@@ -38,8 +38,8 @@
       "git:github.com/lucasmeijer/pi-bash-live-view"
       {
         source = "git:github.com/backnotprop/plannotator";
-        extensions = ["git/github.com/backnotprop/plannotator/apps/pi-extension"];
-        skills = ["git/github.com/backnotprop/plannotator/apps/pi-extension/skills"];
+        extensions = ["apps/pi-extension"];
+        skills = ["apps/pi-extension/skills"];
       }
     ];
     permissionLevel = "high";
