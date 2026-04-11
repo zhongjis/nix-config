@@ -35,12 +35,11 @@
       "git:github.com/samfoy/pi-lsp-extension"
       "git:github.com/RimuruW/pi-hashline-edit"
       "git:github.com/aliou/pi-guardrails"
+      "git:github.com/lucasmeijer/pi-bash-live-view"
       {
         source = "git:github.com/backnotprop/plannotator";
         extensions = ["git/github.com/backnotprop/plannotator/apps/pi-extension"];
         skills = ["git/github.com/backnotprop/plannotator/apps/pi-extension/skills"];
-        prompts = [];
-        themes = [];
       }
     ];
     permissionLevel = "high";
