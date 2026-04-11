@@ -36,7 +36,7 @@ in {
     settings = lib.mkOption {
       type = jsonFormat.type;
       default = {};
-      description = "JSON data written to ~/.pi/agent/settings.json. Copied (not symlinked) so pi can mutate it at runtime.";
+      description = "JSON data symlinked to ~/.pi/agent/settings.json. Immutable — pi cannot override it at runtime.";
     };
   };
 
@@ -45,13 +45,7 @@ in {
       mkPathFiles ".pi/agent/skills" cfg.skills
       // {
         ".pi/agent/AGENTS.md".text = instructionsText;
+        ".pi/agent/settings.json".source = settingsFile;
       };
-
-    # Copy settings.json instead of symlinking — pi mutates this file at runtime
-    # (e.g., lastChangelogVersion). On each `nh switch`, the file is regenerated
-    # from the Nix-declared settings, resetting any runtime mutations.
-    home.activation.piSettings = lib.hm.dag.entryAfter ["writeBoundary"] ''
-      install -Dm644 ${settingsFile} ${config.home.homeDirectory}/.pi/agent/settings.json
-    '';
   };
 }
