@@ -70,6 +70,7 @@ in {
 
   programs.pi = {
     enable = true;
+    rtk.enable = true;
     skills = allSkills;
     instructions = commonInstructions;
     settings = piSettings;

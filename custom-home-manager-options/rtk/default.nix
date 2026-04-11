@@ -14,6 +14,7 @@
 
   opencodeRtkCfg = config.programs.opencode.rtk;
   ompRtkCfg = config.programs."oh-my-pi".rtk;
+  piRtkCfg = config.programs.pi.rtk;
 
   # Lazy: only evaluated when opencodeRtkCfg.enable is true.
   rtkPluginSrc = pkgs.fetchFromGitHub {
@@ -44,6 +45,24 @@ in {
     };
   };
 
+  options.programs.pi.rtk = {
+    enable = lib.mkEnableOption "RTK integration for Pi";
+
+    package = lib.mkOption {
+      type = lib.types.nullOr lib.types.package;
+      default = defaultRtkPackage;
+      defaultText = lib.literalExpression "inputs.llm-agents.packages.\${pkgs.stdenv.hostPlatform.system}.rtk";
+      description = "RTK runtime package installed when programs.pi.rtk.enable is true.";
+    };
+
+    extension = lib.mkOption {
+      type = lib.types.path;
+      default = ./extensions/pi-rtk.ts;
+      defaultText = lib.literalExpression "./rtk/extensions/pi-rtk.ts";
+      description = "Extension file exposed as ~/.pi/agent/extensions/rtk.ts when programs.pi.rtk.enable is true.";
+    };
+  };
+
   config = lib.mkMerge [
     {
       assertions = [
@@ -51,6 +70,13 @@ in {
           assertion = !ompRtkCfg.enable || ompRtkCfg.package != null;
           message = ''
             programs."oh-my-pi".rtk.package must be set when programs."oh-my-pi".rtk.enable is true.
+            If you import this module outside this flake, pass the package explicitly or provide inputs.llm-agents.
+          '';
+        }
+        {
+          assertion = !piRtkCfg.enable || piRtkCfg.package != null;
+          message = ''
+            programs.pi.rtk.package must be set when programs.pi.rtk.enable is true.
             If you import this module outside this flake, pass the package explicitly or provide inputs.llm-agents.
           '';
         }
@@ -64,6 +90,10 @@ in {
     (lib.mkIf ompRtkCfg.enable {
       home.packages = [ompRtkCfg.package];
       programs."oh-my-pi".extensions."rtk.ts" = ompRtkCfg.extension;
+    })
+    (lib.mkIf piRtkCfg.enable {
+      home.packages = [piRtkCfg.package];
+      programs.pi.extensions."rtk.ts" = piRtkCfg.extension;
     })
   ];
 }

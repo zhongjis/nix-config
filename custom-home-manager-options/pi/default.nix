@@ -27,6 +27,12 @@ in {
       description = "Skill directories exposed under ~/.pi/agent/skills/.";
     };
 
+    extensions = lib.mkOption {
+      type = lib.types.attrsOf lib.types.path;
+      default = {};
+      description = "Files or directories exposed under ~/.pi/agent/extensions/.";
+    };
+
     instructions = lib.mkOption {
       type = lib.types.listOf lib.types.path;
       default = [];
@@ -43,6 +49,7 @@ in {
   config = lib.mkIf cfg.enable {
     home.file =
       mkPathFiles ".pi/agent/skills" cfg.skills
+      // mkPathFiles ".pi/agent/extensions" cfg.extensions
       // {
         ".pi/agent/AGENTS.md".text = instructionsText;
         ".pi/agent/settings.json".source = settingsFile;
