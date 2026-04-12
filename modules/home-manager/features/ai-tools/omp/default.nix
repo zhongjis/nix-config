@@ -68,26 +68,27 @@ in {
     impeccable.enable = true;
 
     settings = ompConfig;
-    # models = {};
     skills = allSkills;
-    extensions = {
-      # The upstream direnv extension imports shared helpers from ../_shared.
-      _shared = piAgentKitExtensions + "/_shared";
-      direnv = piAgentKitExtensions + "/direnv";
-      "ultrawork.ts" = ./extensions/ultrawork.ts;
-      "plan.ts" = ./extensions/plan.ts;
-    };
-    commands = {};
-    rules = {
-      sisyphus-protocol = ./rules/sisyphus-protocol.md;
-    };
-    agents = {
-      prometheus = ./agents/prometheus.md;
-      metis = ./agents/metis.md;
-      momus = ./agents/momus.md;
-    };
     instructions = commonInstructions;
 
     rtk.enable = true;
+
+    # models = {};
+    # extensions = {
+    #   # The upstream direnv extension imports shared helpers from ../_shared.
+    #   _shared = piAgentKitExtensions + "/_shared";
+    #   direnv = piAgentKitExtensions + "/direnv";
+    #   "ultrawork.ts" = ./extensions/ultrawork.ts;
+    #   "plan.ts" = ./extensions/plan.ts;
+    # };
+    # commands = {};
+    # rules = {
+    #   sisyphus-protocol = ./rules/sisyphus-protocol.md;
+    # };
+    # agents = {
+    #   prometheus = ./agents/prometheus.md;
+    #   metis = ./agents/metis.md;
+    #   momus = ./agents/momus.md;
+    # };
   };
 }
