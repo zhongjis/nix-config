@@ -31,11 +31,10 @@
     lastChangelogVersion = "0.66.1";
     npmCommand = ["bash" "${config.home.homeDirectory}/.pi/agent/scripts/pi-package-npm.sh"];
     packages = [
-      "git:github.com/nicobailon/pi-mcp-adapter"
+      "git:github.com/nicobailon/pi-mcp-adapter@v2.2.2"
       "git:github.com/samfoy/pi-lsp-extension"
       "git:github.com/RimuruW/pi-hashline-edit"
       "git:github.com/aliou/pi-guardrails"
-      "git:github.com/lucasmeijer/pi-bash-live-view"
       {
         source = "git:github.com/backnotprop/plannotator";
         extensions = ["apps/pi-extension"];
