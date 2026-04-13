@@ -49,13 +49,12 @@
 in {
   home.packages = [
     inputs.self.packages.${system}.oh-my-codex
-    rtkPackage
   ];
 
   programs.codex = {
     enable = true;
     enableMcpIntegration = true;
-    package = llmAgentsPackages.codex;
+    # package = llmAgentsPackages.codex;
     context = codexContext;
     rules = {};
     settings = codexSettings;
