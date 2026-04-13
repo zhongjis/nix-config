@@ -3,7 +3,6 @@
   pkgs,
   lib,
   commonSkills,
-  impeccableSkills,
   ompLocalSkills,
   commonInstructions,
   aiProfileHelpers,
@@ -19,7 +18,7 @@
       hash = "sha256-aYikbALMzZZLQADNPAsr77qk2762iH4w5x3laII8obA=";
     })
     + "/extensions";
-  allSkills = commonSkills // impeccableSkills.ohMyPi // ompLocalSkills;
+  allSkills = commonSkills // ompLocalSkills;
 
   sharedConfig = {
     modelRoles = {

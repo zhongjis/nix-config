@@ -4,7 +4,6 @@
   pkgs,
   lib,
   commonSkills,
-  impeccableSkills,
   ompLocalSkills,
   commonInstructions,
   aiProfileHelpers,
@@ -12,7 +11,7 @@
 }: let
   system = pkgs.stdenv.hostPlatform.system;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
-  allSkills = commonSkills // impeccableSkills.pi // ompLocalSkills;
+  allSkills = commonSkills // ompLocalSkills;
 
   sharedSettings = {
     defaultThinkingLevel = "high";

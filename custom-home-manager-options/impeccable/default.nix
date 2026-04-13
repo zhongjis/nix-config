@@ -56,21 +56,30 @@ in {
   options.programs."oh-my-pi".impeccable.enable =
     lib.mkEnableOption "Impeccable-provided Oh My Pi skills";
 
-  config = {
-    assertions = [
-      (impeccableAssertion "programs.codex.impeccable.enable" codexCfg.enable)
-      (impeccableAssertion "programs.opencode.impeccable.enable" opencodeCfg.enable)
-      (impeccableAssertion "programs.\"claude-code\".impeccable.enable" claudeCodeCfg.enable)
-      (impeccableAssertion "programs.pi.impeccable.enable" piCfg.enable)
-      (impeccableAssertion "programs.\"oh-my-pi\".impeccable.enable" ompCfg.enable)
-    ];
-
-    _module.args.impeccableSkills = {
-      codex = discoverImpeccableSkills codexCfg.enable ".codex/skills";
-      opencode = discoverImpeccableSkills opencodeCfg.enable ".opencode/skills";
-      claudeCode = discoverImpeccableSkills claudeCodeCfg.enable ".claude/skills";
-      pi = discoverImpeccableSkills piCfg.enable ".pi/skills";
-      ohMyPi = discoverImpeccableSkills ompCfg.enable ".pi/skills";
-    };
-  };
+  config = lib.mkMerge [
+    {
+      assertions = [
+        (impeccableAssertion "programs.codex.impeccable.enable" codexCfg.enable)
+        (impeccableAssertion "programs.opencode.impeccable.enable" opencodeCfg.enable)
+        (impeccableAssertion "programs.\"claude-code\".impeccable.enable" claudeCodeCfg.enable)
+        (impeccableAssertion "programs.pi.impeccable.enable" piCfg.enable)
+        (impeccableAssertion "programs.\"oh-my-pi\".impeccable.enable" ompCfg.enable)
+      ];
+    }
+    (lib.mkIf codexCfg.enable {
+      programs.codex.skills = lib.mkDefault (discoverImpeccableSkills true ".codex/skills");
+    })
+    (lib.mkIf opencodeCfg.enable {
+      programs.opencode.skills = lib.mkDefault (discoverImpeccableSkills true ".opencode/skills");
+    })
+    (lib.mkIf claudeCodeCfg.enable {
+      programs."claude-code".skills = lib.mkDefault (discoverImpeccableSkills true ".claude/skills");
+    })
+    (lib.mkIf piCfg.enable {
+      programs.pi.skills = lib.mkDefault (discoverImpeccableSkills true ".pi/skills");
+    })
+    (lib.mkIf ompCfg.enable {
+      programs."oh-my-pi".skills = lib.mkDefault (discoverImpeccableSkills true ".pi/skills");
+    })
+  ];
 }

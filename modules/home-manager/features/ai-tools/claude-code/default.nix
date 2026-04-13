@@ -3,7 +3,6 @@
   pkgs,
   lib,
   commonSkills,
-  impeccableSkills,
   claudeCodeLocalSkills,
   commonInstructions,
   ...
@@ -13,7 +12,7 @@
 
   # Merge pre-filtered common skills and Claude Code-specific skills (from ./skills)
   # Both are already profile-filtered via _module.args
-  allSkills = commonSkills // impeccableSkills.claudeCode // claudeCodeLocalSkills;
+  allSkills = commonSkills // claudeCodeLocalSkills;
 
   # Convert commonInstructions (list of paths) to an attrset for `rules`
   # e.g. /nix/store/...-nix-environment.md → { "nix-environment" = /nix/store/...; }

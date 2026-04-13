@@ -2,7 +2,6 @@
   lib,
   aiProfileHelpers,
   commonSkills,
-  impeccableSkills,
   ...
 }: let
   # Auto-discover skills from directory structure
@@ -29,5 +28,5 @@
     // lib.optionalAttrs aiProfileHelpers.isPersonal localPersonalSkills;
 in {
   # Merge common skills (from common/skills/) with OpenCode-only skills
-  programs.opencode.skills = commonSkills // impeccableSkills.opencode // filteredLocalSkills;
+  programs.opencode.skills = commonSkills // filteredLocalSkills;
 }

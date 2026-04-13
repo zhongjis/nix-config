@@ -2,7 +2,6 @@
   inputs,
   pkgs,
   commonSkills,
-  impeccableSkills,
   commonInstructions,
   ...
 }: let
@@ -60,6 +59,6 @@ in {
     context = codexContext;
     rules = {};
     settings = codexSettings;
-    skills = commonSkills // impeccableSkills.codex;
+    skills = commonSkills;
   };
 }
