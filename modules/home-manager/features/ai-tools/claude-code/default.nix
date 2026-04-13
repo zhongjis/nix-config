@@ -1,4 +1,5 @@
 {
+  inputs,
   pkgs,
   lib,
   commonSkills,
@@ -6,6 +7,9 @@
   commonInstructions,
   ...
 }: let
+  system = pkgs.stdenv.hostPlatform.system;
+  llmAgentsPackages = inputs.llm-agents.packages.${system};
+
   # Merge pre-filtered common skills and Claude Code-specific skills (from ./skills)
   # Both are already profile-filtered via _module.args
   allSkills = commonSkills // claudeCodeLocalSkills;

@@ -21,22 +21,22 @@
             "--indent-type"
             "Spaces"
             "--indent-width"
-            2
+            "2"
             "--column-width"
-            85
+            "85"
             "--sort-requires"
           ];
         };
         black = {
           prepend_args = [
             "--line-length"
-            85
+            "85"
           ];
         };
         shfmt = {
           args = [
             "-i"
-            2
+            "2"
             "-ci"
           ];
         };
