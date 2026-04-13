@@ -31,7 +31,7 @@
     model = "gpt-5.4";
     model_provider = "openai";
     model_reasoning_effort = "high";
-    approval_policy = "on-request";
+    approval_policy = "never";
     allow_login_shell = true;
     sandbox_mode = "workspace-write";
 
