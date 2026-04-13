@@ -17,6 +17,10 @@
           }).neovim;
       }
       // {
+        oh-my-codex = import ../packages/oh-my-codex.nix {
+          inherit pkgs;
+          lib = pkgs.lib;
+        };
         opencode-morph-fast-apply = import ../packages/opencode-morph-fast-apply.nix {
           inherit pkgs;
           lib = pkgs.lib;
