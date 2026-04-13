@@ -1,6 +1,6 @@
 # AI Tools Module Architecture
 
-This module organizes configuration for AI-assisted coding tools (OpenCode, Claude Code) and their shared resources (skills, MCP servers, instructions) using a **profile-based architecture** that supports multiple environments (work, personal).
+This module organizes configuration for AI-assisted coding tools (Codex, OpenCode, Claude Code, Pi-family tools) and their shared resources (skills, MCP servers, instructions) using a **profile-based architecture** that supports multiple environments (work, personal).
 
 ## Module Hierarchy
 
@@ -20,6 +20,8 @@ ai-tools/
 │   │   └── personal/       # Skills only for personal profile
 │   ├── mcp/                # MCP server configurations
 │   └── instructions/       # Shared markdown system prompts (nix-environment.md)
+├── codex/                  # Codex CLI configuration
+│   └── default.nix         # Global Codex config + shared skills wiring
 ├── opencode/               # OpenCode-specific configuration
 │   ├── default.nix         # Main OpenCode config with profile-based filtering
 │   ├── skills/             # OpenCode-only skills with directory-based auto-discovery

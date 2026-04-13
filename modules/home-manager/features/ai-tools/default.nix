@@ -8,6 +8,7 @@ in {
   imports = [
     ../../../../custom-home-manager-options/rtk
     ./common
+    ./codex
     ./opencode
     ./claude-code
     ./factory

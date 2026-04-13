@@ -1,6 +1,6 @@
 # AI TOOLS MODULE
 
-Profile-based, tool-agnostic configuration for OpenCode, Claude Code, and Factory.ai. Manages skills, plugins, agents, instructions, MCP servers, and permissions.
+Profile-based, tool-agnostic configuration for Codex, OpenCode, Claude Code, Pi-family tools, and Factory.ai. Manages skills, plugins, agents, instructions, MCP servers, and permissions.
 
 ## PROFILE SYSTEM
 
@@ -41,6 +41,7 @@ ai-tools/
 │   │   └── personal/        # Personal profile only
 │   ├── mcp/                 # MCP server definitions
 │   └── agents/              # Agent configuration
+├── codex/                   # Codex CLI config (global config + shared skills)
 ├── opencode/                # OpenCode-specific
 │   ├── plugins/             # oh-my-opencode plugins
 │   ├── skills/              # OpenCode-only skills
