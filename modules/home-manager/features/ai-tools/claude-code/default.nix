@@ -35,11 +35,7 @@ in {
       if pkgs.stdenv.isDarwin
       then false
       else true;
-    package =
-      if pkgs.stdenv.isDarwin
-      then null
-      else pkgs.claude-code;
-
+    package = llmAgentsPackages.claude-code;
     skills = allSkills;
 
     # Use rules instead of settings.instructions so settings.json is not managed by HM
