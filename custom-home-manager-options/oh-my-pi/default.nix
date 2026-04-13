@@ -145,10 +145,6 @@ in {
       description = "Files or directories exposed under ~/.omp/agent/extensions/.";
     };
 
-    impeccable = {
-      enable = lib.mkEnableOption "Impeccable-provided Oh My Pi skills";
-    };
-
     plugins = lib.mkOption {
       type = types.attrsOf pluginType;
       default = {};
@@ -174,13 +170,6 @@ in {
           message = ''
             programs."oh-my-pi".package must be set when programs."oh-my-pi".enable is true.
             If you import this module outside this flake, pass the package explicitly or provide inputs.llm-agents.
-          '';
-        }
-        {
-          assertion = !cfg.impeccable.enable || inputs ? impeccable;
-          message = ''
-            programs."oh-my-pi".impeccable.enable requires inputs.impeccable.
-            If you import this module outside this flake, pass the input explicitly or disable impeccable.
           '';
         }
         (markdownNameAssertion "commands" cfg.commands)

@@ -1,6 +1,4 @@
 {
-  config,
-  inputs,
   lib,
   aiProfileHelpers,
   ...
@@ -14,9 +12,6 @@
   in
     skills;
 
-  cfg = config.programs."oh-my-pi";
-
-  impeccableOmpSkills = lib.optionalAttrs cfg.impeccable.enable (discoverSkills (inputs.impeccable + "/.pi/skills"));
   localGeneralSkills = discoverSkills ./general;
   localWorkSkills = discoverSkills ./work;
   localPersonalSkills = discoverSkills ./personal;
@@ -26,5 +21,5 @@
     // lib.optionalAttrs aiProfileHelpers.isWork localWorkSkills
     // lib.optionalAttrs aiProfileHelpers.isPersonal localPersonalSkills;
 in {
-  _module.args.ompLocalSkills = impeccableOmpSkills // filteredLocalSkills;
+  _module.args.ompLocalSkills = filteredLocalSkills;
 }

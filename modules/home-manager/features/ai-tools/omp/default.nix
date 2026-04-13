@@ -3,6 +3,7 @@
   pkgs,
   lib,
   commonSkills,
+  impeccableSkills,
   ompLocalSkills,
   commonInstructions,
   aiProfileHelpers,
@@ -18,7 +19,7 @@
       hash = "sha256-aYikbALMzZZLQADNPAsr77qk2762iH4w5x3laII8obA=";
     })
     + "/extensions";
-  allSkills = commonSkills // ompLocalSkills;
+  allSkills = commonSkills // impeccableSkills.ohMyPi // ompLocalSkills;
 
   sharedConfig = {
     modelRoles = {
@@ -69,7 +70,6 @@ in {
       else llmAgentsPackages.omp;
 
     impeccable.enable = true;
-
     settings = ompConfig;
     skills = allSkills;
     instructions = commonInstructions;

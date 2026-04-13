@@ -17,7 +17,6 @@
 #   - Prefix directory with "disabled-" to skip it
 #   - general/disabled-jq/ → skipped
 {
-  inputs,
   pkgs,
   lib,
   aiProfileHelpers,
@@ -45,33 +44,9 @@
   workSkills = discoverSkills ./work;
   personalSkills = discoverSkills ./personal;
 
-  externalGeneralSkills = {
-    adapt = inputs.impeccable + "/source/skills/adapt";
-    animate = inputs.impeccable + "/source/skills/animate";
-    arrange = inputs.impeccable + "/source/skills/arrange";
-    audit = inputs.impeccable + "/source/skills/audit";
-    bolder = inputs.impeccable + "/source/skills/bolder";
-    clarify = inputs.impeccable + "/source/skills/clarify";
-    colorize = inputs.impeccable + "/source/skills/colorize";
-    critique = inputs.impeccable + "/source/skills/critique";
-    delight = inputs.impeccable + "/source/skills/delight";
-    distill = inputs.impeccable + "/source/skills/distill";
-    extract = inputs.impeccable + "/source/skills/extract";
-    frontend-design = inputs.impeccable + "/source/skills/frontend-design";
-    harden = inputs.impeccable + "/source/skills/harden";
-    normalize = inputs.impeccable + "/source/skills/normalize";
-    onboard = inputs.impeccable + "/source/skills/onboard";
-    optimize = inputs.impeccable + "/source/skills/optimize";
-    overdrive = inputs.impeccable + "/source/skills/overdrive";
-    polish = inputs.impeccable + "/source/skills/polish";
-    quieter = inputs.impeccable + "/source/skills/quieter";
-    teach-impeccable = inputs.impeccable + "/source/skills/teach-impeccable";
-    typeset = inputs.impeccable + "/source/skills/typeset";
-  };
-
   # Pre-filtered skills based on profile
   filteredSkills =
-    (generalSkills // externalGeneralSkills)
+    generalSkills
     // lib.optionalAttrs aiProfileHelpers.isWork workSkills
     // lib.optionalAttrs aiProfileHelpers.isPersonal personalSkills;
 in {

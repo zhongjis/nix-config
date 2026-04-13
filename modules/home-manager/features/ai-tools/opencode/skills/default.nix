@@ -1,9 +1,8 @@
 {
-  inputs,
   lib,
   aiProfileHelpers,
   commonSkills,
-  config,
+  impeccableSkills,
   ...
 }: let
   # Auto-discover skills from directory structure
@@ -18,8 +17,6 @@
   in
     skills;
 
-  impeccableOpenCodeSkills = discoverSkills (inputs.impeccable + "/.opencode/skills");
-
   # Discover OpenCode-only skills from subdirectories
   localGeneralSkills = discoverSkills ./general;
   localWorkSkills = discoverSkills ./work;
@@ -32,5 +29,5 @@
     // lib.optionalAttrs aiProfileHelpers.isPersonal localPersonalSkills;
 in {
   # Merge common skills (from common/skills/) with OpenCode-only skills
-  programs.opencode.skills = commonSkills // impeccableOpenCodeSkills // filteredLocalSkills;
+  programs.opencode.skills = commonSkills // impeccableSkills.opencode // filteredLocalSkills;
 }

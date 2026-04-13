@@ -6,6 +6,7 @@
   cfg = config.myHomeManager.aiProfile;
 in {
   imports = [
+    ../../../../custom-home-manager-options/impeccable
     ../../../../custom-home-manager-options/rtk
     ./common
     ./codex

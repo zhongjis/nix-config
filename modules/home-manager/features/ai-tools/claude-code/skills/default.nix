@@ -1,5 +1,4 @@
 {
-  inputs,
   lib,
   aiProfileHelpers,
   ...
@@ -16,8 +15,6 @@
   in
     skills;
 
-  impeccableClaudeSkills = discoverSkills (inputs.impeccable + "/.claude/skills");
-
   # Discover Claude Code-only skills from subdirectories
   localGeneralSkills = discoverSkills ./general;
   localWorkSkills = discoverSkills ./work;
@@ -30,5 +27,5 @@
     // lib.optionalAttrs aiProfileHelpers.isPersonal localPersonalSkills;
 in {
   # Export filtered local skills via _module.args for use in parent module
-  _module.args.claudeCodeLocalSkills = impeccableClaudeSkills // filteredLocalSkills;
+  _module.args.claudeCodeLocalSkills = filteredLocalSkills;
 }

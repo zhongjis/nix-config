@@ -2,6 +2,7 @@
   inputs,
   pkgs,
   commonSkills,
+  impeccableSkills,
   commonInstructions,
   ...
 }: let
@@ -54,10 +55,11 @@ in {
   programs.codex = {
     enable = true;
     enableMcpIntegration = true;
+    impeccable.enable = true;
     # package = llmAgentsPackages.codex;
     context = codexContext;
     rules = {};
     settings = codexSettings;
-    skills = commonSkills;
+    skills = commonSkills // impeccableSkills.codex;
   };
 }

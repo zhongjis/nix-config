@@ -3,6 +3,7 @@
   pkgs,
   lib,
   commonSkills,
+  impeccableSkills,
   claudeCodeLocalSkills,
   commonInstructions,
   ...
@@ -12,7 +13,7 @@
 
   # Merge pre-filtered common skills and Claude Code-specific skills (from ./skills)
   # Both are already profile-filtered via _module.args
-  allSkills = commonSkills // claudeCodeLocalSkills;
+  allSkills = commonSkills // impeccableSkills.claudeCode // claudeCodeLocalSkills;
 
   # Convert commonInstructions (list of paths) to an attrset for `rules`
   # e.g. /nix/store/...-nix-environment.md → { "nix-environment" = /nix/store/...; }
@@ -40,6 +41,7 @@ in {
       then false
       else true;
     package = llmAgentsPackages.claude-code;
+    impeccable.enable = true;
     skills = allSkills;
 
     # Use rules instead of settings.instructions so settings.json is not managed by HM
