@@ -62,8 +62,11 @@ in {
   ];
 
   programs."oh-my-pi" = {
-    enable = true;
-    package = llmAgentsPackages.omp;
+    enable = false;
+    package =
+      if pkgs.stdenv.isDarwin
+      then null
+      else llmAgentsPackages.omp;
 
     impeccable.enable = true;
 
