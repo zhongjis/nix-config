@@ -6,6 +6,8 @@
   programs.git = {
     enable = true;
 
+    signing.format = "openpgp";
+
     # configure username and email in home.nix
     settings = {
       user = {
