@@ -13,6 +13,7 @@
     else null;
 
   opencodeRtkCfg = config.programs.opencode.rtk;
+  codexRtkCfg = config.programs.codex.rtk;
   ompRtkCfg = config.programs."oh-my-pi".rtk;
   piRtkCfg = config.programs.pi.rtk;
 
@@ -26,6 +27,17 @@
 in {
   options.programs.opencode.rtk.enable =
     lib.mkEnableOption "RTK integration for OpenCode";
+
+  options.programs.codex.rtk = {
+    enable = lib.mkEnableOption "RTK runtime package for Codex";
+
+    package = lib.mkOption {
+      type = lib.types.nullOr lib.types.package;
+      default = defaultRtkPackage;
+      defaultText = lib.literalExpression "inputs.llm-agents.packages.\${pkgs.stdenv.hostPlatform.system}.rtk";
+      description = "RTK runtime package installed when programs.codex.rtk.enable is true.";
+    };
+  };
 
   options.programs."oh-my-pi".rtk = {
     enable = lib.mkEnableOption "RTK integration for Oh My Pi";
@@ -67,6 +79,13 @@ in {
     {
       assertions = [
         {
+          assertion = !codexRtkCfg.enable || codexRtkCfg.package != null;
+          message = ''
+            programs.codex.rtk.package must be set when programs.codex.rtk.enable is true.
+            If you import this module outside this flake, pass the package explicitly or provide inputs.llm-agents.
+          '';
+        }
+        {
           assertion = !ompRtkCfg.enable || ompRtkCfg.package != null;
           message = ''
             programs."oh-my-pi".rtk.package must be set when programs."oh-my-pi".rtk.enable is true.
@@ -86,6 +105,9 @@ in {
       home.packages = [defaultRtkPackage];
       xdg.configFile."opencode/plugins/rtk.ts".source =
         rtkPluginSrc + "/hooks/opencode/rtk.ts";
+    })
+    (lib.mkIf codexRtkCfg.enable {
+      home.packages = [codexRtkCfg.package];
     })
     (lib.mkIf ompRtkCfg.enable {
       home.packages = [ompRtkCfg.package];
