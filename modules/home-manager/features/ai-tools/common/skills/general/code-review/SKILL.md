@@ -94,15 +94,9 @@ gh pr review <number> --approve --body "..."
 
 # Request changes
 gh pr review <number> --request-changes --body "..."
-
-# Inline comment on a specific file and line
-gh api repos/{owner}/{repo}/pulls/{number}/comments \
-  -f body="**[MAJOR]** Issue description..." \
-  -f commit_id="$(gh pr view <number> --json headRefOid -q .headRefOid)" \
-  -f path="src/file.ts" \
-  -F line=42 \
-  -f side="RIGHT"
 ```
+
+For inline line-level comments, see **Inline Comment (PR Mode)** under Output Templates.
 
 ---
 
@@ -126,16 +120,16 @@ gh api repos/{owner}/{repo}/pulls/{number}/comments \
 
 ### Phase 3: Line-by-Line Analysis (10-20 min)
 
-| Dimension | What to Look For |
-|-----------|-----------------|
-| Correctness | Logic errors, off-by-one, null/undefined handling, edge cases, boundary conditions |
-| Security | Input validation, injection points (SQL, XSS, command), auth/authz gaps, secrets exposure, OWASP top 10 |
-| Performance | N+1 queries, heavy allocations in loops, algorithm complexity, resource leaks, missing pagination |
-| Concurrency | Race conditions, deadlocks, unsafe shared mutable state, missing locks/atomic operations |
-| Error Handling | Swallowed exceptions, missing error context, improper error propagation, empty catch blocks |
-| Testing | Coverage of new logic, edge case tests, test quality (meaningful assertions, not just existence) |
-| Observability | Logging for debugging, metrics for monitoring, tracing for distributed systems |
-| Code Quality | Naming clarity, function length/complexity, DRY violations, single responsibility |
+| Dimension      | What to Look For                                                                                        |
+| -------------- | ------------------------------------------------------------------------------------------------------- |
+| Correctness    | Logic errors, off-by-one, null/undefined handling, edge cases, boundary conditions                      |
+| Security       | Input validation, injection points (SQL, XSS, command), auth/authz gaps, secrets exposure, OWASP top 10 |
+| Performance    | N+1 queries, heavy allocations in loops, algorithm complexity, resource leaks, missing pagination       |
+| Concurrency    | Race conditions, deadlocks, unsafe shared mutable state, missing locks/atomic operations                |
+| Error Handling | Swallowed exceptions, missing error context, improper error propagation, empty catch blocks             |
+| Testing        | Coverage of new logic, edge case tests, test quality (meaningful assertions, not just existence)        |
+| Observability  | Logging for debugging, metrics for monitoring, tracing for distributed systems                          |
+| Code Quality   | Naming clarity, function length/complexity, DRY violations, single responsibility                       |
 
 ### Phase 4: Summary and Verdict (2-3 min)
 
@@ -148,13 +142,13 @@ gh api repos/{owner}/{repo}/pulls/{number}/comments \
 
 ## Severity System
 
-| Tag | Meaning | Action Required |
-|-----|---------|-----------------|
-| `[BLOCKER]` | Security vulnerability, data loss risk, crash, correctness bug | Must fix before merge |
-| `[MAJOR]` | Logic error, missing edge case, architectural violation, missing tests | Must fix or justify |
-| `[SUGGESTION]` | Refactoring opportunity, readability improvement, optimization | Recommended, not blocking |
-| `[NIT]` | Style, naming preference, trivial formatting | Optional, author's call |
-| `[KUDOS]` | Exemplary code, clever solution, good pattern usage | No action — recognition |
+| Tag            | Meaning                                                                | Action Required           |
+| -------------- | ---------------------------------------------------------------------- | ------------------------- |
+| `[BLOCKER]`    | Security vulnerability, data loss risk, crash, correctness bug         | Must fix before merge     |
+| `[MAJOR]`      | Logic error, missing edge case, architectural violation, missing tests | Must fix or justify       |
+| `[SUGGESTION]` | Refactoring opportunity, readability improvement, optimization         | Recommended, not blocking |
+| `[NIT]`        | Style, naming preference, trivial formatting                           | Optional, author's call   |
+| `[KUDOS]`      | Exemplary code, clever solution, good pattern usage                    | No action — recognition   |
 
 ---
 
@@ -181,15 +175,16 @@ gh api repos/{owner}/{repo}/pulls/{number}/comments \
 
 Rate overall review confidence on a 1-5 scale.
 
-| Score | Meaning |
-|-------|---------|
-| 5/5 | Trivial or perfectly understood change, full context |
-| 4/5 | Well-understood change, minor areas of uncertainty |
-| 3/5 | Moderate complexity, some logic paths or side effects unclear |
-| 2/5 | Complex change, significant uncertainty or domain unfamiliarity |
-| 1/5 | Very complex, likely issues missed |
+| Score | Meaning                                                         |
+| ----- | --------------------------------------------------------------- |
+| 5/5   | Trivial or perfectly understood change, full context            |
+| 4/5   | Well-understood change, minor areas of uncertainty              |
+| 3/5   | Moderate complexity, some logic paths or side effects unclear   |
+| 2/5   | Complex change, significant uncertainty or domain unfamiliarity |
+| 1/5   | Very complex, likely issues missed                              |
 
 **Adjustment rules** — subtract 1 for each that applies:
+
 - Database migrations or schema changes
 - Authentication or security-sensitive logic
 - Complex concurrency or lock management
@@ -216,6 +211,7 @@ Include in the review summary when the PR touches multiple files with varying co
 ### Python
 
 Bad — no types, no resource management, no error handling:
+
 ```python
 def get_user_data(id):
     f = open("data.json")
@@ -224,6 +220,7 @@ def get_user_data(id):
 ```
 
 Good — typed, safe resource management, defensive:
+
 ```python
 def get_user_data(user_id: str) -> dict:
     try:
@@ -236,6 +233,7 @@ def get_user_data(user_id: str) -> dict:
 ```
 
 Key patterns to check:
+
 - Type hints on function signatures and return types
 - Context managers (`with`) for file/resource handling
 - List comprehensions over loop-and-append
@@ -244,25 +242,34 @@ Key patterns to check:
 ### TypeScript
 
 Bad — `any` types, no error handling:
+
 ```typescript
 async function update(data: any) {
-  const result = await api.post('/update', data);
+  const result = await api.post("/update", data);
   return result.data;
 }
 ```
 
 Good — typed interface, proper error handling:
+
 ```typescript
-interface UpdatePayload { name: string; value: number; }
-interface UpdateResponse { success: boolean; id: string; }
+interface UpdatePayload {
+  name: string;
+  value: number;
+}
+interface UpdateResponse {
+  success: boolean;
+  id: string;
+}
 
 async function update(data: UpdatePayload): Promise<UpdateResponse> {
-  const response = await api.post<UpdateResponse>('/update', data);
+  const response = await api.post<UpdateResponse>("/update", data);
   return response.data;
 }
 ```
 
 Key patterns to check:
+
 - Strict null checks and proper type narrowing (no `as any`)
 - Typed error handling (not `catch(e: any)`)
 - Async/await with proper cleanup (AbortController for cancellation)
@@ -271,10 +278,12 @@ Key patterns to check:
 ### General (Any Language)
 
 **N+1 Query Detection:**
+
 - Bad: `SELECT * FROM posts WHERE user_id = ?` inside a user loop
 - Good: `SELECT * FROM posts WHERE user_id IN (?)` before the loop with eager loading
 
 **Security:**
+
 - XSS: Use `textContent` over `innerHTML` for user-provided strings
 - SQL Injection: Always use parameterized queries; never concatenate user input into SQL
 - Auth: Verify authentication AND authorization on every protected endpoint
@@ -283,11 +292,25 @@ Key patterns to check:
 
 ## Output Templates
 
+### Inline vs Summary Strategy
+
+Use **inline comments** for findings tied to a specific file and line — these are the most actionable because the author sees the issue exactly where it lives in the diff.
+Use the **summary comment** for the overall verdict, architectural concerns that span multiple files, and any findings you couldn't pin to a single line.
+
+| Finding type | Where to post |
+| --- | --- |
+| BLOCKER / MAJOR with a clear file:line | Inline comment via `gh api` |
+| Architectural / cross-cutting concern | Summary comment |
+| Overall verdict + strengths | Summary comment |
+| SUGGESTION / NIT on a specific line | Inline comment (keep brief) |
+
+Avoid flooding the PR with 20+ inline comments — group related nits into the summary. Inline comments should each stand alone and be actionable without reading the full summary.
+
 ### Review Summary
 
 Use this template for both local and PR reviews:
 
-```markdown
+````markdown
 ## Code Review Summary
 
 **Scope**: [Brief description of the changes]
@@ -296,52 +319,79 @@ Use this template for both local and PR reviews:
 
 ### Findings
 
-| # | Severity | File | Description |
-|---|----------|------|-------------|
-| 1 | [BLOCKER] | path/to/file.ts:42 | Brief description |
-| 2 | [MAJOR] | path/to/other.py:15 | Brief description |
-| 3 | [SUGGESTION] | path/to/lib.rs:88 | Brief description |
+| #   | Severity     | File                | Description       |
+| --- | ------------ | ------------------- | ----------------- |
+| 1   | [BLOCKER]    | path/to/file.ts:42  | Brief description |
+| 2   | [MAJOR]      | path/to/other.py:15 | Brief description |
+| 3   | [SUGGESTION] | path/to/lib.rs:88   | Brief description |
 
 ### Details
 
-#### 1. [BLOCKER] Brief title — path/to/file.ts:42
+<details>
+<summary><strong>1. [BLOCKER] Brief title — path/to/file.ts:42</strong></summary>
+
 **Issue**: Description of the problem.
 **Why it matters**: Impact explanation (security risk, data loss, crash).
 **Suggestion**:
-    ```typescript
+`typescript
     // proposed fix
-    ```
+    `
 **Test to add**: Description of a test case that would catch this.
+
+</details>
+
+<details>
+<summary><strong>2. [MAJOR] Brief title — path/to/other.py:15</strong></summary>
+
+**Issue**: ...
+**Why it matters**: ...
+**Suggestion**: ...
+
+</details>
 
 ### File-Level Confidence
 
-| File | Confidence | Notes |
-|------|------------|-------|
-| path/to/file.ts | 3/5 | Complex auth logic |
-| path/to/other.py | 5/5 | Simple utility change |
+| File             | Confidence | Notes                 |
+| ---------------- | ---------- | --------------------- |
+| path/to/file.ts  | 3/5        | Complex auth logic    |
+| path/to/other.py | 5/5        | Simple utility change |
 
 ### Strengths
+
 - [Thing done well]
 - [Another positive observation]
 
 ### Verdict: APPROVE | REQUEST_CHANGES | COMMENT
+
 [Brief justification for the verdict]
+````
+
+### Inline Comment (PR Mode)
+
+Post line-specific findings via `gh api`. Each comment should be self-contained — the author reads it in the diff without needing context from the summary.
+
+```bash
+# Inline comment on a specific file and line
+gh api repos/{owner}/{repo}/pulls/{number}/comments \
+  -f body="**[SEVERITY]** Brief title\n\n**Issue**: What's wrong here.\n**Why it matters**: Impact.\n**Suggestion**:\n\`\`\`lang\n// code fix\n\`\`\`" \
+  -f commit_id="$(gh pr view <number> --json headRefOid -q .headRefOid)" \
+  -f path="src/file.ts" \
+  -F line=42 \
+  -f side="RIGHT"
 ```
 
-### Per-File Comment (PR Mode)
+Inline comment body template:
 
-For inline comments posted via `gh api`:
-
-```markdown
+````markdown
 **[SEVERITY]** Brief title
 
 **Issue**: What's wrong on this line.
 **Why it matters**: Why this needs to change.
 **Suggestion**:
-    ```
-    // code fix
-    ```
+```lang
+// code fix
 ```
+````
 
 Before posting, verify this comment is net-new relative to existing PR comments and replies. If the same issue is already present, extend that thread instead of creating another top-level comment.
 
@@ -350,6 +400,7 @@ Before posting, verify this comment is net-new relative to existing PR comments 
 ## Guidelines
 
 **DO:**
+
 - Understand context and purpose before reading code
 - Provide specific, actionable feedback with code examples
 - Explain WHY something is an issue, not just WHAT
@@ -361,6 +412,7 @@ Before posting, verify this comment is net-new relative to existing PR comments 
 - Check existing PR comments first and avoid repeating points already made by others
 
 **DON'T:**
+
 - Rubber-stamp with "LGTM" without real inspection
 - Block merges over style preferences or personal taste
 - Use condescending, sarcastic, or hostile language

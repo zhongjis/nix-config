@@ -126,14 +126,30 @@ When the branch name is ambiguous (e.g., could contain `/`), clone with the defa
 
 **All skill fetching uses `git clone` to `/tmp`.** This ensures exact content fidelity and avoids token-expensive file writes.
 
-### Step 1: Clone
+### Step 1: Clone (with reuse check)
+
+Before cloning, check if the repo already exists in `/tmp`. Reuse it if the remote matches; refresh it if it does; only remove it when the remote differs.
 
 ```bash
-# Clean up any previous clone
-rm -rf /tmp/{repo}
+CLONE_DIR="/tmp/{repo}"
+WANT_REMOTE="https://github.com/{owner}/{repo}.git"
 
-# Shallow clone the specific branch
-git clone --depth 1 -b {branch} https://github.com/{owner}/{repo}.git /tmp/{repo}
+if [ -d "$CLONE_DIR/.git" ]; then
+  ACTUAL_REMOTE=$(git -C "$CLONE_DIR" remote get-url origin 2>/dev/null)
+  if [ "$ACTUAL_REMOTE" = "$WANT_REMOTE" ]; then
+    # Same repo — fetch latest commits for the target branch
+    git -C "$CLONE_DIR" fetch --depth 1 origin {branch}
+    git -C "$CLONE_DIR" checkout FETCH_HEAD
+  else
+    # Different remote occupying the same directory name — remove and re-clone
+    echo "Remote mismatch ($ACTUAL_REMOTE), removing and re-cloning"
+    rm -rf "$CLONE_DIR"
+    git clone --depth 1 -b {branch} "$WANT_REMOTE" "$CLONE_DIR"
+  fi
+else
+  # No existing clone — fresh clone
+  git clone --depth 1 -b {branch} "$WANT_REMOTE" "$CLONE_DIR"
+fi
 ```
 
 ### Step 2: Locate the Skill
