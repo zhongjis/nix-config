@@ -58,7 +58,7 @@ in {
     # package = llmAgentsPackages.codex;
     context = codexContext;
     rules = {};
-    settings = codexSettings;
+    # settings = codexSettings;
     skills = commonSkills;
   };
 }
