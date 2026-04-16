@@ -7,8 +7,6 @@
     ../../shared/stylix_common.nix
   ];
 
-  gtk.gtk4.theme = config.gtk.theme;
-
   stylix.targets = {
     waybar.enable = false;
     # neovim.enable = false;
