@@ -229,3 +229,5 @@ Summary table of all reviewed threads:
 | 2   | test.py:100 | Incorrect mock           | Fixed     | Fixed                               |
 | 3   | utils.py:50 | Suggested refactor       | Disagreed | Not changing - not needed per YAGNI |
 | 4   | api.py:88   | Broader redesign request | Left open | Needs user decision on scope        |
+
+ALWAYS output the final summary first, then ask for user permission
