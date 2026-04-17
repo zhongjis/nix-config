@@ -46,7 +46,7 @@
 
   workOverrides = {
     defaultProvider = "anthropic";
-    defaultModel = "claude-sonnet-4-6";
+    defaultModel = "claude-opus-4-6";
   };
 
   personalOverrides = {
