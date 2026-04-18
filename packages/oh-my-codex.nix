@@ -3,13 +3,13 @@
   lib,
 }:
 let
-  version = "0.12.6";
+  version = "0.13.2";
 
   src = pkgs.fetchFromGitHub {
     owner = "Yeachan-Heo";
     repo = "oh-my-codex";
     rev = "v${version}";
-    hash = "sha256-Q2Z8aITmEg+yNoRxCMMAie9nuZmLUXVhqc7Tea7zV9w=";
+    hash = "sha256-TdLFlGj+sCwoBXgPLQ8xCc+mBHdSdz5T3kPajEUIK7I=";
   };
 
   # Rust-native helper binaries shipped alongside the Node.js CLI.
@@ -31,7 +31,7 @@ pkgs.buildNpmPackage rec {
   pname = "oh-my-codex";
   inherit version src;
 
-  npmDepsHash = "sha256-HgrC4uLtZ38x6myCu8AbrghrZi4aXod0A6/b19GZ4ro=";
+  npmDepsHash = "sha256-zBcay5NgEnpnCZd7+KUQFnuPBUo2QZxvPLEMIsgb+F4=";
 
   nativeBuildInputs = [pkgs.makeWrapper];
 

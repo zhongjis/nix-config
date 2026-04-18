@@ -28,7 +28,7 @@
       baseDelayMs = 2000;
       maxDelayMs = 60000;
     };
-    lastChangelogVersion = "0.67.3";
+    lastChangelogVersion = "0.67.6";
     npmCommand = ["bash" "${config.home.homeDirectory}/.pi/agent/scripts/pi-package-npm.sh"];
     packages = [
       "git:github.com/nicobailon/pi-mcp-adapter@v2.2.2"
