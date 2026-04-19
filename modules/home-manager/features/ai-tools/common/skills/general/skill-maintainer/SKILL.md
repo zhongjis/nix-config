@@ -124,39 +124,28 @@ When the branch name is ambiguous (e.g., could contain `/`), clone with the defa
 
 ## Clone-to-/tmp Workflow
 
-**All skill fetching uses `git clone` to `/tmp`.** This ensures exact content fidelity and avoids token-expensive file writes.
+**All skill fetching uses `git clone` into an isolated temp dir under `/tmp`.** This preserves exact upstream content, avoids shared `/tmp/{repo}` collisions, and keeps cleanup scoped to current run.
 
-### Step 1: Clone (with reuse check)
+### Step 1: Clone
 
-Before cloning, check if the repo already exists in `/tmp`. Reuse it if the remote matches; refresh it if it does; only remove it when the remote differs.
+> Prefer one shell/session for clone → compare/copy → cleanup so the trap always runs.
 
 ```bash
-CLONE_DIR="/tmp/{repo}"
 WANT_REMOTE="https://github.com/{owner}/{repo}.git"
+CLONE_DIR=$(mktemp -d "/tmp/skill-maintainer-{repo}.XXXXXX")
+cleanup() { rm -rf "$CLONE_DIR"; }
+trap cleanup EXIT
 
-if [ -d "$CLONE_DIR/.git" ]; then
-  ACTUAL_REMOTE=$(git -C "$CLONE_DIR" remote get-url origin 2>/dev/null)
-  if [ "$ACTUAL_REMOTE" = "$WANT_REMOTE" ]; then
-    # Same repo — fetch latest commits for the target branch
-    git -C "$CLONE_DIR" fetch --depth 1 origin {branch}
-    git -C "$CLONE_DIR" checkout FETCH_HEAD
-  else
-    # Different remote occupying the same directory name — remove and re-clone
-    echo "Remote mismatch ($ACTUAL_REMOTE), removing and re-cloning"
-    rm -rf "$CLONE_DIR"
-    git clone --depth 1 -b {branch} "$WANT_REMOTE" "$CLONE_DIR"
-  fi
-else
-  # No existing clone — fresh clone
-  git clone --depth 1 -b {branch} "$WANT_REMOTE" "$CLONE_DIR"
-fi
+git clone --depth 1 -b {branch} "$WANT_REMOTE" "$CLONE_DIR"
 ```
+
+If you must switch shells mid-workflow, remove the temp dir you created when finished. Do not delete a shared `/tmp/{repo}` path by default.
 
 ### Step 2: Locate the Skill
 
 ```bash
 # Verify the skill exists at the parsed path
-ls /tmp/{repo}/{path/to/skill}/
+ls "$CLONE_DIR/{path/to/skill}/"
 ```
 
 The skill directory should contain at minimum a `SKILL.md`. It may also contain supporting files (scripts/, references/, assets/, etc.).
@@ -165,18 +154,14 @@ The skill directory should contain at minimum a `SKILL.md`. It may also contain 
 
 ```bash
 # Copy the entire skill directory to the user's chosen install target
-cp -r /tmp/{repo}/{path/to/skill} {target-location}/{skill-name}
+cp -r "$CLONE_DIR/{path/to/skill}" {target-location}/{skill-name}
 ```
 
 Where `{target-location}` is the path chosen by the user during Install Target Selection.
 
 ### Step 4: Clean Up
 
-```bash
-rm -rf /tmp/{repo}
-```
-
-**Always clean up after copying.** Do not leave cloned repos in `/tmp`.
+Cleanup should happen automatically via the `trap` above. Only run a manual `rm -rf "$CLONE_DIR"` as a fallback when the workflow could not stay in one shell/session.
 
 ## Adding New Skills from Upstream
 
@@ -209,17 +194,17 @@ grep -r '^upstream:' {skills-directory} --include="SKILL.md"
 For each skill (or batch of skills from the same repo):
 
 1. **Parse the `upstream` URL** to extract clone URL, branch, and skill path
-2. **Clone the repo** to `/tmp` using the Clone-to-/tmp Workflow
+2. **Clone the repo** to an isolated temp dir under `/tmp` using the Clone-to-/tmp Workflow
 3. **Compare** the upstream version with the local version:
 
 ```bash
-diff /tmp/{repo}/{path/to/skill}/SKILL.md {local-skill-dir}/SKILL.md
+diff "$CLONE_DIR/{path/to/skill}/SKILL.md" {local-skill-dir}/SKILL.md
 ```
 
 Also check for new or removed supporting files:
 
 ```bash
-diff -rq /tmp/{repo}/{path/to/skill}/ {local-skill-dir}/
+diff -rq "$CLONE_DIR/{path/to/skill}/" {local-skill-dir}/
 ```
 
 ### Step 3: Categorize Changes
@@ -239,15 +224,15 @@ For skills that need updating:
 
 For surgical updates where only specific sections changed, prefer using `edit` to apply targeted changes from the diff rather than overwriting the entire file. This preserves local customizations without needing to re-apply them.
 
-### Step 5: Clean Up and Verify
+### Step 5: Verify
+
+If in a Nix config repo, verify the flake:
 
 ```bash
-# Remove the clone
-rm -rf /tmp/{repo}
-
-# If in a Nix config repo, verify the flake
 nix flake check --no-build
 ```
+
+Cleanup should already be handled by the temp-dir `trap` from the clone step; only remove `"$CLONE_DIR"` manually if you had to continue in a different shell/session.
 
 ## Genericize (MANDATORY)
 
