@@ -35,6 +35,7 @@
       "git:github.com/samfoy/pi-lsp-extension"
       "git:github.com/RimuruW/pi-hashline-edit"
       "git:github.com/aliou/pi-guardrails"
+      "git:github.com/fluxgear/pi-thinking-steps"
       {
         source = "git:github.com/backnotprop/plannotator";
         extensions = ["apps/pi-extension"];
