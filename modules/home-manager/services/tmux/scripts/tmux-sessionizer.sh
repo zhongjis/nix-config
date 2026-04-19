@@ -2,7 +2,7 @@
 # File: tmux-sessionizer
 
 # Default paths if SESSIONIZER_PATHS is not set
-DEFAULT_PATHS="$HOME/.config $HOME/personal $HOME/work"
+DEFAULT_PATHS="$HOME/.config $HOME/personal $HOME/work $HOME/Documents"
 
 if [[ $# -eq 1 ]]; then
   selected="$1"
