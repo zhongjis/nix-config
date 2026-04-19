@@ -9,6 +9,7 @@ in {
   ];
   myHomeManager.aiProfile = "personal";
   myHomeManager.bundles.general.enable = true;
+  myHomeManager.obsidian.enable = true;
   myHomeManager.hyprland.monitors = {
     "desc:BOE 0x0BC9" = {
       width = 2560;

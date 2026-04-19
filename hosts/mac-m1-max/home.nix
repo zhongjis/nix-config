@@ -22,6 +22,7 @@
     darwin.enable = true;
   };
   myHomeManager.aiProfile = "work";
+  myHomeManager.obsidian.enable = true;
 
   home.username = "zshen";
   home.homeDirectory = lib.mkForce "/Users/zshen";
