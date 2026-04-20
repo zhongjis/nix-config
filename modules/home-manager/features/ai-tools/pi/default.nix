@@ -36,6 +36,7 @@
       "git:github.com/RimuruW/pi-hashline-edit"
       "git:github.com/aliou/pi-guardrails"
       "git:github.com/fluxgear/pi-thinking-steps"
+      "git:github.com/davebcn87/pi-autoresearch"
       {
         source = "git:github.com/backnotprop/plannotator";
         extensions = ["apps/pi-extension"];
