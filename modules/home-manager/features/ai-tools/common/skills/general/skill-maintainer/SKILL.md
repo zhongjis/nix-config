@@ -122,24 +122,34 @@ https://github.com/{owner}/{repo}/tree/{branch}/{path/to/skill}
 
 When the branch name is ambiguous (e.g., could contain `/`), clone with the default branch first. If the skill path doesn't exist in the clone, re-clone with `-b {branch-guess}` using longer segments.
 
-## Clone-to-/tmp Workflow
+## Reusable /tmp Repo Workflow
 
-**All skill fetching uses `git clone` into an isolated temp dir under `/tmp`.** This preserves exact upstream content, avoids shared `/tmp/{repo}` collisions, and keeps cleanup scoped to current run.
+**All skill fetching uses a repo-specific temp clone under `/tmp`, not a fresh delete-and-reclone cycle each time.** Reuse the existing path when it already points at the wanted remote. Only remove the path when it exists but is not the repo you need.
 
-### Step 1: Clone
+### Step 1: Prepare Repo Cache
 
-> Prefer one shell/session for clone → compare/copy → cleanup so the trap always runs.
+> Reuse one repo-specific path per upstream repo, for example `/tmp/skill-maintainer-{owner}-{repo}`.
 
 ```bash
 WANT_REMOTE="https://github.com/{owner}/{repo}.git"
-CLONE_DIR=$(mktemp -d "/tmp/skill-maintainer-{repo}.XXXXXX")
-cleanup() { rm -rf "$CLONE_DIR"; }
-trap cleanup EXIT
+CLONE_DIR="/tmp/skill-maintainer-{owner}-{repo}"
 
-git clone --depth 1 -b {branch} "$WANT_REMOTE" "$CLONE_DIR"
+if [ -e "$CLONE_DIR" ]; then
+  HAVE_REMOTE=$(git -C "$CLONE_DIR" remote get-url origin 2>/dev/null || true)
+
+  if [ -n "$HAVE_REMOTE" ] && [ "$HAVE_REMOTE" = "$WANT_REMOTE" ]; then
+    git -C "$CLONE_DIR" fetch --depth 1 origin "{branch}"
+    git -C "$CLONE_DIR" checkout -B "{branch}" "origin/{branch}"
+  else
+    rm -rf -- "$CLONE_DIR"
+    git clone --depth 1 -b "{branch}" "$WANT_REMOTE" "$CLONE_DIR"
+  fi
+else
+  git clone --depth 1 -b "{branch}" "$WANT_REMOTE" "$CLONE_DIR"
+fi
 ```
 
-If you must switch shells mid-workflow, remove the temp dir you created when finished. Do not delete a shared `/tmp/{repo}` path by default.
+Before removing anything, confirm the path exists and confirm the remote does **not** match. Remove only the exact repo cache dir you checked. Never delete a shared or guessed `/tmp/{repo}` path.
 
 ### Step 2: Locate the Skill
 
@@ -161,15 +171,14 @@ Where `{target-location}` is the path chosen by the user during Install Target S
 
 ### Step 4: Clean Up
 
-Cleanup should happen automatically via the `trap` above. Only run a manual `rm -rf "$CLONE_DIR"` as a fallback when the workflow could not stay in one shell/session.
-
+Do **not** auto-delete a matching repo cache at the end of the run. Keep it for reuse. Only manually remove `"$CLONE_DIR"` when the path exists and you confirmed it is the wrong remote, is not a git repo, or the user explicitly asked to purge it.
 ## Adding New Skills from Upstream
 
 When adding a skill from an external source for the first time:
 
 1. **Detect context** and **ask the user** for the install target (see Context Detection and Install Target Selection above)
 2. **Parse the URL** to extract clone URL, branch, and skill path (see URL Parsing above)
-3. **Clone and copy** using the Clone-to-/tmp Workflow above
+3. **Prepare the repo cache and copy** using the Reusable /tmp Repo Workflow above
 4. **Fix the frontmatter** in the copied SKILL.md:
    - Add the `upstream` field set to the original GitHub tree URL (singular string)
    - If this skill adapts or merges content from a prior source, add `adaptedFrom` as a YAML list of informational lineage URLs — these are NOT synced automatically
@@ -194,7 +203,7 @@ grep -r '^upstream:' {skills-directory} --include="SKILL.md"
 For each skill (or batch of skills from the same repo):
 
 1. **Parse the `upstream` URL** to extract clone URL, branch, and skill path
-2. **Clone the repo** to an isolated temp dir under `/tmp` using the Clone-to-/tmp Workflow
+2. **Prepare or refresh the repo cache** under `/tmp` using the Reusable /tmp Repo Workflow
 3. **Compare** the upstream version with the local version:
 
 ```bash
@@ -232,7 +241,7 @@ If in a Nix config repo, verify the flake:
 nix flake check --no-build
 ```
 
-Cleanup should already be handled by the temp-dir `trap` from the clone step; only remove `"$CLONE_DIR"` manually if you had to continue in a different shell/session.
+Keep the matching temp repo cache for future runs. Only remove `"$CLONE_DIR"` manually when the path exists and you confirmed it points at the wrong remote, is not a usable git repo, or needs an explicit purge.
 
 ## Genericize (MANDATORY)
 

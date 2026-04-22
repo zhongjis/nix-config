@@ -126,3 +126,4 @@ This skill handles **discovery only**. For installing, updating, or maintaining 
 - Updating existing skills from their upstream sources
 - Provenance tracking via the `upstream` frontmatter field
 - Vendor-neutral genericization of skill content
+- Safer `/tmp` repo reuse: check whether the temp path exists, confirm the cached repo remote matches, refresh it when it does, remove it only when it points somewhere else
