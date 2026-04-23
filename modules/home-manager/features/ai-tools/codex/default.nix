@@ -48,7 +48,7 @@
   };
 in {
   home.packages = [
-    inputs.self.packages.${system}.oh-my-codex
+    llmAgentsPackages.oh-my-codex
   ];
 
   programs.codex = {

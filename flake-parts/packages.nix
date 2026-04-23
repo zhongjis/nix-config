@@ -17,10 +17,7 @@
           }).neovim;
       }
       // {
-        oh-my-codex = import ../packages/oh-my-codex.nix {
-          inherit pkgs;
-          lib = pkgs.lib;
-        };
+        oh-my-codex = inputs.llm-agents.packages.${system}.oh-my-codex;
         opencode-morph-fast-apply = import ../packages/opencode-morph-fast-apply.nix {
           inherit pkgs;
           lib = pkgs.lib;
