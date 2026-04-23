@@ -83,20 +83,51 @@ Build a quick list of issues other reviewers already raised. Treat those points 
 
 4. **Understand codebase**: Read files surrounding the changes. Use `rg` to find related usages of changed functions/variables across the repo.
 5. **Systematic review**: Follow the Review Process below.
-6. **Post results**:
+6. **Submit review to GitHub** — always post the review. Never just show it in conversation.
+
+Build a temporary JSON file containing the summary body, verdict event, and any inline comments, then submit it as a single atomic review. This ensures the summary appears in the Conversation tab and inline comments appear in the Files Changed tab, all grouped as one review.
 
 ```bash
-# Summary comment
-gh pr review <number> --comment --body "..."
+# 1. Determine owner/repo and head commit
+OWNER_REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+HEAD_OID=$(gh pr view <number> --json headRefOid -q .headRefOid)
 
-# Approve
-gh pr review <number> --approve --body "..."
+# 2. Build the review payload as a JSON file
+cat > /tmp/review.json << 'REVIEW_EOF'
+{
+  "body": "## Code Review Summary\n\n...",
+  "event": "COMMENT",
+  "comments": [
+    {
+      "path": "src/file.ts",
+      "line": 42,
+      "side": "RIGHT",
+      "body": "**[BLOCKER]** Brief title\n\n**Issue**: ...\n**Why it matters**: ...\n**Suggestion**:\n```lang\n// fix\n```"
+    }
+  ]
+}
+REVIEW_EOF
 
-# Request changes
-gh pr review <number> --request-changes --body "..."
+# 3. Submit the review (inline comments + summary in one call)
+gh api repos/${OWNER_REPO}/pulls/<number>/reviews --input /tmp/review.json
 ```
 
-For inline line-level comments, see **Inline Comment (PR Mode)** under Output Templates.
+Set `event` based on verdict:
+
+| Verdict | `event` value |
+| --- | --- |
+| Approve | `APPROVE` |
+| Request changes | `REQUEST_CHANGES` |
+| Comment only | `COMMENT` |
+
+The `comments` array contains inline comments that appear in the Files Changed tab. Each entry needs `path`, `line`, `side` (always `"RIGHT"` for new code), and `body`. Omit the `comments` array if no line-specific findings — the summary body still posts as a review comment.
+
+If the review has no inline findings at all (e.g., a simple approval), you can use the simpler CLI form instead:
+
+```bash
+gh pr review <number> --approve --body "..."
+gh pr review <number> --request-changes --body "..."
+```
 
 ---
 
@@ -294,17 +325,19 @@ Key patterns to check:
 
 ### Inline vs Summary Strategy
 
-Use **inline comments** for findings tied to a specific file and line — these are the most actionable because the author sees the issue exactly where it lives in the diff.
-Use the **summary comment** for the overall verdict, architectural concerns that span multiple files, and any findings you couldn't pin to a single line.
+The atomic review API (see PR Review pipeline step 6) handles both inline and summary comments in one call. When building the review JSON:
 
-| Finding type | Where to post |
+- **Inline comments** (`comments` array): Findings tied to a specific file and line — most actionable because the author sees the issue exactly where it lives in the diff.
+- **Summary body** (`body` field): Overall verdict, architectural concerns spanning files, findings not pinnable to a single line.
+
+| Finding type | Where it goes |
 | --- | --- |
-| BLOCKER / MAJOR with a clear file:line | Inline comment via `gh api` |
-| Architectural / cross-cutting concern | Summary comment |
-| Overall verdict + strengths | Summary comment |
-| SUGGESTION / NIT on a specific line | Inline comment (keep brief) |
+| BLOCKER / MAJOR with a clear file:line | `comments` array entry |
+| Architectural / cross-cutting concern | `body` summary |
+| Overall verdict + strengths | `body` summary |
+| SUGGESTION / NIT on a specific line | `comments` array entry (keep brief) |
 
-Avoid flooding the PR with 20+ inline comments — group related nits into the summary. Inline comments should each stand alone and be actionable without reading the full summary.
+Avoid 20+ inline comments — group related nits into the summary. Each inline comment should stand alone and be actionable without reading the full summary.
 
 ### Review Summary
 
@@ -319,16 +352,16 @@ Use this template for both local and PR reviews:
 
 ### Findings
 
-| #   | Severity     | File                | Description       |
+| Sev | Severity     | File                | Description       |
 | --- | ------------ | ------------------- | ----------------- |
-| 1   | [BLOCKER]    | path/to/file.ts:42  | Brief description |
-| 2   | [MAJOR]      | path/to/other.py:15 | Brief description |
-| 3   | [SUGGESTION] | path/to/lib.rs:88   | Brief description |
+| B1  | [BLOCKER]    | path/to/file.ts:42  | Brief description |
+| M1  | [MAJOR]      | path/to/other.py:15 | Brief description |
+| S1  | [SUGGESTION] | path/to/lib.rs:88   | Brief description |
 
 ### Details
 
 <details>
-<summary><strong>1. [BLOCKER] Brief title — path/to/file.ts:42</strong></summary>
+<summary><strong>B1. [BLOCKER] Brief title — path/to/file.ts:42</strong></summary>
 
 **Issue**: Description of the problem.
 **Why it matters**: Impact explanation (security risk, data loss, crash).
@@ -341,7 +374,7 @@ Use this template for both local and PR reviews:
 </details>
 
 <details>
-<summary><strong>2. [MAJOR] Brief title — path/to/other.py:15</strong></summary>
+<summary><strong>M1. [MAJOR] Brief title — path/to/other.py:15</strong></summary>
 
 **Issue**: ...
 **Why it matters**: ...
@@ -366,35 +399,14 @@ Use this template for both local and PR reviews:
 [Brief justification for the verdict]
 ````
 
-### Inline Comment (PR Mode)
+### GitHub Comment Formatting Rules
 
-Post line-specific findings via `gh api`. Each comment should be self-contained — the author reads it in the diff without needing context from the summary.
+When posting comments to GitHub (both inline and summary):
 
-```bash
-# Inline comment on a specific file and line
-gh api repos/{owner}/{repo}/pulls/{number}/comments \
-  -f body="**[SEVERITY]** Brief title\n\n**Issue**: What's wrong here.\n**Why it matters**: Impact.\n**Suggestion**:\n\`\`\`lang\n// code fix\n\`\`\`" \
-  -f commit_id="$(gh pr view <number> --json headRefOid -q .headRefOid)" \
-  -f path="src/file.ts" \
-  -F line=42 \
-  -f side="RIGHT"
-```
-
-Inline comment body template:
-
-````markdown
-**[SEVERITY]** Brief title
-
-**Issue**: What's wrong on this line.
-**Why it matters**: Why this needs to change.
-**Suggestion**:
-```lang
-// code fix
-```
-````
-
-Before posting, verify this comment is net-new relative to existing PR comments and replies. If the same issue is already present, extend that thread instead of creating another top-level comment.
-
+- **Never use `#N` notation** (e.g., `#1`, `#2`, `#3`) — GitHub auto-links these to issues/PRs, creating broken references. Use severity-prefixed IDs instead: `B1`, `M1`, `S1`, `N1` (for Blocker, Major, Suggestion, Nit).
+- **Never reference findings as "issue #1"** — write "finding B1" or just use the severity tag.
+- Keep inline comment bodies self-contained — the author reads them in the diff without needing context from the summary.
+- Before posting, verify each comment is net-new relative to existing PR discussion. If the same issue already exists, extend that thread instead of creating another top-level comment.
 ---
 
 ## Guidelines
