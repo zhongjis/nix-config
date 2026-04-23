@@ -44,6 +44,7 @@
       }
     ];
     permissionLevel = "high";
+    theme = "github-diff";
   };
 
   workOverrides = {
