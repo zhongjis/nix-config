@@ -55,7 +55,7 @@ in {
     enable = true;
     enableMcpIntegration = true;
     impeccable.enable = true;
-    # package = llmAgentsPackages.codex;
+    package = llmAgentsPackages.codex;
     context = codexContext;
     rules = {};
     # settings = codexSettings;
