@@ -22,10 +22,13 @@
     then preferredDir
     else fallbackSkillDir;
 
+  mkDefaultAttrs = attrs:
+    lib.mapAttrs (_: value: lib.mkDefault value) attrs;
+
   discoverImpeccableSkills = enabled: toolDir:
     if !enabled || !(inputs ? impeccable)
     then {}
-    else discoverSkills (resolveSkillDir toolDir);
+    else mkDefaultAttrs (discoverSkills (resolveSkillDir toolDir));
 
   codexCfg = config.programs.codex.impeccable;
   opencodeCfg = config.programs.opencode.impeccable;
@@ -67,19 +70,19 @@ in {
       ];
     }
     (lib.mkIf codexCfg.enable {
-      programs.codex.skills = lib.mkDefault (discoverImpeccableSkills true ".codex/skills");
+      programs.codex.skills = discoverImpeccableSkills true ".codex/skills";
     })
     (lib.mkIf opencodeCfg.enable {
-      programs.opencode.skills = lib.mkDefault (discoverImpeccableSkills true ".opencode/skills");
+      programs.opencode.skills = discoverImpeccableSkills true ".opencode/skills";
     })
     (lib.mkIf claudeCodeCfg.enable {
-      programs."claude-code".skills = lib.mkDefault (discoverImpeccableSkills true ".claude/skills");
+      programs."claude-code".skills = discoverImpeccableSkills true ".claude/skills";
     })
     (lib.mkIf piCfg.enable {
-      programs.pi.skills = lib.mkDefault (discoverImpeccableSkills true ".pi/skills");
+      programs.pi.skills = discoverImpeccableSkills true ".pi/skills";
     })
     (lib.mkIf ompCfg.enable {
-      programs."oh-my-pi".skills = lib.mkDefault (discoverImpeccableSkills true ".pi/skills");
+      programs."oh-my-pi".skills = discoverImpeccableSkills true ".pi/skills";
     })
   ];
 }

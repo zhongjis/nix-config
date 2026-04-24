@@ -1263,11 +1263,11 @@
     "impeccable": {
       "flake": false,
       "locked": {
-        "lastModified": 1775685441,
-        "narHash": "sha256-bUaVfF+4ilcazXnyLWa9nuqUINnH8WgElcTVFYodeTY=",
+        "lastModified": 1776993686,
+        "narHash": "sha256-z5Vm84h/noAmSYWPGVfeCk1/jpwiiOSmBPxGienmHng=",
         "owner": "pbakaus",
         "repo": "impeccable",
-        "rev": "e7afda2c5505a8893bc4d05267949b3197b4c00f",
+        "rev": "f5e82162c1c6e6bdc0cd29f287c4446b679b61a5",
         "type": "github"
       },
       "original": {
