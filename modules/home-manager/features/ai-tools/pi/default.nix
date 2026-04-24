@@ -54,7 +54,7 @@
 
   personalOverrides = {
     defaultProvider = "openai-codex";
-    defaultModel = "gpt-5.4";
+    defaultModel = "gpt-5.5";
   };
 
   piSettings = lib.recursiveUpdate sharedSettings (
