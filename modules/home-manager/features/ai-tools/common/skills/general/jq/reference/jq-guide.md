@@ -137,6 +137,51 @@ jq -r '.services | keys[]' docker-compose.json
 jq '.services.api.environment' docker-compose.json
 ```
 
+## "Inspect a JSONL or pi session log"
+
+JSONL = one JSON object per line. jq applies your filter to each line; avoid top-level `.[]` unless each line is an array.
+
+```bash
+# Count record types
+jq -r '.type' session.jsonl | sort | uniq -c
+
+# See keys for first few records (safe with set -o pipefail)
+jq -c 'limit(5; keys)' session.jsonl
+
+# User messages / requests (content can be null, string, or array)
+jq -r '
+  def text:
+    (.message.content // [])
+    | if type == "array" then map(.text? // empty) | join(" ")
+      else tostring
+      end;
+  select(.message.role == "user")
+  | [.timestamp, .id, text] | @tsv
+' session.jsonl
+
+# Failed toolResult records with tool name and error text
+jq -r '
+  def text:
+    (.message.content // [])
+    | if type == "array" then map(.text? // empty) | join(" ")
+      else tostring
+      end;
+  select(.message.role == "toolResult" and .message.isError)
+  | [.timestamp, .message.toolName, text] | @tsv
+' session.jsonl
+
+# Tool usage counts
+jq -r 'select(.message.role == "toolResult") | .message.toolName' session.jsonl | sort | uniq -c | sort -nr
+```
+
+For heterogeneous logs, never iterate maybe-null fields directly. Use `(.field // [])[]?`, `map(select(type == "string"))`, and convert arrays before string concatenation.
+
+When building task summaries with `jq -s`, keep arrays as arrays until final formatting: `paths: []`, `.paths += [$newPath]`, then `(.paths | unique | join(", "))`.
+
+Under `set -o pipefail`, avoid `jq ... | head`; `head` can close the pipe early and make jq fail with SIGPIPE. Prefer jq `limit(n; expr)` or let the downstream command consume all rows.
+
+With optional operators and defaults, keep `?` separate from `//`. Good: `(.message | keys? // [])`, `(.message.content | type? // "null")`. Bad: `keys?//[]`, `type?//null`.
+
 ---
 
 # Advanced Patterns (20% Use Cases)
