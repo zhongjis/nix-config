@@ -30,9 +30,6 @@ in
         system = "aarch64-darwin";
         darwin = true;
       };
-      "zshen@thinkpad-t480" = mkHome "thinkpad-t480" {
-        system = "x86_64-linux";
-      };
       "zshen@framework-16" = mkHome "framework-16" {
         system = "x86_64-linux";
       };
