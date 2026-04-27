@@ -31,14 +31,14 @@
     lastChangelogVersion = "0.70.0";
     npmCommand = ["bash" "${config.home.homeDirectory}/.pi/agent/scripts/pi-package-npm.sh"];
     packages = [
-      "git:github.com/nicobailon/pi-mcp-adapter@v2.2.2"
-      "git:github.com/samfoy/pi-lsp-extension"
-      "git:github.com/RimuruW/pi-hashline-edit"
-      "git:github.com/aliou/pi-guardrails"
-      "git:github.com/fluxgear/pi-thinking-steps"
-      "git:github.com/davebcn87/pi-autoresearch"
+      "git:github.com/nicobailon/pi-mcp-adapter@v2.5.1"
+      "git:github.com/samfoy/pi-lsp-extension@v1.0.0"
+      "git:github.com/RimuruW/pi-hashline-edit@v0.6.0"
+      "git:github.com/aliou/pi-guardrails@v0.11.0"
+      "git:github.com/fluxgear/pi-thinking-steps@v1.0.7"
+      "git:github.com/davebcn87/pi-autoresearch@v1.1.0"
       {
-        source = "git:github.com/backnotprop/plannotator";
+        source = "git:github.com/backnotprop/plannotator@0.19.1";
         extensions = ["apps/pi-extension"];
         skills = ["apps/pi-extension/skills"];
       }
