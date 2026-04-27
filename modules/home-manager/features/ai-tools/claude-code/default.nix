@@ -33,6 +33,10 @@ in {
     ./skills # Provides claudeCodeLocalSkills via _module.args (already filtered by profile)
   ];
 
+  home.packages = [
+    llmAgentsPackages.oh-my-claudecode
+  ];
+
   programs.claude-code = {
     enable = true;
     enableMcpIntegration =
