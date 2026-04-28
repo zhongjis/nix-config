@@ -63,7 +63,6 @@
     css.enable = true;
 
     # Tailwind CSS
-    tailwind.enable = true;
 
     # HTML
     html.enable = true;
@@ -72,12 +71,15 @@
     sql.enable = true;
 
     # TypeScript/JavaScript
-    ts = {
+    typescript = {
       enable = true;
       extensions.ts-error-translator.enable = true;
       format.type = ["prettierd"];
     };
   };
+
+  # Tailwind CSS
+  vim.lsp.presets.tailwindcss-language-server.enable = true;
 
   # Advanced LSP settings via Lua configuration
   # These settings are applied after LSP servers are attached
