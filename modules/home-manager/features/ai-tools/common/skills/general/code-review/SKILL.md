@@ -56,7 +56,8 @@ jj log -r 'all()' --limit 10
 1. Run `diff --stat` to understand the scope and distribution of changes.
 2. Examine the full diff to identify logic and structural changes.
 3. Check recent history to understand the context of current work.
-4. Proceed to the Review Process below.
+4. Gather codebase context using Phase 1.5 below (at minimum Layers 1-2).
+5. Proceed to the Review Process below.
 
 ### PR Review (gh CLI)
 
@@ -81,7 +82,7 @@ gh api repos/{owner}/{repo}/pulls/{number}/reviews --paginate
 
 Build a quick list of issues other reviewers already raised. Treat those points as already covered unless you have materially different evidence, a different root cause, or a more precise remediation.
 
-4. **Understand codebase**: Read files surrounding the changes. Use `rg` to find related usages of changed functions/variables across the repo.
+4. **Gather codebase context**: Expand understanding outward from the diff using the structured protocol in Phase 1.5 below. Depth depends on PR risk — at minimum, read full files and find callers of changed functions.
 5. **Systematic review**: Follow the Review Process below.
 6. **Submit review to GitHub** — always post the review. Never just show it in conversation.
 
@@ -140,6 +141,63 @@ gh pr review <number> --request-changes --body "..."
 - Map out which files changed and how they interact with the broader system.
 - Check for linked issues, related PRs, or migration dependencies.
 - Read existing PR comments and reviews before drafting feedback. Note which concerns are already raised, who raised them, and whether they are still unresolved.
+
+### Phase 1.5: Codebase Context Gathering
+
+Before evaluating architecture or correctness, build a working model of how the changed code fits into the system. Work outward from the diff in layers. Scale depth to PR risk.
+
+**Layer 1 — Full file read** (always)
+
+Read the COMPLETE file for every changed file, not just diff hunks. The diff alone hides surrounding invariants, sibling functions, and class structure that affect whether the change is correct.
+
+**Layer 2 — Direct dependents and dependencies** (always)
+
+For each changed file, identify:
+- What it imports (dependencies) — read key imported modules to understand the contracts the changed code relies on.
+- What imports it (dependents) — find with `rg "import.*from.*<module>"` or `rg "require.*<module>"` across the repo. These are the files that may break.
+
+For each changed function, class, type, or exported symbol:
+- Find all callers: `rg "<symbol>\b" --type <lang>` across the repo.
+- Check whether signature, return type, or behavioral changes break any caller.
+
+**Layer 3 — Data flow tracing** (when changes touch I/O, APIs, or user input)
+
+Trace data through the change end-to-end:
+- Where does input originate? (API endpoint, UI form, message queue, cron job)
+- What transformations or validations does it pass through?
+- Where does it end up? (DB write, rendered output, external API call, log)
+
+Read each file along the path, not just the changed ones. This catches missing validation, auth gaps, and injection points that live outside the diff.
+
+**Layer 4 — Convention sampling** (when changes introduce new patterns or touch unfamiliar areas)
+
+Find 2-3 existing files that do something similar:
+- `rg -l "<pattern>" --type <lang>` or browse sibling files in the same directory.
+- Compare error handling, naming, structure, logging, and test patterns.
+- Flag deviations from the dominant codebase convention.
+
+**Layer 5 — History and churn** (when changes touch complex or bug-prone areas)
+
+```bash
+# Recent change velocity — high churn = higher scrutiny
+git log --oneline -10 -- <changed_file>
+
+# When was this symbol last modified and why?
+git log --oneline --all -S "<changed_function>" -- <changed_file>
+
+# Who owns this area? (for context, not blame)
+git shortlog -sn --no-merges -- <changed_file>
+```
+
+**Depth control** — scale to risk:
+
+| PR Risk Level | Examples | Layers |
+| --- | --- | --- |
+| Trivial | Docs, config, formatting, typo fixes | 1 only |
+| Standard | Feature work, refactors, test additions | 1-2 |
+| Risky | Auth, payments, DB schema, public API, concurrency | 1-5 |
+
+When in doubt, do at least Layers 1-2. A review without caller analysis misses breaking changes.
 
 ### Phase 2: High-Level Architecture (5-10 min)
 
