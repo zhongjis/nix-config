@@ -13,7 +13,6 @@
 
   # Plugins available to all profiles
   generalPlugins = [
-    "oh-my-openagent@latest"
     "@simonwjackson/opencode-direnv@latest"
     "@tarquinen/opencode-dcp@latest"
     "opencode-pty@latest"

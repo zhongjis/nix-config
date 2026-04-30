@@ -3,7 +3,10 @@
   pkgs,
   commonInstructions,
   ...
-}: {
+}: let
+  system = pkgs.stdenv.hostPlatform.system;
+  llmAgentsPackages = inputs.llm-agents.packages.${system};
+in {
   imports = [
     ../common
     ./skills
@@ -13,6 +16,10 @@
     ./permission.nix
     ./provider.nix
     ./plugins
+  ];
+
+  home.packages = [
+    llmAgentsPackages.oh-my-opencode
   ];
 
   programs.opencode = {
