@@ -186,36 +186,75 @@ For thorough exploration — call graph tracing, multi-file analysis, architectu
 # 1. Check repo size BEFORE cloning (skip clone for repos >500MB)
 gh api repos/{owner}/{repo} --jq '.size'
 
-# 2. Clone shallow to /tmp
-gh repo clone owner/repo /tmp/agent-repos/owner-repo -- --depth 1
+# 2. Choose a deterministic cache path
+dest=/tmp/agent-repos/owner-repo
+mkdir -p /tmp/agent-repos
 
-# 3. Use full local search tooling on the clone
-#    (grep, glob, AST-grep, LSP — all available)
+# 3. If the path exists, inspect it first. Never rm first.
+if [ -d "$dest/.git" ]; then
+  actual_remote=$(git -C "$dest" remote get-url origin 2>/dev/null || true)
+  expected_remote="https://github.com/owner/repo.git"
 
-# 4. Cleanup when done (MANDATORY)
-rm -rf /tmp/agent-repos/owner-repo
+  if [ "$actual_remote" = "$expected_remote" ] || [ "$actual_remote" = "git@github.com:owner/repo.git" ]; then
+    if [ -n "$(git -C "$dest" status --short)" ]; then
+      echo "Existing clone has local changes; use a different destination."
+      exit 1
+    fi
+    git -C "$dest" pull --ff-only --depth 1
+  else
+    echo "Existing clone has different origin: $actual_remote"
+    echo "Use a different destination; remove only as last resort after manual confirmation."
+    exit 1
+  fi
+elif [ -e "$dest" ]; then
+  echo "Destination exists but is not a git repo: $dest"
+  echo "Inspect it; use a different destination unless you can prove it is disposable."
+  exit 1
+else
+  gh repo clone owner/repo "$dest" -- --depth 1
+fi
+
+# 4. Use full local search tooling on the clone
 ```
 
 **Size guard**: Check `gh api repos/{owner}/{repo} --jq '.size'` first. If size >500000 (KB, ~500MB), skip clone and use API-only. For very large repos, use sparse checkout:
 
 ```bash
-# Sparse clone for huge repos — only fetch relevant directories
-git clone --depth 1 --filter=blob:none --sparse \
-  https://github.com/owner/repo.git /tmp/agent-repos/owner-repo
-git -C /tmp/agent-repos/owner-repo sparse-checkout set src/relevant/path
+# Sparse clone for huge repos — only fetch relevant directories.
+# Same rule: if destination exists, inspect it first; never remove first.
+dest=/tmp/agent-repos/owner-repo-sparse
+expected_remote="https://github.com/owner/repo.git"
+if [ -d "$dest/.git" ]; then
+  actual_remote=$(git -C "$dest" remote get-url origin 2>/dev/null || true)
+  [ "$actual_remote" = "$expected_remote" ] || { echo "Different origin: $actual_remote"; exit 1; }
+elif [ -e "$dest" ]; then
+  echo "Destination exists but is not a git repo: $dest"; exit 1
+else
+  git clone --depth 1 --filter=blob:none --sparse \
+    https://github.com/owner/repo.git "$dest"
+fi
+git -C "$dest" sparse-checkout set src/relevant/path
 ```
 
-**Cache policy**: If the same repo was recently cloned to `/tmp/agent-repos/`, reuse it with a pull:
-```bash
-# Reuse existing clone
-git -C /tmp/agent-repos/owner-repo pull --ff-only 2>/dev/null || \
-  gh repo clone owner/repo /tmp/agent-repos/owner-repo -- --depth 1
-```
+**Existing destination policy**: Treat `/tmp/agent-repos/` as a reusable cache, not disposable scratch. Before cloning, always check whether the destination exists. If it exists, confirm it is a git repo and that `origin` matches the repo you intend to inspect. If it matches, reuse or refresh it. If it does not match, prefer a new destination name (for example `/tmp/agent-repos/owner-repo-2`) over deleting anything.
 
-**Cleanup policy**: Always clean up cloned repos after analysis. For long-running sessions, periodically remove stale clones:
+**Removal policy**: Do not clean up cloned repos automatically. `rm -rf` is a last resort, not a setup step and not routine cleanup. Only remove a path after all of these are true:
+
+1. You inspected the path and confirmed it is under `/tmp/agent-repos/`.
+2. You confirmed the remote and contents are not needed for the current task.
+3. You are not inside that directory and no process depends on it.
+4. Reusing it or choosing a different destination is worse than removal.
+
+If removal is truly necessary, make the guard explicit:
+
 ```bash
-# Remove clones older than 60 minutes
-find /tmp/agent-repos -maxdepth 1 -mmin +60 -type d -exec rm -rf {} +
+dest=/tmp/agent-repos/owner-repo
+case "$dest" in
+  /tmp/agent-repos/*) ;;
+  *) echo "Refusing to remove outside /tmp/agent-repos: $dest"; exit 1 ;;
+esac
+git -C "$dest" remote -v 2>/dev/null || true
+rm -rf -- "$dest"
 ```
 
 **Fallback**: If clone fails (auth, network, repo too large), fall back to Tier 1 (API search via `gh search code` + `gh api`).
@@ -235,12 +274,13 @@ gh search repos "topic" --language typescript --sort stars --limit 10
 gh search code "pattern" --repo owner/top-repo --language typescript
 
 # 4. Clone top 2-3 repos to /tmp for deep analysis (Tier 2)
-gh repo clone owner/top-repo /tmp/agent-repos/owner-top-repo -- --depth 1
+dest=/tmp/agent-repos/owner-top-repo
+# Repeat the Tier 2 safe clone flow for each repo: if $dest exists, verify origin first; do not remove first.
+# Then use: gh repo clone owner/top-repo "$dest" -- --depth 1
 
 # 5. Full local tooling on each clone
 # 6. Compare approaches, synthesize findings
-# 7. Cleanup all clones when done
-rm -rf /tmp/agent-repos/owner-top-repo
+# 7. Leave reusable clones in /tmp/agent-repos; remove only as last resort per Tier 2 policy
 ```
 
 **Use when**: Pattern discovery across OSS, finding best practices, comparing approaches.
