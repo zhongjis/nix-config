@@ -28,15 +28,15 @@
       baseDelayMs = 2000;
       maxDelayMs = 60000;
     };
-    lastChangelogVersion = "0.70.2";
+    lastChangelogVersion = "0.70.6";
     npmCommand = ["bash" "${config.home.homeDirectory}/.pi/agent/scripts/pi-package-npm.sh"];
     packages = [
       "git:github.com/nicobailon/pi-mcp-adapter@v2.5.1"
-      "git:github.com/samfoy/pi-lsp-extension@v1.0.0"
+      "git:github.com/samfoy/pi-lsp-extension@main"
       "git:github.com/RimuruW/pi-hashline-edit@v0.6.0"
       "git:github.com/aliou/pi-guardrails@v0.11.0"
-      "git:github.com/fluxgear/pi-thinking-steps@v1.0.7"
-      "git:github.com/davebcn87/pi-autoresearch@v1.1.0"
+      "git:github.com/fluxgear/pi-thinking-steps@v1.0.8"
+      "git:github.com/davebcn87/pi-autoresearch@v1.2.0"
       {
         source = "git:github.com/backnotprop/plannotator@0.19.1";
         extensions = ["apps/pi-extension"];
