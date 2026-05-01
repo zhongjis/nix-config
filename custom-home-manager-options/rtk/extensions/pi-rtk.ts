@@ -3,7 +3,9 @@ import type { ExecFileSyncOptionsWithStringEncoding, ExecFileSyncReturns } from 
 import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
 import { createLocalBashOperations, isToolCallEventType } from "@mariozechner/pi-coding-agent";
 
-const REWRITE_TIMEOUT_MS = 5_000;
+const RTK_BIN = process.env.PI_RTK_BIN || "rtk";
+const REWRITE_TIMEOUT_MS = Number.parseInt(process.env.PI_RTK_TIMEOUT_MS || "800", 10);
+const PROBE_TIMEOUT_MS = 1_000;
 const NO_REWRITE_EXIT_CODE = 1;
 const REWRITE_FOUND_EXIT_CODE = 3;
 
@@ -43,7 +45,7 @@ function formatRewriteFailure(error: ExecFileSyncError): string {
 function rtkRewriteCommand(command: string): RewriteResult {
   try {
     return {
-      command: execFileSync("rtk", ["rewrite", command], {
+      command: execFileSync(RTK_BIN, ["rewrite", command], {
         encoding: "utf-8",
         timeout: REWRITE_TIMEOUT_MS,
       }).trimEnd(),
@@ -66,6 +68,8 @@ function rtkRewriteCommand(command: string): RewriteResult {
 
 export default function rtkExtension(pi: ExtensionAPI): void {
   let warnedAboutFailure = false;
+  let rtkProbed = false;
+  let rtkAvailable = false;
 
   function warnRewriteFailureOnce(ctx: ExtensionContext, failure: string) {
     if (warnedAboutFailure || !ctx.hasUI) {
@@ -75,10 +79,34 @@ export default function rtkExtension(pi: ExtensionAPI): void {
     warnedAboutFailure = true;
     ctx.ui.notify(`RTK rewrite extension failed: ${failure}. Falling back to raw commands.`, "error");
   }
+
+  // Probe rtk once per process. Skips spawn-per-call when rtk is missing.
+  // Surfaces the failure reason through the same notify-once path as runtime errors.
+  function ensureRtkAvailable(ctx: ExtensionContext): boolean {
+    if (rtkProbed) return rtkAvailable;
+    rtkProbed = true;
+    try {
+      execFileSync(RTK_BIN, ["--help"], {
+        encoding: "utf-8",
+        timeout: PROBE_TIMEOUT_MS,
+        stdio: "pipe",
+      });
+      rtkAvailable = true;
+    } catch (error) {
+      rtkAvailable = false;
+      warnRewriteFailureOnce(ctx, formatRewriteFailure(error as ExecFileSyncError));
+    }
+    return rtkAvailable;
+  }
+
   // Rewrite bash tool commands before execution
   pi.on("tool_call", (_event, ctx) => {
     const event = _event;
     if (!isToolCallEventType("bash", event)) {
+      return;
+    }
+
+    if (!ensureRtkAvailable(ctx)) {
       return;
     }
 
@@ -100,6 +128,10 @@ export default function rtkExtension(pi: ExtensionAPI): void {
     }
 
     if (typeof event.command !== "string") {
+      return;
+    }
+
+    if (!ensureRtkAvailable(ctx)) {
       return;
     }
 
