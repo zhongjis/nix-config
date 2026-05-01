@@ -29,6 +29,12 @@
       maxDelayMs = 60000;
     };
     lastChangelogVersion = "0.71.1";
+    collapseChangelog = true;
+    treeFilterMode = "no-tools";
+    # Only read by openai-codex provider; ignored by others (no fallback).
+    # Options: "sse" (default), "websocket", "websocket-cached", "auto".
+    # "websocket-cached" = WS + cached prompt context, no SSE fallback on failure.
+    transport = "websocket-cached";
     npmCommand = ["bash" "${config.home.homeDirectory}/.pi/agent/scripts/pi-package-npm.sh"];
     packages = [
       "git:github.com/nicobailon/pi-mcp-adapter@v2.5.1"
@@ -45,7 +51,6 @@
       }
     ];
     permissionLevel = "high";
-    theme = "github-diff";
   };
 
   workOverrides = {
