@@ -11,6 +11,10 @@
 # Instruction naming:
 #   - Files must be .md (markdown) files
 #   - Filename becomes instruction identifier (for reference only)
+#   - Prefix with `NN-` (two-digit number + dash) to control concat order.
+#     Files within the same profile dir are concatenated in sorted filename order.
+#     Suggested ranges: 00-09 core principles, 10-29 environment/tooling,
+#     30-69 domain rules, 70-89 nice-to-haves, 90-99 formatting/meta.
 #
 # Disabling instructions:
 #   - Prefix file with "disabled-" to skip it
