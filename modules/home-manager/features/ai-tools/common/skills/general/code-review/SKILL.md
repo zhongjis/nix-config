@@ -383,23 +383,26 @@ Key patterns to check:
 
 ### Inline vs Summary Strategy
 
-The atomic review API (see PR Review pipeline step 6) handles both inline and summary comments in one call. When building the review JSON:
+The atomic review API (see PR Review pipeline step 6) handles both inline and summary comments in one call. The summary body and inline comments serve different purposes — when used well they compose; when confused they duplicate.
 
-- **Inline comments** (`comments` array): Findings tied to a specific file and line — most actionable because the author sees the issue exactly where it lives in the diff.
-- **Summary body** (`body` field): Overall verdict, architectural concerns spanning files, findings not pinnable to a single line.
+**Core rule: the summary is an index, the inlines are the content.**
 
-| Finding type | Where it goes |
-| --- | --- |
-| BLOCKER / MAJOR with a clear file:line | `comments` array entry |
-| Architectural / cross-cutting concern | `body` summary |
-| Overall verdict + strengths | `body` summary |
-| SUGGESTION / NIT on a specific line | `comments` array entry (keep brief) |
+If a finding has a file and line, its full detail (issue, why it matters, suggested fix, test to add) lives in the inline comment. The summary references it by severity ID (B1, M1, S1) in the findings table — one row, one sentence. A reader should see severity distribution at a glance in the summary, then click through to the inline for the actual patch.
 
-Avoid 20+ inline comments — group related nits into the summary. Each inline comment should stand alone and be actionable without reading the full summary.
+Why this matters: GitHub renders the summary in the Conversation tab and inlines in the Files Changed tab. Restating the same finding in both tabs forces the author to read it twice, visually inflates the PR page, and creates drift risk if one copy is updated and the other isn't. Keep the summary lean — resist the urge to "helpfully" restate inline content in a collapsible block.
+
+| Finding type | Where it goes | Summary mention |
+| --- | --- | --- |
+| BLOCKER / MAJOR with a clear file:line | `comments` array entry (full detail) | One row in findings table |
+| SUGGESTION / NIT on a specific line | `comments` array entry (keep brief) | One row in findings table |
+| Architectural / cross-cutting concern spanning files | `body` summary (full detail) | Written out — no inline exists |
+| Overall verdict, confidence, strengths (KUDOS) | `body` summary | N/A — can't live inline |
+
+Avoid 20+ inline comments — group related nits into one inline on a representative line, or roll them into the summary only if they're truly cross-cutting. Each inline comment should stand alone and be actionable without reading the summary.
 
 ### Review Summary
 
-Use this template for both local and PR reviews:
+Use this template for both local and PR reviews. Keep it lean — the summary is the index into inline comments, not a restatement of them.
 
 ````markdown
 ## Code Review Summary
@@ -412,33 +415,11 @@ Use this template for both local and PR reviews:
 
 | Sev | Severity     | File                | Description       |
 | --- | ------------ | ------------------- | ----------------- |
-| B1  | [BLOCKER]    | path/to/file.ts:42  | Brief description |
-| M1  | [MAJOR]      | path/to/other.py:15 | Brief description |
-| S1  | [SUGGESTION] | path/to/lib.rs:88   | Brief description |
+| B1  | [BLOCKER]    | path/to/file.ts:42  | One-line summary — full detail inline |
+| M1  | [MAJOR]      | path/to/other.py:15 | One-line summary — full detail inline |
+| S1  | [SUGGESTION] | path/to/lib.rs:88   | One-line summary — full detail inline |
 
-### Details
-
-<details>
-<summary><strong>B1. [BLOCKER] Brief title — path/to/file.ts:42</strong></summary>
-
-**Issue**: Description of the problem.
-**Why it matters**: Impact explanation (security risk, data loss, crash).
-**Suggestion**:
-`typescript
-    // proposed fix
-    `
-**Test to add**: Description of a test case that would catch this.
-
-</details>
-
-<details>
-<summary><strong>M1. [MAJOR] Brief title — path/to/other.py:15</strong></summary>
-
-**Issue**: ...
-**Why it matters**: ...
-**Suggestion**: ...
-
-</details>
+Each row is a pointer to the matching inline comment. Do not expand findings here — the inline carries the issue, why it matters, suggested fix, and test to add. Include a `### Cross-cutting Concerns` section below *only* for findings that span multiple files or have no single line to attach to.
 
 ### File-Level Confidence
 
