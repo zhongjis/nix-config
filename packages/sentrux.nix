@@ -3,6 +3,8 @@
   lib,
 }: let
   version = "0.5.7";
+  inherit (pkgs.stdenv.hostPlatform) system isDarwin;
+
   grammarSrcs = {
     x86_64-linux = {
       platform = "linux-x86_64";
@@ -12,16 +14,59 @@
       platform = "linux-aarch64";
       hash = "sha256-8fuLTRD5YvPNynHq9oZi36lx5Q4i07iUfRvCKcQX8lM=";
     };
+    aarch64-darwin = {
+      platform = "darwin-arm64";
+      hash = "sha256-lCoVl/rmwzgj3PcViphQ5LZyWMrfiRAMIMmA/Dq69I8=";
+    };
   };
-  grammarSrcInfo = grammarSrcs.${pkgs.stdenv.hostPlatform.system} or (throw "Unsupported system: ${pkgs.stdenv.hostPlatform.system}");
+
+  grammarSrcInfo = grammarSrcs.${system} or (throw "Unsupported system: ${system}");
   grammarSrc = pkgs.fetchurl {
     url = "https://github.com/sentrux/sentrux/releases/download/v${version}/grammars-${grammarSrcInfo.platform}.tar.gz";
     inherit (grammarSrcInfo) hash;
   };
-in
-  pkgs.rustPlatform.buildRustPackage {
+
+  meta = with lib; {
+    description = "Live codebase visualization and structural quality gate for AI-agent-written code";
+    homepage = "https://github.com/sentrux/sentrux";
+    license = licenses.mit;
+    platforms = lib.attrNames grammarSrcs;
+    mainProgram = "sentrux";
+  };
+
+  # Darwin: prebuilt binary from GitHub releases
+  darwinPackage = pkgs.stdenv.mkDerivation {
     pname = "sentrux";
-    inherit version;
+    inherit version meta;
+
+    src = pkgs.fetchurl {
+      url = "https://github.com/sentrux/sentrux/releases/download/v${version}/sentrux-darwin-arm64";
+      hash = "sha256-MK4aRNRHit8pQBn85tZc5WhsJbyGPrcVsyDFI0kn9sI=";
+    };
+
+    dontUnpack = true;
+
+    nativeBuildInputs = [pkgs.makeWrapper];
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out/bin $out/bin/plugins
+      cp $src $out/bin/sentrux
+      chmod +x $out/bin/sentrux
+      tar -xzf ${grammarSrc} -C $out/bin/plugins
+      runHook postInstall
+    '';
+
+    postFixup = ''
+      wrapProgram $out/bin/sentrux \
+        --set SENTRUX_SKIP_GRAMMAR_DOWNLOAD 1
+    '';
+  };
+
+  # Linux: build from source
+  linuxPackage = pkgs.rustPlatform.buildRustPackage {
+    pname = "sentrux";
+    inherit version meta;
 
     src = pkgs.fetchFromGitHub {
       owner = "sentrux";
@@ -70,12 +115,8 @@ in
       )
       wrapProgram $out/bin/sentrux "''${gappsWrapperArgs[@]}"
     '';
-
-    meta = with lib; {
-      description = "Live codebase visualization and structural quality gate for AI-agent-written code";
-      homepage = "https://github.com/sentrux/sentrux";
-      license = licenses.mit;
-      platforms = attrNames grammarSrcs;
-      mainProgram = "sentrux";
-    };
-  }
+  };
+in
+  if isDarwin
+  then darwinPackage
+  else linuxPackage

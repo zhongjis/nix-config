@@ -27,12 +27,14 @@
           lib = pkgs.lib;
         };
       }
-      // optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
-        helium = import ../packages/helium.nix {
+      // {
+        sentrux = import ../packages/sentrux.nix {
           inherit pkgs;
           lib = pkgs.lib;
         };
-        sentrux = import ../packages/sentrux.nix {
+      }
+      // optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+        helium = import ../packages/helium.nix {
           inherit pkgs;
           lib = pkgs.lib;
         };
