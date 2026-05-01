@@ -32,6 +32,10 @@
           inherit pkgs;
           lib = pkgs.lib;
         };
+        sentrux = import ../packages/sentrux.nix {
+          inherit pkgs;
+          lib = pkgs.lib;
+        };
       };
   };
 }
