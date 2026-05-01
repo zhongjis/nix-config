@@ -36,6 +36,7 @@
       "git:github.com/RimuruW/pi-hashline-edit@v0.6.0"
       "git:github.com/aliou/pi-guardrails@v0.11.0"
       "git:github.com/fluxgear/pi-thinking-steps@v1.0.8"
+      "git:github.com/Gurpartap/pi-mermaid@v0.3.0"
       "git:github.com/davebcn87/pi-autoresearch@v1.2.0"
       {
         source = "git:github.com/backnotprop/plannotator@0.19.1";
