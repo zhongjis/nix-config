@@ -1,9 +1,13 @@
 {
+  inputs,
   lib,
+  pkgs,
   config,
   ...
 }: let
+  system = pkgs.stdenv.hostPlatform.system;
   cfg = config.myHomeManager.aiProfile;
+  llmAgentsPackages = inputs.llm-agents.packages.${system};
 in {
   imports = [
     ../../../../custom-home-manager-options/impeccable
@@ -37,5 +41,10 @@ in {
       isWork = cfg == "work";
       isPersonal = cfg == "personal";
     };
+
+    home.packages =
+      [llmAgentsPackages.gitnexus]
+      ++ lib.optional (inputs.self.packages.${system} ? sentrux)
+      inputs.self.packages.${system}.sentrux;
   };
 }
