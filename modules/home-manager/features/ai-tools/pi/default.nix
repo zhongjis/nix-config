@@ -80,7 +80,11 @@ in {
     impeccable.enable = true;
     rtk.enable = true;
     skills = allSkills;
-    instructions = commonInstructions;
+    instructions =
+      commonInstructions
+      ++ [
+        "${./instructions/shell-tools.md}"
+      ];
     settings = piSettings;
   };
 }
