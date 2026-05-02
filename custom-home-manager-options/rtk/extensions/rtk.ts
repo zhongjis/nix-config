@@ -34,7 +34,43 @@ type UserBashEvent = {
   excludeFromContext?: boolean;
 };
 
+// UPSTREAM-PATCH: skip rtk rewrite for rg/grep commands using flags that
+// collide with `rtk grep`'s own short options or break its clap parser.
+// Tracking upstream:
+//   - rtk-ai/rtk#1604  (hook rewrite produces unparseable args; -l, -E, -q, -A/-B/-C)
+//   - rtk-ai/rtk#1436  (rtk grep is not grep-compatible)
+//   - rtk-ai/rtk#236   (find/grep rewrite breaks on native flags)
+//   - rtk-ai/rtk#1367  (rg rewrite edge case on quoted regex)
+//   - rtk-ai/rtk#1219  (open PR: accept -r/--recursive)
+// Remove this function and its call sites once those are resolved.
+function shouldSkipRtkRewrite(command: string): boolean {
+  const trimmed = command.trimStart();
+  // Only touch bare `rg ...` / `grep ...` invocations. Anything pipelined,
+  // command-substituted, or compound falls through to normal rewrite.
+  const match = /^(?:rg|grep)\s+(.*)$/s.exec(trimmed);
+  if (!match) {
+    return false;
+  }
+  const rest = match[1];
+  // Semantic collisions with `rtk grep`'s own short flags:
+  //   -l  rtk: --max-len       vs rg/grep: --files-with-matches
+  //   -m  rtk: --max           vs rg/grep: --max-count
+  //   -c  rtk: --context-only  vs rg/grep: --count
+  //   -v  rtk: --verbose       vs rg/grep: --invert-match
+  // Clap parse failures observed in #1604 / #229 / #236:
+  //   -E  extended regex, -q quiet, -A/-B/-C N context
+  // Flag tokens only — avoid matching inside patterns or quoted strings by
+  // requiring preceding whitespace or start-of-string.
+  const conflictFlag = /(^|\s)-(?:[lmcvEq]|[ABC]\b|[ABC]\s*\d+)(?=\s|=|$)/;
+  // Short-flag clusters like -rn, -nE, -nl that embed a conflicting letter.
+  const conflictCluster = /(^|\s)-[a-zA-Z]*[lmcvEq][a-zA-Z]*(?=\s|$)/;
+  return conflictFlag.test(rest) || conflictCluster.test(rest);
+}
+
 function rtkRewriteCommand(command: string): string | undefined {
+  if (shouldSkipRtkRewrite(command)) {
+    return undefined;
+  }
   try {
     return execFileSync("rtk", ["rewrite", command], {
       encoding: "utf-8",
