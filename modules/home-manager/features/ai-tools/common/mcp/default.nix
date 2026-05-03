@@ -13,7 +13,7 @@
   commonMcps = {
     nixos = {
       command = "nix";
-      args = ["run" "github:utensils/mcp-nixos" "--"];
+      args = ["run" "github:utensils/mcp-nixos/v2.4.0" "--"];
     };
     context7 = {
       url = "https://mcp.context7.com/mcp";
@@ -29,17 +29,20 @@
 
   # MCPs only for personal profile
   personalMcps = {
-    # mcp_k8s = {
-    #   command = "nix";
-    #   args = ["run" "nixpkgs#mcp-k8s-go"];
-    # };
-    # flux_operator_mcp = {
-    #   command = "nix";
-    #   args = ["run" "nixpkgs#fluxcd-operator-mcp" "serve"];
-    #   env = {
-    #     "KUBECONFIG" = "/home/zshen/.kube/config";
-    #   };
-    # };
+    flux = {
+      command = "nix";
+      args = [
+        "run"
+        "nixpkgs#fluxcd-operator-mcp"
+        "--"
+        "serve"
+        "--read-only"
+        "--mask-secrets"
+      ];
+      env = {
+        KUBECONFIG = "/home/zshen/.kube/config";
+      };
+    };
   };
 in {
   sops.secrets.context7_api_key = {
