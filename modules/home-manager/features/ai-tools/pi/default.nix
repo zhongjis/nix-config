@@ -43,7 +43,7 @@
   piMcporterSettings = {
     configPath = "${config.home.homeDirectory}/.mcporter/mcporter.json";
     timeoutMs = 30000;
-    mode = "preload";
+    mode = "lazy";
   };
 
   sharedSettings = {
@@ -71,7 +71,6 @@
     npmCommand = ["bash" "${config.home.homeDirectory}/.pi/agent/scripts/pi-package-npm.sh"];
     packages = [
       "git:github.com/mavam/pi-mcporter@v0.3.1"
-      "git:github.com/nicobailon/pi-mcp-adapter@v2.5.1"
       "git:github.com/RimuruW/pi-hashline-edit@v0.6.0"
       "git:github.com/aliou/pi-guardrails@v0.11.0"
       "git:github.com/fluxgear/pi-thinking-steps@v1.0.8"
