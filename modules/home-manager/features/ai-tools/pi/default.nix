@@ -61,7 +61,7 @@
       baseDelayMs = 2000;
       maxDelayMs = 60000;
     };
-    lastChangelogVersion = "0.71.1";
+    lastChangelogVersion = "0.73.0";
     collapseChangelog = true;
     treeFilterMode = "no-tools";
     # Only read by openai-codex provider; ignored by others (no fallback).
