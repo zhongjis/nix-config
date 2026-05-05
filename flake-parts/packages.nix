@@ -38,6 +38,10 @@
           inherit pkgs;
           lib = pkgs.lib;
         };
+        fincept-terminal = import ../packages/fincept-terminal.nix {
+          inherit pkgs;
+          lib = pkgs.lib;
+        };
       };
   };
 }

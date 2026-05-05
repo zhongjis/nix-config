@@ -1,4 +1,8 @@
-{pkgs, ...}: let
+{
+  pkgs,
+  inputs,
+  ...
+}: let
   internalMonitor = "desc:BOE 0x0BC9";
   lgUntraWideMonitor = "desc:ASUSTek COMPUTER INC PG27UCDM T1LMAS019666";
   dellMonitor = "desc:Dell Inc. DELL P2419H 78NFR63";
@@ -61,5 +65,7 @@ in {
   home.username = "zshen";
   home.homeDirectory = "/home/zshen";
   home.stateVersion = "23.11";
-  home.packages = with pkgs; [];
+  home.packages = with pkgs; [
+    inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.fincept-terminal
+  ];
 }
