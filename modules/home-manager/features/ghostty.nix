@@ -1,10 +1,4 @@
-{
-  pkgs,
-  lib,
-  config,
-  inputs,
-  ...
-}: {
+{pkgs, ...}: {
   programs.ghostty = {
     enable = true;
     enableZshIntegration = true;
@@ -18,7 +12,7 @@
       cursor-style-blink = false;
 
       # font
-      font-size = 14;
+      font-size = 12;
 
       # window
       window-decoration = false;
