@@ -1260,11 +1260,11 @@
     "impeccable": {
       "flake": false,
       "locked": {
-        "lastModified": 1776993686,
-        "narHash": "sha256-z5Vm84h/noAmSYWPGVfeCk1/jpwiiOSmBPxGienmHng=",
+        "lastModified": 1777937883,
+        "narHash": "sha256-Lf4Bb8iikicR/aw3cvWU5nxLt1iHf+GUJc7W/z1w284=",
         "owner": "pbakaus",
         "repo": "impeccable",
-        "rev": "f5e82162c1c6e6bdc0cd29f287c4446b679b61a5",
+        "rev": "e587004ee42883dad40d14cd0f5e1b21ae1933df",
         "type": "github"
       },
       "original": {
