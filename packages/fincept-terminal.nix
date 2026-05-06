@@ -17,8 +17,13 @@
 in
   pkgs.appimageTools.wrapType2 rec {
     inherit pname version src;
+    nativeBuildInputs = [pkgs.makeWrapper];
 
-    extraPkgs = pkgs: [];
+    extraPkgs = pkgs: [
+      pkgs.gcc
+      pkgs.pkg-config
+      pkgs.portaudio
+    ];
 
     extraInstallCommands = ''
       # Install desktop file and icons from extracted AppImage
@@ -29,6 +34,12 @@ in
 
       install -Dm644 ${appimageContents}/fincept-terminal.png \
         $out/share/icons/hicolor/256x256/apps/${pname}.png
+
+      # The AppImage bundles Qt with only the xcb platform plugin; force xcb so
+      # Hyprland/Wayland sessions do not request the missing wayland plugin.
+      wrapProgram $out/bin/${pname} \
+        --set QT_QPA_PLATFORM xcb \
+        --set-default QT_ENABLE_HIGHDPI_SCALING 1
     '';
 
     meta = with lib; {

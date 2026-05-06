@@ -64,9 +64,6 @@
     lastChangelogVersion = "0.73.0";
     collapseChangelog = true;
     treeFilterMode = "no-tools";
-    # Only read by openai-codex provider; ignored by others (no fallback).
-    # Options: "sse" (default), "websocket", "websocket-cached", "auto".
-    # "websocket-cached" = WS + cached prompt context, no SSE fallback on failure.
     transport = "websocket-cached";
     npmCommand = ["bash" "${config.home.homeDirectory}/.pi/agent/scripts/pi-package-npm.sh"];
     packages = [
@@ -87,12 +84,15 @@
 
   workOverrides = {
     defaultProvider = "anthropic";
-    defaultModel = "claude-opus-4-6";
+    defaultModel = "claude-opus-4-7";
   };
 
   personalOverrides = {
     defaultProvider = "openai-codex";
     defaultModel = "gpt-5.5";
+    # Only read by openai-codex provider; ignored by others (no fallback).
+    # Options: "sse" (default), "websocket", "websocket-cached", "auto".
+    # "websocket-cached" = WS + cached prompt context, no SSE fallback on failure.
   };
 
   piSettings = lib.recursiveUpdate sharedSettings (
