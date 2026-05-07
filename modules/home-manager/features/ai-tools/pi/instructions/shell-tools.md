@@ -6,16 +6,16 @@
 
 **Before running `find` or `grep` in any bash command, STOP and rewrite using the table below.**
 
-| POSIX command | Use instead | Notes |
-|---|---|---|
-| `find . -name '*.py'` | `fd -e py` | Extension filter |
-| `find . -type d -name node_modules` | `fd -t d node_modules` | Directory search |
-| `find . -name '*.py' -exec X {} \;` | `fd -e py -x X` | Batch exec |
-| `find . -name X -maxdepth 1` | `fd X -d 1` | Depth limit |
-| `grep -r foo .` | `rg foo` | Recursive grep |
-| `grep -rn 'pattern' --include='*.ts'` | `rg 'pattern' -t ts` | Type-scoped search |
-| `cat file \| grep pattern` | `rg pattern file` | Single-file search |
-| `ls \| grep pattern` | `fd pattern -d 1` | Directory listing filter |
+| POSIX command                         | Use instead            | Notes                    |
+| ------------------------------------- | ---------------------- | ------------------------ |
+| `find . -name '*.py'`                 | `fd -e py`             | Extension filter         |
+| `find . -type d -name node_modules`   | `fd -t d node_modules` | Directory search         |
+| `find . -name '*.py' -exec X {} \;`   | `fd -e py -x X`        | Batch exec               |
+| `find . -name X -maxdepth 1`          | `fd X -d 1`            | Depth limit              |
+| `grep -r foo .`                       | `rg foo`               | Recursive grep           |
+| `grep -rn 'pattern' --include='*.ts'` | `rg 'pattern' -t ts`   | Type-scoped search       |
+| `cat file \| grep pattern`            | `rg pattern file`      | Single-file search       |
+| `ls \| grep pattern`                  | `fd pattern -d 1`      | Directory listing filter |
 
 ## ast-grep — specialist only
 
@@ -44,3 +44,10 @@
 ## Verification
 
 If you catch yourself typing `find ` or `grep ` in a bash command, rewrite it first.
+
+## Escalation
+
+Load the matching skill when:
+
+- `ast-grep` pattern needs more than a one-liner → load `ast-grep` skill (has `REFERENCE.md`)
+- Two `fd`/`rg` attempts fail on flag combos (size, time, boolean, type filters) → load `fd` or `rg` skill instead of guessing again
