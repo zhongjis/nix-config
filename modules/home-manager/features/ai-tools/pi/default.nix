@@ -61,7 +61,7 @@
       baseDelayMs = 2000;
       maxDelayMs = 60000;
     };
-    lastChangelogVersion = "0.73.0";
+    lastChangelogVersion = "0.74.0";
     collapseChangelog = true;
     treeFilterMode = "no-tools";
     transport = "websocket-cached";
