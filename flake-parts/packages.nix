@@ -8,6 +8,27 @@
   }: {
     packages = let
       inherit (lib) optionalAttrs;
+      modelConfig = import ../lib/llamacpp-models.nix {inherit lib;};
+      inherit (modelConfig) hfHome modelDir modelFiles modelPath modelRevision modelsDir;
+      huggingfaceCli = pkgs.python3Packages.huggingface-hub;
+      downloadModel = id: model: ''
+        if [ ! -f ${lib.escapeShellArg (modelPath model)} ]; then
+          echo "Downloading ${id}"
+          ${lib.escapeShellArgs [
+          "hf"
+          "download"
+          model.repo
+          model.file
+          "--revision"
+          (modelRevision model)
+          "--local-dir"
+          (modelDir model)
+          "--quiet"
+        ]}
+        else
+          echo "Already downloaded ${id}"
+        fi
+      '';
     in
       {
         neovim =
@@ -36,6 +57,29 @@
             pkgs.jq
           ];
           text = builtins.readFile ../scripts/sync-mcporter-instructions.sh;
+        };
+        download-llamacpp-models = pkgs.writeShellApplication {
+          name = "download-llamacpp-models";
+          runtimeInputs = [
+            huggingfaceCli
+            pkgs.coreutils
+          ];
+          text = ''
+            set -euo pipefail
+
+            if [ "$(id -u)" -ne 0 ]; then
+              echo "error: run as root: sudo nix run .#download-llamacpp-models" >&2
+              exit 1
+            fi
+
+            export HF_HOME=${lib.escapeShellArg hfHome}
+            export HF_HUB_DOWNLOAD_TIMEOUT="''${HF_HUB_DOWNLOAD_TIMEOUT:-60}"
+
+            install -d -m 0755 ${lib.escapeShellArg modelsDir}
+            install -d -m 0700 ${lib.escapeShellArg hfHome}
+
+            ${lib.concatStringsSep "\n\n" (lib.mapAttrsToList downloadModel modelFiles)}
+          '';
         };
       }
       // {
