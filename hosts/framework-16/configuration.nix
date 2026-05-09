@@ -28,15 +28,9 @@
     services.amdcpu.enable = true;
     services.amdgpu.enable = true;
     multi-lang-input-layout.enable = true;
-    ollama.enable = true;
+    llamacpp.enable = true;
     sops.enable = true;
     virt-manager.enable = true;
-  };
-
-  # for radeon 7700s
-  services.ollama = {
-    package = pkgs.ollama-vulkan;
-    rocmOverrideGfx = "11.0.2";
   };
 
   # xremap
