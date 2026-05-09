@@ -46,6 +46,74 @@
     mode = "lazy";
   };
 
+  localLlamaModels = [
+    {
+      id = "qwen2.5-coder:7b";
+      name = "Qwen 2.5 Coder 7B (fast local worker)";
+      contextWindow = 32768;
+      maxTokens = 8192;
+    }
+    {
+      id = "qwen2.5-coder:14b";
+      name = "Qwen 2.5 Coder 14B (main local coding)";
+      contextWindow = 32768;
+      maxTokens = 8192;
+    }
+    {
+      id = "gemma4:e4b";
+      name = "Gemma 4 E4B (tiny offline fallback)";
+      contextWindow = 32768;
+      maxTokens = 8192;
+    }
+    {
+      id = "gemma4:26b";
+      name = "Gemma 4 26B (local planning/review)";
+      contextWindow = 32768;
+      maxTokens = 8192;
+    }
+    {
+      id = "qwen3:8b";
+      name = "Qwen 3 8B (general planner fallback)";
+      reasoning = true;
+      contextWindow = 32768;
+      maxTokens = 8192;
+    }
+    {
+      id = "granite4.1:8b";
+      name = "Granite 4.1 8B (structured fallback)";
+      contextWindow = 32768;
+      maxTokens = 8192;
+    }
+    {
+      id = "qwen3.6:27b";
+      name = "Qwen 3.6 27B (agentic coding quality)";
+      reasoning = true;
+      contextWindow = 32768;
+      maxTokens = 8192;
+    }
+    {
+      id = "gemma4:31b";
+      name = "Gemma 4 31B (high-quality slow local)";
+      contextWindow = 32768;
+      maxTokens = 8192;
+    }
+  ];
+
+  piModels = {
+    providers = {
+      llama-swap = {
+        baseUrl = "http://127.0.0.1:9292/v1";
+        api = "openai-completions";
+        apiKey = "llama-swap";
+        compat = {
+          supportsDeveloperRole = false;
+          supportsReasoningEffort = false;
+        };
+        models = localLlamaModels;
+      };
+    };
+  };
+
   sharedSettings = {
     defaultThinkingLevel = "high";
     quietStartup = true;
@@ -88,8 +156,8 @@
   };
 
   personalOverrides = {
-    defaultProvider = "openai-codex";
-    defaultModel = "gpt-5.5";
+    defaultProvider = "llama-swap";
+    defaultModel = "qwen2.5-coder:14b";
     # Only read by openai-codex provider; ignored by others (no fallback).
     # Options: "sse" (default), "websocket", "websocket-cached", "auto".
     # "websocket-cached" = WS + cached prompt context, no SSE fallback on failure.
@@ -113,6 +181,7 @@ in {
   home.file = {
     ".mcporter/mcporter.json".text = builtins.toJSON mcporterConfig;
     ".pi/agent/mcporter.json".text = builtins.toJSON piMcporterSettings;
+    ".pi/agent/models.json".text = builtins.toJSON piModels;
   };
 
   programs.pi = {
