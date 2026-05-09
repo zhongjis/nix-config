@@ -123,6 +123,7 @@ in {
     instructions =
       commonInstructions
       ++ [
+        "${./instructions/mcporter.md}"
         "${./instructions/shell-tools.md}"
       ];
     settings = piSettings;
