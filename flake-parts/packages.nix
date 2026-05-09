@@ -26,6 +26,17 @@
           inherit pkgs;
           lib = pkgs.lib;
         };
+        sync-mcporter-instructions = pkgs.writeShellApplication {
+          name = "sync-mcporter-instructions";
+          runtimeInputs = [
+            inputs.llm-agents.packages.${system}.mcporter
+            pkgs.coreutils
+            pkgs.diffutils
+            pkgs.git
+            pkgs.jq
+          ];
+          text = builtins.readFile ../scripts/sync-mcporter-instructions.sh;
+        };
       }
       // {
         sentrux = import ../packages/sentrux.nix {
