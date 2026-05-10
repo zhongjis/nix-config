@@ -48,6 +48,19 @@
 
   localLlamaModels = [
     {
+      id = "qwen3-coder:30b-a3b";
+      name = "Qwen 3 Coder 30B-A3B (powerful local orchestrator)";
+      contextWindow = 131072;
+      maxTokens = 8192;
+    }
+    {
+      id = "deepseek-r1-qwen3:8b";
+      name = "DeepSeek R1 0528 Qwen3 8B (local reasoning)";
+      reasoning = true;
+      contextWindow = 32768;
+      maxTokens = 8192;
+    }
+    {
       id = "qwen2.5-coder:7b";
       name = "Qwen 2.5 Coder 7B (fast local worker)";
       contextWindow = 32768;
@@ -66,12 +79,6 @@
       maxTokens = 8192;
     }
     {
-      id = "gemma4:26b";
-      name = "Gemma 4 26B (local planning/review)";
-      contextWindow = 32768;
-      maxTokens = 8192;
-    }
-    {
       id = "qwen3:8b";
       name = "Qwen 3 8B (general planner fallback)";
       reasoning = true;
@@ -81,19 +88,6 @@
     {
       id = "granite4.1:8b";
       name = "Granite 4.1 8B (structured fallback)";
-      contextWindow = 32768;
-      maxTokens = 8192;
-    }
-    {
-      id = "qwen3.6:27b";
-      name = "Qwen 3.6 27B (agentic coding quality)";
-      reasoning = true;
-      contextWindow = 32768;
-      maxTokens = 8192;
-    }
-    {
-      id = "gemma4:31b";
-      name = "Gemma 4 31B (high-quality slow local)";
       contextWindow = 32768;
       maxTokens = 8192;
     }

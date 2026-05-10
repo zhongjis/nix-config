@@ -18,8 +18,11 @@
     "--no-webui"
     "-ngl"
     "999"
+  ];
+
+  contextFlags = model: [
     "-c"
-    "32768"
+    (toString (model.contextWindow or 32768))
   ];
 
   mkModel = model:
@@ -30,6 +33,7 @@
           (modelPath model)
         ]
         ++ commonFlags
+        ++ contextFlags model
         ++ (model.extraFlags or []));
     }
     // lib.optionalAttrs (model.unlisted or false) {unlisted = true;};
