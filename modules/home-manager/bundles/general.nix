@@ -41,6 +41,7 @@
   programs.zen-browser.enable = lib.mkDefault false;
 
   home.packages = [
+    inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.hunk
     inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.openkanban
     inputs.agent-of-empires.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
