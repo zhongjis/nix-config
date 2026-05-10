@@ -5,7 +5,7 @@
   inputs ? {},
   ...
 }: let
-  system = pkgs.stdenv.hostPlatform.system;
+  inherit (pkgs.stdenv.hostPlatform) system;
 
   defaultRtkPackage =
     if inputs ? llm-agents

@@ -9,7 +9,7 @@
   types = lib.types;
   jsonFormat = pkgs.formats.json {};
   yamlFormat = pkgs.formats.yaml {};
-  system = pkgs.stdenv.hostPlatform.system;
+  inherit (pkgs.stdenv.hostPlatform) system;
 
   defaultOmpPackage =
     if inputs ? llm-agents
