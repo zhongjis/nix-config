@@ -7,7 +7,7 @@
   commonInstructions,
   ...
 }: let
-  system = pkgs.stdenv.hostPlatform.system;
+  inherit (pkgs.stdenv.hostPlatform) system;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
 
   # Merge pre-filtered common skills and Claude Code-specific skills (from ./skills)

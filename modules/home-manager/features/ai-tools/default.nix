@@ -5,7 +5,7 @@
   config,
   ...
 }: let
-  system = pkgs.stdenv.hostPlatform.system;
+  inherit (pkgs.stdenv.hostPlatform) system;
   cfg = config.myHomeManager.aiProfile;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
 in {
