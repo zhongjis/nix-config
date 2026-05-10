@@ -8,7 +8,7 @@
   aiProfileHelpers,
   ...
 }: let
-  system = pkgs.stdenv.hostPlatform.system;
+  inherit (pkgs.stdenv.hostPlatform) system;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
   piAgentKitExtensions =
     (pkgs.fetchFromGitHub {

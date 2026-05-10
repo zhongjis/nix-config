@@ -9,7 +9,7 @@
   aiProfileHelpers,
   ...
 }: let
-  system = pkgs.stdenv.hostPlatform.system;
+  inherit (pkgs.stdenv.hostPlatform) system;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
   allSkills = commonSkills // ompLocalSkills;
 
