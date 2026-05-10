@@ -15,7 +15,7 @@ bun2nix.mkDerivation {
   };
 
   bunDeps = bun2nix.fetchBunDeps {
-    bunNix = ./hunk-bun-lock.nix;
+    bunNix = ./bun-lock.nix;
   };
 
   buildPhase = ''

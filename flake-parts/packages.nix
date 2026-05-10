@@ -43,7 +43,7 @@
           inherit pkgs;
           lib = pkgs.lib;
         };
-        hunk = import ../packages/hunk.nix {
+        hunk = import ../packages/hunk {
           inherit pkgs;
           lib = pkgs.lib;
           bun2nix = inputs.bun2nix.packages.${system}.default;
