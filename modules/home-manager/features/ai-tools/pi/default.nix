@@ -11,6 +11,7 @@
 }: let
   inherit (pkgs.stdenv.hostPlatform) system;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
+  sopsFile = inputs.self + "/secrets/ai-tokens.yaml";
   allSkills = commonSkills // ompLocalSkills;
 
   convertEnvPlaceholders = value:
@@ -168,7 +169,6 @@ in {
   ];
 
   home.packages = [
-    llmAgentsPackages.pi
     llmAgentsPackages.mcporter
   ];
 
@@ -178,8 +178,14 @@ in {
     ".pi/agent/models.json".text = builtins.toJSON piModels;
   };
 
+  sops.secrets.opencode_zen_api_key = {
+    inherit sopsFile;
+  };
+
   programs.pi = {
     enable = true;
+    package = llmAgentsPackages.pi;
+    opencodeApiKeyFile = config.sops.secrets.opencode_zen_api_key.path;
     impeccable.enable = true;
     rtk.enable = true;
     skills = allSkills;
