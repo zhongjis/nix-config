@@ -130,10 +130,10 @@
     transport = "websocket-cached";
     npmCommand = ["bash" "${config.home.homeDirectory}/.pi/agent/scripts/pi-package-npm.sh"];
     packages = [
-      "git:github.com/mavam/pi-mcporter@v0.3.2"
+      "git:github.com/mavam/pi-mcporter@v0.4.0"
       "git:github.com/RimuruW/pi-hashline-edit@v0.6.1"
       "git:github.com/aliou/pi-guardrails@v0.11.2"
-      "git:github.com/fluxgear/pi-thinking-steps@v1.0.9"
+      "git:github.com/fluxgear/pi-thinking-steps@v1.0.11"
       "git:github.com/davebcn87/pi-autoresearch@v1.4.0"
       {
         source = "git:github.com/backnotprop/plannotator@0.19.11";
