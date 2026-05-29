@@ -87,6 +87,11 @@
       url = "github:pbakaus/impeccable";
       flake = false;
     };
+    open-design = {
+      url = "github:nexu-io/open-design";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
 
     ## hyprland
     hyprland.url = "github:hyprwm/Hyprland/v0.54.1";
