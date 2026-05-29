@@ -38,27 +38,27 @@
   personalOverrides = {
     runtime_fallback.enabled = true;
     agents = {
-      sisyphus.model = "openai/gpt-5.4";
-      metis.model = "github-copilot/claude-opus-4.6";
+      sisyphus.model = "openai/gpt-5.5";
+      metis.model = "github-copilot/claude-opus-4.7";
 
-      prometheus.model = "github-copilot/claude-opus-4.6";
-      atlas.model = "openai/gpt-5.4";
+      prometheus.model = "github-copilot/claude-opus-4.7";
+      atlas.model = "openai/gpt-5.5";
 
-      hephaestus.model = "openai/gpt-5.3-codex";
-      oracle.model = "openai/gpt-5.4";
-      momus.model = "openai/gpt-5.4";
+      hephaestus.model = "openai/gpt-5.5";
+      oracle.model = "openai/gpt-5.5";
+      momus.model = "openai/gpt-5.5";
 
-      multimodal-looker.model = "openai/gpt-5.4";
-      librarian.model = "opencode/minimax-m2.5";
-      explore.model = "github-copilot/grok-code-fast-1";
+      multimodal-looker.model = "openai/gpt-5.5";
+      librarian.model = "openai/gpt-5.4-mini-fast";
+      explore.model = "openai/gpt-5.4-mini-fast";
     };
     categories = {
       visual-engineering.model = "github-copilot/gemini-3.1-pro-preview";
-      ultrabrain.model = "openai/gpt-5.4";
-      deep.model = "openai/gpt-5.3-codex";
+      ultrabrain.model = "openai/gpt-5.5";
+      deep.model = "openai/gpt-5.5";
       artistry.model = "github-copilot/gemini-3.1-pro-preview";
-      quick.model = "github-copilot/gpt-5.4-mini";
-      unspecified-high.model = "openai/gpt-5.4";
+      quick.model = "openai/gpt-5.4-mini";
+      unspecified-high.model = "github-copilot/claude-opus-4.7";
       unspecified-low.model = "github-copilot/claude-sonnet-4.6";
       writing.model = "github-copilot/gemini-3-flash-preview";
     };
@@ -66,28 +66,29 @@
 
   workOverrides = {
     # --- mixed GitHub Copilot + Bedrock (Anthropic) + openai configuration ---
+    runtime_fallback.enabled = true;
     agents = {
-      sisyphus.model = "openai/gpt-5.4";
-      metis.model = "github-copilot/claude-opus-4.6";
+      sisyphus.model = "openai/gpt-5.5";
+      metis.model = "github-copilot/claude-opus-4.7";
 
-      prometheus.model = "github-copilot/claude-opus-4.6";
-      atlas.model = "openai/gpt-5.4";
+      prometheus.model = "github-copilot/claude-opus-4.7";
+      atlas.model = "openai/gpt-5.5";
 
-      hephaestus.model = "openai/gpt-5.4";
-      oracle.model = "openai/gpt-5.4";
-      momus.model = "openai/gpt-5.4";
+      hephaestus.model = "openai/gpt-5.5";
+      oracle.model = "openai/gpt-5.5";
+      momus.model = "openai/gpt-5.5";
 
-      multimodal-looker.model = "openai/gpt-5.3-codex";
+      multimodal-looker.model = "openai/gpt-5.5";
       librarian.model = "github-copilot/gemini-3-flash-preview";
       explore.model = "github-copilot/claude-haiku-4.5";
     };
     categories = {
       visual-engineering.model = "github-copilot/gemini-3.1-pro-preview";
-      ultrabrain.model = "openai/gpt-5.3-codex";
-      deep.model = "openai/gpt-5.3-codex";
+      ultrabrain.model = "openai/gpt-5.5";
+      deep.model = "openai/gpt-5.5";
       artistry.model = "github-copilot/gemini-3.1-pro-preview";
       quick.model = "openai/gpt-5.4-mini";
-      unspecified-high.model = "openai/gpt-5.4";
+      unspecified-high.model = "github-copilot/claude-opus-4.7";
       unspecified-low.model = "github-copilot/claude-sonnet-4.6";
       writing.model = "github-copilot/gemini-3-flash-preview";
     };
@@ -112,7 +113,7 @@ in {
       description = ''
         Oh My OpenCode configuration attrset.
         This will be serialized to JSON and placed at
-        ~/.config/opencode/oh-my-opencode.jsonc.
+        ~/.config/opencode/oh-my-openagent.jsonc.
         Other plugin modules can merge additional settings into this option.
       '';
     };
@@ -122,8 +123,8 @@ in {
     # Set the base configuration
     programs.opencode.ohMyOpenCode.settings = baseConfig;
 
-    # Generate oh-my-opencode.jsonc from the final merged attrset
-    xdg.configFile."opencode/oh-my-opencode.jsonc".text =
+    # Generate oh-my-openagent.jsonc from the final merged attrset
+    xdg.configFile."opencode/oh-my-openagent.jsonc".text =
       builtins.toJSON cfg.settings;
   };
 }

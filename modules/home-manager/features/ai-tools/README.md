@@ -266,4 +266,4 @@ The oh-my-opencode configuration is defined as Nix attrsets in `opencode/plugins
 - **Profile overrides**: Work and personal overrides merged via `lib.recursiveUpdate` based on `aiProfileHelpers.isWork`
 - **Plugin merging**: Other plugins can inject settings via `programs.opencode.ohMyOpenCode.settings` (e.g., `supermemory.nix` adds `disabled_hooks` when active)
 
-The final merged attrset is serialized to JSON and placed at `~/.config/opencode/oh-my-opencode.jsonc`.
+The final merged attrset is serialized to JSON and placed at `~/.config/opencode/oh-my-openagent.jsonc`.
