@@ -19,7 +19,7 @@ in {
     "desc:BOE 0x0BC9" = {
       width = 2560;
       height = 1600;
-      refreshRate = 165.;
+      refreshRate = 165.0;
       x = 0;
       y = 0;
       scale = 1.0;
@@ -37,7 +37,7 @@ in {
     "desc:Dell Inc. DELL P2419H 78NFR63" = {
       width = 1920;
       height = 1080;
-      refreshRate = 60.;
+      refreshRate = 60.0;
       # x = 6000;
       x = 5488;
       y = 0;

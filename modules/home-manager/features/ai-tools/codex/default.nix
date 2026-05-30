@@ -27,9 +27,9 @@
   );
 
   codexSettings = {
-    model = "gpt-5.4";
+    model = "gpt-5.5";
     model_provider = "openai";
-    model_reasoning_effort = "high";
+    model_reasoning_effort = "xhigh";
     approval_policy = "never";
     allow_login_shell = true;
     sandbox_mode = "workspace-write";
@@ -39,6 +39,12 @@
       network_access = false;
       exclude_tmpdir_env_var = false;
       exclude_slash_tmp = false;
+    };
+
+    projects = {
+      "/home/zshen/personal/nix-config".trust_level = "trusted";
+      "/home/zshen/personal/server-config".trust_level = "trusted";
+      "/home/zshen/personal/ghostline".trust_level = "trusted";
     };
 
     shell_environment_policy = {
@@ -56,9 +62,9 @@ in {
     enableMcpIntegration = true;
     impeccable.enable = true;
     package = llmAgentsPackages.codex;
-    context = codexContext;
+    # context = codexContext;
     rules = {};
-    # settings = codexSettings;
+    settings = codexSettings;
     skills = commonSkills;
   };
 }

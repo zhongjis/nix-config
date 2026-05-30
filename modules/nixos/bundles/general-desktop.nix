@@ -98,7 +98,6 @@
       netflix
 
       chromium
-      jujutsu
     ]
     ++ (
       lib.optional (inputs.self.packages.${pkgs.stdenv.hostPlatform.system} ? helium)
