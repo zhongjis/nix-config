@@ -74,6 +74,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
+    zed.url = "github:zed-industries/zed/nightly";
     agent-of-empires = {
       url = "github:njbrake/agent-of-empires";
       inputs.nixpkgs.follows = "nixpkgs";

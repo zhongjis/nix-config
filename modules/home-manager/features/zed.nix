@@ -1,7 +1,11 @@
-{pkgs, ...}: let
-in {
+{
+  pkgs,
+  inputs,
+  ...
+}: {
   programs.zed-editor = {
     enable = true;
+    package = inputs.zed.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
     # Install Zed remote server for remote connections
     installRemoteServer = false;

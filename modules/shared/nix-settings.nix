@@ -15,6 +15,7 @@
     "https://mitchellh-nixos-config.cachix.org"
     "https://cache.flakehub.com"
     "https://cache.numtide.com"
+    "https://zed.cachix.org"
   ];
 
   defaultTrustedPublicKeys = [
@@ -38,6 +39,7 @@
     "cache.flakehub.com-9:wChaSeTI6TeCuV/Sg2513ZIM9i0qJaYsF+lZCXg0J6o="
     "cache.flakehub.com-10:2GqeNlIp6AKp4EF2MVbE1kBOp9iBSyo0UPR9KoR0o1Y="
     "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
+    "zed.cachix.org-1:/pHQ6dpMsAZk2DiP4WCL0p9YDNKWj2Q5FL20bNmw1cU="
   ];
 
   settings = {
