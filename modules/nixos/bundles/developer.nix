@@ -16,8 +16,6 @@
       # nix
       inputs.colmena.packages.${pkgs.stdenv.hostPlatform.system}.colmena
 
-      graphite-cli
-
       # db
       postgresql
 
