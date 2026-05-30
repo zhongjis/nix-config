@@ -33,7 +33,19 @@
       in
         if nodeModulesIdx != null && lib.length pathParts > nodeModulesIdx + 1
         then lib.elemAt pathParts (nodeModulesIdx + 1)
-        else name
+        # Fallback for file:// paths without a node_modules segment
+        # (e.g. /lib/oh-my-opencode/dist/index.js): drop the filename, then
+        # the package dir is the parent, skipping dist/build/lib wrappers.
+        else let
+          dirs =
+            if lib.hasInfix "." (lib.last pathParts)
+            then lib.init pathParts
+            else pathParts;
+          lastDir = lib.last dirs;
+        in
+          if lastDir == "dist" || lastDir == "build" || lastDir == "lib"
+          then lib.elemAt dirs (lib.length dirs - 2)
+          else lastDir
       else name;
 
     # Handle github: prefix
