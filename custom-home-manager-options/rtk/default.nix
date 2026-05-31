@@ -85,7 +85,7 @@ in {
     (lib.mkIf opencodeRtkCfg.enable {
       home.packages = [defaultRtkPackage];
       xdg.configFile."opencode/plugins/rtk.ts".source =
-        rtkPluginSrc + "/hooks/opencode/rtk.ts";
+        rtkPluginSrc + "/hooks/opencode-rtk.ts";
     })
     (lib.mkIf ompRtkCfg.enable {
       home.packages = [ompRtkCfg.package];

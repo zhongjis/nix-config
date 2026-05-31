@@ -27,9 +27,16 @@
     disabled_skills = ["playwright" "frontend-ui-ux"];
     disabled_hooks = ["comment-checker"];
 
+    # team mode
+    team_mode = {
+      enabled = true;
+      max_parallel_members = 4;
+      max_members = 8;
+      tmux_visualization = false;
+    };
+
     # others
     browser_automation_engine.provider = "agent-browser";
-    hashline_edit = true;
   };
 
   # Profile-specific overrides
