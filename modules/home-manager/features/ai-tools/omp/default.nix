@@ -10,25 +10,22 @@
 }: let
   inherit (pkgs.stdenv.hostPlatform) system;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
-  piAgentKitExtensions =
-    (pkgs.fetchFromGitHub {
-      owner = "aldoborrero";
-      repo = "pi-agent-kit";
-      rev = "a307560a447da0efc8cdfa672e49ca5ae4aa554d";
-      hash = "sha256-aYikbALMzZZLQADNPAsr77qk2762iH4w5x3laII8obA=";
-    })
-    + "/extensions";
   allSkills = commonSkills // ompLocalSkills;
 
   sharedConfig = {
+    providers.webSearch = "auto";
+    symbolPreset = "unicode";
+    theme.dark = "titanium";
+    setupVersion = 1;
+
     modelRoles = {
-      default = "openai-codex/gpt-5.4";
-      vision = "openai-codex/gpt-5.4:high";
+      default = "openai-codex/gpt-5.5:xhigh";
+      vision = "openai-codex/gpt-5.5:high";
       smol = "github-copilot/claude-haiku-4.5:off";
-      slow = "openai-codex/gpt-5.4:high";
-      plan = "github-copilot/claude-opus-4.6:high";
+      slow = "openai-codex/gpt-5.5:xhigh";
+      plan = "github-copilot/claude-opus-4.8:high";
       commit = "github-copilot/claude-haiku-4.5:off";
-      task = "openai-codex/gpt-5.4";
+      task = "openai-codex/gpt-5.5:xhigh";
     };
   };
 
@@ -36,10 +33,10 @@
     # Anthropic ULW (ultra-large-window, 1M context) models
     modelRoles = {
       default = "anthropic/claude-sonnet-4-6";
-      vision = "github-copilot/gpt-5.4:high";
+      vision = "github-copilot/gpt-5.5:high";
       smol = "anthropic/claude-haiku-4-5:off";
-      slow = "anthropic/claude-opus-4-6:high";
-      plan = "anthropic/claude-opus-4-6:high";
+      slow = "anthropic/claude-opus-4-8:xhigh";
+      plan = "anthropic/claude-opus-4-8:xhigh";
       commit = "anthropic/claude-haiku-4-5:off";
       task = "anthropic/claude-sonnet-4-6";
     };
@@ -62,11 +59,8 @@ in {
   ];
 
   programs."oh-my-pi" = {
-    enable = false;
-    package =
-      if pkgs.stdenv.isDarwin
-      then null
-      else llmAgentsPackages.omp;
+    enable = true;
+    package = llmAgentsPackages.omp;
 
     impeccable.enable = true;
     settings = ompConfig;

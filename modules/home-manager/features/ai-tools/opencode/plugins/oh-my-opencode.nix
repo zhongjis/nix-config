@@ -57,27 +57,66 @@
   personalOverrides = {
     runtime_fallback.enabled = true;
     agents = {
-      sisyphus.model = "openai/gpt-5.5";
-      metis.model = "github-copilot/claude-opus-4.8";
+      sisyphus = {
+        model = "openai/gpt-5.5";
+        variant = "medium";
+      };
+      metis = {
+        model = "github-copilot/claude-opus-4.8";
+        variant = "max";
+      };
 
-      prometheus.model = "github-copilot/claude-opus-4.8";
-      atlas.model = "openai/gpt-5.5";
+      prometheus = {
+        model = "github-copilot/claude-opus-4.8";
+        variant = "max";
+      };
+      atlas = {
+        model = "openai/gpt-5.5";
+        variant = "medium";
+      };
 
-      hephaestus.model = "openai/gpt-5.5";
-      oracle.model = "openai/gpt-5.5";
-      momus.model = "openai/gpt-5.5";
+      hephaestus = {
+        model = "openai/gpt-5.5";
+        variant = "medium";
+      };
+      oracle = {
+        model = "openai/gpt-5.5";
+        variant = "high";
+      };
+      momus = {
+        model = "openai/gpt-5.5";
+        variant = "xhigh";
+      };
 
-      multimodal-looker.model = "openai/gpt-5.5";
+      multimodal-looker = {
+        model = "openai/gpt-5.5";
+        variant = "medium";
+      };
       librarian.model = "openai/gpt-5.4-mini-fast";
       explore.model = "openai/gpt-5.4-mini-fast";
     };
     categories = {
-      visual-engineering.model = "github-copilot/gemini-3.1-pro-preview";
-      ultrabrain.model = "openai/gpt-5.5";
-      deep.model = "openai/gpt-5.5";
-      artistry.model = "github-copilot/gemini-3.1-pro-preview";
+      visual-engineering = {
+        model = "github-copilot/gemini-3.1-pro-preview";
+        variant = "high";
+      };
+      ultrabrain = {
+        model = "openai/gpt-5.5";
+        variant = "xhigh";
+      };
+      deep = {
+        model = "openai/gpt-5.5";
+        variant = "medium";
+      };
+      artistry = {
+        model = "github-copilot/gemini-3.1-pro-preview";
+        variant = "high";
+      };
       quick.model = "openai/gpt-5.4-mini";
-      unspecified-high.model = "github-copilot/claude-opus-4.8";
+      unspecified-high = {
+        model = "github-copilot/claude-opus-4.8";
+        variant = "max";
+      };
       unspecified-low.model = "github-copilot/claude-sonnet-4.6";
       writing.model = "github-copilot/gemini-3.5-flash";
     };
@@ -87,28 +126,112 @@
     # --- mixed GitHub Copilot + Bedrock (Anthropic) + openai configuration ---
     runtime_fallback.enabled = true;
     agents = {
-      sisyphus.model = "openai/gpt-5.5";
-      metis.model = "github-copilot/claude-opus-4.7";
+      sisyphus = {
+        model = "anthropic/claude-opus-4.8";
+        variant = "max";
+        fallback_models = [
+          {
+            model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
+            variant = "max";
+          }
+        ];
+      };
+      metis = {
+        model = "github-copilot/claude-opus-4.8";
+        variant = "max";
+        fallback_models = [
+          {
+            model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
+            variant = "max";
+          }
+        ];
+      };
 
-      prometheus.model = "github-copilot/claude-opus-4.7";
-      atlas.model = "openai/gpt-5.5";
+      prometheus = {
+        model = "anthropic/claude-opus-4.8";
+        variant = "max";
+        fallback_models = [
+          {
+            model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
+            variant = "max";
+          }
+        ];
+      };
+      atlas = {
+        model = "openai/gpt-5.5";
+        variant = "medium";
+        fallback_models = [
+          {
+            model = "amazon-bedrock/us.anthropic.claude-sonnet-4-6";
+            variant = "medium";
+          }
+        ];
+      };
 
-      hephaestus.model = "openai/gpt-5.5";
-      oracle.model = "openai/gpt-5.5";
-      momus.model = "openai/gpt-5.5";
+      hephaestus = {
+        model = "openai/gpt-5.5";
+        variant = "medium";
+      };
+      oracle = {
+        model = "openai/gpt-5.5";
+        variant = "high";
+        fallback_models = [
+          {
+            model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
+            variant = "high";
+          }
+        ];
+      };
+      momus = {
+        model = "anthropic/claude-opus-4.8";
+        variant = "max";
+        fallback_models = [
+          {
+            model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
+            variant = "max";
+          }
+        ];
+      };
 
-      multimodal-looker.model = "openai/gpt-5.5";
+      multimodal-looker = {
+        model = "openai/gpt-5.5";
+        variant = "medium";
+      };
       librarian.model = "github-copilot/gemini-3-flash-preview";
       explore.model = "github-copilot/claude-haiku-4.5";
     };
     categories = {
-      visual-engineering.model = "github-copilot/gemini-3.1-pro-preview";
-      ultrabrain.model = "openai/gpt-5.5";
-      deep.model = "openai/gpt-5.5";
-      artistry.model = "github-copilot/gemini-3.1-pro-preview";
+      visual-engineering = {
+        model = "github-copilot/gemini-3.1-pro-preview";
+        variant = "high";
+      };
+      ultrabrain = {
+        model = "openai/gpt-5.5";
+        variant = "xhigh";
+      };
+      deep = {
+        model = "openai/gpt-5.5";
+        variant = "medium";
+      };
+      artistry = {
+        model = "github-copilot/gemini-3.1-pro-preview";
+        variant = "high";
+      };
       quick.model = "openai/gpt-5.4-mini";
-      unspecified-high.model = "github-copilot/claude-opus-4.7";
-      unspecified-low.model = "github-copilot/claude-sonnet-4.6";
+      unspecified-high = {
+        model = "github-copilot/claude-opus-4.8";
+        variant = "max";
+        fallback_models = [
+          {
+            model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
+            variant = "max";
+          }
+        ];
+      };
+      unspecified-low = {
+        model = "anthropic/claude-sonnet-4.6";
+        fallback_models = [{model = "amazon-bedrock/us.anthropic.claude-sonnet-4-6";}];
+      };
       writing.model = "github-copilot/gemini-3-flash-preview";
     };
   };

@@ -17,21 +17,24 @@ in {
 
   programs.opencode.settings.model =
     if aiProfileHelpers.isWork
-    then "openai/gpt-5.4"
-    else "openai/gpt-5.4";
+    then "openai/gpt-5.5"
+    else "openai/gpt-5.5";
 
   # NOTE: work profile
   programs.opencode.settings.enabled_providers =
     lib.mkIf aiProfileHelpers.isWork
-    ["github-copilot" "openai"];
+    ["github-copilot" "openai" "anthropic" "amazon-bedrock"];
 
   # NOTE: work profile end
 
-  programs.opencode.settings.provider = {
-    # openrouter = {
-    #   options = {
-    #     apiKey = "{file:${config.sops.secrets.openrouter_api_key.path}}";
-    #   };
-    # };
-  };
+  programs.opencode.settings.provider =
+    lib.mkIf aiProfileHelpers.isWork
+    {
+      amazon-bedrock = {
+        options = {
+          region = "us-east-1";
+          profile = "ajob2b-int";
+        };
+      };
+    };
 }
