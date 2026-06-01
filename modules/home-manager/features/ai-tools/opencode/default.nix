@@ -27,6 +27,10 @@ in {
     package = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.opencode;
     web.enable = false;
     enableMcpIntegration = true;
+    caveman = {
+      enable = true;
+      mode = "ultra";
+    };
     impeccable.enable = true;
     rtk.enable = true;
 
