@@ -37,6 +37,7 @@ in {
     settings = {
       share = "disabled";
       autoupdate = false;
+      snapshot = false;
 
       instructions =
         commonInstructions

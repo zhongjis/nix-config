@@ -13,6 +13,9 @@
   sharedConfig = {
     "$schema" = "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json";
 
+    # Impeccable enforcement
+    agents.artistry.prompt_append = "Always use impeccable skill for UI work";
+
     # Disable all Claude Code compatibility features
     claude_code = {
       mcp = false;
@@ -27,12 +30,21 @@
     disabled_skills = ["playwright" "frontend-ui-ux"];
     disabled_hooks = ["comment-checker"];
 
+    # hashline edit
+    hashline_edit = true;
+
     # team mode
     team_mode = {
       enabled = true;
       max_parallel_members = 4;
       max_members = 8;
       tmux_visualization = false;
+    };
+
+    # git master
+    git_master = {
+      commit_footer = false;
+      include_co_authored_by = false;
     };
 
     # others
@@ -98,11 +110,6 @@
       unspecified-high.model = "github-copilot/claude-opus-4.7";
       unspecified-low.model = "github-copilot/claude-sonnet-4.6";
       writing.model = "github-copilot/gemini-3-flash-preview";
-    };
-
-    git_master = {
-      commit_footer = false;
-      include_co_authored_by = false;
     };
   };
 
