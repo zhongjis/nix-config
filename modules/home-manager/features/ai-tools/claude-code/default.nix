@@ -45,6 +45,10 @@ in {
       else true;
     package = llmAgentsPackages.claude-code;
     impeccable.enable = true;
+    caveman = {
+      enable = true;
+      mode = "ultra";
+    };
     skills = allSkills;
 
     # Use rules instead of settings.instructions so settings.json is not managed by HM

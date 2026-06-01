@@ -61,8 +61,12 @@ in {
     enable = true;
     enableMcpIntegration = true;
     impeccable.enable = true;
+    caveman = {
+      enable = true;
+      mode = "ultra";
+    };
     package = llmAgentsPackages.codex;
-    # context = codexContext;
+    context = codexContext;
     rules = {};
     settings = codexSettings;
     skills = commonSkills;
