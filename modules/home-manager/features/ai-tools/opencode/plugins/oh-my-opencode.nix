@@ -62,8 +62,10 @@
         variant = "medium";
       };
       metis = {
-        model = "github-copilot/claude-opus-4.8";
-        variant = "max";
+        model = "openai/gpt-5.5";
+        variant = "xhigh";
+        # model = "github-copilot/claude-opus-4.8";
+        # variant = "max";
       };
 
       prometheus = {
@@ -114,8 +116,8 @@
       };
       quick.model = "openai/gpt-5.4-mini";
       unspecified-high = {
-        model = "github-copilot/claude-opus-4.8";
-        variant = "max";
+        model = "openai/gpt-5.5";
+        variant = "xhigh";
       };
       unspecified-low.model = "github-copilot/claude-sonnet-4.6";
       writing.model = "github-copilot/gemini-3.5-flash";

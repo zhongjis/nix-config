@@ -21,7 +21,7 @@
     owner = "rtk-ai";
     repo = "rtk";
     rev = "v${defaultRtkPackage.version}";
-    hash = "sha256-QkAtxSpMyjbscQgSUWks0aIkWaAYXgY6c9qM3sdPN+0=";
+    hash = "sha256-ZCDVS/AFljljMac+cAzQztYPQgvQrcEhKIHHRhkMsv8=";
   };
 in {
   options.programs.opencode.rtk.enable =
