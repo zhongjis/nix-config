@@ -129,7 +129,7 @@
     runtime_fallback.enabled = true;
     agents = {
       sisyphus = {
-        model = "anthropic/claude-opus-4.8";
+        model = "anthropic/claude-opus-4-8";
         variant = "max";
         fallback_models = [
           {
@@ -150,7 +150,7 @@
       };
 
       prometheus = {
-        model = "anthropic/claude-opus-4.8";
+        model = "anthropic/claude-opus-4-8";
         variant = "max";
         fallback_models = [
           {
@@ -160,7 +160,7 @@
         ];
       };
       atlas = {
-        model = "openai/gpt-5.5";
+        model = "anthropic/claude-sonnet-4-6";
         variant = "medium";
         fallback_models = [
           {
@@ -170,22 +170,24 @@
         ];
       };
 
-      hephaestus = {
-        model = "openai/gpt-5.5";
-        variant = "medium";
-      };
+      hephaestus.disabled = true;
+
       oracle = {
-        model = "openai/gpt-5.5";
+        model = "github-copilot/gemini-3.1-pro-preview";
         variant = "high";
         fallback_models = [
           {
+            model = "anthropic/claude-opus-4-8";
+            variant = "max";
+          }
+          {
             model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
-            variant = "high";
+            variant = "max";
           }
         ];
       };
       momus = {
-        model = "anthropic/claude-opus-4.8";
+        model = "anthropic/claude-opus-4-8";
         variant = "max";
         fallback_models = [
           {
@@ -196,32 +198,84 @@
       };
 
       multimodal-looker = {
-        model = "openai/gpt-5.5";
+        model = "github-copilot/gpt-5.5";
         variant = "medium";
       };
-      librarian.model = "github-copilot/gemini-3-flash-preview";
-      explore.model = "github-copilot/claude-haiku-4.5";
+      librarian = {
+        model = "github-copilot/gpt-5.4-mini-fast";
+        fallback_models = [
+          {model = "anthropic/claude-haiku-4-5";}
+          {model = "amazon-bedrock/us.anthropic.claude-haiku-4-5";}
+        ];
+      };
+      explore = {
+        model = "anthropic/claude-haiku-4-5";
+        fallback_models = [
+          {model = "amazon-bedrock/us.anthropic.claude-haiku-4-5";}
+        ];
+      };
     };
     categories = {
       visual-engineering = {
         model = "github-copilot/gemini-3.1-pro-preview";
         variant = "high";
+        fallback_models = [
+          {
+            model = "anthropic/claude-opus-4-8";
+            variant = "max";
+          }
+          {
+            model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
+            variant = "max";
+          }
+        ];
       };
       ultrabrain = {
-        model = "openai/gpt-5.5";
-        variant = "xhigh";
+        model = "github-copilot/gemini-3.1-pro-preview";
+        variant = "high";
+        fallback_models = [
+          {
+            model = "anthropic/claude-opus-4-8";
+            variant = "max";
+          }
+          {
+            model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
+            variant = "max";
+          }
+        ];
       };
       deep = {
-        model = "openai/gpt-5.5";
-        variant = "medium";
+        model = "anthropic/claude-opus-4-8";
+        variant = "max";
+        fallback_models = [
+          {
+            model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
+            variant = "max";
+          }
+        ];
       };
       artistry = {
         model = "github-copilot/gemini-3.1-pro-preview";
         variant = "high";
+        fallback_models = [
+          {
+            model = "anthropic/claude-opus-4-8";
+            variant = "max";
+          }
+          {
+            model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
+            variant = "max";
+          }
+        ];
       };
-      quick.model = "openai/gpt-5.4-mini";
+      quick = {
+        model = "anthropic/claude-haiku-4-5";
+        fallback_models = [
+          {model = "amazon-bedrock/us.anthropic.claude-haiku-4-5";}
+        ];
+      };
       unspecified-high = {
-        model = "github-copilot/claude-opus-4.8";
+        model = "anthropic/claude-opus-4-8";
         variant = "max";
         fallback_models = [
           {
@@ -231,10 +285,13 @@
         ];
       };
       unspecified-low = {
-        model = "anthropic/claude-sonnet-4.6";
+        model = "anthropic/claude-sonnet-4-6";
         fallback_models = [{model = "amazon-bedrock/us.anthropic.claude-sonnet-4-6";}];
       };
-      writing.model = "github-copilot/gemini-3-flash-preview";
+      writing = {
+        model = "github-copilot/gemini-3-flash-preview";
+        fallback_models = [{model = "amazon-bedrock/us.anthropic.claude-sonnet-4-6";}];
+      };
     };
   };
 

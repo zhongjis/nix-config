@@ -23,7 +23,7 @@ in {
   # NOTE: work profile
   programs.opencode.settings.enabled_providers =
     lib.mkIf aiProfileHelpers.isWork
-    ["github-copilot" "openai" "anthropic" "amazon-bedrock"];
+    ["github-copilot" "anthropic" "amazon-bedrock"];
 
   # NOTE: work profile end
 
