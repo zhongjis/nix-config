@@ -67,8 +67,8 @@
       };
 
       prometheus = {
-        model = "github-copilot/claude-opus-4.8";
-        variant = "max";
+        model = "openai/gpt-5.5";
+        variant = "high";
       };
       atlas = {
         model = "openai/gpt-5.5";
