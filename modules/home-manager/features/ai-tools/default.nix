@@ -44,7 +44,10 @@ in {
     };
 
     home.packages =
-      [llmAgentsPackages.gitnexus]
+      [
+        llmAgentsPackages.gitnexus
+        llmAgentsPackages.qmd
+      ]
       ++ lib.optional (inputs.self.packages.${system} ? sentrux)
       inputs.self.packages.${system}.sentrux;
   };

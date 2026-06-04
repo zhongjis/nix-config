@@ -143,6 +143,10 @@
         variant = "max";
         fallback_models = [
           {
+            model = "anthropic/claude-opus-4-8";
+            variant = "max";
+          }
+          {
             model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
             variant = "max";
           }

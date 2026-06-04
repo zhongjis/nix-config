@@ -18,9 +18,9 @@
     # plugin (the CLI in home.packages alone does not activate it).
     "file://${ohMyOpenCodePkg}/lib/oh-my-opencode/dist/index.js"
     "@simonwjackson/opencode-direnv@latest"
-    "@tarquinen/opencode-dcp@latest"
+    # "@tarquinen/opencode-dcp@latest"
     "opencode-pty@latest"
-    "@slkiser/opencode-quota@latest"
+    # "@slkiser/opencode-quota@latest"
   ];
 
   # Plugins only for work profile
