@@ -41,6 +41,9 @@
       tmux_visualization = false;
     };
 
+    # runtime fallback
+    runtime_fallback = true;
+
     # git master
     git_master = {
       commit_footer = false;
@@ -95,7 +98,9 @@
     };
     categories = {
       visual-engineering = {
-        model = "github-copilot/gemini-3.1-pro-preview";
+        # model = "github-copilot/gemini-3.1-pro-preview";
+        # variant = "high";
+        model = "openai/gpt-5.5";
         variant = "high";
         fallback_models = [
           {

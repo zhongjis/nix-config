@@ -44,11 +44,6 @@ in {
         ++ [
           "${./instructions/shell-strategy.md}"
         ];
-
-      permission.skill = {
-        # Allow all provisioned skills (filtering is handled by commonSkills based on aiProfile)
-        "*" = "allow";
-      };
     };
   };
 
