@@ -52,8 +52,9 @@
   };
 
   # Profile-specific overrides
-  # Providers: GitHub Copilot, OpenCode Zen
-  # Based on oh-my-opencode official model-requirements.ts recommendations
+  # Providers: OpenAI/ChatGPT Plus, GitHub Copilot, OpenCode Go.
+  # No direct Claude subscription: keep Claude-family agents on Copilot Claude where possible,
+  # then fall back to OpenCode Go Claude-like models before GPT.
   personalOverrides = {
     runtime_fallback.enabled = true;
     agents = {
@@ -61,22 +62,6 @@
         model = "openai/gpt-5.5";
         variant = "medium";
       };
-      metis = {
-        model = "openai/gpt-5.5";
-        variant = "xhigh";
-        # model = "github-copilot/claude-opus-4.8";
-        # variant = "max";
-      };
-
-      prometheus = {
-        model = "openai/gpt-5.5";
-        variant = "high";
-      };
-      atlas = {
-        model = "openai/gpt-5.5";
-        variant = "medium";
-      };
-
       hephaestus = {
         model = "openai/gpt-5.5";
         variant = "medium";
@@ -85,26 +70,47 @@
         model = "openai/gpt-5.5";
         variant = "high";
       };
-      momus = {
-        model = "openai/gpt-5.5";
-        variant = "xhigh";
-      };
-
+      librarian.model = "openai/gpt-5.4-mini-fast";
+      explore.model = "openai/gpt-5.4-mini-fast";
       multimodal-looker = {
         model = "openai/gpt-5.5";
         variant = "medium";
       };
-      librarian.model = "openai/gpt-5.4-mini-fast";
-      explore.model = "openai/gpt-5.4-mini-fast";
+      prometheus = {
+        model = "openai/gpt-5.5";
+        variant = "high";
+      };
+      metis = {
+        model = "openai/gpt-5.5";
+        variant = "high";
+      };
+      momus = {
+        model = "openai/gpt-5.5";
+        variant = "xhigh";
+      };
+      atlas = {
+        model = "openai/gpt-5.5";
+        variant = "medium";
+      };
     };
     categories = {
       visual-engineering = {
         model = "github-copilot/gemini-3.1-pro-preview";
         variant = "high";
+        fallback_models = [
+          {
+            model = "openai/gpt-5.5";
+            variant = "high";
+          }
+          {model = "opencode-go/glm-5.1";}
+        ];
       };
       ultrabrain = {
         model = "openai/gpt-5.5";
         variant = "xhigh";
+        fallback_models = [
+          {model = "opencode-go/glm-5.1";}
+        ];
       };
       deep = {
         model = "openai/gpt-5.5";
@@ -113,14 +119,36 @@
       artistry = {
         model = "github-copilot/gemini-3.1-pro-preview";
         variant = "high";
+        fallback_models = [
+          {model = "opencode-go/glm-5.1";}
+          {
+            model = "openai/gpt-5.5";
+            variant = "high";
+          }
+        ];
       };
-      quick.model = "openai/gpt-5.4-mini";
+      quick = {
+        model = "openai/gpt-5.4-mini";
+      };
       unspecified-high = {
         model = "openai/gpt-5.5";
         variant = "xhigh";
       };
-      unspecified-low.model = "github-copilot/claude-sonnet-4.6";
-      writing.model = "github-copilot/gemini-3.5-flash";
+      unspecified-low = {
+        model = "opencode-go/kimi-k2.6";
+        fallback_models = [
+          {
+            model = "openai/gpt-5.5";
+            variant = "medium";
+          }
+        ];
+      };
+      writing = {
+        model = "github-copilot/gemini-3-flash-preview";
+        fallback_models = [
+          {model = "openai/gpt-5.4-mini";}
+        ];
+      };
     };
   };
 
