@@ -2,6 +2,25 @@
 
 NixOS/nix-darwin flake repo for two hosts, Home Manager profiles, custom packages, and AI tooling.
 
+## RELATED PRIVATE REPO
+
+This **public** repo consumes a sibling **private** repo as a flake input:
+
+- Path: `~/personal/nix-config-private` — GitHub `zhongjis/nix-config-private` (**private, never public**).
+- Holds work-related and private configurations (work modules + sops secrets) that must not be exposed publicly. Same flake-parts/auto-discovery layout as this repo.
+- Wired via `inputs.nix-config-private` (`flake.nix`); consumed in host configs, e.g. `hosts/mac-m1-max/home.nix`. Option namespaces there: `zshen-private-flake.*`, `myPrivate.bundles.*`.
+
+When working here, also consider the private repo:
+
+- Changing shared module APIs, option names, or overlay outputs can break the private repo. Check `~/personal/nix-config-private` before such changes.
+- `nix flake check` pulls the private input over SSH; failures may originate there.
+
+**PUBLIC/PRIVATE BOUNDARY (BLOCKING):**
+
+- This repo is PUBLIC on GitHub. NEVER copy secrets, decrypted sops content, work-internal names, hostnames, credentials, or any private-repo content into this repo.
+- Keep work-related and private logic in `nix-config-private`; reference it via the flake input — do not inline it here.
+- Do not add comments/examples/docs here that reveal private or work details.
+
 ## COMMANDS
 
 Run from the repo root:
