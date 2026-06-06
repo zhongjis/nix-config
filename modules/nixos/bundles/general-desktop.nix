@@ -15,6 +15,7 @@
   myNixOS.plymouth.enable = lib.mkDefault true;
   myNixOS.flatpak.enable = lib.mkDefault true;
   myNixOS.xremap.enable = lib.mkDefault true;
+  myNixOS.services.postgresql.enable = lib.mkDefault true;
 
   # firewall
   networking.firewall.enable = true;
