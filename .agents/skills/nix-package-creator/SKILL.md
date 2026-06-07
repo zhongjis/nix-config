@@ -15,6 +15,7 @@ Create Nix packages for this flake-parts-based repository. Packages go in `packa
 4. Track with `jj file track packages/<name>.nix` (flakes require VCS tracking)
 5. Build with `nix build .#<name>` (use `lib.fakeHash` first, fix hashes iteratively)
 6. Verify with `nix flake check`
+7. Ask whether the user wants GitHub Actions update automation for this package (see Update Automation below)
 
 ## Package Type Decision Tree
 
@@ -46,7 +47,7 @@ Before writing a derivation, **read existing packages** for battle-tested patter
 | Quounter | AppImage (single-arch, Tauri) | `packages/quounter.nix` | Direct `fetchurl`, no AppRun fix needed |
 | DevToys | Deb extraction | `packages/devtoys.nix` | `dpkg-deb` + `makeWrapper` + `autoPatchelfHook` |
 | Agent Browser | pnpm complex build | `packages/agent-browser.nix` | `pnpm.fetchDeps` + `pnpm.configHook` |
-| opencode-morph-fast-apply | npm build | `packages/opencode-morph-fast-apply.nix` | `buildNpmPackage` |
+| opencode-morph-fast-apply | Bun package | `packages/opencode-morph-fast-apply.nix` | `bun2nix.mkDerivation` + generated Bun lock Nix |
 
 ## AppImage Packages
 
@@ -164,6 +165,28 @@ packages = {
 ```bash
 jj file track packages/new-package.nix
 ```
+
+## Update Automation
+
+After the package builds, ask the user whether they want a GitHub Actions workflow to check for upstream updates and open PRs automatically. Do this especially for packages sourced from GitHub releases/tags or fast-moving repositories, where hash and lockfile drift is likely.
+
+Use existing repo patterns as references:
+- `scripts/update-helium-package.sh` + `.github/workflows/update-helium.yml` for AppImage release assets and per-architecture hashes.
+- `scripts/update-opencode-morph-fast-apply-package.sh` + `.github/workflows/update-opencode-morph-fast-apply.yml` for GitHub release/tag updates, generated dependency lock files, build verification, and PR creation.
+
+Recommended prompt to user:
+
+```text
+Do you want me to add a daily/manual GitHub Actions updater for this package too? It would check upstream, update hashes or generated lock files, build the package, then open a PR rather than pushing to main.
+```
+
+If the user says yes:
+1. Add a strict updater script under `scripts/update-<package>-package.sh` with `--check`, `--package`, and `--no-format` where applicable.
+2. Fetch upstream metadata with authenticated GitHub API when possible (`GITHUB_TOKEN`/`GH_TOKEN`). Validate tags, assets, versions, and expected file names before editing.
+3. Update only the package file and any generated lock/hash files required for reproducibility.
+4. Run `alejandra`, build the package, and add output-path checks for files consumers rely on.
+5. Add a scheduled + `workflow_dispatch` workflow under `.github/workflows/` with least-privilege permissions (`contents: write`, `pull-requests: write`), concurrency, changed-file guard, package build, and `peter-evans/create-pull-request`.
+6. Prefer opening/updating a PR over pushing directly to `main`.
 
 ## Common Patterns
 
