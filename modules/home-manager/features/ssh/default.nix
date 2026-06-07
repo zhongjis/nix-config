@@ -42,50 +42,39 @@ in {
   programs.ssh.enableDefaultConfig = false;
   # NOTE: example for entry order
   # "*" = lib.hm.dag.entryBefore ["*.example.com"] {
-  programs.ssh.matchBlocks = {
+  programs.ssh.settings = {
     "*" = {
-      addKeysToAgent = "yes";
-      controlMaster = "auto";
-      forwardAgent = true;
-      serverAliveInterval = 60;
+      AddKeysToAgent = "yes";
+      ControlMaster = "auto";
+      ForwardAgent = true;
+      ServerAliveInterval = 60;
       # NOTE: never figure out a way to put this under host *. so just set it as override for now
-      extraOptions = {
-        HostkeyAlgorithms = "+ssh-rsa";
-        PubkeyAcceptedAlgorithms = "+ssh-rsa";
-      };
+      HostKeyAlgorithms = "+ssh-rsa";
+      PubkeyAcceptedAlgorithms = "+ssh-rsa";
     };
-    "github.com-zhongjis" = {
-      host = "github.com";
-      hostname = "github.com";
-      identityFile = "${config.home.homeDirectory}/.ssh/github_com_zhongjis";
-      identitiesOnly = true;
-      extraOptions = let
-        baseOptions = {
-          PreferredAuthentications = "publickey";
-        };
-      in
-        baseOptions // darwinKeychainOption;
-    };
-    "homelab" = {
-      host = "192.168.50.103 192.168.50.104";
-      identityFile = "${config.home.homeDirectory}/.ssh/homelab";
-      extraOptions = let
-        baseOptions = {
-          PreferredAuthentications = "publickey";
-        };
-      in
-        baseOptions // darwinKeychainOption;
-    };
-    "raspberrypi4b" = {
-      host = "192.168.50.2";
-      identityFile = "${config.home.homeDirectory}/.ssh/homelab";
-      identitiesOnly = true;
-      extraOptions = let
-        baseOptions = {
-          PreferredAuthentications = "publickey";
-        };
-      in
-        baseOptions // darwinKeychainOption;
-    };
+    "github.com-zhongjis" =
+      {
+        header = "Host github.com";
+        HostName = "github.com";
+        IdentityFile = "${config.home.homeDirectory}/.ssh/github_com_zhongjis";
+        IdentitiesOnly = true;
+        PreferredAuthentications = "publickey";
+      }
+      // darwinKeychainOption;
+    "homelab" =
+      {
+        header = "Host 192.168.50.103 192.168.50.104";
+        IdentityFile = "${config.home.homeDirectory}/.ssh/homelab";
+        PreferredAuthentications = "publickey";
+      }
+      // darwinKeychainOption;
+    "raspberrypi4b" =
+      {
+        header = "Host 192.168.50.2";
+        IdentityFile = "${config.home.homeDirectory}/.ssh/homelab";
+        IdentitiesOnly = true;
+        PreferredAuthentications = "publickey";
+      }
+      // darwinKeychainOption;
   };
 }
