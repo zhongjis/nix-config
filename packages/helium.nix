@@ -2,17 +2,17 @@
   pkgs,
   lib,
 }: let
-  version = "0.11.7.1";
+  version = "0.13.1.1";
 
   # Map from Nix system to architecture suffix and hash
   srcs = {
     x86_64-linux = {
       url = "https://github.com/imputnet/helium-linux/releases/download/${version}/helium-${version}-x86_64.AppImage";
-      sha256 = "sha256-qzc135IP5F2btxtOMUGMz+0azJhYL9KI0lcPG2KjcxU=";
+      sha256 = "sha256-ZAU+IHSuKu8KiqtgK+fe914C/y7KToVWzC+drqdk+ZM=";
     };
     aarch64-linux = {
       url = "https://github.com/imputnet/helium-linux/releases/download/${version}/helium-${version}-arm64.AppImage";
-      sha256 = "sha256-OfI7oDveklNmKef9u8RHInbKT+jldaXMDgs8BSdiaUs=";
+      sha256 = "sha256-wfCUiHq++Wgq1PySt0aa3thrBSKg+7RQqod/Pudgdps=";
     };
   };
 
