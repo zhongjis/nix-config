@@ -91,7 +91,7 @@
       neovim
 
       obsidian
-      bitwarden-desktop
+      # bitwarden-desktop
       fluent-reader
 
       ghostty
