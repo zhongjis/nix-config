@@ -42,6 +42,7 @@
         opencode-morph-fast-apply = import ../packages/opencode-morph-fast-apply.nix {
           inherit pkgs;
           lib = pkgs.lib;
+          bun2nix = inputs.bun2nix.packages.${system}.default;
         };
         hunk = import ../packages/hunk {
           inherit pkgs;

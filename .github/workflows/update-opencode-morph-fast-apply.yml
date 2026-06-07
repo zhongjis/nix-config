@@ -1,0 +1,91 @@
+name: Update opencode-morph-fast-apply package
+
+on:
+  schedule:
+    - cron: "47 9 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-opencode-morph-fast-apply
+  cancel-in-progress: false
+
+jobs:
+  update:
+    name: Check opencode-morph-fast-apply release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Update package files
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          nix shell \
+            nixpkgs#alejandra \
+            nixpkgs#curl \
+            nixpkgs#git \
+            nixpkgs#jq \
+            nixpkgs#nix-prefetch-github \
+            nixpkgs#python3 \
+            github:nix-community/bun2nix \
+            -c scripts/update-opencode-morph-fast-apply-package.sh
+
+      - name: Detect changes
+        id: diff
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify changed files
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          unexpected_files=""
+          while IFS= read -r file; do
+            case "$file" in
+              packages/opencode-morph-fast-apply.nix|packages/opencode-morph-fast-apply-bun-lock.nix) ;;
+              *) unexpected_files+="$file"$'\n' ;;
+            esac
+          done < <(git diff --name-only)
+          if [[ -n "$unexpected_files" ]]; then
+            echo "Unexpected changed files:" >&2
+            echo "$unexpected_files" >&2
+            exit 1
+          fi
+
+      - name: Build package
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          out="$(nix build .#opencode-morph-fast-apply --no-link --print-out-paths)"
+          test -f "$out/lib/node_modules/opencode-morph-fast-apply/index.ts"
+          test -f "$out/lib/node_modules/opencode-morph-fast-apply/instructions/morph-tools.md"
+          test -d "$out/lib/node_modules/opencode-morph-fast-apply/node_modules"
+
+      - name: Create pull request
+        if: steps.diff.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v8
+        with:
+          branch: automation/update-opencode-morph-fast-apply
+          delete-branch: true
+          commit-message: "chore(opencode): update morph fast apply package"
+          title: "chore(opencode): update morph fast apply package"
+          body: |
+            Automated daily opencode-morph-fast-apply package update.
+
+            Verification:
+            - `nix build .#opencode-morph-fast-apply --no-link --print-out-paths`
+            - output contains `index.ts`, `instructions/morph-tools.md`, and `node_modules`

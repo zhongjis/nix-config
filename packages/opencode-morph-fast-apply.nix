@@ -1,23 +1,27 @@
 {
+  bun2nix,
   pkgs,
   lib,
 }:
-pkgs.buildNpmPackage {
+bun2nix.mkDerivation {
   pname = "opencode-morph-fast-apply";
-  version = "1.9.0";
+  version = "1.10.0";
 
   src = pkgs.fetchFromGitHub {
     owner = "JRedeker";
     repo = "opencode-morph-fast-apply";
-    rev = "0625507c07ac73443ec8780a674778287a4a0c4e";
-    sha256 = "sha256-XjZDwSPidAgNZHyIh6VjOiuDrjOeTFdC5fmTK0UZVm8=";
+    rev = "7481cb0d8fe939bae0595dce422497161196ccac";
+    hash = "sha256-tz4T03Zw5HJUwLeRf58qjsVr+LKXauY1C8QWJFm9+rI=";
   };
 
-  npmDepsHash = "sha256-N7IgSo6zeUQeXqEdewUoXXSEn6u9CKz5rkELRY3FQiU=";
+  bunDeps = bun2nix.fetchBunDeps {
+    bunNix = ./opencode-morph-fast-apply-bun-lock.nix;
+  };
 
-  # This is a TypeScript plugin that runs directly via Bun
-  # No build step needed - just install deps
-  dontNpmBuild = true;
+  buildPhase = ''
+    runHook preBuild
+    runHook postBuild
+  '';
 
   installPhase = ''
     runHook preInstall
@@ -27,6 +31,8 @@ pkgs.buildNpmPackage {
 
     runHook postInstall
   '';
+
+  dontRunLifecycleScripts = true;
 
   meta = {
     description = "OpenCode plugin for Morph Fast Apply - 10x faster code editing";
