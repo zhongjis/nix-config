@@ -1,6 +1,7 @@
 {
   pkgs,
-  inputs,
+  # inputs,
+  lib,
   ...
 }: {
   imports = [
@@ -14,12 +15,12 @@
     # ./disko.nix
   ];
 
-  # gaming kernel. not sure if it is good
   boot.kernelPackages = pkgs.linuxPackages_zen;
   # boot.kernelPackages = pkgs.linuxPackages_latest;
 
   myNixOS = {
     bundles.general-desktop.enable = true;
+    plymouth.enable = lib.mkForce false;
     bundles.developer.enable = true;
     bundles.hyprland.enable = true;
     bundles.kde.enable = false;
@@ -42,6 +43,7 @@
 
   # Bootloader.
   boot.loader = {
+    timeout = 5;
     systemd-boot.enable = false;
 
     efi = {

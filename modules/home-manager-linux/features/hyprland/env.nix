@@ -30,7 +30,7 @@
     export AMD_VULKAN_ICD=RADV
 
     # QT
-    export QT_QPA_PLATFORM=wayland;xcb
+    export QT_QPA_PLATFORM='wayland;xcb'
     export QT_QPA_PLATFORMTHEME=qt6ct
     # export QT_QPA_PLATFORMTHEME=qt5ct  # duplicate - use qt6ct
     export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
