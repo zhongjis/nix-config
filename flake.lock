@@ -1421,11 +1421,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1780430101,
-        "narHash": "sha256-GVElaX4x8crW9onxeewK2zFMyzrzhCdwobGMneHe42k=",
+        "lastModified": 1780948771,
+        "narHash": "sha256-HBtEYSh+TGnSuvr6tZW+e6EVWHtK18arBXy81TGkGz8=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "5c8d6eb7047d607879007c8cd07db7052a17c096",
+        "rev": "f51fca76857c644f1fbd007894148c662d99568e",
         "type": "github"
       },
       "original": {
@@ -1560,11 +1560,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1780421308,
-        "narHash": "sha256-k2mmYtpx27EpDD2MdpSLw4m8t5xdkmuwdXeSW+SMHA8=",
+        "lastModified": 1780950107,
+        "narHash": "sha256-e1w7xSIpHk8EPnt+LKxE0TfylMXMVeUdExIo0Ce/67g=",
         "ref": "refs/heads/main",
-        "rev": "5fa76eeb60940daf9b58385060089a27146f9e78",
-        "revCount": 53,
+        "rev": "72e851a07050673b30234d2629d49f4c9d663589",
+        "revCount": 56,
         "type": "git",
         "url": "ssh://git@github.com/zhongjis/nix-config-private.git"
       },
@@ -2000,11 +2000,11 @@
     },
     "nixpkgs_6": {
       "locked": {
-        "lastModified": 1780336545,
-        "narHash": "sha256-vhVhuXzFrIOfcssC/9hDHx7MHzDKjF3keHuREOQqQiQ=",
+        "lastModified": 1780747962,
+        "narHash": "sha256-IX7G1dlKrOqPOImfbo7ADDfV5yU1+j+MRChI3TL4tAA=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "4df1b885d76a54e1aa1a318f8d16fd6005b6401f",
+        "rev": "cbb5cf358f50aa6acc9efd6113b7bcfbc352cd73",
         "type": "github"
       },
       "original": {
