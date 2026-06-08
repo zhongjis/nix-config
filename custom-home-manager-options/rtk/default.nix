@@ -16,7 +16,7 @@
   ompRtkCfg = config.programs."oh-my-pi".rtk;
   piRtkCfg = config.programs.pi.rtk;
 
-  # Lazy: only evaluated when opencodeRtkCfg.enable is true.
+  # Lazy: only evaluated when a consumer that sources upstream hooks is enabled (opencode or pi).
   rtkPluginSrc = pkgs.fetchFromGitHub {
     owner = "rtk-ai";
     repo = "rtk";
@@ -57,8 +57,8 @@ in {
 
     extension = lib.mkOption {
       type = lib.types.path;
-      default = ./extensions/pi-rtk.ts;
-      defaultText = lib.literalExpression "./rtk/extensions/pi-rtk.ts";
+      default = rtkPluginSrc + "/hooks/pi/rtk.ts";
+      defaultText = lib.literalExpression "rtkPluginSrc + \"/hooks/pi/rtk.ts\"";
       description = "Extension file exposed as ~/.pi/agent/extensions/rtk.ts when programs.pi.rtk.enable is true.";
     };
   };
