@@ -50,6 +50,9 @@ in {
       # aws
       awscli2
 
+      # splunk
+      inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.splunk-as
+
       # mongosh removed - now in shared/packages/dev-tools.nix
       # gh removed - now in shared/packages/dev-tools.nix
 
