@@ -93,6 +93,10 @@
           inherit pkgs;
           lib = pkgs.lib;
         };
+        splunk-as = import ../packages/splunk-as.nix {
+          inherit pkgs;
+          lib = pkgs.lib;
+        };
       }
       // optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
         helium = import ../packages/helium.nix {
