@@ -35,21 +35,43 @@
     then map dropNulls (lib.filter (item: item != null) value)
     else value;
 
+  normalizeMcpServer = server: let
+    isUrlServer = (server.url or null) != null;
+    enabled =
+      if (server.enabled or null) != null
+      then server.enabled
+      else !(server.disabled or false);
+    headers = server.http_headers or server.headers or {};
+    baseServer = {
+      inherit enabled;
+    };
+  in
+    dropNulls (
+      if isUrlServer
+      then
+        baseServer
+        // {
+          url = server.url;
+        }
+        // lib.optionalAttrs (headers != {}) {
+          http_headers = headers;
+        }
+      else
+        baseServer
+        // {
+          command = server.command;
+        }
+        // lib.optionalAttrs ((server.args or []) != []) {
+          args = server.args;
+        }
+        // lib.optionalAttrs ((server.env or {}) != {}) {
+          env = server.env;
+        }
+    );
+
   codexMcpServers = lib.optionalAttrs config.programs.mcp.enable (
     lib.mapAttrs (
-      _name: server:
-        dropNulls (
-          (lib.removeAttrs server [
-            "disabled"
-            "headers"
-          ])
-          // (lib.optionalAttrs (server ? headers && !(server ? http_headers)) {
-            http_headers = server.headers;
-          })
-          // {
-            enabled = !(server.disabled or false);
-          }
-        )
+      _name: server: normalizeMcpServer server
     )
     config.programs.mcp.servers
   );

@@ -34,7 +34,35 @@
                 changed = merge_missing(target_value, value) or changed
         return changed
 
-    if merge_missing(config_doc, seed_doc):
+    def clean_stale_mcp_fields(doc):
+        changed = False
+        mcp_servers = doc.get("mcp_servers")
+        if not hasattr(mcp_servers, "items"):
+            return False
+
+        for server in mcp_servers.values():
+            if not hasattr(server, "items"):
+                continue
+
+            transport = server.get("transport")
+            if transport is not None and not hasattr(transport, "items"):
+                del server["transport"]
+                changed = True
+
+            if "url" not in server:
+                continue
+
+            for key in ("args", "command", "env"):
+                if key in server:
+                    del server[key]
+                    changed = True
+
+        return changed
+
+    changed = merge_missing(config_doc, seed_doc)
+    changed = clean_stale_mcp_fields(config_doc) or changed
+
+    if changed:
         config_path.write_text(tomlkit.dumps(config_doc))
   '';
 in {
