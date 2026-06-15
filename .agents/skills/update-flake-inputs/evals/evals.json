@@ -1,0 +1,49 @@
+{
+  "skill_name": "update-flake-inputs",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "In this nix-config repo, update only the nixpkgs flake input to latest. Keep the lock diff scoped, don't update everything, and tell me how you verified it.",
+      "expected_output": "A scoped nixpkgs update plan or implementation that avoids broad lock churn and verifies the result.",
+      "files": [],
+      "expectations": [
+        "Uses or recommends a scoped command like `nix flake update nixpkgs`, not plain `nix flake update`.",
+        "Inspects or plans to inspect `flake.lock` / `git diff` for unrelated input movement.",
+        "Includes verification with `nix flake metadata`, `nix flake check --no-build`, full `nix flake check`, or a targeted build/eval."
+      ]
+    },
+    {
+      "id": 1,
+      "prompt": "Update the Hyprland-related flake inputs. Don't just check the newest release note; look at the full delta from the currently pinned version and adjust config if needed.",
+      "expected_output": "A Hyprland ecosystem update workflow that researches release notes across the full version range and applies required config migrations without optional churn.",
+      "files": [],
+      "expectations": [
+        "Compares current adopted version/revision to target and reviews the full release-note range, not only the latest patch note.",
+        "Identifies required config migrations separately from optional new features.",
+        "Preserves compatibility/follows relationships for related Hyprland ecosystem inputs unless there is evidence to change them."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Bump two related inputs: my-overlay and my-plugin. my-plugin follows my-overlay's nixpkgs. Make sure the update doesn't accidentally duplicate nixpkgs pins or break ABI compatibility.",
+      "expected_output": "A related-input update workflow that checks follows/shared dependencies and compatibility before and after the scoped update.",
+      "files": [],
+      "expectations": [
+        "Explicitly checks and preserves `inputs.<name>.follows` relationships when they express compatibility or deduplication.",
+        "Uses a scoped multi-input update command rather than updating every flake input.",
+        "Reviews lock metadata/diff to confirm expected direct and transitive movement only."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "After updating one flake input, `nix flake check` fails in a totally different module. Decide what to do next; don't just assume the update broke it.",
+      "expected_output": "A failure-triage workflow that isolates whether the failure is caused by the update or pre-existing/unrelated.",
+      "files": [],
+      "expectations": [
+        "Uses targeted eval/build commands for the updated input or affected output before blaming the update.",
+        "Suggests comparing against the pre-update `HEAD` or baseline state when the failure looks unrelated.",
+        "Reports unrelated/pre-existing failures only with concrete evidence from commands or diffs."
+      ]
+    }
+  ]
+}
