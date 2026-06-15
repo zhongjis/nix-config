@@ -60,7 +60,6 @@
       # "flux"
       "box-drive"
       "caffeine"
-      "aerospace"
       "appcleaner"
       "bartender"
       # "quicksilver"
@@ -75,6 +74,12 @@
       "google-chrome"
       "helium-browser"
     ];
+
+    # AeroSpace's cask ships from a third-party tap. Homebrew now refuses to
+    # load casks from untrusted taps, so grant explicit trust for this cask.
+    extraConfig = ''
+      cask "nikitabobko/tap/aerospace", trusted: true
+    '';
 
     masApps = {
       Things3 = 904280696;
