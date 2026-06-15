@@ -1,5 +1,6 @@
 {lib, ...}: {
   services.postgresql.enable = lib.mkForce false;
+  # Container DB (when this module is active): psql -h 127.0.0.1 -p 5432 -U postgres -d postgres; password comes from POSTGRES_PASSWORD below.
   virtualisation.oci-containers.containers.postgresql = {
     image = "supabase/postgres:17.6.1.084";
     autoStart = true;
