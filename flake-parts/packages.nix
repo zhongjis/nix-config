@@ -39,6 +39,11 @@
       }
       // {
         oh-my-codex = inputs.llm-agents.packages.${system}.oh-my-codex;
+        oh-my-opencode = import ../packages/oh-my-opencode.nix {
+          inherit pkgs;
+          lib = pkgs.lib;
+          base = inputs.llm-agents.packages.${system}.oh-my-opencode;
+        };
         opencode-morph-fast-apply = import ../packages/opencode-morph-fast-apply.nix {
           inherit pkgs;
           lib = pkgs.lib;
