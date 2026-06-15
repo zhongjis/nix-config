@@ -10,7 +10,7 @@
 
   # Nix-built plugins (for packages not on npm or with github: prefix issues)
   morphFastApplyPkg = inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.opencode-morph-fast-apply;
-  ohMyOpenCodePkg = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.oh-my-opencode;
+  ohMyOpenCodePkg = inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.oh-my-opencode;
 
   # Plugins available to all profiles
   generalPlugins = [

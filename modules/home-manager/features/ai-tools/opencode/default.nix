@@ -6,6 +6,7 @@
 }: let
   inherit (pkgs.stdenv.hostPlatform) system;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
+  selfPackages = inputs.self.packages.${system};
 in {
   imports = [
     ../common
@@ -19,12 +20,12 @@ in {
   ];
 
   home.packages = [
-    llmAgentsPackages.oh-my-opencode
+    selfPackages.oh-my-opencode
   ];
 
   programs.opencode = {
     enable = true;
-    package = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.opencode;
+    package = llmAgentsPackages.opencode;
     web.enable = false;
     enableMcpIntegration = true;
     caveman = {
