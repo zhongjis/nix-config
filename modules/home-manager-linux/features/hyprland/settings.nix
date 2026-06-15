@@ -78,7 +78,6 @@
 
     # See https://wiki.hyprland.org/Configuring/Dwindle-Layout/ for more
     dwindle = {
-      pseudotile = true; # Master switch for pseudotiling. Enabling is bound to mainMod + P in the keybinds section below
       preserve_split = true; # You probably want this
     };
 
@@ -93,9 +92,6 @@
       disable_splash_rendering = true;
       initial_workspace_tracking = 1;
       middle_click_paste = false;
-
-      # Variable Frame Rate - reduces GPU usage when idle (better for laptop battery)
-      vfr = true;
     };
 
     #############
@@ -136,6 +132,9 @@
     };
 
     debug = {
+      # Variable Frame Rate - reduces GPU usage when idle (moved from misc in Hyprland 0.55)
+      vfr = true;
+
       # NOTE: full_cm_proto is experimental and can cause issues on AMD - disabled
       # full_cm_proto = true;
     };
