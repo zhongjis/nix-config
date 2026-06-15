@@ -1,5 +1,7 @@
 {
   inputs,
+  config,
+  lib,
   pkgs,
   commonSkills,
   commonInstructions,
@@ -25,19 +27,34 @@
     (map builtins.readFile commonInstructions)
     ++ [(builtins.readFile codexRtkInstructions)]
   );
-in {
-  programs.codex = {
-    enable = true;
-    enableMcpIntegration = true;
-    impeccable.enable = true;
-    caveman = {
-      enable = true;
-      mode = "ultra";
-    };
-    package = llmAgentsPackages.codex;
-    context = codexContext;
-    rules = {};
-    settings = {
+
+  dropNulls = value:
+    if builtins.isAttrs value
+    then lib.mapAttrs (_: dropNulls) (lib.filterAttrs (_: attrValue: attrValue != null) value)
+    else if builtins.isList value
+    then map dropNulls (lib.filter (item: item != null) value)
+    else value;
+
+  codexMcpServers = lib.optionalAttrs config.programs.mcp.enable (
+    lib.mapAttrs (
+      _name: server:
+        dropNulls (
+          (lib.removeAttrs server [
+            "disabled"
+            "headers"
+          ])
+          // (lib.optionalAttrs (server ? headers && !(server ? http_headers)) {
+            http_headers = server.headers;
+          })
+          // {
+            enabled = !(server.disabled or false);
+          }
+        )
+    )
+    config.programs.mcp.servers
+  );
+  codexSeedSettings =
+    {
       approval_policy = "never";
       allow_login_shell = true;
       sandbox_mode = "workspace-write";
@@ -46,7 +63,25 @@ in {
         "inherit" = "all";
         experimental_use_profile = true;
       };
+    }
+    // lib.optionalAttrs (codexMcpServers != {}) {
+      mcp_servers = codexMcpServers;
     };
+in {
+  programs.codex = {
+    enable = true;
+    seedSettings = codexSeedSettings;
+    impeccable.enable = true;
+    caveman = {
+      enable = true;
+      mode = "ultra";
+    };
+    package = llmAgentsPackages.codex;
+    context = codexContext;
+    rules = {};
+    # Codex mutates ~/.codex/config.toml for project trust and local state.
+    # Keep Home Manager from owning the live file; seed defaults via programs.codex.seedSettings.
+    settings = {};
     skills = commonSkills;
   };
 }
