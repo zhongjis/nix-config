@@ -1,5 +1,6 @@
 {
   caveman = ./caveman;
+  codex = ./codex;
   impeccable = ./impeccable;
   "oh-my-pi" = ./oh-my-pi;
   rtk = ./rtk;
