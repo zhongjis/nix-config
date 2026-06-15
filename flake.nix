@@ -95,7 +95,7 @@
     };
 
     ## hyprland
-    hyprland.url = "github:hyprwm/Hyprland/v0.54.1";
+    hyprland.url = "github:hyprwm/Hyprland/v0.55.4";
     hyprland-plugins = {
       url = "github:hyprwm/hyprland-plugins";
       inputs.hyprland.follows = "hyprland";
