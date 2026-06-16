@@ -72,6 +72,7 @@
     alsa.support32Bit = true;
     pulse.enable = true;
     jack.enable = true;
+    extraLadspaPackages = [pkgs.rnnoise-plugin];
   };
 
   hardware.graphics = {
