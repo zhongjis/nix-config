@@ -7,9 +7,9 @@
   hyprland-pkgs-unstable = inputs.hyprland.inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system};
 in {
   services.xserver.enable = true;
-  services.displayManager.defaultSession = "hyprland-uwsm";
+  services.displayManager.defaultSession = "hyprland";
 
-  programs.uwsm.enable = true;
+  programs.uwsm.enable = false;
   programs.hyprland = {
     enable = true;
 
@@ -18,7 +18,7 @@ in {
     portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
 
     xwayland.enable = true;
-    withUWSM = true;
+    withUWSM = false;
   };
 
   hardware.graphics = {
