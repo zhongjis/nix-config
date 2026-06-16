@@ -130,13 +130,5 @@
     cursor = {
       no_hardware_cursors = true;
     };
-
-    debug = {
-      # Variable Frame Rate - reduces GPU usage when idle (moved from misc in Hyprland 0.55)
-      vfr = true;
-
-      # NOTE: full_cm_proto is experimental and can cause issues on AMD - disabled
-      # full_cm_proto = true;
-    };
   };
 }
