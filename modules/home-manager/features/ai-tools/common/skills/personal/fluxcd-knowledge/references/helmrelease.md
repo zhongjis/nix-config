@@ -58,12 +58,9 @@ spec:
   install:
     strategy:
       name: RetryOnFailure
-      retryInterval: 3m
   upgrade:
-    force: true
     strategy:
       name: RetryOnFailure
-      retryInterval: 3m
   values:
     crds:
       enabled: true
@@ -167,7 +164,7 @@ Detects and optionally corrects configuration drift between the Helm release and
 ```yaml
 spec:
   driftDetection:
-    mode: enabled            # enabled or disabled
+    mode: enabled            # disabled (default), warn, or enabled
     ignore:
       - paths:
           - /spec/replicas

@@ -21,23 +21,24 @@ Prescriptive guidance for production Flux deployments with Flux Operator.
   is fully rolled out before dependents proceed.
 - **CRDs before CRs:** Deploy CRD-installing HelmReleases in a separate Kustomization
   that runs before the Kustomization applying custom resources.
-- **ResourceSet dependency chains:** Use `ready: true` with `readyExpr` CEL expressions
-  for cross-ResourceSet dependencies (policies → infra → apps).
+- **ResourceSet dependency chains:** Use `ready: true` for cross-ResourceSet
+  dependencies (policies → infra → apps). Optionally add a `readyExpr` CEL expression
+  to replace the built-in readiness check with a custom one.
 
 ## Remediation and Reliability
 
 - **Install/upgrade strategies:** Always use `RetryOnFailure` — it retries without
   uninstalling or rolling back, avoiding downtime and data loss on transient failures.
 - **Set `retryInterval`:** Configure retry intervals on Kustomizations (`retryInterval: 5m`)
-  and HelmReleases (`strategy.retryInterval: 3m`) for faster recovery from transient failures.
+  and HelmReleases (`strategy.retryInterval: 5m`) for faster recovery from transient failures.
 - **Drift detection:** Enable `driftDetection.mode: enabled` on HelmReleases for critical
   applications to prevent manual cluster changes from diverging. Ignore HPA-managed fields
   like `/spec/replicas`.
 - **Timeouts:** Set explicit `timeout` on Kustomizations and HelmReleases to prevent
   indefinite hanging during apply operations.
 - **CRD handling:** Use `install.crds: Create` and `upgrade.crds: CreateReplace` for
-  HelmReleases that manage CRDs. Set `keep: false` for CRDs that should be cleaned up
-  on uninstall.
+  HelmReleases that manage CRDs. Note that CRDs installed via a Helm chart are **not**
+  deleted on uninstall — Helm has no native support for removing CRDs.
 - **Reactivity:** Add `reconcile.fluxcd.io/watch: Enabled` label to ConfigMaps and Secrets
   that feed into `postBuild.substituteFrom` or `valuesFrom` — this triggers immediate
   reconciliation when values change instead of waiting for the next interval.
@@ -66,7 +67,6 @@ Prescriptive guidance for production Flux deployments with Flux Operator.
 - **Service account impersonation:** Use `serviceAccountName` on Kustomizations and HelmReleases
   with per-namespace ServiceAccounts and RoleBindings for least-privilege access.
 
-
 ## Flux Operator Configuration
 
 - **Cluster sizing:** Match `cluster.size` to workload count — `small` for dev (<50 resources),
@@ -84,8 +84,6 @@ Prescriptive guidance for production Flux deployments with Flux Operator.
 
 - **Alerts on failures:** Create Provider + Alert for Slack/Teams with `eventSeverity: error`
   watching all Kustomizations and HelmReleases. Every cluster should have failure notifications.
-- **Receivers for fast sync:** Set up Receiver webhooks for GitHub/GitLab push events to trigger
-  immediate GitRepository reconciliation instead of waiting for the poll interval.
 - **Intervals:** Use short intervals for sources (`5m`) and longer intervals for appliers
   (`30m`). Receivers handle immediate triggers; intervals are the fallback.
 - **Prune: true:** Always set `prune: true` on Kustomizations to enable garbage collection
@@ -97,3 +95,5 @@ Prescriptive guidance for production Flux deployments with Flux Operator.
   (Dex, Keycloak, Microsoft Entra ID, OpenShift) and can be exposed via Ingress.
 - **Image automation isolation:** Run image automation controllers on a dedicated cluster
   to isolate Git write access from production clusters.
+- **Receivers for fast sync:** Set up Receiver webhooks for GitHub/GitLab push events to trigger
+  immediate GitRepository reconciliation instead of waiting for the poll interval.

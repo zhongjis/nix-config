@@ -19,8 +19,7 @@ to answer questions accurately, generate correct YAML manifests, and explain Flu
 **Rules:**
 - Always use the exact apiVersion/kind combinations from the CRD table below. Never invent API versions.
 - Before generating YAML for any CRD, read its OpenAPI schema from `assets/schemas/` to verify field names, types, and enum values.
-- ResourceSet templates use `<< >>` delimiters, NEVER `{{ }}` (Go templates are only used inside ImageUpdateAutomation commit messages).
-- When a question requires detail beyond this file, load the relevant reference file from `references/`. Load at most 1-2 reference files per question.
+- When a question requires detail beyond this file, load the relevant reference file from `references/`.
 - Prefer Flux Operator (FluxInstance) for cluster setup. Do not reference `flux bootstrap` or legacy `gotk-*` files.
 
 ## What is Flux
@@ -120,7 +119,7 @@ spec:
     - name: infra-controllers  # wait for this Kustomization to be Ready
 ```
 
-ResourceSets support richer dependencies with `readyExpr` (CEL expressions):
+ResourceSets support richer dependencies with `readyExpr` (CEL expressions) and can depend on any type of resource:
 
 ```yaml
 spec:
@@ -163,44 +162,6 @@ references it via `postBuild.substituteFrom` or `valuesFrom` will reconcile imme
 - **Plain YAML or Kustomize overlays** → `Kustomization`
 - **Helm chart** → `HelmRelease`
 - Both can deploy to remote clusters via `kubeConfig` and support `dependsOn`.
-
-### How to Reference Helm Charts (3 Patterns)
-
-**Pattern 1 — HTTPS Helm repository:**
-```yaml
-# HelmRelease creates a HelmChart automatically
-spec:
-  chart:
-    spec:
-      chart: metrics-server
-      version: "3.x"
-      sourceRef:
-        kind: HelmRepository
-        name: metrics-server
-```
-
-**Pattern 2 — OCI registry with chartRef (recommended):**
-```yaml
-# Separate OCIRepository + HelmRelease with chartRef
-spec:
-  chartRef:
-    kind: OCIRepository
-    name: nginx-chart
-```
-
-**Pattern 3 — HelmChart from Git/Bucket source:**
-```yaml
-# Chart stored in Git, HelmRelease references HelmChart
-spec:
-  chart:
-    spec:
-      chart: ./charts/my-app
-      sourceRef:
-        kind: GitRepository
-        name: my-repo
-```
-
-`chart.spec` and `chartRef` are **mutually exclusive** — use one or the other.
 
 ### ResourceSet vs Kustomization?
 
@@ -320,7 +281,6 @@ spec:
   values:
     crds:
       enabled: true
-      keep: false
 ```
 
 ### 4. FluxInstance with OCI Sync (Gitless GitOps)
@@ -363,46 +323,17 @@ kind: ResourceSet
 metadata:
   name: apps
   namespace: flux-system
-  annotations:
-    fluxcd.controlplane.io/reconcileEvery: "5m"
 spec:
-  dependsOn:
-    - apiVersion: fluxcd.controlplane.io/v1
-      kind: ResourceSet
-      name: infra
-      ready: true
   inputs:
     - tenant: "frontend"
-      tag: "latest"
       environment: "production"
     - tenant: "backend"
-      tag: "latest"
       environment: "production"
   resources:
     - apiVersion: v1
       kind: Namespace
       metadata:
         name: << inputs.tenant >>
-        labels:
-          toolkit.fluxcd.io/role: "tenant"
-    - apiVersion: v1
-      kind: ServiceAccount
-      metadata:
-        name: flux
-        namespace: << inputs.tenant >>
-    - apiVersion: rbac.authorization.k8s.io/v1
-      kind: RoleBinding
-      metadata:
-        name: flux
-        namespace: << inputs.tenant >>
-      roleRef:
-        apiGroup: rbac.authorization.k8s.io
-        kind: ClusterRole
-        name: admin
-      subjects:
-        - kind: ServiceAccount
-          name: flux
-          namespace: << inputs.tenant >>
     - apiVersion: source.toolkit.fluxcd.io/v1
       kind: OCIRepository
       metadata:
@@ -412,33 +343,45 @@ spec:
         interval: 5m
         url: "oci://ghcr.io/my-org/apps/<< inputs.tenant >>"
         ref:
-          tag: << inputs.tag >>
+          tag: latest
     - apiVersion: kustomize.toolkit.fluxcd.io/v1
       kind: Kustomization
       metadata:
         name: apps
         namespace: << inputs.tenant >>
       spec:
-        targetNamespace: << inputs.tenant >>
-        serviceAccountName: flux
         interval: 30m
-        retryInterval: 5m
         wait: true
-        timeout: 5m
+        prune: true
         sourceRef:
           kind: OCIRepository
           name: apps
         path: "./<< inputs.environment >>"
-        prune: true
 ```
 
-### 6. Image Automation Pipeline
+For the full multi-tenant pattern — per-tenant ServiceAccount + RoleBinding,
+`serviceAccountName` impersonation, `dependsOn`, and the `reconcileEvery` annotation —
+load `references/resourcesets.md`.
 
-Pipeline: ImageRepository → ImagePolicy → ImageUpdateAutomation. Mark images in YAML with
-`# {"$imagepolicy": "namespace:policy-name"}` comment markers for automatic tag updates.
+### 6. Image Automation
 
-For complete YAML examples, tag filtering, commit message templates, and marker formats,
-load `references/image-automation.md`.
+Flux supports two delivery models for updating container images and Helm chart versions.
+Pick based on whether the team wants Git commits as the audit log for version changes:
+
+- **Git-based** — `ImageRepository` + `ImagePolicy` + `ImageUpdateAutomation` scan the
+  registry and commit tag bumps back to Git via `$imagepolicy` YAML markers. Requires
+  `image-reflector-controller` and `image-automation-controller` on the cluster. Load
+  `references/image-automation.md`.
+- **Gitless** — `ResourceSet` + `ResourceSetInputProvider` (`type: OCIArtifactTag`)
+  scans the registry and re-renders the `ResourceSet` directly, upgrading the downstream
+  `HelmRelease` or `Kustomization` without touching Git. No bot credentials, no Git
+  poll lag, no extra controllers. Recommended default for Flux Operator deployments.
+  Load `references/gitless-image-automation.md`.
+
+Gitless is the better fit when the tag lives in Helm values, when tags should differ per
+cluster in a fleet, or when the team doesn't want a bot writing to the repo. Git-based is
+the better fit when PR-based approval of version bumps is required or when Git must remain
+the canonical record of every deployed version.
 
 ### 7. Notifications (Slack, GitHub, Webhooks)
 
@@ -458,18 +401,6 @@ load `references/notifications.md`.
 - HelmRelease: `spec.chart.spec` and `spec.chartRef` are mutually exclusive
 - FluxInstance: only one per cluster, must be named `flux`
 
-**Required fields often forgotten:**
-- `Kustomization.spec.prune` — must be set (true or false), controls garbage collection
-- `Kustomization.spec.sourceRef` — must specify kind and name
-- `HelmRelease.spec.interval` — required for reconciliation
-- `Alert.spec.eventSources` — at least one source required
-
-**Wrong API versions:**
-- Alert and Provider use `v1beta3`, not `v1` — `notification.toolkit.fluxcd.io/v1beta3`
-- Receiver uses `v1` — `notification.toolkit.fluxcd.io/v1`
-- HelmRelease uses `v2`, not `v1` or `v2beta1` — `helm.toolkit.fluxcd.io/v2`
-- ImageRepository and ImagePolicy use `v1` — `image.toolkit.fluxcd.io/v1`
-
 **HelmRelease strategy fields:**
 - Install/upgrade strategy is at `spec.install.strategy.name` and `spec.upgrade.strategy.name`
 - Always use `RetryOnFailure` — it retries without rollback or uninstall, avoiding downtime
@@ -482,7 +413,6 @@ load `references/notifications.md`.
     mediaType: "application/vnd.cncf.helm.chart.content.v1.tar+gzip"
     operation: copy
   ```
-- Without `layerSelector`, the OCIRepository fetches the full OCI artifact, not the extracted chart.
 
 ## Reference Index
 
@@ -517,19 +447,6 @@ Load at most 1-2 reference files per question. Read schemas for field-level vali
 | Best practices, dependency management, remediation, versioning | `references/best-practices.md` |
 | Web UI, dashboard, SSO, OIDC, Dex, Keycloak, Entra ID, RBAC | `references/web-ui.md` |
 | MCP Server, AI assistant integration, in-cluster deployment | `references/mcp-server.md` |
-
-## FluxInstance Enums
-
-**Cluster types:** `kubernetes`, `openshift`, `aws`, `azure`, `gcp`
-
-**Cluster sizes:** `small` (5 concurrency, 512Mi), `medium` (10, 1Gi), `large` (20, 3Gi)
-
-**Components:** `source-controller`, `kustomize-controller`, `helm-controller`,
-`notification-controller`, `image-reflector-controller`, `image-automation-controller`, `source-watcher`
-
-**Sync kinds:** `GitRepository`, `OCIRepository`, `Bucket`
-
-**Distribution variants:** `upstream-alpine`, `enterprise-alpine`, `enterprise-distroless`, `enterprise-distroless-fips`
-
-For enums of other CRDs (HelmRelease strategies, Provider types, ImagePolicy types,
-ResourceSetInputProvider types, etc.), check the relevant reference file or OpenAPI schema.
+| Terraform bootstrap of Flux Operator | `references/terraform-bootstrap.md` |
+| Gitless GitOps, Flux OCI artifacts, `flux push artifact`, registry-based delivery | `references/gitless-gitops.md` |
+| Gitless image automation (ResourceSet + OCIArtifactTag) | `references/gitless-image-automation.md` |
