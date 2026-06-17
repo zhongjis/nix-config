@@ -1,12 +1,18 @@
 # Minimal Skeletons (Not Full Templates)
 
-Use these as structure starters only. Fill with project-specific commands, gotchas, and conventions.
+Use these as structure starters only. Fill with project-specific commands, gotchas, and conventions. Do not ship these verbatim; a shipped placeholder is worse than no file.
 
-Do not ship these verbatim.
+## Contents
 
-## Before/After Examples
+- Before/After Example
+- Root file skeleton (single project)
+- Root file skeleton (monorepo)
+- Root file skeleton (multi-language monorepo)
+- Authoring rules
 
-### Bad Example (Generic Template)
+## Before/After Example
+
+### Bad (generic template)
 
 ```markdown
 # My Project
@@ -20,9 +26,9 @@ Install dependencies and run the app.
 Write clean code. Use TypeScript properly.
 ```
 
-**Issues:** No commands, generic advice, no gotchas, no actionable guidance
+**Issues:** no commands, generic advice, no gotchas; an agent learns nothing it didn't already know.
 
-### Good Example (Execution-First)
+### Good (execution-first)
 
 ```markdown
 # payments-api
@@ -45,7 +51,7 @@ REST API for payment processing.
 - Use `createPaymentIntent()` helper for all payment creation
 ```
 
-**Wins:** Copy-paste commands, specific gotchas with fixes, implementation-affecting conventions
+**Wins:** copy-paste commands, specific gotchas with fixes, implementation-affecting conventions.
 
 ## Root file skeleton (single project)
 
@@ -69,7 +75,7 @@ One-line description.
 
 ## References
 - @docs/architecture.md
-- @.agents/testing.md
+- @.claude/testing.md
 ```
 
 ## Root file skeleton (monorepo)
@@ -77,37 +83,54 @@ One-line description.
 ```markdown
 # <Monorepo name>
 
+One-line description.
+
 ## Commands
 - `<root install/build/test/lint commands>`
 
-## Scope
-- Root file: shared rules only
-- `apps/<app>/AGENTS.md`: app-specific rules
-- `packages/<pkg>/AGENTS.md`: package-specific rules
+## Workspace map
+Each workspace has its own `AGENTS.md`:
+@apps/<app>/AGENTS.md
+@packages/<pkg>/AGENTS.md
 
-## Cross-workspace gotchas
-- `<workspace failure mode> -> <fix>`
+## Rules
+- `<cross-workspace rule that affects all workspaces>`
 
-## References
-- @docs/deployment.md
-- @docs/shared-conventions.md
+## Do not commit
+<Files/dirs that are runtime inputs or build outputs, not source>
 ```
 
-## Bad vs good
+## Root file skeleton (multi-language monorepo)
 
-Bad:
-- 300 lines of framework docs
-- Full folder tree for entire repo
-- Generic advice with no commands
+For projects mixing runtimes (e.g., Node + Python, Node + Rust):
 
-Good:
-- Clear run/test/build/lint commands
-- 3-8 high-value gotchas from real failures
-- Non-obvious conventions and boundaries
-- Links to deeper files for non-universal detail
+```markdown
+# <Monorepo name>
+
+One-line description. <Language A> + <Language B> monorepo using <tooling>.
+
+## Commands
+- `<root install/build/test/lint commands>`
+- `<language-B setup command>`
+
+## Workspace map
+Each workspace has its own `AGENTS.md`:
+@apps/<app>/AGENTS.md
+@packages/<pkg>/AGENTS.md
+
+(`packages/<lang-b-pkg>` is <Language B>-only; see its README for entry points.)
+
+## Rules
+- **Always use `<venv-or-toolchain-path>`, never global `<tool>`**: dependencies may not be on PATH.
+- <Cross-language boundary rule>
+
+## Do not commit
+<Runtime inputs, build outputs, venvs, node_modules, caches>
+```
 
 ## Authoring rules
 
 - Prefer bullets over paragraphs
-- Keep root file typically within 60-150 lines
-- Each line should save debugging time or prevent a known mistake
+- Keep the root file within 60-150 lines for typical active repos
+- 3-8 gotchas from real failures beats 20 hypothetical ones
+- Each line must save debugging time or prevent a known mistake
