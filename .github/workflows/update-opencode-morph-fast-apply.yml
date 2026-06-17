@@ -29,9 +29,12 @@ jobs:
             experimental-features = nix-command flakes
 
       - name: Update package files
+        id: update
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          old_version="$(grep -m1 -oE 'version = "[0-9.]+"' packages/opencode-morph-fast-apply.nix | grep -oE '[0-9.]+')"
+          echo "old_version=$old_version" >> "$GITHUB_OUTPUT"
           nix shell \
             nixpkgs#alejandra \
             nixpkgs#curl \
@@ -41,6 +44,8 @@ jobs:
             nixpkgs#python3 \
             github:nix-community/bun2nix \
             -c scripts/update-opencode-morph-fast-apply-package.sh
+          new_version="$(grep -m1 -oE 'version = "[0-9.]+"' packages/opencode-morph-fast-apply.nix | grep -oE '[0-9.]+')"
+          echo "new_version=$new_version" >> "$GITHUB_OUTPUT"
 
       - name: Detect changes
         id: diff
@@ -85,6 +90,8 @@ jobs:
           title: "chore(opencode): update morph fast apply package"
           body: |
             Automated daily opencode-morph-fast-apply package update.
+
+            Version: `${{ steps.update.outputs.old_version }}` → `${{ steps.update.outputs.new_version }}`
 
             Verification:
             - `nix build .#opencode-morph-fast-apply --no-link --print-out-paths`
