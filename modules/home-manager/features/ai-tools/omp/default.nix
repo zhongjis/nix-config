@@ -23,7 +23,7 @@
       vision = "openai-codex/gpt-5.5:high";
       smol = "github-copilot/claude-haiku-4.5:off";
       slow = "openai-codex/gpt-5.5:xhigh";
-      plan = "github-copilot/claude-opus-4.8:high";
+      plan = "github-copilot/claude-opus-4.8:xhigh";
       commit = "github-copilot/claude-haiku-4.5:off";
       task = "openai-codex/gpt-5.5:xhigh";
     };
@@ -32,13 +32,13 @@
   workOverrides = {
     # Anthropic ULW (ultra-large-window, 1M context) models
     modelRoles = {
-      default = "anthropic/claude-sonnet-4-6";
+      default = "anthropic/claude-opus-4-8:xhigh";
       vision = "github-copilot/gpt-5.5:high";
       smol = "anthropic/claude-haiku-4-5:off";
       slow = "anthropic/claude-opus-4-8:xhigh";
       plan = "anthropic/claude-opus-4-8:xhigh";
       commit = "anthropic/claude-haiku-4-5:off";
-      task = "anthropic/claude-sonnet-4-6";
+      task = "anthropic/claude-sonnet-4-6:xhigh";
     };
   };
 
