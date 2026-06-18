@@ -1,36 +1,47 @@
 #!/usr/bin/env bash
 # File: tmux-sessionizer
 
-# Default paths if SESSIONIZER_PATHS is not set
-DEFAULT_PATHS="$HOME/.config $HOME/personal $HOME/work $HOME/Documents"
+# Paths scanned one level deep: each direct child becomes a session.
+DEFAULT_PATHS="$HOME/.config $HOME/personal $HOME/Documents"
+# Paths using an org/repo layout: scanned two levels deep, so each repo
+# (not the org) becomes a session.
+DEFAULT_DEEP_PATHS="$HOME/work"
+
+# Override defaults via SESSIONIZER_PATHS / SESSIONIZER_DEEP_PATHS if set.
+shallow_paths=${SESSIONIZER_PATHS:-$DEFAULT_PATHS}
+deep_paths=${SESSIONIZER_DEEP_PATHS:-$DEFAULT_DEEP_PATHS}
 
 if [[ $# -eq 1 ]]; then
   selected="$1"
 else
-  # Use SESSIONIZER_PATHS if set, otherwise use default paths
-  paths=${SESSIONIZER_PATHS:-$DEFAULT_PATHS}
-
-  # Convert space-separated paths to find arguments
-  find_args=()
-  for path in $paths; do
-    if [[ -d "$path" ]]; then
-      find_args+=("$path")
-    fi
-  done
-
-  if [[ ${#find_args[@]} -eq 0 ]]; then
-    echo "No valid paths found in SESSIONIZER_PATHS"
-    exit 1
-  fi
-
-  selected=$(find "${find_args[@]}" -mindepth 1 -maxdepth 1 -type d | fzf)
+  selected=$(
+    {
+      for path in $shallow_paths; do
+        [[ -d "$path" ]] && find "$path" -mindepth 1 -maxdepth 1 -type d
+      done
+      for path in $deep_paths; do
+        [[ -d "$path" ]] && find "$path" -mindepth 2 -maxdepth 2 -type d
+      done
+    } | fzf
+  )
 fi
 
 if [[ -z "$selected" ]]; then
   exit 0
 fi
 
-selected_name=$(basename "$selected" | sed 's/\./_/g')
+# Work repos live at <deep_path>/<org>/<repo>; name them org_repo to avoid
+# collisions when two orgs share a repo name. Everything else uses basename.
+selected_name=""
+for path in $deep_paths; do
+  if [[ "$selected" == "$path/"* ]]; then
+    rel="${selected#"$path"/}"
+    selected_name="${rel//\//_}"
+    selected_name="${selected_name//./_}"
+    break
+  fi
+done
+[[ -z "$selected_name" ]] && selected_name=$(basename "$selected" | sed 's/\./_/g')
 tmux_running=$(pgrep tmux)
 
 if [[ -z "$TMUX" ]] && [[ -z "$tmux_running" ]]; then
