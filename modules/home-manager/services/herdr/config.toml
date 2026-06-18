@@ -21,7 +21,7 @@ new_cwd = "follow"
 [[keys.command]]
 key = "prefix+f"
 type = "pane"
-command = "herdr-sessionizer"
+command = "sessionizer"
 
 [ui]
 # Auto-generate tab names instead of prompting (the "auto tab naming" you asked about).

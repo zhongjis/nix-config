@@ -10,8 +10,8 @@
 in {
   home.packages = [
     herdrPkg
-    pkgs.jq # herdr-sessionizer parses `herdr workspace list` JSON
-    (pkgs.writeScriptBin "herdr-sessionizer" ''
+    pkgs.jq # sessionizer parses `herdr workspace list` JSON
+    (pkgs.writeScriptBin "sessionizer" ''
       ${builtins.readFile ./scripts/herdr-sessionizer.sh}
     '')
   ];
