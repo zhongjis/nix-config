@@ -29,11 +29,13 @@ command = "sessionizer"
 prompt_new_tab_name = false
 # herdr is agent-aware; surface agent state on split borders.
 show_agent_labels_on_pane_borders = true
+# Hold cmd + right-click to forward right-click to pane apps (e.g. hunk's TUI)
+# instead of opening herdr's pane menu.
+right_click_passthrough_modifier = "cmd"
 
 [ui.toast]
-# Agent finished / needs-input popups inside the Herdr UI. Click a toast
-# (mouse capture is on by default) to jump to that workspace/tab/pane.
-delivery = "herdr"
+# Deliver agent finished / needs-input popups via the OS notification service.
+delivery = "system"
 
 [ui.toast.herdr]
 position = "bottom-right"
