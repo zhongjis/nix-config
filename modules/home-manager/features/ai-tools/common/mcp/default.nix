@@ -58,11 +58,11 @@ in {
     if [[ -r "${secretPath_context7}" ]]; then
       export CONTEXT7_API_KEY="$(<"${secretPath_context7}")"
     fi
-
-    if [[ -r "${secretPath_exa}" ]]; then
-      export EXA_API_KEY="$(<"${secretPath_exa}")"
-    fi
   '';
+  #
+  #     if [[ -r "${secretPath_exa}" ]]; then
+  #       export EXA_API_KEY="$(<"${secretPath_exa}")"
+  #     fi
 
   programs.mcp = {
     enable = true;
