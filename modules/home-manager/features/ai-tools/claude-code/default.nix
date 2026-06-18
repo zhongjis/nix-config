@@ -39,12 +39,9 @@ in {
 
   programs.claude-code = {
     enable = true;
-    enableMcpIntegration =
-      if pkgs.stdenv.isDarwin
-      then false
-      else true;
+    enableMcpIntegration = false;
     package = llmAgentsPackages.claude-code;
-    impeccable.enable = true;
+    impeccable.enable = false;
     caveman = {
       enable = true;
       mode = "ultra";
