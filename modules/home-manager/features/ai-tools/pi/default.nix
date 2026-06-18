@@ -28,12 +28,25 @@
     then map convertEnvPlaceholders value
     else value;
 
+  # mcporter rejects null-valued fields: a stdio server must not carry baseUrl,
+  # a url server must not carry command. programs.mcp fills every option with a
+  # null default, so drop null attrs (recursively) before serializing.
+  # Matches the dropNulls helper in ../codex/default.nix.
+  dropNulls = value:
+    if builtins.isAttrs value
+    then lib.mapAttrs (_: dropNulls) (lib.filterAttrs (_: attrValue: attrValue != null) value)
+    else if builtins.isList value
+    then map dropNulls (lib.filter (item: item != null) value)
+    else value;
+
   normalizeMcporterServer = server: let
     converted = convertEnvPlaceholders server;
+    renamed =
+      if converted ? url && !(converted ? baseUrl)
+      then builtins.removeAttrs (converted // {baseUrl = converted.url;}) ["url"]
+      else converted;
   in
-    if converted ? url && !(converted ? baseUrl)
-    then builtins.removeAttrs (converted // {baseUrl = converted.url;}) ["url"]
-    else converted;
+    dropNulls renamed;
 
   mcporterConfig = {
     "$schema" = "https://raw.githubusercontent.com/steipete/mcporter/main/mcporter.schema.json";
