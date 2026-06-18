@@ -21,7 +21,7 @@
       title = "Ghostty";
 
       # init
-      initial-command = "zsh -l -c 'tmux attach || tmux new-session -d -s home \"${pkgs.fastfetch}/bin/fastfetch; exec $SHELL\" && tmux attach -t home'";
+      initial-command = "zsh -l -c 'cd ~/personal/nix-config && herdr'";
       confirm-close-surface = false;
       background-opacity = 0.9;
       keybind = [
