@@ -1,6 +1,6 @@
 ---
 name: nix
-description: Unified Nix toolkit — running packages without installing, evaluating expressions and debugging derivations, flakes (build/devShell/lock/check), nh system switching and store cleanup, authoring patterns (overlays, unfree, binary overlays, devShells), and choosing the narrowest ad-hoc execution path. Use whenever working with Nix: running a tool one-off, evaluating a Nix expression, converting or prefetching hashes (SRI), nix or flake commands, editing flake.nix or shell.nix, nh os/home/darwin switch, garbage collection, overlays, unfree packages, or running a missing command without polluting the host.
+description: "Unified Nix toolkit — running packages without installing, evaluating expressions and debugging derivations, flakes (build/devShell/lock/check), nh system switching and store cleanup, authoring patterns (overlays, unfree, binary overlays, devShells), and choosing the narrowest ad-hoc execution path. Use whenever working with Nix: running a tool one-off, evaluating a Nix expression, converting or prefetching hashes (SRI), nix or flake commands, editing flake.nix or shell.nix, nh os/home/darwin switch, garbage collection, overlays, unfree packages, or running a missing command without polluting the host."
 adaptedFrom:
   - "https://github.com/knoopx/pi/tree/main/agent/skills/tools/nix"
   - "https://github.com/knoopx/pi/tree/main/agent/skills/tools/nix-flake"
