@@ -25,4 +25,4 @@
 
 ## Detailed Ad-hoc Guidance
 
-For detailed Python, Node.js, and ad-hoc command selection, use the `nix-ad-hoc-execution` skill.
+For detailed Python, Node.js, and ad-hoc command selection, see the `nix` skill (ad-hoc execution reference).

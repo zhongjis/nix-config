@@ -1,9 +1,3 @@
----
-name: nix-best-practices
-description: Nix patterns for flakes, overlays, unfree handling, and binary overlays. Use when working with flake.nix or shell.nix.
-upstream: "https://github.com/0xbigboss/claude-code/tree/main/.claude/skills/nix-best-practices"
----
-
 # Nix Best Practices
 
 ## Flake Structure
@@ -209,7 +203,7 @@ When nixpkgs builds a community version lacking features (common with open-core 
 ```bash
 nix-prefetch-url https://example.com/tool-linux-amd64-v1.0.0
 # Returns hash in base32, convert to SRI format:
-nix hash to-sri --type sha256 <base32-hash>
+nix hash convert --hash-algo sha256 --from nix32 --to sri <base32-hash>
 ```
 
 Or use SRI directly:

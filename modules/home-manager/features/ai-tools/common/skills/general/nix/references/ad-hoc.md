@@ -1,11 +1,6 @@
----
-name: nix-ad-hoc-execution
-description: Chooses the right ad-hoc execution path in this Nix environment. Use when a command is missing, when you need to run a tool without installing it, when you need a one-off CLI, or when Python/Node work needs temporary dependencies without mutating the host.
----
+# Nix — ad-hoc execution
 
-# Nix Ad-hoc Execution
-
-Use this skill to choose the narrowest temporary execution path without polluting the host.
+Choose the narrowest temporary execution path without polluting the host.
 
 ## Selection Order
 
@@ -35,12 +30,3 @@ npx tsx script.ts
 - Do not mutate the host environment unless the user explicitly asks for a persistent setup change.
 - Prefer project-scoped or ephemeral execution over system-wide changes.
 - Avoid `pip install`, `pip install --user`, `npm install -g`, `sudo npm install -g`, and similar global mutable installs as the default answer.
-
-## Related Skills
-
-- `nix` - broader Nix command and evaluation patterns
-- `nix-flakes` - flake-based environments and workflows
-- `nh` - NixOS / Home Manager switching and maintenance
-- `python` - Python project structure, typing, and testing
-- `uv` - uv project and dependency workflows
-- `pnpm` / `bun` - project-specific Node.js package manager workflows

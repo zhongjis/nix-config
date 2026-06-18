@@ -1,9 +1,3 @@
----
-name: nix-flakes
-description: Creates reproducible builds, manages flake inputs, defines devShells, and builds packages with flake.nix. Use when initializing Nix projects, locking dependencies, or running nix build/develop commands.
-upstream: "https://github.com/knoopx/pi/tree/main/agent/skills/tools/nix-flake"
----
-
 # Nix Flakes
 
 Modern Nix project management with hermeticity and reproducibility through flake.lock.
@@ -120,14 +114,3 @@ nix flake metadata path:.
 # Evaluate a specific output
 nix eval path:.#packages.x86_64-linux.default.name
 ```
-
-## Related Skills
-
-- **nix**: Run applications without installation and create development environments using Nix.
-- **nh**: Manage NixOS and Home Manager operations with improved output using nh.
-
-## Related Tools
-
-- **search-nix-packages**: Search for packages available in the NixOS package repository when working with flakes.
-- **search-nix-options**: Find configuration options available in NixOS for flake configurations.
-- **search-home-manager-options**: Find configuration options for Home Manager in flake setups.

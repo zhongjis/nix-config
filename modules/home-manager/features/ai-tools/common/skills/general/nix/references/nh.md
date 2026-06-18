@@ -1,9 +1,3 @@
----
-name: nh
-description: Switches NixOS/Home Manager configurations, cleans old generations, and performs system maintenance. Use when running os/home switch, pruning the Nix store, or managing system generations.
-upstream: "https://github.com/knoopx/pi/tree/main/agent/skills/tools/nh"
----
-
 # nh (Nix Helper)
 
 CLI tool that simplifies Nix operations with cleaner interface for builds, switches, and garbage collection.
@@ -105,8 +99,3 @@ nh clean all
 - **Headless Usage**: Avoid using the `--ask` flag in scripts or automated environments as it requires user interaction.
 - **Path Inference**: `nh` automatically looks for a `flake.nix` in the current directory if no path is provided.
 - **Visuals**: `nh` provides a more readable "Nom-like" output by default, which is helpful for monitoring build progress in a terminal.
-
-## Related Skills
-
-- **nix**: Use Nix for running applications without installation and evaluating Nix expressions.
-- **nix-flakes**: Leverage Nix Flakes for reproducible builds and project isolation with nh.
