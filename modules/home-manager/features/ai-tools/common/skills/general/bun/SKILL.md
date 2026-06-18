@@ -1,6 +1,7 @@
 ---
 name: bun
 description: Initializes projects, manages dependencies, runs scripts, executes tests, and bundles code using Bun. Use when working with package.json, installing packages, running dev servers, or building for production.
+upstream: "https://www.skills.sh/site/bun.sh/bun"
 ---
 
 # Bun

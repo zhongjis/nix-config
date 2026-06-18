@@ -1,6 +1,7 @@
 ---
 name: yt-dlp
 description: Download videos from YouTube and other sites using yt-dlp. Use when downloading videos, extracting metadata, or batch downloading multiple files.
+upstream: "https://github.com/knoopx/pi/tree/07747da19217308d5438d63c7b61be0587a71833/agent/skills/yt-dlp"
 ---
 
 # yt-dlp Cheatsheet

@@ -1,6 +1,7 @@
 ---
 name: nh
 description: Switches NixOS/Home Manager configurations, cleans old generations, and performs system maintenance. Use when running os/home switch, pruning the Nix store, or managing system generations.
+upstream: "https://github.com/knoopx/pi/tree/main/agent/skills/tools/nh"
 ---
 
 # nh (Nix Helper)

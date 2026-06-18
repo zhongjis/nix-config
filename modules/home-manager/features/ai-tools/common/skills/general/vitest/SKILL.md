@@ -1,6 +1,7 @@
 ---
 name: vitest
 description: Writes and runs tests, configures test environments, mocks dependencies, and generates coverage reports. Use when setting up vitest.config.ts, writing test suites, mocking modules, or measuring code coverage.
+upstream: "https://github.com/knoopx/pi/tree/main/agent/skills/tools/vitest"
 ---
 
 # Vitest

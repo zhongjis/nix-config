@@ -1,6 +1,7 @@
 ---
 name: python
 description: Structures Python projects, writes type-hinted code, tests with pytest, and enforces quality with ruff and mypy. Use when setting up pyproject.toml, writing tests, adding type annotations, or formatting/linting code.
+upstream: "https://github.com/knoopx/pi/tree/07747da19217308d5438d63c7b61be0587a71833/agent/skills/python"
 ---
 
 # Python

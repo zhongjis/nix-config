@@ -1,6 +1,7 @@
 ---
 name: nix-flakes
 description: Creates reproducible builds, manages flake inputs, defines devShells, and builds packages with flake.nix. Use when initializing Nix projects, locking dependencies, or running nix build/develop commands.
+upstream: "https://github.com/knoopx/pi/tree/main/agent/skills/tools/nix-flake"
 ---
 
 # Nix Flakes

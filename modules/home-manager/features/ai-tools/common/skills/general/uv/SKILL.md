@@ -1,6 +1,7 @@
 ---
 name: uv
 description: Initializes Python projects, manages dependencies, pins Python versions, and runs scripts with uv. Use when adding/removing packages, syncing environments, running tools with uvx, or building distributions.
+upstream: "https://github.com/knoopx/pi/tree/main/agent/skills/tools/uv"
 ---
 
 # uv

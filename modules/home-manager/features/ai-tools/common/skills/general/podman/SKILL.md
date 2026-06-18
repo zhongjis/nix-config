@@ -1,6 +1,7 @@
 ---
 name: podman
 description: Manages containers, builds images, configures pods and networks with Podman. Use when running containers, creating Containerfiles, grouping services in pods, or managing container resources.
+upstream: "https://github.com/knoopx/pi/tree/main/agent/skills/tools/podman"
 ---
 
 # Podman

@@ -1,6 +1,7 @@
 ---
 name: jujutsu
 description: "Manages version control with Jujutsu (jj), including rebasing, conflict resolution, and Git interop. Use only when the user explicitly mentions Jujutsu or `jj`, or when the current repository is jj-managed and contains a `.jj/` directory. Do not trigger for plain git repositories."
+upstream: "https://github.com/knoopx/pi/tree/main/agent/skills/tools/jj-core"
 ---
 
 # Jujutsu

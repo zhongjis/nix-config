@@ -1,6 +1,7 @@
 ---
 name: nix
 description: Runs packages temporarily, creates isolated shell environments, and evaluates Nix expressions. Use when executing tools without installing, debugging derivations, or working with nixpkgs.
+upstream: "https://github.com/knoopx/pi/tree/main/agent/skills/tools/nix"
 ---
 
 # Nix
