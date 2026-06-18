@@ -30,6 +30,14 @@ prompt_new_tab_name = false
 # herdr is agent-aware; surface agent state on split borders.
 show_agent_labels_on_pane_borders = true
 
+[ui.toast]
+# Agent finished / needs-input popups inside the Herdr UI. Click a toast
+# (mouse capture is on by default) to jump to that workspace/tab/pane.
+delivery = "herdr"
+
+[ui.toast.herdr]
+position = "bottom-right"
+
 [advanced]
 # Roughly mirrors tmux historyLimit = 100000 (herdr counts bytes; 10MB ~= default).
 scrollback_limit_bytes = 10000000
