@@ -48,6 +48,7 @@ in {
       [
         llmAgentsPackages.gitnexus
         llmAgentsPackages.qmd
+        llmAgentsPackages.beads
       ]
       ++ lib.optional (inputs.self.packages.${system} ? sentrux)
       inputs.self.packages.${system}.sentrux;
