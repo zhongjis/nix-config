@@ -1,0 +1,35 @@
+# herdr configuration — managed by home-manager (nix-config).
+# Migrated from the tmux setup. Edit the nix module, not this file.
+
+[theme]
+# Inherit the terminal's (stylix-managed) palette instead of a built-in theme,
+# matching the old tmux truecolor passthrough.
+name = "terminal"
+
+[terminal]
+# Empty default_shell uses $SHELL (zsh). "auto" => login shell on macOS.
+shell_mode = "auto"
+# Inherit cwd from the source pane/workspace (closest to tmux behavior).
+new_cwd = "follow"
+
+[keys]
+# prefix stays ctrl+b (tmux default). Vim pane nav (prefix+h/j/k/l) and
+# reload (prefix+shift+r) are herdr defaults, matching the old tmux binds.
+
+# Sessionizer: fzf project switcher — create/switch a workspace from a workspace.
+# Replaces the tmux `sessionizer` command/keybind.
+[[keys.command]]
+key = "prefix+f"
+type = "pane"
+command = "herdr-sessionizer"
+
+[ui]
+# Auto-generate tab names instead of prompting (the "auto tab naming" you asked about).
+# Workspaces are already auto-named after the root pane's repo/folder.
+prompt_new_tab_name = false
+# herdr is agent-aware; surface agent state on split borders.
+show_agent_labels_on_pane_borders = true
+
+[advanced]
+# Roughly mirrors tmux historyLimit = 100000 (herdr counts bytes; 10MB ~= default).
+scrollback_limit_bytes = 10000000
