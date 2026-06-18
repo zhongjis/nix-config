@@ -2,6 +2,8 @@
 
 ## Flake Structure
 
+> **Note:** the examples below use `flake-utils`, which still works but is now largely discouraged in favour of [`flake-parts`](https://flake.parts) (per nix.dev and the NixOS Wiki). Prefer flake-parts for new projects.
+
 Standard flake.nix structure:
 
 ```nix
@@ -200,15 +202,19 @@ When nixpkgs builds a community version lacking features (common with open-core 
 
 ### Getting SHA256 Hashes
 
+Prefer `nix store prefetch-file` (modern CLI) — it prints an SRI hash directly, ready for `fetchurl`:
+
 ```bash
-nix-prefetch-url https://example.com/tool-linux-amd64-v1.0.0
-# Returns hash in base32, convert to SRI format:
-nix hash convert --hash-algo sha256 --from nix32 --to sri <base32-hash>
+nix store prefetch-file https://example.com/tool-linux-amd64-v1.0.0
+# prints the store path plus hash 'sha256-...' (already SRI)
+# scriptable: nix store prefetch-file --json <url> | jq -r .hash
 ```
 
-Or use SRI directly:
+The legacy `nix-prefetch-url` still works but prints a base32 hash you must convert (it never emits SRI, even with `--type sha256`):
+
 ```bash
-nix-prefetch-url --type sha256 https://example.com/tool-linux-amd64-v1.0.0
+nix-prefetch-url https://example.com/tool-linux-amd64-v1.0.0
+nix hash convert --hash-algo sha256 --from nix32 --to sri <base32-hash>
 ```
 
 ## Dev Shell Patterns

@@ -49,7 +49,7 @@ nix hash convert --hash-algo sha256 --to nix32 sha256-ungWv48Bz+pBQUDeXa4iI7ADYa
 
 ## Prefetching Hashes
 
-Use prefetch helpers to fetch sources and get the nix32 hash, then convert to SRI if needed.
+Prefer `nix store prefetch-file` (prints an SRI hash directly). The legacy `nix-prefetch-url` still works but prints a nix32 hash you must convert:
 
 ```bash
 # Fetch a tarball and print its nix32 hash
