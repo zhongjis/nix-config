@@ -73,7 +73,9 @@ If a template exists, follow its structure exactly. If not, use the format below
 - Epic: <JIRA_BASE_URL>/browse/<EPIC>
 ```
 
-**Variables:** If the user provided a Jira URL, parse it per the "Jira Ticket Integration" section above to extract JIRA_BASE_URL, TICKET_KEY, and EPIC. If no Jira URL was provided, prompt the user. If the user defers, use placeholders (`<JIRA_BASE_URL>`, `<TICKET>`, `<EPIC>`) and move on.
+**Variables:** If the user provided a Jira URL, parse it per the "Jira URL Parsing" section above to extract JIRA_BASE_URL, TICKET_KEY, and EPIC. If no Jira URL was provided, prompt the user. If the user defers, use placeholders (`<JIRA_BASE_URL>`, `<TICKET>`, `<EPIC>`) and move on.
+
+For large or multi-file PRs, also append a **Reviewer Guide** (see §7) so reviewers know where to start and what they can safely skim.
 
 ### 4. Change Types
 
@@ -108,6 +110,25 @@ When changes span multiple repos, link companion PRs:
 ### Companion PR
 [repo-name #N](url) -- one-line description
 ```
+
+### 7. Reviewer Guide (large or mechanical PRs)
+
+For PRs that touch many files -- especially when a small high-signal core sits alongside a large, repetitive bulk -- append a **Reviewer Guide** that tells reviewers where to start and what they can skim. Knowing where the risk lives makes review faster and better.
+
+**Include it when:** the diff is large (rough rule: 10+ files or several hundred lines), the change mixes a mechanical/repetitive bulk with a few load-bearing files, or a reviewer wouldn't otherwise know which files matter.
+
+**Rank files by review value, not by directory** -- highest-signal first, skimmable bulk last. Echo the real file count in the heading so scope is clear up front. Template:
+
+> ## How to review N files
+> 1. **Start here** -- the contract / entry points: the few files that define the change (interfaces, the one gate/seam, config).
+> 2. **The one behavioral risk** -- the file(s) that can actually change runtime behavior; everything else is lower-risk.
+> 3. **The bulk** -- name the repetitive change once, point to ONE reference file as the example, and say "skim one, the rest look the same."
+> 4. **Docs / tests** -- pointers, reviewed last.
+
+**Rules:**
+- Be honest about risk -- the whole value is separating "scrutinize this" from "trust this." Never bury the risky file in the bulk.
+- For repetitive changes, name a concrete reference file so reviewers don't re-read the same pattern N times.
+- Skip it for small, focused PRs -- a 3-file change doesn't need a map.
 
 ## PR Comments
 
