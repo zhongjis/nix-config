@@ -169,6 +169,9 @@
     # Only read by openai-codex provider; ignored by others (no fallback).
     # Options: "sse" (default), "websocket", "websocket-cached", "auto".
     # "websocket-cached" = WS + cached prompt context, no SSE fallback on failure.
+    packages = [
+      "git:github.com/ttttmr/pi-context"
+    ];
   };
 
   piSettings = lib.recursiveUpdate sharedSettings (
