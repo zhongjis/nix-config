@@ -59,6 +59,5 @@ myHomeManager.aiProfile = "work"; # or "personal" when ai-tools is enabled
 ## COMMANDS
 
 Deployment stays at the repo root:
-- `nh darwin switch .`
-- `nh os switch .`
+- `nh home switch .`
 - `nix flake check`

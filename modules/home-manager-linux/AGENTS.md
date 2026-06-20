@@ -51,7 +51,7 @@ myHomeManager.bundles.hyprland.enable = true;
 ## COMMANDS
 
 Deployment stays at the repo root:
-- `nh os switch .`
+- `nh home switch .`
 - `nix flake check`
 
 Local helper:

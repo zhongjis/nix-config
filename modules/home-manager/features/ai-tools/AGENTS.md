@@ -15,8 +15,7 @@ Set per host in `hosts/{name}/home.nix`. Used for filtering skills, instructions
 
 Run from the repo root:
 
-- `nh darwin switch .`
-- `nh os switch .`
+- `nh home switch .`
 - `nix flake check`
 
 ## BOOTSTRAP AND MAINTENANCE
@@ -101,5 +100,5 @@ Defined in `common/mcp/default.nix`. General: nixos-docs, context7, mcp-k8s. Per
 2. Add `SKILL.md` with YAML frontmatter (`name`, `description`)
 3. If from external source, add `upstream` field (singular canonical URL). If adapting from a prior source alongside a new canonical upstream, add `adaptedFrom` as a YAML list of informational-only lineage URLs.
 4. Genericize vendor-specific content for local/shared skills; preserve intentional upstream/generated packaging when that structure is the source artifact
-5. Apply from the repo root with `nh darwin switch .` or `nh os switch .`, then run `nix flake check` (auto-discovered, no registration needed)
+5. Apply from the repo root with `nh home switch .`, then run `nix flake check` (auto-discovered, no registration needed)
 For contributor-oriented build, validation, or generation steps inside a skill directory, document them in that skill's `README.md`, not here.

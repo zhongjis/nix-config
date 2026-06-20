@@ -25,8 +25,9 @@ When working here, also consider the private repo:
 
 Run from the repo root:
 
-- `nh darwin switch .`
-- `nh os switch .`
+- `nh home switch .` — apply Home Manager / user config changes (`modules/home-manager*`, `custom-home-manager-options`, `programs.pi`)
+- `nh os switch .` — apply NixOS system changes
+- `nh darwin switch .` — apply nix-darwin system changes
 - `nix flake check`
 - `nix build .#neovim`
 - `nix build .#helium`
@@ -58,6 +59,7 @@ Run from the repo root:
 - Use relative imports in Nix modules, never absolute paths.
 - Do not hardcode architecture; use `pkgs.stdenv.hostPlatform`.
 - `system.stateVersion` and `home.stateVersion` are host-owned migration boundaries; check the host before changing them.
+- Home Manager-owned changes (including Pi settings under `programs.pi`) require `nh home switch .`, not `nh os switch .` or `nh darwin switch .`.
 - Edit secrets with `nix run nixpkgs#sops -- secrets.yaml`; the age key lives at `~/.config/sops/age/keys.txt`.
 - Always run `nix flake check` after changes.
 

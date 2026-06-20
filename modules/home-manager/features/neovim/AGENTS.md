@@ -4,8 +4,7 @@ Neovim configuration via NVF. Run commands from the repo root.
 
 ## COMMANDS
 
-- `nh darwin switch .`
-- `nh os switch .`
+- `nh home switch .`
 - `nix flake check`
 
 ## WHERE TO EDIT
