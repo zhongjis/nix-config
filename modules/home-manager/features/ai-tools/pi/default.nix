@@ -149,6 +149,7 @@
       "git:github.com/fluxgear/pi-thinking-steps@v1.0.11"
       "git:github.com/davebcn87/pi-autoresearch@v1.6.0"
       "git:github.com/nicobailon/pi-web-access@v0.10.7"
+      "git:github.com/aliou/pi-processes@v0.9.4"
       {
         source = "git:github.com/backnotprop/plannotator@0.20.1";
         extensions = ["apps/pi-extension"];
@@ -172,7 +173,7 @@
     packages =
       sharedSettings.packages
       ++ [
-        "git:github.com/ttttmr/pi-context"
+        "git:github.com/ttttmr/pi-context@2.0.0"
       ];
   };
 
