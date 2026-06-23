@@ -66,4 +66,6 @@ in
       license = lib.licenses.mit;
       mainProgram = "splunk-as";
     };
+
+    passthru.updateScript = pkgs.nix-update-script {};
   }

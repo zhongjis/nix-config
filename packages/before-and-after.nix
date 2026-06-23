@@ -35,6 +35,18 @@ pkgs.stdenv.mkDerivation (finalAttrs: {
 
   passthru.upstreamLicense = "PolyForm-Shield-1.0.0";
 
+  passthru.updateScript = lib.getExe (pkgs.writeShellApplication {
+    name = "update-before-and-after";
+    runtimeInputs = [
+      pkgs.curl
+      pkgs.jq
+      pkgs.python3
+      pkgs.gnutar
+      pkgs.alejandra
+    ];
+    text = builtins.readFile ../scripts/update-before-and-after-package.sh;
+  });
+
   meta = {
     description = "Simple before/after screenshot tool for capturing and comparing web pages";
     homepage = "https://github.com/vercel-labs/before-and-after";

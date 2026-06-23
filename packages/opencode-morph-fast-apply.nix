@@ -40,4 +40,20 @@ bun2nix.mkDerivation {
     license = lib.licenses.mit;
     platforms = lib.platforms.unix;
   };
+
+  passthru.updateScript = lib.getExe (pkgs.writeShellApplication {
+    name = "update-opencode-morph-fast-apply";
+    runtimeInputs = [
+      bun2nix
+      pkgs.alejandra
+      pkgs.curl
+      pkgs.gawk
+      pkgs.gnused
+      pkgs.coreutils
+      pkgs.jq
+      pkgs.nix-prefetch-github
+      pkgs.python3
+    ];
+    text = builtins.readFile ../scripts/update-opencode-morph-fast-apply-package.sh;
+  });
 }

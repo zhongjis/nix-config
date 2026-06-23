@@ -50,4 +50,6 @@ in
       mainProgram = pname;
       sourceProvenance = [sourceTypes.binaryNativeCode];
     };
+
+    passthru.updateScript = pkgs.nix-update-script {};
   }
