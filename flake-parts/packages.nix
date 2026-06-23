@@ -49,6 +49,11 @@
           lib = pkgs.lib;
           bun2nix = inputs.bun2nix.packages.${system}.default;
         };
+        context-mode = import ../packages/context-mode {
+          inherit pkgs;
+          lib = pkgs.lib;
+          bun2nix = inputs.bun2nix.packages.${system}.default;
+        };
         before-and-after = import ../packages/before-and-after.nix {
           inherit pkgs;
           lib = pkgs.lib;

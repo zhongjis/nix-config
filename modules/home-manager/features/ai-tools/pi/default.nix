@@ -173,7 +173,10 @@
     packages =
       sharedSettings.packages
       ++ [
-        "git:github.com/ttttmr/pi-context@2.0.0"
+        # context-mode: built from a GitHub clone with bun (packages/context-mode),
+        # consumed as a local-path pi package (its pi.extensions + skills load from
+        # the Nix store). Replaces the former git:github.com/ttttmr/pi-context entry.
+        "${inputs.self.packages.${system}.context-mode}"
       ];
   };
 
