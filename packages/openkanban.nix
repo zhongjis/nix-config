@@ -4,13 +4,13 @@
 }:
 pkgs.buildGoModule rec {
   pname = "openkanban";
-  version = "0.1.0";
+  version = "0.1.1";
 
   src = pkgs.fetchFromGitHub {
     owner = "TechDufus";
     repo = "openkanban";
     rev = "v${version}";
-    hash = "sha256-R0UbJiiE9jrWTtyUYooxC1/8W5H2HCquNJAwGwY5ASk=";
+    hash = "sha256-86Q70Qh5AMaTX3ogDZl2+V6KCQA5HZjpRcqBmfEucm4=";
   };
 
   vendorHash = "sha256-ziBcns1wN5p1gp7hSh3+1d05OnZZqHlvcXJtsfEXq6s=";
