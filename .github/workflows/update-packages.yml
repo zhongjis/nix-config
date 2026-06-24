@@ -69,7 +69,25 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          nix run nixpkgs#nix-update -- --flake --use-update-script "${{ matrix.package }}"
+          set -euo pipefail
+          pkg='${{ matrix.package }}'
+          # Packages flagged `selfUpdateScript` ship a self-contained launcher.
+          # nix-update's read-only metadata eval forces `cargoDeps.outputHash`,
+          # which triggers IFD on bun2nix's vendored deps and crashes with
+          # "path is not valid". Such scripts need nix-update for nothing, so
+          # build the updateScript directly (`nix build` allows IFD) and exec it.
+          self="$(nix eval --impure --json --expr \
+            "(import ./packages/registry.nix).\"$pkg\".selfUpdateScript or false")"
+          if [ "$self" = "true" ]; then
+            expr="(builtins.getFlake (toString ./.)).packages.\${builtins.currentSystem}.\"$pkg\".passthru.updateScript"
+            # `nix build` of the getExe string itself fails (output subpath), so
+            # build its store root: dirOf (dirOf "\${drv}/bin/<name>") == "\${drv}".
+            nix build --impure --no-link --expr "builtins.dirOf (builtins.dirOf $expr)"
+            exe="$(nix eval --raw --impure --expr "$expr")"
+            "$exe"
+          else
+            nix run nixpkgs#nix-update -- --flake --use-update-script "$pkg"
+          fi
 
       - name: Detect changes
         id: diff

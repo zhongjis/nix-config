@@ -17,11 +17,17 @@
 #                         files that `throw` at import on unsupported platforms.
 #   updatable  (optional) when true, the update workflow tracks this package
 #                         (the package must declare `passthru.updateScript`).
+#   selfUpdateScript (optional) when true, `passthru.updateScript` is a fully
+#                         self-contained launcher (getExe of a
+#                         writeShellApplication). The workflow builds and execs
+#                         it directly, skipping nix-update -- whose read-only
+#                         metadata eval can choke on IFD (e.g. bun2nix cargoDeps).
 {
   opencode-morph-fast-apply = {
     path = ./opencode-morph-fast-apply.nix;
     extraArgs = ["bun2nix"];
     updatable = true;
+    selfUpdateScript = true;
   };
   context-mode = {
     path = ./context-mode;
