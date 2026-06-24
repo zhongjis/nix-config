@@ -39,6 +39,7 @@ jobs:
   update:
     name: Update ${{ matrix.package }}
     needs: discover
+    if: ${{ needs.discover.outputs.packages != '[]' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write

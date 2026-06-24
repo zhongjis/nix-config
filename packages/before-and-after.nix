@@ -39,6 +39,7 @@ pkgs.stdenv.mkDerivation (finalAttrs: {
     name = "update-before-and-after";
     runtimeInputs = [
       pkgs.curl
+      pkgs.git
       pkgs.jq
       pkgs.nix
       pkgs.python3

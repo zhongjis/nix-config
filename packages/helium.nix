@@ -57,6 +57,7 @@ in
       name = "update-helium";
       runtimeInputs = [
         pkgs.curl
+        pkgs.git
         pkgs.jq
         pkgs.nix
         pkgs.python3

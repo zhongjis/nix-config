@@ -47,6 +47,7 @@ bun2nix.mkDerivation {
       bun2nix
       pkgs.alejandra
       pkgs.curl
+      pkgs.git
       pkgs.gawk
       pkgs.gnused
       pkgs.coreutils
