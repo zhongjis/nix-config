@@ -51,5 +51,5 @@ in
       sourceProvenance = [sourceTypes.binaryNativeCode];
     };
 
-    passthru.updateScript = pkgs.nix-update-script {};
+    passthru.updateScript = pkgs.nix-update-script {extraArgs = ["--flake"];};
   }

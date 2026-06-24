@@ -10,14 +10,12 @@ on:
     - cron: "17 9 * * *"
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
   discover:
     name: Discover updatable packages
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       packages: ${{ steps.list.outputs.packages }}
     steps:
@@ -42,6 +40,9 @@ jobs:
     name: Update ${{ matrix.package }}
     needs: discover
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     strategy:
       fail-fast: false
       matrix:

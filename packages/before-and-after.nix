@@ -40,6 +40,7 @@ pkgs.stdenv.mkDerivation (finalAttrs: {
     runtimeInputs = [
       pkgs.curl
       pkgs.jq
+      pkgs.nix
       pkgs.python3
       pkgs.gnutar
       pkgs.alejandra

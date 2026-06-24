@@ -51,6 +51,7 @@ bun2nix.mkDerivation {
       pkgs.gnused
       pkgs.coreutils
       pkgs.jq
+      pkgs.nix
       pkgs.nix-prefetch-github
       pkgs.python3
     ];
