@@ -60,6 +60,10 @@ jobs:
         with:
           extra_nix_config: |
             experimental-features = nix-command flakes
+          # nix-update --use-update-script builds each package's updateScript via
+          # an impure `with import <nixpkgs> {}` expr, which needs <nixpkgs> in the
+          # search path. Map it to the flake registry entry (no legacy channel).
+          nix_path: nixpkgs=flake:nixpkgs
 
       - name: Run updater
         env:
