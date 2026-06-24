@@ -52,8 +52,6 @@ in {
         llmAgentsPackages.herdr
         llmAgentsPackages.codegraph
         inputs.self.packages.${system}.before-and-after
-      ]
-      ++ lib.optional (inputs.self.packages.${system} ? sentrux)
-      inputs.self.packages.${system}.sentrux;
+      ];
   };
 }

@@ -33,4 +33,6 @@ pkgs.buildGoModule rec {
     platforms = platforms.unix;
     mainProgram = "openkanban";
   };
+
+  passthru.updateScript = pkgs.nix-update-script {extraArgs = ["--flake"];};
 }

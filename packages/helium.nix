@@ -52,4 +52,17 @@ in
       platforms = ["x86_64-linux" "aarch64-linux"];
       mainProgram = "helium";
     };
+
+    passthru.updateScript = lib.getExe (pkgs.writeShellApplication {
+      name = "update-helium";
+      runtimeInputs = [
+        pkgs.curl
+        pkgs.git
+        pkgs.jq
+        pkgs.nix
+        pkgs.python3
+        pkgs.alejandra
+      ];
+      text = builtins.readFile ../scripts/update-helium-package.sh;
+    });
   }

@@ -7,7 +7,21 @@
     ...
   }: {
     packages = let
-      inherit (lib) optionalAttrs;
+      registry = import ../packages/registry.nix;
+      argSources = {
+        bun2nix = inputs.bun2nix.packages.${system}.default;
+        agentBrowser = inputs.llm-agents.packages.${system}.agent-browser;
+      };
+      isAvailable = spec: !(spec.linuxOnly or false) || pkgs.stdenv.hostPlatform.isLinux;
+      importCustomPackage = _name: spec:
+        import spec.path ({
+            inherit pkgs;
+            lib = pkgs.lib;
+          }
+          // lib.genAttrs (spec.extraArgs or []) (argName: argSources.${argName}));
+      customPackages =
+        lib.mapAttrs importCustomPackage
+        (lib.filterAttrs (_name: isAvailable) registry);
       modelConfig = import ../lib/llamacpp-models.nix {inherit lib;};
       inherit (modelConfig) hfHome modelDir modelFiles modelPath modelRevision modelsDir;
       huggingfaceCli = pkgs.python3Packages.huggingface-hub;
@@ -36,38 +50,14 @@
             inherit pkgs;
             modules = [../modules/home-manager/features/neovim/nvf];
           }).neovim;
-      }
-      // {
+
         oh-my-codex = inputs.llm-agents.packages.${system}.oh-my-codex;
         oh-my-opencode = import ../packages/oh-my-opencode.nix {
           inherit pkgs;
           lib = pkgs.lib;
           base = inputs.llm-agents.packages.${system}.oh-my-opencode;
         };
-        opencode-morph-fast-apply = import ../packages/opencode-morph-fast-apply.nix {
-          inherit pkgs;
-          lib = pkgs.lib;
-          bun2nix = inputs.bun2nix.packages.${system}.default;
-        };
-        context-mode = import ../packages/context-mode {
-          inherit pkgs;
-          lib = pkgs.lib;
-          bun2nix = inputs.bun2nix.packages.${system}.default;
-        };
-        before-and-after = import ../packages/before-and-after.nix {
-          inherit pkgs;
-          lib = pkgs.lib;
-          agentBrowser = inputs.llm-agents.packages.${system}.agent-browser;
-        };
-        hunk = import ../packages/hunk {
-          inherit pkgs;
-          lib = pkgs.lib;
-          bun2nix = inputs.bun2nix.packages.${system}.default;
-        };
-        openkanban = import ../packages/openkanban.nix {
-          inherit pkgs;
-          lib = pkgs.lib;
-        };
+
         sync-mcporter-instructions = pkgs.writeShellApplication {
           name = "sync-mcporter-instructions";
           runtimeInputs = [
@@ -79,6 +69,7 @@
           ];
           text = builtins.readFile ../scripts/sync-mcporter-instructions.sh;
         };
+
         download-llamacpp-models = pkgs.writeShellApplication {
           name = "download-llamacpp-models";
           runtimeInputs = [
@@ -103,25 +94,6 @@
           '';
         };
       }
-      // {
-        sentrux = import ../packages/sentrux.nix {
-          inherit pkgs;
-          lib = pkgs.lib;
-        };
-        splunk-as = import ../packages/splunk-as.nix {
-          inherit pkgs;
-          lib = pkgs.lib;
-        };
-      }
-      // optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
-        helium = import ../packages/helium.nix {
-          inherit pkgs;
-          lib = pkgs.lib;
-        };
-        fincept-terminal = import ../packages/fincept-terminal.nix {
-          inherit pkgs;
-          lib = pkgs.lib;
-        };
-      };
+      // customPackages;
   };
 }
