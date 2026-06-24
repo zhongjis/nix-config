@@ -39,10 +39,6 @@
     extraArgs = ["agentBrowser"];
     updatable = true;
   };
-  openkanban = {
-    path = ./openkanban.nix;
-    updatable = true;
-  };
   splunk-as = {
     path = ./splunk-as.nix;
     updatable = true;

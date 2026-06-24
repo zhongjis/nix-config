@@ -46,7 +46,6 @@
 
   home.packages = [
     inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.hunk
-    inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.openkanban
     inputs.agent-of-empires.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
