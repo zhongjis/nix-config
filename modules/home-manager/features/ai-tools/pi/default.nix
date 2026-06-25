@@ -150,6 +150,7 @@
       "git:github.com/davebcn87/pi-autoresearch@v1.6.0"
       "git:github.com/nicobailon/pi-web-access@v0.10.7"
       "git:github.com/aliou/pi-processes@v0.9.4"
+      "git:github.com/dbachelder/pi-btw@v0.4.1"
       {
         source = "git:github.com/backnotprop/plannotator@0.20.1";
         extensions = ["apps/pi-extension"];
