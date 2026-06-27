@@ -140,7 +140,6 @@
     lastChangelogVersion = "0.74.0";
     collapseChangelog = true;
     treeFilterMode = "no-tools";
-    transport = "websocket-cached";
     npmCommand = ["bash" "${config.home.homeDirectory}/.pi/agent/scripts/pi-package-npm.sh"];
     packages = [
       "git:github.com/mavam/pi-mcporter@v0.5.0"
