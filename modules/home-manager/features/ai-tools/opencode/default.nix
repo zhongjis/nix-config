@@ -11,11 +11,11 @@ in {
   imports = [
     ../common
     ./skills
-    ./lsp.nix
     ./agents
     ./formatters.nix
     ./permission.nix
     ./provider.nix
+    ./lsp.nix
     ./plugins
   ];
 

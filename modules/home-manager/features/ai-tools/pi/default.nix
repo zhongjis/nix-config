@@ -125,7 +125,9 @@
   sharedSettings = {
     defaultThinkingLevel = "high";
     quietStartup = true;
+    defaultProjectTrust = "always";
     doubleEscapeAction = "tree";
+    warnings.anthropicExtraUsage = false;
     compaction = {
       enabled = true;
       reserveTokens = 16384;
@@ -137,7 +139,7 @@
       baseDelayMs = 2000;
       maxDelayMs = 60000;
     };
-    lastChangelogVersion = "0.74.0";
+    transport = "sse";
     collapseChangelog = true;
     treeFilterMode = "no-tools";
     npmCommand = ["bash" "${config.home.homeDirectory}/.pi/agent/scripts/pi-package-npm.sh"];
@@ -188,6 +190,7 @@
 in {
   imports = [
     ../../../../../custom-home-manager-options/pi
+    ./lsp.nix
   ];
 
   home.packages = [

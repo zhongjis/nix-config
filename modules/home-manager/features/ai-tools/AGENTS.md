@@ -23,6 +23,15 @@ Run from the repo root:
 - Set `myHomeManager.aiProfile` in `hosts/{name}/home.nix` before enabling ai-tools; profile helpers and profile-filtered content depend on it
 - Skills and `common/instructions/*` files are auto-discovered from the correct profile subtree; place them in the right directory and do not add manual registration. Tool-specific instructions, MCP servers, and shared agents stay defined in their respective `default.nix` files
 - For upstream/shared skill sync and update policy, follow the `skill-maintainer` workflow instead of inventing ad hoc local conventions here
+
+## LSP OWNERSHIP
+
+- `common/lsp.nix` owns the global AI-tool LSP server definitions and exports `commonLsp` via `_module.args`.
+- Tool-specific adapters consume `commonLsp` directly: `opencode/lsp.nix` writes OpenCode settings, and `pi/lsp.nix` writes `~/.pi/agent/lsp.json`.
+- Pi extension loading remains repo-managed by `pi-config/install.sh`, not `programs.pi.extensions` or `settings.json` packages.
+- `pi-config/lsp.json` was removed. `.pi-lsp.json` in pi-config is preserved legacy/non-dreki state; dreki project overrides use `.pi/lsp.json`.
+- Claude Code and Codex do not consume common LSP yet. Treat both as future integrations until projection + generated-config tests exist.
+
 ## STRUCTURE
 
 ```
@@ -39,7 +48,8 @@ ai-tools/
 │   │   ├── work/            # Work profile only
 │   │   └── personal/        # Personal profile only
 │   ├── mcp/                 # MCP server definitions
-│   └── agents/              # Agent configuration
+│   ├── agents/              # Agent configuration
+│   └── lsp.nix              # Global LSP server source of truth exported as commonLsp
 ├── codex/                   # Codex CLI config (global config + shared skills)
 ├── opencode/                # OpenCode-specific
 │   ├── plugins/             # oh-my-opencode plugins
@@ -49,8 +59,9 @@ ai-tools/
 │   ├── permission.nix       # Runtime permission wildcards
 │   ├── provider.nix         # LLM provider config
 │   ├── formatters.nix       # Code formatters
-│   └── lsp.nix              # LSP server config
+│   └── lsp.nix              # OpenCode adapter from commonLsp to programs.opencode.settings.lsp
 ├── claude-code/             # Claude Code-specific (skills, agents, instructions)
+├── pi/                      # Pi-specific settings, models, instructions, and LSP adapter
 └── factory/                 # Factory.ai-specific (skills only, via home.file symlinks)
 ```
 

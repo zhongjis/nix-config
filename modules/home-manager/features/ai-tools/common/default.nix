@@ -7,5 +7,6 @@
     ./instructions
     ./skills
     ./mcp
+    ./lsp.nix
   ];
 }
