@@ -61,7 +61,7 @@ ai-tools/
 │   ├── formatters.nix       # Code formatters
 │   └── lsp.nix              # OpenCode adapter from commonLsp to programs.opencode.settings.lsp
 ├── claude-code/             # Claude Code-specific (skills, agents, instructions)
-├── pi/                      # Pi-specific settings, models, instructions, and LSP adapter
+├── pi/                      # Pi-specific settings, skills, instructions, and LSP adapter
 └── factory/                 # Factory.ai-specific (skills only, via home.file symlinks)
 ```
 
@@ -78,7 +78,7 @@ in lib.mapAttrs (name: _: profileDir + "/${name}") enabledDirs;
 
 - **Disable a skill**: prefix directory with `disabled-` (e.g., `disabled-find-skills/`)
 - **Merge order**: common skills → tool-specific skills (tool overrides common on name collision)
-- **Exposed via**: `_module.args.commonSkills`, merged into `programs.opencode.skills` / `programs.claude-code.skills` / `home.file` (factory)
+- **Exposed via**: `_module.args.commonSkills`, merged into `programs.opencode.skills` / `programs.claude-code.skills` / `programs.pi.skills` / `home.file` (factory)
 
 ## SKILL CONVENTIONS
 

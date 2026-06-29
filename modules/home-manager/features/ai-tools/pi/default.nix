@@ -4,7 +4,7 @@
   pkgs,
   lib,
   commonSkills,
-  ompLocalSkills,
+  piLocalSkills,
   commonInstructions,
   aiProfileHelpers,
   ...
@@ -12,7 +12,7 @@
   inherit (pkgs.stdenv.hostPlatform) system;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
   sopsFile = inputs.self + "/secrets/ai-tokens.yaml";
-  allSkills = commonSkills // ompLocalSkills;
+  allSkills = commonSkills // piLocalSkills;
 
   convertEnvPlaceholders = value:
     if builtins.isString value
@@ -191,6 +191,7 @@ in {
   imports = [
     ../../../../../custom-home-manager-options/pi
     ./lsp.nix
+    ./skills
   ];
 
   home.packages = [

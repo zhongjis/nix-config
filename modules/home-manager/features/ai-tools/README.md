@@ -32,9 +32,9 @@ ai-tools/
 ├── opencode/                # OpenCode config, plugins, agents, skills
 ├── claude-code/             # Claude Code config, rules, skills
 ├── factory/                 # Factory skill and instruction symlinks
-├── omp/                     # OMP-specific skill exports
+├── omp/                     # OMP-specific config and skill exports
 ├── codex/                   # Codex config
-└── pi/                      # Pi-family config
+└── pi/                      # Pi-family config and skill exports
 ```
 
 ## Profiles
