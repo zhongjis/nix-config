@@ -11,8 +11,7 @@
   fetchgit,
   fetchurl,
   ...
-}:
-{
+}: {
   "@clack/core@1.2.0" = fetchurl {
     url = "https://registry.npmjs.org/@clack/core/-/core-1.2.0.tgz";
     hash = "sha512-qfxof/3T3t9DPU/Rj3OmcFyZInceqj/NVtO9rwIuJqCUgh32gwPjpFQQp/ben07qKlhpwq7GzfWpST4qdJ5Drg==";
