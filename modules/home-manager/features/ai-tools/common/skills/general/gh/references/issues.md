@@ -30,6 +30,80 @@ gh issue create --repo owner/repo --title "Issue title"
 gh issue create --web
 ```
 
+## Production-Ready Issue Creation
+
+Use `--body-file` for long Markdown bodies. It avoids shell quoting bugs, preserves checklists/code blocks, and makes partial-failure recovery easier.
+
+```bash
+# Confirm target repo
+gh repo view --json nameWithOwner,url
+
+# Confirm labels before create/edit
+gh label list --limit 200 --json name
+
+# Create from a prepared body file
+gh issue create \
+  --title "Issue title" \
+  --body-file issue-body.md \
+  --label label-name
+
+# Verify created issue and capture GraphQL node id
+gh issue view 123 --json id,number,title,labels,url
+```
+
+Guidelines:
+- Create related issues in dependency order so later issues can reference earlier blockers.
+- Put human-readable blockers in the body even when also using GitHub relationship links.
+- Check that labels exist before creating issues. If a requested label is missing, ask before creating labels unless the user explicitly requested label management.
+- Keep parent issues unchanged unless the user asks to edit them; linking sub-issues is a relationship change, not a body rewrite.
+
+## Issue Trees and Relationships
+
+GitHub sub-issues and blocked-by links are GraphQL mutations. Use them when the user asks for sub-issues, parent/child issues, issue dependencies, blockers, or blocked-by relationships.
+
+### Link Sub-Issues
+
+```bash
+# Get parent and child node ids
+gh issue view 123 --json id,number,title,url
+gh issue view 124 --json id,number,title,url
+
+# Link child under parent
+gh api graphql \
+  -f query='mutation($issueId: ID!, $subIssueId: ID!) { addSubIssue(input: { issueId: $issueId, subIssueId: $subIssueId }) { issue { id } subIssue { id } } }' \
+  -f issueId=PARENT_ID \
+  -f subIssueId=CHILD_ID
+
+# Verify parent lists the child
+gh api graphql \
+  -f query='query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { issue(number: $number) { subIssues(first: 50) { nodes { number title url } } } } }' \
+  -f owner=OWNER \
+  -f repo=REPO \
+  -F number=123
+```
+
+### Link Blocked-By Dependencies
+
+```bash
+# Link issue as blocked by another issue
+gh api graphql \
+  -f query='mutation($issueId: ID!, $blockingIssueId: ID!) { addBlockedBy(input: { issueId: $issueId, blockingIssueId: $blockingIssueId }) { issue { id } blockingIssue { id } } }' \
+  -f issueId=BLOCKED_ISSUE_ID \
+  -f blockingIssueId=BLOCKER_ISSUE_ID
+```
+
+Publish blockers first. This lets issue bodies and relationship links reference real issue numbers.
+
+### Partial Failure Recovery
+
+When a create/link batch fails midway:
+1. List or view the issues already created; do not recreate them.
+2. Capture their node ids with `gh issue view <number> --json id,number,title,url`.
+3. Verify existing sub-issue and blocked-by links.
+4. Retry only missing relationship mutations.
+5. Re-run verification and report any links that still failed.
+
+
 ## List Issues
 
 ```bash

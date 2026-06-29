@@ -100,6 +100,39 @@ gh api graphql \
   -f repo='hello-world'
 ```
 
+### Issue Relationship Mutations
+
+Use GraphQL node ids from `gh issue view <number> --json id`. Relationship mutations are useful for sub-issues and blocked-by dependencies. Verify support first if working against GitHub Enterprise or an older API surface.
+
+```bash
+# Optional: confirm mutation names exist
+gh api graphql \
+  -f query='query { __schema { mutationType { fields { name } } } }' \
+  --jq '.data.__schema.mutationType.fields[].name'
+
+# Link a child issue under a parent issue
+gh api graphql \
+  -f query='mutation($issueId: ID!, $subIssueId: ID!) { addSubIssue(input: { issueId: $issueId, subIssueId: $subIssueId }) { issue { id } subIssue { id } } }' \
+  -f issueId=PARENT_ID \
+  -f subIssueId=CHILD_ID
+
+# Mark one issue as blocked by another
+gh api graphql \
+  -f query='mutation($issueId: ID!, $blockingIssueId: ID!) { addBlockedBy(input: { issueId: $issueId, blockingIssueId: $blockingIssueId }) { issue { id } blockingIssue { id } } }' \
+  -f issueId=BLOCKED_ISSUE_ID \
+  -f blockingIssueId=BLOCKER_ISSUE_ID
+```
+
+```bash
+# Verify parent sub-issues
+gh api graphql \
+  -f query='query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { issue(number: $number) { subIssues(first: 50) { nodes { number title url } } } } }' \
+  -f owner=OWNER \
+  -f repo=REPO \
+  -F number=123
+```
+
+
 ## Common API Patterns
 
 ### Get Repository Info

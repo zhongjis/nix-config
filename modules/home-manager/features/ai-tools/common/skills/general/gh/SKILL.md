@@ -1,6 +1,6 @@
 ---
 name: gh
-description: GitHub CLI (gh) comprehensive reference for repositories, issues, pull requests, Actions, projects, releases, gists, codespaces, organizations, extensions, and all GitHub operations from the command line. Use when creating PRs, managing issues, running workflows, checking CI status, managing releases, or making GitHub API calls. Triggers on "create PR", "list issues", "gh command", "merge PR", "run workflow", "check status", "create release", "download artifacts", "set secret".
+description: GitHub CLI (gh) comprehensive reference for repositories, issues, pull requests, Actions, projects, releases, gists, codespaces, organizations, extensions, and all GitHub operations from the command line. Use when creating PRs, managing issues, running workflows, checking CI status, managing releases, making GitHub API calls, or handling operational issue workflows such as bulk issue creation, sub-issues, blocked-by links, labels, and GitHub API/GraphQL issue relationships. Triggers on "create PR", "list issues", "gh command", "merge PR", "run workflow", "check status", "create release", "download artifacts", "set secret", "create issues", "sub-issues", "blocked by", and "GitHub API".
 upstream: https://github.com/github/awesome-copilot/blob/main/skills/gh-cli/SKILL.md
 ---
 
@@ -20,6 +20,10 @@ Work seamlessly with GitHub from the command line.
 | Create issue            | `gh issue create --title "..." --body "..."`      |
 | List issues             | `gh issue list`                                   |
 | Close issue             | `gh issue close 123 --comment "Fixed in #456"`   |
+| Create issue from file  | `gh issue create --title "..." --body-file issue.md` |
+| Add issue label         | `gh issue edit 123 --add-label label-name` |
+| Link sub-issue          | `gh api graphql -f query='mutation...' -f issueId=... -f subIssueId=...` |
+| Link blocked-by         | `gh api graphql -f query='mutation...' -f issueId=... -f blockingIssueId=...` |
 | Clone repo              | `gh repo clone owner/repo`                        |
 | Create repo             | `gh repo create my-repo --public`                 |
 | List workflow runs      | `gh run list`                                     |
@@ -123,6 +127,31 @@ State: {{.state}}'
 ```
 
 ## Common Workflows
+
+### Publish Issue Tree
+
+> Use this for generic GitHub execution mechanics. Planning skills decide what issues should exist; this workflow creates, links, and verifies them.
+
+```bash
+# 1. Confirm target repo and available labels
+gh repo view --json nameWithOwner,url
+gh label list --limit 200 --json name
+
+# 2. Fetch parent issue node id when linking children
+gh issue view 123 --json id,number,title,url
+
+# 3. Create children in dependency order, using files for long Markdown bodies
+gh issue create --title "Child issue title" --body-file child.md --label label-name
+
+# 4. Capture node ids for relationship mutations
+gh issue view 124 --json id,number,title,url
+
+# 5. Link sub-issues / blockers with GraphQL, then verify
+gh api graphql -f query='mutation($issueId: ID!, $subIssueId: ID!) { addSubIssue(input: { issueId: $issueId, subIssueId: $subIssueId }) { issue { id } subIssue { id } } }' -f issueId=PARENT_ID -f subIssueId=CHILD_ID
+gh api graphql -f query='mutation($issueId: ID!, $blockingIssueId: ID!) { addBlockedBy(input: { issueId: $issueId, blockingIssueId: $blockingIssueId }) { issue { id } blockingIssue { id } } }' -f issueId=CHILD_ID -f blockingIssueId=BLOCKER_ID
+```
+
+If a relationship call fails after issue creation, do not recreate issues. Re-fetch created issue numbers/node ids, verify which relationships exist, then retry only missing links.
 
 ### Create PR from Issue
 
