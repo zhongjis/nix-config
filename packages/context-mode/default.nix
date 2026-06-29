@@ -5,13 +5,13 @@
 }:
 bun2nix.mkDerivation {
   pname = "context-mode";
-  version = "1.0.168";
+  version = "1.0.169";
 
   src = pkgs.fetchFromGitHub {
     owner = "mksglu";
     repo = "context-mode";
-    rev = "v1.0.168";
-    hash = "sha256-M0FC1r3J3EF8XSNT6+IuaG7l69pnyQB80dYh5a+cSLk=";
+    rev = "v1.0.169";
+    hash = "sha256-1pV56ZB2aqod+C0kb5myuiWLAJ7+opiaurwZZ3BGKYk=";
   };
 
   bunDeps = bun2nix.fetchBunDeps {
@@ -44,6 +44,46 @@ bun2nix.mkDerivation {
     # darwin; on Linux node-gyp archives better-sqlite3 with ar from stdenv.
     ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [pkgs.cctools];
 
+  patches = [
+    (pkgs.writeText "disable-pi-version-check.patch" ''
+      diff --git a/src/adapters/pi/mcp-bridge.ts b/src/adapters/pi/mcp-bridge.ts
+      --- a/src/adapters/pi/mcp-bridge.ts
+      +++ b/src/adapters/pi/mcp-bridge.ts
+      @@ -885,8 +885,9 @@ export function foregroundBridgeEnv(
+         baseEnv: NodeJS.ProcessEnv,
+         foreground: boolean,
+       ): NodeJS.ProcessEnv {
+      -  if (!foreground) return baseEnv;
+      -  return { ...baseEnv, CONTEXT_MODE_BRIDGE_IDLE_MS: "0" };
+      +  const piBridgeEnv = { ...baseEnv, CONTEXT_MODE_DISABLE_VERSION_CHECK: "1" };
+      +  if (!foreground) return piBridgeEnv;
+      +  return { ...piBridgeEnv, CONTEXT_MODE_BRIDGE_IDLE_MS: "0" };
+       }
+
+       /** Result of bootstrapping the bridge. */
+      diff --git a/src/server.ts b/src/server.ts
+      --- a/src/server.ts
+      +++ b/src/server.ts
+      @@ -4953,10 +4953,12 @@ async function main() {
+         // (some users keep the MCP server alive 24h+) catch new releases without a
+         // restart. `.unref()` lets the process exit normally on SIGTERM regardless
+         // of pending intervals.
+      -  fetchLatestVersion().then(v => { if (v !== "unknown") _latestVersion = v; });
+      -  setInterval(() => {
+      -    fetchLatestVersion().then(v => { if (v !== "unknown") _latestVersion = v; });
+      -  }, 60 * 60 * 1000).unref();
+      +  if (process.env.CONTEXT_MODE_DISABLE_VERSION_CHECK !== "1") {
+      +    fetchLatestVersion().then(v => { if (v !== "unknown") _latestVersion = v; });
+      +    setInterval(() => {
+      +      fetchLatestVersion().then(v => { if (v !== "unknown") _latestVersion = v; });
+      +    }, 60 * 60 * 1000).unref();
+      +  }
+
+         // Stats heartbeat — keep the statusline truthful while the user works in
+         // tools other than MCP (Bash/Read/Edit during long sessions or post-/compact
+    '')
+  ];
+
   buildPhase = ''
     runHook preBuild
 
@@ -65,6 +105,20 @@ bun2nix.mkDerivation {
     # Compile TypeScript -> build/, producing build/adapters/pi/extension.js
     # (the entry point declared in package.json's "pi" manifest).
     node_modules/.bin/tsc -p tsconfig.json
+
+    # Rebuild the MCP server bundle after postPatch; Pi spawns this file at runtime.
+    node_modules/.bin/esbuild \
+      src/server.ts \
+      --bundle \
+      --platform=node \
+      --target=node18 \
+      --format=esm \
+      --outfile=server.bundle.mjs \
+      --external:better-sqlite3 \
+      --external:turndown \
+      --external:turndown-plugin-gfm \
+      --external:@mixmark-io/domino \
+      --minify
 
     runHook postBuild
   '';
