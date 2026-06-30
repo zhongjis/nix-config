@@ -178,7 +178,8 @@
         # context-mode: built from a GitHub clone with bun (packages/context-mode),
         # consumed as a local-path pi package (its pi.extensions + skills load from
         # the Nix store). Replaces the former git:github.com/ttttmr/pi-context entry.
-        "${inputs.self.packages.${system}.context-mode}"
+        # "${inputs.self.packages.${system}.context-mode}"
+        "git:github.com/ttttmr/pi-context@e5263cc46ae2e9b3e35c12193d97a01e4efeb9f5"
       ];
   };
 
