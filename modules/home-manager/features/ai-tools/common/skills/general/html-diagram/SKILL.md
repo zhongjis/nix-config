@@ -17,13 +17,15 @@ The output should be mostly visual: full-screen diagram, sparse labels, highligh
 3. Write a graph spec before HTML: title, audience, zones/groups, nodes, edges, flow states, and any sequence chips.
    If the graph feels dense, split it into scenes/lanes before drawing.
 4. Choose the renderer:
-   - Default for architecture/infra/pipeline diagrams: D2-generated SVG, embedded in the HTML shell.
-   - Simple flowcharts: Mermaid is acceptable when layout control is not critical.
+   - Default for dense architecture/infra/pipeline diagrams: D2-generated SVG with ELK layout when available, embedded in the HTML shell.
+   - Render D2 with tight framing: prefer `d2 --layout=elk --pad 16` (or the smallest readable pad), avoid `--center`, and rerender instead of accepting a huge blank viewBox.
+   - Simple flowcharts: Mermaid is acceptable when layout control is not critical; use Mermaid ELK for larger Mermaid graphs when available.
+   - Graphviz/DOT is acceptable for hierarchical dependency diagrams when you need explicit `ranksep`, `nodesep`, `margin=0`, or `ratio=compress` controls.
    - Hand-authored SVG: only for tiny custom diagrams (about 8 nodes or fewer) or decorative elements. Do not hand-place dense architecture graphs.
-   - If D2 is not available, fall back explicitly: Mermaid for simple flowcharts, hand-authored SVG only for tiny/decorative pieces.
-     Do not pretend a renderer was run.
+   - If the intended renderer is not available, fall back explicitly and say which renderer actually produced the diagram.
+   - Do not pretend a renderer was run.
 5. Let the renderer own layout. Let the reusable wrapper own the standard HTML shell, interaction, highlighting, animation, theme, and details.
-6. For D2 output, keep the D2 graph text as the layout source.
+6. For renderer output, keep the graph text as the layout source.
    If layout changes are needed, update the graph and rerender.
    Post-process generated SVG only for stable ids/classes/data attributes before wrapping.
    Do not hand-edit generated SVG coordinates.
@@ -53,11 +55,16 @@ Config shape:
   ],
   "details": {
     "node-a": {"title": "Node A", "body": "What this node does"}
-  }
+  },
+  "fitViewBox": true,
+  "keyboardGraph": true
 }
 ```
 
-Prepare the SVG so important nodes/edges have stable `id` or `data-k` values that match flow targets.
+Prepare the SVG so important nodes/edges have stable `id` or `data-k` values that match flow targets. Keep each flow target list narrow enough that the active path is visually distinct; do not highlight half the graph for a single chip/node.
+If you want an overview selected on load, make the first flow an explicit `all`/overview chip with empty targets; otherwise the wrapper starts undimmed until the user chooses a flow or node.
+The wrapper auto-fits SVG viewBox to interactive graph content to reduce blank canvas; set `"fitViewBox": false` only when a diagram intentionally needs preserved outer margins or decorative zones.
+Graph nodes are keyboard-focusable by default; set `"keyboardGraph": false` only when a very dense diagram would create too many tab stops.
 Only hand-write the full HTML shell when the user asks for a custom shell that the wrapper cannot express.
 ## Artifact contract
 
@@ -68,6 +75,7 @@ Only hand-write the full HTML shell when the user asks for a custom shell that t
 - Keep diagram styling class-based.
   Use stable node/edge IDs or `data-*` attributes so chips can light up exact paths.
 - Preserve interaction when useful: flow chips, clickable nodes, selected details, and `.lit` classes.
+  Put `data-k`/`id` on the clickable graph group (`.node`, `.edge`, `.d2-node`, `.d2-edge`, `.d2-zone`) rather than only on inner text/paths, so node clicks highlight the intended element.
 - Preserve animation when useful: CSS stroke-dashoffset/path pulse on lit edges, with `prefers-reduced-motion` support.
 - Always include dark mode:
   - CSS variables on `:root` / `html.dark`.
@@ -76,9 +84,10 @@ Only hand-write the full HTML shell when the user asks for a custom shell that t
   - Apply-before-paint script in `<head>` defaulting to `prefers-color-scheme`.
   - SVG styled through CSS variables/classes, not hard-coded SVG colors.
 
-## No-overlap rules
+## No-overlap and no-wasted-space rules
 
-- Nodes, labels, badges, and cards must not intersect. If space is tight, increase the viewBox, add scroll/pan, split scenes, or move details into a dock.
+- Nodes, labels, badges, and cards must not intersect. If space is tight, first trim renderer padding/viewBox and shorten labels; then add scroll/pan, split scenes, or move details into a dock.
+- Large blank canvas is a defect. Keep the rendered diagram bounds tight around content; avoid centering small graphs inside huge SVG/viewBox space.
 - Arrowheads must visibly terminate at the source/target node boundary, not in empty space or through node text.
 - Edge labels must sit on clear whitespace and must not cross unrelated nodes.
 - Use short labels. Wrap or split long text into details so node text never drives overlap.
@@ -86,6 +95,7 @@ Only hand-write the full HTML shell when the user asks for a custom shell that t
 - Keep a reserved margin around zones and at least one node-height of vertical separation between parallel lanes.
 - Put detail cards outside the SVG stage or in a reserved dock. Never float cards over important diagram content.
 - For large graphs, prefer multiple chips/scenes over one crowded canvas.
+- Active highlighting must be unmistakable: dim non-active nodes/edges, use a high-contrast accent distinct from base graph colors, and keep the active set small enough to understand.
 
 ## Final QA
 
@@ -95,8 +105,10 @@ If you cannot run browser/screenshot QA, say visual QA is not verified; do not c
 - No node overlap.
 - No label clipping.
 - No box/card overlap.
+- No excessive blank canvas around the graph.
 - Clear arrow starts/ends.
 - Readable dark and light modes.
-- Each flow chip highlights the intended nodes and edges.
+- Each flow chip highlights the intended nodes and edges, with inactive graph elements visibly de-emphasized.
+- Clicking a node or flow makes the active selection obvious even when the base graph already uses blue or similar colors.
 
 If a visual check finds overlap, fix layout first. Do not accept a crowded diagram.
