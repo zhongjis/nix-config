@@ -5,13 +5,13 @@
 }:
 bun2nix.mkDerivation {
   pname = "opencode-morph-fast-apply";
-  version = "1.10.0";
+  version = "1.10.1";
 
   src = pkgs.fetchFromGitHub {
     owner = "JRedeker";
     repo = "opencode-morph-fast-apply";
-    rev = "7481cb0d8fe939bae0595dce422497161196ccac";
-    hash = "sha256-tz4T03Zw5HJUwLeRf58qjsVr+LKXauY1C8QWJFm9+rI=";
+    rev = "a5ebcc8b0e83145a500083250163a1b24ad1f72b";
+    hash = "sha256-xtlSJxXZhoBVpFy4b0LW7i/Q1xuLnzcPnLDT3CuTnrk=";
   };
 
   bunDeps = bun2nix.fetchBunDeps {
