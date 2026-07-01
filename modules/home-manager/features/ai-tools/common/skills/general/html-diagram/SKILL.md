@@ -11,7 +11,7 @@ The output should be mostly visual: full-screen diagram, sparse labels, highligh
 
 ## Workflow
 
-1. Read `references/architecture-example.html` for the shell pattern: full-screen SVG stage, flow chips, clickable nodes, lit request paths, side detail panel, and dark mode.
+1. Read `references/architecture-example.html` only when you need to inspect the shell pattern.
 2. Read at most one relevant file from `references/html-effectiveness/` when you need a style cue.
    Do not scan the whole reference gallery unless the user explicitly asks; broad reference reading makes generation slow.
 3. Write a graph spec before HTML: title, audience, zones/groups, nodes, edges, flow states, and any sequence chips.
@@ -22,12 +22,43 @@ The output should be mostly visual: full-screen diagram, sparse labels, highligh
    - Hand-authored SVG: only for tiny custom diagrams (about 8 nodes or fewer) or decorative elements. Do not hand-place dense architecture graphs.
    - If D2 is not available, fall back explicitly: Mermaid for simple flowcharts, hand-authored SVG only for tiny/decorative pieces.
      Do not pretend a renderer was run.
-5. Let the renderer own layout. Let the HTML shell own interaction, highlighting, animation, theme, and details.
+5. Let the renderer own layout. Let the reusable wrapper own the standard HTML shell, interaction, highlighting, animation, theme, and details.
 6. For D2 output, keep the D2 graph text as the layout source.
    If layout changes are needed, update the graph and rerender.
-   Post-process generated SVG only for ids/classes/styles used by the HTML shell.
+   Post-process generated SVG only for stable ids/classes/data attributes before wrapping.
    Do not hand-edit generated SVG coordinates.
+7. Use `scripts/html-diagram-wrap.py` to create the standalone HTML shell instead of rewriting CSS/JS from scratch.
+   Write a small JSON config with title, subtitle, flows, and details; pass the rendered SVG to the wrapper.
 
+
+## Reusable wrapper
+
+Use the bundled wrapper for normal architecture/infra/pipeline diagrams:
+
+```bash
+python <skill-dir>/scripts/html-diagram-wrap.py \
+  --svg rendered.svg \
+  --config diagram-config.json \
+  --out diagram.html
+```
+
+Config shape:
+
+```json
+{
+  "title": "System flow",
+  "subtitle": "Current path vs target path",
+  "flows": [
+    {"id": "happy", "label": "Happy path", "targets": ["node-a", "edge-a-b"]}
+  ],
+  "details": {
+    "node-a": {"title": "Node A", "body": "What this node does"}
+  }
+}
+```
+
+Prepare the SVG so important nodes/edges have stable `id` or `data-k` values that match flow targets.
+Only hand-write the full HTML shell when the user asks for a custom shell that the wrapper cannot express.
 ## Artifact contract
 
 - Produce one standalone `.html` file.
