@@ -135,6 +135,7 @@ in {
               "bat": "BAT2"
           },
           "battery": {
+              "bat": "BAT1",
               "interval": 1,
               "states": {
                   "good": 99,

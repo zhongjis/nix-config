@@ -31,7 +31,7 @@ in {
   services.open-design = {
     enable = true;
     package = fixPnpmDeps openDesignPackages.daemon;
-    autoStart = true;
+    autoStart = false;
 
     webFrontend = {
       enable = true;
