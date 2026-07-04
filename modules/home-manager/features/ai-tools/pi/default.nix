@@ -152,6 +152,7 @@
       "git:github.com/nicobailon/pi-web-access@v0.13.0"
       "git:github.com/aliou/pi-processes@v0.9.4"
       "git:github.com/dbachelder/pi-btw@v0.4.1"
+      "git:github.com/ttttmr/pi-context@e5263cc46ae2e9b3e35c12193d97a01e4efeb9f5"
       {
         source = "git:github.com/backnotprop/plannotator@v0.21.2";
         extensions = ["apps/pi-extension"];
@@ -179,7 +180,6 @@
         # consumed as a local-path pi package (its pi.extensions + skills load from
         # the Nix store). Replaces the former git:github.com/ttttmr/pi-context entry.
         # "${inputs.self.packages.${system}.context-mode}"
-        "git:github.com/ttttmr/pi-context@e5263cc46ae2e9b3e35c12193d97a01e4efeb9f5"
       ];
   };
 
