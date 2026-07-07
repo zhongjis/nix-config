@@ -130,6 +130,28 @@ For PRs that touch many files -- especially when a small high-signal core sits a
 - For repetitive changes, name a concrete reference file so reviewers don't re-read the same pattern N times.
 - Skip it for small, focused PRs -- a 3-file change doesn't need a map.
 
+### 8. Progressive Disclosure (keep the first screen scannable)
+
+A reviewer's first screen should carry only what they *need to know* to start: the summary, the change list, and any breaking-change or required footers. Everything *nice to know on demand* -- the "why" rationale, verification evidence, long enumerations, out-of-scope notes, migration detail -- belongs in a GitHub `<details>` block, one click away instead of pushing the essentials below the fold.
+
+Use it when the description would otherwise make a reviewer scroll past secondary detail to find the changes. Skip it for short descriptions -- collapsing three lines helps no one.
+
+```markdown
+<details>
+<summary>Why <decision> (rationale)</summary>
+
+<reasoning, references, trade-offs>
+</details>
+
+<details>
+<summary>Verification</summary>
+
+<how it was tested, commands, evidence>
+</details>
+```
+
+**Never collapse the need-to-know.** The changes, breaking-change warnings, and required footers stay visible -- collapsibles add depth, they don't hide things a reviewer must act on. A good test: if a reviewer skips every collapsed block, they should still understand *what* the PR does and whether it's safe to merge.
+
 ## PR Comments
 
 - Use comments for supplementary context (flowcharts, diagrams, design rationale) that doesn't belong in the description.

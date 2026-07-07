@@ -438,6 +438,12 @@ Each row is a pointer to the matching inline comment. Do not expand findings her
 [Brief justification for the verdict]
 ````
 
+### Progressive Disclosure in the Summary
+
+For large reviews, keep the verdict and findings table above the fold -- that is the reviewer's need-to-know. Genuinely secondary, *summary-only* sections can go in `<details>` blocks so they don't push the verdict down: a File-Level Confidence table with many rows, Strengths/KUDOS, or a long context/methodology note.
+
+This is distinct from the anti-pattern in "Inline vs Summary Strategy": collapse summary-only material that is truly secondary -- never a restatement of inline findings (those live in the Files Changed tab). Blockers and majors are never collapsed; they are the whole point of the review.
+
 ### GitHub Comment Formatting Rules
 
 When posting comments to GitHub (both inline and summary):
