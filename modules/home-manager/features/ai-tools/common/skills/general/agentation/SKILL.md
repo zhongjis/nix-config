@@ -2,6 +2,7 @@
 name: agentation
 description: Add Agentation visual feedback toolbar to a Next.js project
 upstream: "https://github.com/benjitaylor/agentation/tree/main/skills/agentation"
+disable-model-invocation: true
 ---
 
 # Agentation Setup

@@ -2,6 +2,7 @@
 name: code-review
 description: "Comprehensive code review for local diffs and GitHub PRs. Supports git/jj diff review and gh CLI PR workflows with severity-ranked findings, confidence scoring, and professional feedback."
 upstream: "https://github.com/wshobson/agents/blob/main/plugins/developer-essentials/skills/code-review-excellence/SKILL.md"
+disable-model-invocation: true
 ---
 
 # Code Review

@@ -12,6 +12,7 @@ description: >
   clean handoff to teammates or other agents. Bare "整理" / "tidy" with prior dev
   context counts — do not under-trigger. Cross-platform: works with common coding agents.
 upstream: "https://github.com/KKKKhazix/khazix-skills/tree/main/neat-freak"
+disable-model-invocation: true
 ---
 
 # 洁癖 — Knowledge Base Neat-Freak

@@ -2,6 +2,7 @@
 name: agents-md
 description: Audits and writes AGENTS.md files using execution-first standards. Checks commands, gotchas, and signal-to-noise ratio. Use when asked to audit, review, score, refactor, or improve agent instruction files, fix stale commands, reduce bloat, or asking "my AGENTS.md is bad", "help me write an AGENTS.md", or "improve my agent instructions".
 upstream: "https://github.com/mblode/agent-skills/tree/main/skills/agents-md"
+disable-model-invocation: true
 ---
 
 # AGENTS.md Audit

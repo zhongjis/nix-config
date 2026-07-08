@@ -7,6 +7,7 @@ description: >
   Use when addressing unresolved PR review comments or threads from Copilot, bots, or humans.
   Triggers on "address comments", "fix review comments", "address Copilot feedback", "respond to PR comments",
   "resolve PR threads", and similar requests to work review feedback to closure.
+disable-model-invocation: true
 ---
 
 # Address PR Review Threads

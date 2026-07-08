@@ -1,6 +1,7 @@
 ---
 name: update-flake-inputs
 description: Safe workflow for updating Nix flake input(s) in this repository. Use whenever the user asks to update, bump, refresh, pin, repin, or migrate any flake input or flake.lock entry — including nixpkgs, home-manager, Hyprland, Homebrew taps, overlays, private inputs, tool flakes, or groups of related inputs. Trigger even if the user only says “update inputs”, “bump nixpkgs”, “refresh flake.lock”, “update Hyprland”, or “bring this flake input to latest”. This skill prevents accidental broad lock churn, missed release-note migrations, broken follows/ABI compatibility, and false blame from pre-existing flake check failures.
+disable-model-invocation: true
 ---
 
 # Update Flake Inputs

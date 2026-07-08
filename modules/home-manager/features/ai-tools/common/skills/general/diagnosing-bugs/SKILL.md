@@ -2,6 +2,7 @@
 name: diagnosing-bugs
 description: Disciplined diagnosis loop for hard bugs and performance regressions. Reproduce → minimise → hypothesise → instrument → fix → regression-test. Use when user says "diagnose this" / "debug this", reports a bug, says something is broken/throwing/failing, or describes a performance regression.
 upstream: "https://github.com/mattpocock/skills/tree/main/skills/engineering/diagnosing-bugs"
+disable-model-invocation: true
 ---
 
 # Diagnosing Bugs

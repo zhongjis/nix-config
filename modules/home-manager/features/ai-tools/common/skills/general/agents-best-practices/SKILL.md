@@ -6,6 +6,7 @@ metadata:
   version: "1.2.0"
   scope: "provider-neutral-agent-harness"
   file_policy: "markdown-only"
+disable-model-invocation: true
 ---
 
 # Agents Best Practices
