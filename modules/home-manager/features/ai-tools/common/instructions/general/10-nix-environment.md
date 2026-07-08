@@ -1,6 +1,6 @@
 # Nix Environment Awareness
 
-**Context:** This environment uses the Nix package manager. Prefer ephemeral or project-scoped execution over mutating the host. Nix configuration located at ~/nix-config
+**Context:** This environment uses the Nix package manager. Prefer ephemeral or project-scoped execution over mutating the host. If asked to edit the user's personal Nix config, use `~/personal/nix-config`.
 
 ## Command Selection
 

@@ -2,6 +2,20 @@
 
 **Context:** `fd`, `rg`, and `ast-grep` are installed globally. Never fall back to POSIX `find`/`grep` when the modern tool is present.
 
+## Relationship to CodeGraph
+
+Use CodeGraph before shell search for indexed code structure: architecture,
+code flow, symbol definitions, callers/callees, impact radius, routes,
+components, and "how does X work?" questions.
+
+Use shell tools for raw filesystem and text work: `fd` for paths/files,
+`rg` for exact text/literals/config/docs, and `ast-grep` for syntax-shaped
+patterns that regex cannot safely match.
+
+Do not use `rg`/`Read` first to understand indexed code when CodeGraph is
+available. Fall back to `rg` for literals, generated text, non-indexed files,
+or details CodeGraph did not cover.
+
 ## Mandatory substitutions
 
 **Before running `find` or `grep` in any bash command, STOP and rewrite using the table below.**
@@ -19,7 +33,7 @@
 
 ## ast-grep — specialist only
 
-`ast-grep` is NOT a replacement for `rg`. `rg` remains the default for text/symbol code search.
+`ast-grep` is NOT a replacement for `rg`. `rg` remains the default for exact text search.
 
 **Use `ast-grep` ONLY when regex cannot reliably match the structure you need:**
 
@@ -28,7 +42,7 @@
 - Nested AST patterns (e.g., `await` inside `try` inside async fn)
 - Structural refactors that must preserve syntax shape
 
-**Keep using `rg` for:** plain symbol lookups (`rg 'fn foo'`), text matches, file-content grep.
+**Keep using `rg` for:** exact text matches, literals, config/docs, file-content grep, and fallback symbol search when CodeGraph is insufficient.
 
 ## Exceptions (use POSIX tools only when)
 
