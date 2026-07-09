@@ -8,6 +8,19 @@
   # https://nixos.wiki/wiki/Overlays
   # hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
   modifications = final: prev: rec {
+    # open-design's daemon compiles the better-sqlite3 native addon from
+    # source (no Node 24 prebuild ships). On darwin node-gyp links the
+    # static archive with Apple's `libtool` from cctools, which upstream's
+    # package derivation omits from its darwin build inputs. Add it here so
+    # `nh home/darwin switch` can build the daemon on macOS. On Linux the
+    # optionals list is empty, so the derivation is byte-identical (no
+    # rebuild, no regression).
+    open-design-daemon = inputs.open-design.packages.${final.stdenv.hostPlatform.system}.daemon.overrideAttrs (old: {
+      nativeBuildInputs =
+        (old.nativeBuildInputs or [])
+        ++ final.lib.optionals final.stdenv.isDarwin [final.cctools];
+    });
+
     # jdk = prev."jdk${toString 17}";
     # maven = prev.maven.override {inherit jdk;};
     # xwayland = prev.xwayland.overrideAttrs (oldAttrs: {

@@ -12,7 +12,7 @@ in {
 
   services.open-design = {
     enable = true;
-    package = openDesignPackages.daemon;
+    package = pkgs.open-design-daemon;
     autoStart = true;
 
     webFrontend = {

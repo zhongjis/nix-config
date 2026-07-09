@@ -9,8 +9,7 @@
   sopsFile = inputs.self + "/secrets/ai-tokens.yaml";
   secretPath_context7 = config.sops.secrets.context7_api_key.path;
   secretPath_exa = config.sops.secrets.exa_api_key.path;
-  system = pkgs.stdenv.hostPlatform.system;
-  openDesignDaemon = inputs.open-design.packages.${system}.daemon;
+  openDesignDaemon = pkgs.open-design-daemon;
 
   # MCPs available to all profiles
   commonMcps = {
