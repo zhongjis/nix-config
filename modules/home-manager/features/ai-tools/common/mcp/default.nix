@@ -2,12 +2,15 @@
   config,
   lib,
   inputs,
+  pkgs,
   aiProfileHelpers,
   ...
 }: let
   sopsFile = inputs.self + "/secrets/ai-tokens.yaml";
   secretPath_context7 = config.sops.secrets.context7_api_key.path;
   secretPath_exa = config.sops.secrets.exa_api_key.path;
+  system = pkgs.stdenv.hostPlatform.system;
+  openDesignDaemon = inputs.open-design.packages.${system}.daemon;
 
   # MCPs available to all profiles
   commonMcps = {
@@ -20,6 +23,14 @@
       headers = {
         CONTEXT7_API_KEY = "{env:CONTEXT7_API_KEY}";
       };
+    };
+    open-design = {
+      command = "${openDesignDaemon}/bin/od";
+      args = [
+        "mcp"
+        "--daemon-url"
+        "http://127.0.0.1:${toString config.services.open-design.port}"
+      ];
     };
   };
 
