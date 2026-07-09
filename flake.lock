@@ -2112,11 +2112,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1781744090,
-        "narHash": "sha256-Dcr+kz9SBiH+kFt0ilud8Th77an1tFPxSS90Ss1Zoz8=",
+        "lastModified": 1783582776,
+        "narHash": "sha256-GCbCv0rzd/X0FYsfHloBPelCT54oFdvyEr6eo3e1dN8=",
         "owner": "nexu-io",
         "repo": "open-design",
-        "rev": "48da58f7511ba11bfa1a5107aa5a5e7366664885",
+        "rev": "3649f81cb7ca196b4e4ac4f104e44eabfc8d0327",
         "type": "github"
       },
       "original": {
