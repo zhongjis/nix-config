@@ -44,14 +44,14 @@ in {
       isPersonal = cfg == "personal";
     };
 
-    home.packages =
-      [
-        llmAgentsPackages.gitnexus
-        llmAgentsPackages.qmd
-        llmAgentsPackages.beads
-        llmAgentsPackages.herdr
-        llmAgentsPackages.codegraph
-        inputs.self.packages.${system}.before-and-after
-      ];
+    home.packages = [
+      llmAgentsPackages.gitnexus
+      llmAgentsPackages.qmd
+      llmAgentsPackages.beads
+      llmAgentsPackages.herdr
+      llmAgentsPackages.codegraph
+      llmAgentsPackages.agentsview
+      inputs.self.packages.${system}.before-and-after
+    ];
   };
 }
