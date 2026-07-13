@@ -46,27 +46,5 @@
         ".css"
       ];
     };
-
-    # google-java-format = {
-    #   command = [
-    #     (lib.getExe pkgs.google-java-format)
-    #     "--replace"
-    #     "$FILE"
-    #   ];
-    #   extensions = [".java"];
-    # };
-
-    # scalafmt = {
-    #   command = [
-    #     (lib.getExe pkgs.scalafmt)
-    #     "--non-interactive"
-    #     "$FILE"
-    #   ];
-    #   extensions = [
-    #     ".scala"
-    #     ".sbt"
-    #     ".sc"
-    #   ];
-    # };
   };
 }
