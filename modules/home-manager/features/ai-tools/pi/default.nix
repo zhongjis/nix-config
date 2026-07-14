@@ -123,26 +123,42 @@
   };
 
   sharedSettings = {
-    defaultThinkingLevel = "high";
+    # UI & Display
+    theme = "dark";
+    collapseChangelog = true;
+    enableInstallTelemetry = false;
+    treeFilterMode = "no-tools";
+    editorPaddingX = 1;
     quietStartup = true;
-    defaultProjectTrust = "always";
     doubleEscapeAction = "tree";
+    defaultProjectTrust = "always";
+
+    # Warnings
     warnings.anthropicExtraUsage = false;
+
+    # Compaction
     compaction = {
       enabled = true;
       reserveTokens = 16384;
       keepRecentTokens = 20000;
     };
+
+    # Retry
     retry = {
       enabled = true;
       maxRetries = 3;
       baseDelayMs = 2000;
       maxDelayMs = 60000;
     };
-    transport = "sse";
-    collapseChangelog = true;
-    treeFilterMode = "no-tools";
-    npmCommand = ["bash" "${config.home.homeDirectory}/.pi/agent/scripts/pi-package-npm.sh"];
+
+    # Message Delivery
+    steeringMode = "all";
+    followUpMode = "all";
+    transport = "auto";
+    httpIdleTimeoutMs = 30000;
+    websocketConnectTimeoutMs = 10000;
+
+    # Resources
     packages = [
       "git:github.com/mavam/pi-mcporter@v0.5.0"
       "git:github.com/RimuruW/pi-hashline-edit@v0.7.0"
@@ -152,7 +168,7 @@
       "git:github.com/nicobailon/pi-web-access@v0.13.0"
       "git:github.com/aliou/pi-processes@v0.9.4"
       "git:github.com/dbachelder/pi-btw@v0.4.1"
-      "git:github.com/ttttmr/pi-context@e5263cc46ae2e9b3e35c12193d97a01e4efeb9f5"
+      # "git:github.com/ttttmr/pi-context@e5263cc46ae2e9b3e35c12193d97a01e4efeb9f5"
       "git:github.com/Michaelliv/pi-goal@v0.1.7"
       {
         source = "git:github.com/backnotprop/plannotator@v0.21.2";
@@ -160,6 +176,9 @@
         skills = ["apps/pi-extension/skills"];
       }
     ];
+
+    npmCommand = ["bash" "${config.home.homeDirectory}/.pi/agent/scripts/pi-package-npm.sh"];
+
     permissionLevel = "high";
   };
 
