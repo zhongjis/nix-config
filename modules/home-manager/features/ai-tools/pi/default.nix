@@ -169,7 +169,6 @@
       "git:github.com/aliou/pi-processes@v0.9.4"
       "git:github.com/dbachelder/pi-btw@v0.4.1"
       # "git:github.com/ttttmr/pi-context@e5263cc46ae2e9b3e35c12193d97a01e4efeb9f5"
-      "git:github.com/Michaelliv/pi-goal@v0.1.7"
       {
         source = "git:github.com/backnotprop/plannotator@v0.21.2";
         extensions = ["apps/pi-extension"];
