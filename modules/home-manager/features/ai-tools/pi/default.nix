@@ -163,7 +163,6 @@
       "git:github.com/mavam/pi-mcporter@v0.5.0"
       "git:github.com/RimuruW/pi-hashline-edit@v0.7.0"
       "git:github.com/aliou/pi-guardrails@v0.15.0"
-      "git:github.com/fluxgear/pi-thinking-steps@v1.0.11"
       "git:github.com/davebcn87/pi-autoresearch@v1.6.0"
       "git:github.com/nicobailon/pi-web-access@v0.13.0"
       "git:github.com/aliou/pi-processes@v0.9.4"
