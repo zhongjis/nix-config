@@ -4,30 +4,15 @@ upstream: "https://github.com/openai/skills/tree/main/skills/.curated/gh-address
 adaptedFrom:
   - "https://github.com/v1-io/v1tamins/tree/main/claude/skills/address-review"
 description: >
-  Use when addressing unresolved PR review comments or threads from Copilot, bots, or humans.
-  Triggers on "address comments", "fix review comments", "address Copilot feedback", "respond to PR comments",
-  "resolve PR threads", and similar requests to work review feedback to closure.
+  Address unresolved pull request review comments and threads to closure.
 disable-model-invocation: true
 ---
 
 # Address PR Review Threads
 
-Address unresolved PR review threads end-to-end by gathering full context, deciding whether each thread needs a code change or a technical disagreement, applying the necessary changes, commenting in the thread, and resolving only the threads actually addressed.
-
-## Trigger
-
-Use this skill for requests like:
-
-- "fix review comments"
-- "address Copilot feedback"
-- "respond to PR comments"
-- "resolve PR threads"
-
-The unit of work is the unresolved review thread, not just unreplied comments.
+Work unresolved PR review threads end-to-end: gather full context, decide fix or technical disagreement, make approved changes, reply in-thread, and resolve only threads addressed in this pass.
 
 ## Prerequisites
-
-Before performing any PR operation:
 
 1. Verify GitHub CLI authentication:
 
@@ -35,200 +20,84 @@ Before performing any PR operation:
 gh auth status
 ```
 
-2. Ensure you are on the correct PR branch:
+Complete when authentication succeeds, or stop with the auth error.
+
+2. Ensure the correct PR branch is checked out:
 
 ```bash
 gh pr checkout <PR_NUMBER>
 ```
 
-3. To retrieve structured comment and thread context, stay in the checked-out repository and run the bundled script via this skill's base directory (the directory containing this `SKILL.md`):
+Complete when the current branch is the PR branch, or stop with the checkout error.
+
+3. Fetch structured PR context from the PR repository root:
 
 ```bash
 SKILL_DIR="<base directory for this skill>"
-python3 "$SKILL_DIR/scripts/fetch_comments.py"
+python3 "$SKILL_DIR/scripts/fetch_comments.py" > pr-comments.json
 ```
 
-This outputs a JSON blob with `pull_request`, `conversation_comments`, `reviews`, and `review_threads`. The script requires `gh` CLI to be authenticated. Do not `cd` into the skill directory before running it; the script must execute while your current working directory is the PR repository so `gh pr view` can resolve the checked-out branch correctly.
-
-If authentication fails or the PR branch cannot be checked out, stop and report the issue.
+Complete when `pr-comments.json` contains `pull_request`, `conversation_comments`, `reviews`, and `review_threads`. The script must run from the PR repository so `gh pr view` can resolve the current branch.
 
 ## Workflow
 
-### 1. Discover Unresolved Threads
+### 1. Discover unresolved threads
 
-Identify unresolved review threads on the PR. The preferred method is running `python3 "$SKILL_DIR/scripts/fetch_comments.py"`, which provides a structured JSON view of all comments and threads while preserving the PR repository as the current working directory. Alternatively, use `gh pr view --json reviewThreads` as a fallback.
+Use `pr-comments.json` to list every unresolved review thread. Complete when every unresolved thread has an identifier, file path, line or range, full comment chain, and resolved state recorded. If none exist, report that and stop.
 
-If there are no unresolved threads, report that and stop.
+### 2. Gather local context
 
-### 2. Fetch Full Context for Each Thread
+For each unresolved thread, read the referenced file around the location and the relevant PR diff or patch context. Complete when every thread has current code context plus enough diff context to judge the comment.
 
-Before deciding what to do with a thread, gather all of the following:
+### 3. Classify each thread
 
-- The full comment body and all replies in the thread
-- The referenced file path and code location
-- The current contents of the referenced file around that location
-- The relevant diff hunk or patch context, if available
+Classify every unresolved thread as one of:
 
-Read the thread end-to-end and de-duplicate against existing discussion:
+| Verdict | Action |
+| --- | --- |
+| `fix` | Make the smallest code change that addresses the concern. |
+| `disagree` | Keep the code and reply with a concise technical reason. |
+| `left open` | Needs user input, broader scope, or cannot be resolved safely in this pass. |
 
-- Do not restate points already made in the same thread unless you are adding materially new reasoning
-- Prefer replying in the existing thread instead of creating parallel discussion elsewhere
-- Keep the thread focused on the specific issue being addressed
+Complete when every unresolved thread has exactly one verdict and a one-sentence rationale.
 
-Do not classify or act on a thread until you have read this context.
+### 4. Present plan and get approval before side effects
 
-### 3. Classify Each Thread
+Present a per-thread plan with identifier, verdict, files to touch, intended change or reply, and threads that will remain open. Get user confirmation before commits, pushes, PR comments, thread replies, or thread resolution. Complete when the user explicitly confirms the plan, or stop without external side effects.
 
-For each unresolved thread, classify it as:
+### 5. Apply approved fixes
 
-| Verdict      | Action                                                                      |
-| ------------ | --------------------------------------------------------------------------- |
-| **fix**      | Make a code change that addresses the concern                               |
-| **disagree** | Reply with a concise technical explanation for keeping the current approach |
+For every approved `fix`, edit only the files needed, follow local patterns, and avoid unrelated refactors. Complete when every approved `fix` has either a code change that addresses it or a documented blocker.
 
-A narrower or partial code change is still a **fix** if it addresses the core valid concern.
+### 6. Verify changes
 
-**Evaluation heuristics:**
+Run the narrowest relevant tests, typechecks, or linters for changed files. Complete when checks pass, or report the failing command and affected threads.
 
-- Unused imports, duplicate calls, outdated docs, stale mocks -> usually **fix**
-- Performance suggestions -> evaluate if impact is meaningful before changing code
-- Refactoring suggestions -> evaluate against KISS/YAGNI and existing local patterns
-- Security suggestions -> take seriously, verify the issue is real before acting
+### 7. Publish code changes if needed
 
-### 4. Present Plan to the User
+If code changed and the confirmed plan includes publishing, create one descriptive commit and push it using the repository's VCS. Complete when the pushed commit is visible on the PR branch, or report the failed command.
 
-Before making any external side effects, present a per-thread plan that includes:
+### 8. Reply in addressed threads
 
-- Thread identifier or short description
-- Classification (`fix` or `disagree`)
-- Files that will be touched, if any
-- Brief explanation of the intended change or disagreement
+Reply in the existing thread for every `fix` or `disagree` handled in this pass. Keep replies brief: `Fixed` plus a note when the implementation differs, or `Not changing this - <technical reason>`. Complete when every handled thread has exactly one closing reply.
 
-Do not commit, push, comment, or resolve threads before the user approves.
+### 9. Resolve handled threads
 
-### 5. Approval Boundary
-
-After presenting the plan, you MUST ask for approval (use ask tool if exist) before any external side effects. Do not commit, push, comment in a thread, or resolve any thread before the user approves.
-
-### 6. Apply Fixes
-
-For every thread classified as **fix**:
-
-- Read the relevant file(s) and surrounding code again if needed
-- Implement the smallest change that addresses the concern
-- Follow existing patterns and avoid unrelated refactors
-- Track which thread or comment IDs were addressed by code changes
-
-Do not defer valid fixes that are part of the approved plan.
-
-### 7. Commit and Push If Code Changed
-
-After the user approves, commit and push only if this pass includes code changes:
-
-- In `jj` repositories, use `jj` commands for commit and push
-- In git repositories, use git commands for commit and push
-
-Use a single descriptive commit message that summarizes the review fixes.
-
-### 8. Comment on Each Addressed Thread
-
-After any required commit and push are complete, comment on each addressed thread before resolving it.
-
-For every thread classified as **fix**:
-
-- Reply in the existing thread
-- Keep the reply brief and concrete
-- State that the issue was fixed, and note if the final implementation differs from the original suggestion
-
-For every thread classified as **disagree**:
-
-- Reply in the existing thread
-- Keep the reply brief, technical, and respectful
-- Explain why the current implementation is preferable on correctness, maintainability, performance, or scope grounds
-
-Do not use dismissive or vague replies.
-
-If no code changes were required, this commenting step is the first external action after approval.
-
-**Posting replies via gh CLI:**
-
-For general PR comments (not thread-specific):
-
-```bash
-gh pr comment <PR_NUMBER> --body "Fixed in commit <SHA>"
-```
-
-For replying to specific review threads (requires GraphQL API):
-
-```bash
-# Reply to a review thread using GraphQL
-gh api graphql -f query='
-  mutation($body: String!, $threadId: ID!) {
-    addPullRequestReviewThreadReply(input: {body: $body, pullRequestReviewThreadId: $threadId}) {
-      comment {
-        id
-        body
-      }
-    }
-  }
-' -f body="Fixed" -f threadId="<THREAD_ID>"
-```
-
-### 9. Resolve Addressed Threads
-
-After the thread has a closing comment:
-
-- Resolve only the threads actually addressed in this pass
-- Do not resolve threads that remain unaddressed or still need user input
-
-The resolution flow is always: comment first, then resolve.
-
-Use the available GitHub tooling (`gh`, MCP, or equivalent) to post replies in the existing thread.
-
-Keep replies brief:
-
-- Fix: "Fixed" or "Fixed - [note if approach differs]"
-- Disagree: "Not changing this - [brief technical reason]"
-
-Do not use dismissive or vague replies.
-
-**Resolving threads via gh CLI:**
-
-Resolving a review thread requires the GraphQL API:
-
-```bash
-# Resolve a review thread
-gh api graphql -f query='
-  mutation($threadId: ID!) {
-    resolveReviewThread(input: {threadId: $threadId}) {
-      thread {
-        id
-        isResolved
-      }
-    }
-  }
-' -f threadId="<THREAD_ID>"
-```
+Resolve only threads handled in this pass, after their closing replies. Leave `left open` threads unresolved. Complete when every handled thread is resolved and every unhandled thread remains unresolved.
 
 ## Output
 
-Provide a final summary that includes:
+Provide a final summary with:
 
 - Total unresolved threads found
-- Number addressed with code changes
-- Number addressed with disagreement replies
-- Number intentionally left unresolved, with reasons
+- Count fixed with code changes
+- Count answered with technical disagreement
+- Count left open, with reasons
 - Files changed
-- Whether commit and push succeeded
-- Number of threads commented on and resolved
+- Commit and push result, if applicable
+- Threads replied to and resolved
 
-Summary table of all reviewed threads:
+Include a compact table:
 
-| #   | File:Line   | Issue                    | Action    | Reply                               |
-| --- | ----------- | ------------------------ | --------- | ----------------------------------- |
-| 1   | path.py:42  | Unused import            | Fixed     | Fixed                               |
-| 2   | test.py:100 | Incorrect mock           | Fixed     | Fixed                               |
-| 3   | utils.py:50 | Suggested refactor       | Disagreed | Not changing - not needed per YAGNI |
-| 4   | api.py:88   | Broader redesign request | Left open | Needs user decision on scope        |
-
-ALWAYS output the final summary first, then ask for user permission
+| # | File:Line | Issue | Action | Reply |
+| --- | --- | --- | --- | --- |

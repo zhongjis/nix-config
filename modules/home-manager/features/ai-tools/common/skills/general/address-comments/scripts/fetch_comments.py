@@ -14,11 +14,13 @@ Usage:
 """
 
 from __future__ import annotations
+# pyright: reportAny=false, reportExplicitAny=false, reportUnknownVariableType=false, reportUnknownMemberType=false, reportUnknownArgumentType=false, reportUnusedCallResult=false
 
 import json
 import subprocess
 import sys
 from typing import Any
+from urllib.parse import urlparse
 
 QUERY = """\
 query(
@@ -76,6 +78,7 @@ query(
           originalStartLine
           resolvedBy { login }
           comments(first: 100) {
+            pageInfo { hasNextPage endCursor }
             nodes {
               id
               body
@@ -84,6 +87,28 @@ query(
               author { login }
             }
           }
+        }
+      }
+    }
+  }
+}
+"""
+
+THREAD_COMMENTS_QUERY = """\
+query(
+  $threadId: ID!,
+  $commentsCursor: String
+) {
+  node(id: $threadId) {
+    ... on PullRequestReviewThread {
+      comments(first: 100, after: $commentsCursor) {
+        pageInfo { hasNextPage endCursor }
+        nodes {
+          id
+          body
+          createdAt
+          updatedAt
+          author { login }
         }
       }
     }
@@ -116,20 +141,26 @@ def _ensure_gh_authenticated() -> None:
 
 
 def gh_pr_view_json(fields: str) -> dict[str, Any]:
-    # fields is a comma-separated list like: "number,headRepositoryOwner,headRepository"
+    # fields is a comma-separated list like: "number,url"
     return _run_json(["gh", "pr", "view", "--json", fields])
 
 
 def get_current_pr_ref() -> tuple[str, str, int]:
     """
-    Resolve the PR for the current branch (whatever gh considers associated).
-    Works for cross-repo PRs too, by reading head repository owner/name.
+    Resolve the PR for the current branch using the base PR URL coordinates.
     """
-    pr = gh_pr_view_json("number,headRepositoryOwner,headRepository")
-    owner = pr["headRepositoryOwner"]["login"]
-    repo = pr["headRepository"]["name"]
+    pr = gh_pr_view_json("number,url")
+    owner, repo = parse_pr_url(pr["url"])
     number = int(pr["number"])
     return owner, repo, number
+
+
+def parse_pr_url(url: str) -> tuple[str, str]:
+    parts = [part for part in urlparse(url).path.split("/") if part]
+    if len(parts) < 4 or parts[-2] != "pull":
+        raise RuntimeError(f"Unexpected PR URL: {url}")
+    owner, repo = parts[-4], parts[-3]
+    return owner, repo
 
 
 def gh_api_graphql(
@@ -167,6 +198,41 @@ def gh_api_graphql(
     return _run_json(cmd, stdin=QUERY)
 
 
+def gh_api_thread_comments(thread_id: str, comments_cursor: str | None = None) -> dict[str, Any]:
+    cmd = [
+        "gh",
+        "api",
+        "graphql",
+        "-F",
+        "query=@-",
+        "-F",
+        f"threadId={thread_id}",
+    ]
+    if comments_cursor:
+        cmd += ["-F", f"commentsCursor={comments_cursor}"]
+
+    return _run_json(cmd, stdin=THREAD_COMMENTS_QUERY)
+
+
+def fetch_remaining_thread_comments(
+    thread_id: str, comments_cursor: str
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    comments: list[dict[str, Any]] = []
+    cursor: str | None = comments_cursor
+    page_info: dict[str, Any] = {"hasNextPage": True, "endCursor": comments_cursor}
+    while cursor:
+        payload = gh_api_thread_comments(thread_id, cursor)
+        if "errors" in payload and payload["errors"]:
+            raise RuntimeError(f"GitHub GraphQL errors:\n{json.dumps(payload['errors'], indent=2)}")
+
+        thread = payload["data"]["node"]
+        thread_comments = thread["comments"]
+        comments.extend(thread_comments.get("nodes") or [])
+        page_info = thread_comments["pageInfo"]
+        cursor = page_info["endCursor"] if page_info["hasNextPage"] else None
+    return comments, page_info
+
+
 def fetch_all(owner: str, repo: str, number: int) -> dict[str, Any]:
     conversation_comments: list[dict[str, Any]] = []
     reviews: list[dict[str, Any]] = []
@@ -177,6 +243,9 @@ def fetch_all(owner: str, repo: str, number: int) -> dict[str, Any]:
     threads_cursor: str | None = None
 
     pr_meta: dict[str, Any] | None = None
+    comments_done = False
+    reviews_done = False
+    threads_done = False
 
     while True:
         payload = gh_api_graphql(
@@ -206,15 +275,35 @@ def fetch_all(owner: str, repo: str, number: int) -> dict[str, Any]:
         r = pr["reviews"]
         t = pr["reviewThreads"]
 
-        conversation_comments.extend(c.get("nodes") or [])
-        reviews.extend(r.get("nodes") or [])
-        review_threads.extend(t.get("nodes") or [])
+        if not comments_done:
+            conversation_comments.extend(c.get("nodes") or [])
+            comments_page_info = c["pageInfo"]
+            comments_cursor = comments_page_info["endCursor"] if comments_page_info["hasNextPage"] else None
+            comments_done = comments_cursor is None
 
-        comments_cursor = c["pageInfo"]["endCursor"] if c["pageInfo"]["hasNextPage"] else None
-        reviews_cursor = r["pageInfo"]["endCursor"] if r["pageInfo"]["hasNextPage"] else None
-        threads_cursor = t["pageInfo"]["endCursor"] if t["pageInfo"]["hasNextPage"] else None
+        if not reviews_done:
+            reviews.extend(r.get("nodes") or [])
+            reviews_page_info = r["pageInfo"]
+            reviews_cursor = reviews_page_info["endCursor"] if reviews_page_info["hasNextPage"] else None
+            reviews_done = reviews_cursor is None
 
-        if not (comments_cursor or reviews_cursor or threads_cursor):
+        if not threads_done:
+            threads = t.get("nodes") or []
+            for thread in threads:
+                thread_comments = thread.get("comments") or {}
+                thread_comments_page_info = thread_comments.get("pageInfo") or {}
+                if thread_comments_page_info.get("hasNextPage"):
+                    remaining_comments, final_page_info = fetch_remaining_thread_comments(
+                        thread["id"], thread_comments_page_info["endCursor"]
+                    )
+                    thread_comments.setdefault("nodes", []).extend(remaining_comments)
+                    thread_comments["pageInfo"] = final_page_info
+            review_threads.extend(threads)
+            threads_page_info = t["pageInfo"]
+            threads_cursor = threads_page_info["endCursor"] if threads_page_info["hasNextPage"] else None
+            threads_done = threads_cursor is None
+
+        if comments_done and reviews_done and threads_done:
             break
 
     assert pr_meta is not None
