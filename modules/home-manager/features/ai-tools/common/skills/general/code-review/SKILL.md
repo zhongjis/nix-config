@@ -1,38 +1,29 @@
 ---
 name: code-review
-description: "Comprehensive code review for local diffs and GitHub PRs. Supports git/jj diff review and gh CLI PR workflows with severity-ranked findings, confidence scoring, and professional feedback."
-upstream: "https://github.com/wshobson/agents/blob/main/plugins/developer-essentials/skills/code-review-excellence/SKILL.md"
+description: "Comprehensive code review for local diffs (git/jj) and GitHub PRs — severity-ranked, confidence-scored findings with structured PR feedback via the gh CLI."
 disable-model-invocation: true
+adaptedFrom:
+  - "https://github.com/wshobson/agents/blob/main/plugins/developer-essentials/skills/code-review-excellence/SKILL.md"
 ---
 
 # Code Review
 
 A systematic framework for evaluating code changes that ensures consistency, security, and maintainability while fostering professional growth.
 
-**Trigger**: "review this code", "review this PR", "code review", "review my changes", "review PR #N"
-
 **Modes**: Local Review (git/jj diff) | PR Review (gh CLI)
-
-**Tools**: Bash (git, jj, gh, rg), Read, Grep, Write
 
 ---
 
-## Core Principles
+## Principles
 
-- **Respect and Empathy**: Critique the code, not the person. Every line represents effort.
-- **Constructive Feedback**: Every finding must lead toward a better solution with clear alternatives.
-- **Specificity**: Reference exact lines and provide code examples. Vague feedback is useless.
-- **Educational Value**: Use reviews to share knowledge about patterns, security, and performance.
-- **Code Health Over Perfection**: Approve changes that improve overall code health, even if they aren't perfect. Don't block progress for minor preferences. (Google)
-- **Focus Human Review**: Keep reviews under 400 LOC per session. Automate style/formatting checks so human review can focus on architecture and business logic. (Microsoft)
-
-### Anti-Patterns
-
-- **Rubber stamps**: Approving with "LGTM" without thorough analysis
-- **Endless cycles**: Moving goalposts or introducing new requirements late in review
-- **Style battles**: Forcing your stylistic preferences over equally valid alternatives
-- **Hostile tone**: Sarcasm, condescension, or personal attacks
-- **Preference blocking**: Holding up a merge for non-correctness issues
+- **Critique the code, not the person.** No sarcasm, condescension, or personal attacks — every line represents effort.
+- **Every finding leads to a better solution.** Reference exact lines, include a code example, and explain *why* it matters (rationale, not just the what). Vague feedback is useless.
+- **Differentiate severity.** Tag every finding so the author can tell a blocker from a preference (see Severity System).
+- **Code health over perfection (Google).** Approve changes that improve overall code health even when imperfect. Never `REQUEST_CHANGES` over style, naming, or other non-correctness preferences — that is preference-blocking.
+- **Keep human review focused (Microsoft).** Under 400 LOC per session; let automated tooling catch formatting so review targets architecture and business logic.
+- **Acknowledge good work.** Use `[KUDOS]` for well-written sections — it reinforces standards and builds trust.
+- **Land on a stable set of required changes.** Ask when intent is unclear, but don't rubber-stamp with "LGTM" without inspection, and don't move the goalposts by introducing new requirements late or demanding a rewrite of an otherwise-valid approach.
+- **Keep review scope to the actual changes.** Raise unrelated issues or feature ideas elsewhere, not in this review.
 
 ---
 
@@ -68,7 +59,7 @@ Full GitHub pull request workflow with structured feedback.
 
 1. **Gather context**: `gh pr view <number>` — read title, body, author, labels, linked issues.
 2. **Fetch diff**: `gh pr diff <number>` — get the full changeset.
-3. **Collect existing feedback first**: review existing PR discussion before drafting anything new.
+3. **Collect existing feedback first**: before drafting anything, read the full PR discussion.
 
 ```bash
 # General PR conversation
@@ -81,7 +72,7 @@ gh api repos/{owner}/{repo}/pulls/{number}/comments --paginate
 gh api repos/{owner}/{repo}/pulls/{number}/reviews --paginate
 ```
 
-Build a quick list of issues other reviewers already raised. Treat those points as already covered unless you have materially different evidence, a different root cause, or a more precise remediation.
+Treat issues other reviewers already raised as **prior art** — your findings must be **net-new**. Reply in the existing thread rather than reposting, and add a fresh comment only when you have materially new information: a different root cause, a higher-severity impact, a more precise file/line, or a concrete fix the thread lacks. When in doubt, collapse the duplicate — the goal is signal, not vote-counting.
 
 4. **Gather codebase context**: Expand understanding outward from the diff using the structured protocol in Phase 1.5 below. Depth depends on PR risk — at minimum, read full files and find callers of changed functions.
 5. **Systematic review**: Follow the Review Process below.
@@ -135,13 +126,12 @@ gh pr review <number> --request-changes --body "..."
 
 ## Review Process
 
-### Phase 1: Context and Scope (2-3 min)
+### Phase 1: Context and Scope
 
 - Read the PR description and commit messages carefully.
 - Understand the problem being solved and the proposed approach.
 - Map out which files changed and how they interact with the broader system.
 - Check for linked issues, related PRs, or migration dependencies.
-- Read existing PR comments and reviews before drafting feedback. Note which concerns are already raised, who raised them, and whether they are still unresolved.
 
 ### Phase 1.5: Codebase Context Gathering
 
@@ -200,7 +190,7 @@ git shortlog -sn --no-merges -- <changed_file>
 
 When in doubt, do at least Layers 1-2. A review without caller analysis misses breaking changes.
 
-### Phase 2: High-Level Architecture (5-10 min)
+### Phase 2: High-Level Architecture
 
 - Does the change fit the existing architecture and conventions?
 - Are there design concerns: tight coupling, missing abstractions, separation of concerns violations?
@@ -208,7 +198,7 @@ When in doubt, do at least Layers 1-2. A review without caller analysis misses b
 - Does this introduce technical debt that should be addressed now?
 - Are there simpler alternatives worth proposing?
 
-### Phase 3: Line-by-Line Analysis (10-20 min)
+### Phase 3: Line-by-Line Analysis
 
 | Dimension      | What to Look For                                                                                        |
 | -------------- | ------------------------------------------------------------------------------------------------------- |
@@ -221,10 +211,9 @@ When in doubt, do at least Layers 1-2. A review without caller analysis misses b
 | Observability  | Logging for debugging, metrics for monitoring, tracing for distributed systems                          |
 | Code Quality   | Naming clarity, function length/complexity, DRY violations, single responsibility                       |
 
-### Phase 4: Summary and Verdict (2-3 min)
+### Phase 4: Summary and Verdict
 
 - Compile findings into the structured output template.
-- Filter out duplicate findings that are already present in the PR discussion unless your comment adds materially new information.
 - Assign a confidence score.
 - Render verdict: APPROVE, REQUEST_CHANGES, or COMMENT.
 
@@ -244,20 +233,10 @@ When in doubt, do at least Layers 1-2. A review without caller analysis misses b
 
 ## Feedback Techniques
 
-- **Question Approach**: Frame critiques as inquiries. "What happens if this input is empty?" is more effective than "This fails on empty input."
-- **Suggest, Don't Command**: Offer alternatives as possibilities. "Consider using a Map here for O(1) lookups" instead of "Use a Map."
-- **Differentiate Severity**: Always tag findings so the author can prioritize what's essential vs. what's a preference.
-- **Explain the Why**: Provide rationale, not just the what. "This should be private to prevent external mutation" explains the benefit.
-- **Acknowledge Good Work**: Use `[KUDOS]` to highlight well-written sections. Reinforces high standards and builds trust.
-- **Be Specific**: Include code snippets in suggestions. Reduce the author's cognitive load when implementing fixes.
+Phrasing craft — how to word findings so they land:
 
-### De-duplicate Against Existing Comments
-
-- Read existing review threads before posting any new summary or inline comment.
-- Do not post the same issue again just because you found it independently.
-- If another reviewer already raised the same underlying problem, prefer replying in that thread or omit the comment entirely.
-- Add a new comment only when you have something materially new: a different root cause, a higher-severity impact, a more accurate file/line, or a concrete fix that the existing thread lacks.
-- When in doubt, collapse duplicates. The goal is signal, not vote-counting.
+- **Ask, don't assert.** "What happens if this input is empty?" invites reflection more than "This fails on empty input."
+- **Suggest, don't command.** "Consider a Map here for O(1) lookups" over "Use a Map." Offer alternatives as possibilities.
 
 ---
 
@@ -282,101 +261,13 @@ Rate overall review confidence on a 1-5 scale.
 - Missing or inadequate test coverage
 - Unfamiliar language or domain
 
-### File-Level Confidence Table
-
-Include in the review summary when the PR touches multiple files with varying complexity:
-
-```
-| File | Confidence | Notes |
-|------|------------|-------|
-| src/auth/login.ts | 2/5 | Auth logic, unfamiliar JWT library |
-| src/utils/format.ts | 5/5 | Pure utility, straightforward |
-| migrations/003_add_index.sql | 3/5 | Schema change, needs DBA review |
-```
+For PRs touching multiple files with varying complexity, include a per-file confidence table in the review summary (see the File-Level Confidence table in Output Templates).
 
 ---
 
 ## Language-Specific Patterns
 
-### Python
-
-Bad — no types, no resource management, no error handling:
-
-```python
-def get_user_data(id):
-    f = open("data.json")
-    data = json.load(f)
-    return data[id]
-```
-
-Good — typed, safe resource management, defensive:
-
-```python
-def get_user_data(user_id: str) -> dict:
-    try:
-        with open("data.json", "r") as f:
-            data = json.load(f)
-            return data.get(user_id, {})
-    except (FileNotFoundError, json.JSONDecodeError) as e:
-        logger.error("Failed to load user data for %s: %s", user_id, e)
-        return {}
-```
-
-Key patterns to check:
-
-- Type hints on function signatures and return types
-- Context managers (`with`) for file/resource handling
-- List comprehensions over loop-and-append
-- Specific exceptions, never bare `except:`
-
-### TypeScript
-
-Bad — `any` types, no error handling:
-
-```typescript
-async function update(data: any) {
-  const result = await api.post("/update", data);
-  return result.data;
-}
-```
-
-Good — typed interface, proper error handling:
-
-```typescript
-interface UpdatePayload {
-  name: string;
-  value: number;
-}
-interface UpdateResponse {
-  success: boolean;
-  id: string;
-}
-
-async function update(data: UpdatePayload): Promise<UpdateResponse> {
-  const response = await api.post<UpdateResponse>("/update", data);
-  return response.data;
-}
-```
-
-Key patterns to check:
-
-- Strict null checks and proper type narrowing (no `as any`)
-- Typed error handling (not `catch(e: any)`)
-- Async/await with proper cleanup (AbortController for cancellation)
-- Guard clauses over deeply nested conditionals
-
-### General (Any Language)
-
-**N+1 Query Detection:**
-
-- Bad: `SELECT * FROM posts WHERE user_id = ?` inside a user loop
-- Good: `SELECT * FROM posts WHERE user_id IN (?)` before the loop with eager loading
-
-**Security:**
-
-- XSS: Use `textContent` over `innerHTML` for user-provided strings
-- SQL Injection: Always use parameterized queries; never concatenate user input into SQL
-- Auth: Verify authentication AND authorization on every protected endpoint
+When the diff includes Python or TypeScript, consult `references/language-patterns.md` for language-specific bad/good examples and checklists (type hints, resource management, typed errors) plus cross-language patterns (N+1 queries, XSS, SQL injection, auth). Apply them alongside the Phase 3 dimensions.
 
 ---
 
@@ -452,31 +343,3 @@ When posting comments to GitHub (both inline and summary):
 - **Never use `#N` notation** (e.g., `#1`, `#2`, `#3`) — GitHub auto-links these to issues/PRs, creating broken references. Use severity-prefixed IDs instead: `B1`, `M1`, `S1`, `N1` (for Blocker, Major, Suggestion, Nit).
 - **Never reference findings as "issue #1"** — write "finding B1" or just use the severity tag.
 - Keep inline comment bodies self-contained — the author reads them in the diff without needing context from the summary.
-- Before posting, verify each comment is net-new relative to existing PR discussion. If the same issue already exists, extend that thread instead of creating another top-level comment.
----
-
-## Guidelines
-
-**DO:**
-
-- Understand context and purpose before reading code
-- Provide specific, actionable feedback with code examples
-- Explain WHY something is an issue, not just WHAT
-- Acknowledge good patterns and well-written code
-- Ask clarifying questions when intent is unclear
-- Focus on correctness, security, and maintainability over style
-- Keep review scope to the actual changes
-- Adjust depth based on change risk (auth change > typo fix)
-- Check existing PR comments first and avoid repeating points already made by others
-
-**DON'T:**
-
-- Rubber-stamp with "LGTM" without real inspection
-- Block merges over style preferences or personal taste
-- Use condescending, sarcastic, or hostile language
-- Nitpick formatting that automated tools should catch
-- Review more than 400 lines without breaking into sessions
-- Demand a complete rewrite of the author's valid approach
-- Ignore test coverage gaps
-- Mix unrelated feedback or feature requests into the review
-- Post duplicate comments when the same concern is already captured elsewhere in the PR
