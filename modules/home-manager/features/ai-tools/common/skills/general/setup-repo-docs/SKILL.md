@@ -25,9 +25,9 @@ docs/
 └── rules/                    # Locked execution policy imported by root AGENTS.md
 ```
 
-Declare every bucket in `docs/README.md`, but create bucket directories only when they contain a document. Use lowercase kebab-case paths. Name ADRs `NNNN-short-decision-title.md`.
+Declare every bucket in `docs/README.md`. Create bucket directories only when they contain a document, except during `MIGRATION`: for each missing bucket, ask whether the user wants to initialize an empty directory with `.gitkeep`. Create approved buckets; leave declined buckets absent. Treat an approved `.gitkeep` bucket as intentional, not empty-directory drift. Use lowercase kebab-case paths. Name ADRs `NNNN-short-decision-title.md`.
 
-Canonical bucket paths are `docs/ideas/`, `docs/specs/`, `docs/adr/`, `docs/guides/`, `docs/references/`, and `docs/rules/`. Setup is idempotent: a second run against a complete structure proposes no changes.
+Setup is idempotent: a second run against a complete structure proposes no changes.
 
 ## Companion conventions
 
@@ -53,7 +53,7 @@ Use statuses `idea`, `draft`, `planned`, `shipped`, `superseded`, and `retired`.
 
 ## Workflow
 
-Run one structural pass every time, and an optional content pass only when the user asks to go deeper. Each pass examines and reports without mutating, then gates once before applying. Route every change through the same invariant checks regardless of pass: preserve locked `docs/rules/` paths, keep ADR history append-only, and repair every inbound reference in the same change set.
+Run one structural pass every time, and an optional content pass only when the user asks to go deeper. Route every change through the same invariant checks regardless of pass: preserve locked `docs/rules/` paths, keep ADR history append-only, and repair every inbound reference in the same change set.
 
 ### Structural pass
 
@@ -77,17 +77,17 @@ Then list discrepancies and missing pieces, with every fix tiered:
 - **T2 — unambiguous move:** a single-purpose document that belongs in a different bucket.
 - **T3 — flagged:** a mixed-purpose or ambiguous document; report it and leave it in place.
 
-Every proposed fix carries a destination, an inbound-reference plan, and a rollback-safe step. A `CLEANUP-ONLY` verdict still surfaces deferred structural doubts (for example, a non-canonical directory left untouched). Unless the verdict is `CLEAN NO-OP`, offer a deeper content reorganization as a menu option alongside the fixes.
+Every proposed fix carries a destination, an inbound-reference plan, and a rollback-safe step. For `MIGRATION`, list every missing bucket and its `.gitkeep` initialization choice. A `CLEANUP-ONLY` verdict still surfaces deferred structural doubts (for example, a non-canonical directory left untouched). Unless the verdict is `CLEAN NO-OP`, offer a deeper content reorganization as a menu option alongside the fixes.
 
 Complete when the verdict header, tiered fixes, and — unless `CLEAN NO-OP` — the content-reorganization offer are stated.
 
 #### Gate
 
-Change nothing until the user approves. The user approves T1 and T2 in bulk; T3 items are approved individually or left in place. A `CLEAN NO-OP` verdict has nothing to approve — stop here.
+Change nothing until the user approves. The user approves T1 and T2 in bulk, chooses initialization for each missing bucket, and approves T3 items individually or leaves them in place. A `CLEAN NO-OP` verdict has nothing to approve — stop here.
 
 #### 3. Apply
 
-Create only needed directories and documents. Make only approved, unambiguous changes. Update `docs/README.md`, Markdown links, indexes, scripts, and `AGENTS.md` imports in the same change set. Preserve locked `docs/rules/` paths and ADR history.
+Create only needed directories and documents, including approved `.gitkeep` bucket initializations. Make only approved, unambiguous changes. Update `docs/README.md`, Markdown links, indexes, scripts, and `AGENTS.md` imports in the same change set. Preserve locked `docs/rules/` paths and ADR history.
 
 Complete when no active reference points to an obsolete path, no subject has competing canonical documents, and re-running the examine step against the resulting tree reports `CLEAN NO-OP`.
 

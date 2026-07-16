@@ -86,6 +86,19 @@
         "Repairs intra-document anchors and heading links affected by the split atomically with the move.",
         "Does not restructure or rewrite anything under docs/rules or docs/adr."
       ]
+    },
+    {
+      "id": 7,
+      "name": "migration-missing-buckets",
+      "prompt": "Examine a repository that needs documentation migration and currently has docs/specs/ and docs/guides/, but lacks docs/ideas/, docs/adr/, docs/references/, and docs/rules/. Report the migration choices before changing files.",
+      "expected_output": "A MIGRATION report that asks whether each missing canonical bucket should be initialized as an empty directory with .gitkeep, while preserving the approval gate and leaving declined buckets uncreated.",
+      "files": [],
+      "expectations": [
+        "Emits a MIGRATION verdict and identifies every missing canonical bucket.",
+        "Asks whether the user wants each missing bucket initialized as an empty directory containing .gitkeep.",
+        "Creates no bucket before approval and leaves each declined bucket uncreated.",
+        "Treats an approved .gitkeep-initialized bucket as intentional on re-examination so the migration remains idempotent."
+      ]
     }
   ]
 }
