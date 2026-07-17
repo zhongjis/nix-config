@@ -6,9 +6,10 @@
 
 ## Core Rules
 
-1. **Default to surgical changes.** Touch only what the task requires. Don't "improve" adjacent code, comments, or formatting.
-2. **Follow existing patterns exactly.** Read 2-3 similar files first. Match naming, structure, error handling, and style — even if you'd do it differently.
-3. **Never expand scope without explicit approval.** No refactoring, restructuring, or dependency changes beyond the immediate task.
+Extends the Coding Contract for shared/production code:
+
+1. **Read before writing.** Read 2-3 similar files first; match their naming, structure, error handling, and style — even if you'd do it differently.
+2. **Never expand scope without approval.** No refactoring, restructuring, or dependency changes beyond the immediate task (see Approval Required).
 
 ## Format Matching
 
@@ -58,9 +59,4 @@ Before declaring any change complete:
 
 ## When Uncertain
 
-- Not sure of the pattern → read more code before writing.
-- Not sure of the impact → ask before changing.
-- Not sure of the requirement → clarify before implementing.
-- Not sure it's within scope → ask before expanding.
-
-**DEFAULT: When uncertain, ask. Never assume.**
+**When uncertain, ask. Never assume.** Read more code, or clarify scope or requirements before proceeding.
