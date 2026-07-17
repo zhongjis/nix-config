@@ -235,6 +235,7 @@ When in doubt, do at least Layers 1-2. A review without caller analysis misses b
 
 Phrasing craft — how to word findings so they land:
 
+- **Write it clearly.** Run the `/writing-clearly-and-concisely` skill and apply it to every finding, the summary body, and PR comments — plain, tight, no filler.
 - **Ask, don't assert.** "What happens if this input is empty?" invites reflection more than "This fails on empty input."
 - **Suggest, don't command.** "Consider a Map here for O(1) lookups" over "Use a Map." Offer alternatives as possibilities.
 
