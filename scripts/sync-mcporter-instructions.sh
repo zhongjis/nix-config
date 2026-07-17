@@ -9,7 +9,8 @@ Generate Pi mcporter instruction markdown from currently available mcporter MCP 
 
 Options:
   --config PATH      mcporter config path (default: ~/.mcporter/mcporter.json if present)
-  --output PATH      output path (default: modules/home-manager/features/ai-tools/pi/instructions/mcporter.md)
+  --profile NAME     profile: work or personal (default: work). Selects default output file.
+  --output PATH      output path (default: .../pi/instructions/mcporter.<profile>.md)
   --max-tools N      max selectors to include (default: 40)
   --timeout MS       mcporter list timeout in ms (default: 30000)
   --check            fail if output file is stale; do not write
@@ -19,7 +20,8 @@ EOF
 }
 
 config_path="${MCPORTER_CONFIG:-}"
-output_path="${MCPORTER_INSTRUCTIONS_OUTPUT:-modules/home-manager/features/ai-tools/pi/instructions/mcporter.md}"
+output_path="${MCPORTER_INSTRUCTIONS_OUTPUT:-}"
+profile="${MCPORTER_PROFILE:-work}"
 max_tools="${MCPORTER_MAX_TOOLS:-40}"
 timeout_ms="${MCPORTER_TIMEOUT:-30000}"
 check_mode=0
@@ -30,6 +32,11 @@ while [[ $# -gt 0 ]]; do
     --config)
       [[ $# -ge 2 ]] || { echo "error: --config requires PATH" >&2; exit 2; }
       config_path="$2"
+      shift 2
+      ;;
+    --profile)
+      [[ $# -ge 2 ]] || { echo "error: --profile requires NAME" >&2; exit 2; }
+      profile="$2"
       shift 2
       ;;
     --output)
@@ -69,6 +76,10 @@ done
 
 [[ "$max_tools" =~ ^[0-9]+$ ]] || { echo "error: --max-tools must be a non-negative integer" >&2; exit 2; }
 [[ "$timeout_ms" =~ ^[0-9]+$ ]] || { echo "error: --timeout must be a non-negative integer" >&2; exit 2; }
+[[ "$profile" == "work" || "$profile" == "personal" ]] || { echo "error: --profile must be work or personal" >&2; exit 2; }
+if [[ -z "$output_path" ]]; then
+  output_path="modules/home-manager/features/ai-tools/pi/instructions/mcporter.${profile}.md"
+fi
 
 repo_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 expected_dir="$repo_root/modules/home-manager/features/ai-tools/pi/instructions"
@@ -131,7 +142,7 @@ jq -r --argjson maxTools "$max_tools" '
       | (.tools // [])[]?
       | {
           selector: ($server + "." + .name),
-          description: ((.description // "No description.") | oneline | clip(140))
+          description: ((.description // "No description.") | oneline | sub("\\. .*$"; ".") | clip(200))
         }
     ]
     | unique_by(.selector)

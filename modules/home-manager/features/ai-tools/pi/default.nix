@@ -237,7 +237,11 @@ in {
     instructions =
       commonInstructions
       ++ [
-        "${./instructions/mcporter.md}"
+        (
+          if aiProfileHelpers.isPersonal
+          then "${./instructions/mcporter.personal.md}"
+          else "${./instructions/mcporter.work.md}"
+        )
         "${./instructions/shell-tools.md}"
       ];
     settings = piSettings;
