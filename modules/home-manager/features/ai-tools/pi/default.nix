@@ -191,6 +191,7 @@
     # Only read by openai-codex provider; ignored by others (no fallback).
     # Options: "sse" (default), "websocket", "websocket-cached", "auto".
     # "websocket-cached" = WS + cached prompt context, no SSE fallback on failure.
+    transport = "sse";
     packages =
       sharedSettings.packages
       ++ [
