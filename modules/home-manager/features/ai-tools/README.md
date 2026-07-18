@@ -69,7 +69,7 @@ Use skills as the workflow spine:
 | --- | --- |
 | Shape unclear idea | `grilling` → `domain-modeling` |
 | Preserve project language | `domain-modeling` updates domain terms; ADRs record decisions |
-| Explore logic or state uncertainty | `logic-prototype` for throwaway state/API/business-rule harnesses |
+| Explore logic or state uncertainty | `prototype` for throwaway state/API/business-rule harnesses |
 | Explore UI direction | `impeccable` for production UI shaping; `huashu-design` for hi-fi HTML variants, demos, decks, and animation |
 | Turn conversation into spec | `to-spec` |
 | Split spec into work | `to-tickets` |
