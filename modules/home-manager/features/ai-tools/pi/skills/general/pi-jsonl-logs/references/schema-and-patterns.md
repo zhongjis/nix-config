@@ -230,7 +230,7 @@ Thinking blocks alone account for 30–60% of a typical file's bytes.
 Pi sessions are small (< 2MB). `--stream` adds complexity with no benefit. Plain line-by-line is always sufficient.
 
 **Mistake: Forgetting that user `.content` can be string or array**  
-Always guard: `if type=="string" then . else map(select(.type=="text")|.text)|join("") end`
+Always guard both shapes — use the **Safe user content extraction** pattern above.
 
 **Mistake: Missing compaction when reconstructing thread**  
 If a session has compaction entries, the earliest messages before `firstKeptEntryId` are gone. Check:

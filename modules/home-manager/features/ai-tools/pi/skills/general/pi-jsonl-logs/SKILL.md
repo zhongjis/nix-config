@@ -1,11 +1,11 @@
 ---
 name: pi-jsonl-logs
-description: Parse and analyze pi agent session logs (JSONL format). Use this skill whenever you need to read, query, summarize, or extract data from pi session files — including finding sessions for a project, extracting conversation threads, auditing tool usage, computing cost/token stats, or searching across sessions. Load this skill before touching any .jsonl file under ~/.pi/agent/sessions or similar session directories. Do NOT read raw session JSONL files directly — always use jq patterns from this skill to extract only what you need.
+description: Parse and analyze pi agent session logs (JSONL format). Use this skill whenever you need to read or extract data from pi session files — including finding sessions for a project, extracting conversation threads, auditing tool usage, computing cost/token stats, or searching across sessions. Load this skill before touching any .jsonl file under ~/.pi/agent/sessions or similar session directories.
 ---
 
 # Pi Session Log Analysis
 
-Pi session logs are JSONL files (one JSON object per line). Raw files average 200KB — 90%+ is thinking blocks and tool outputs. Extract only what you need.
+Pi session logs are JSONL files (one JSON object per line). Raw files average ~200KB — most of it thinking blocks and tool outputs. Extract only what you need.
 
 ## Why scripts instead of inline jq
 
@@ -58,6 +58,7 @@ bash "$SCRIPTS/pi-session-thread.sh" "$SESSION" --tail 5 --tools
 bash "$SCRIPTS/pi-session-thread.sh" "$SESSION" --max-chars 500
 # Skip empty assistant messages (thinking-only/blank)
 bash "$SCRIPTS/pi-session-thread.sh" "$SESSION" --no-empty
+```
 
 ### pi-session-subagents.sh — Agent delegation extraction
 
@@ -66,7 +67,6 @@ Extracts all Agent tool calls with type, description, background flag, max_turns
 ```bash
 # All subagent calls
 bash "$SCRIPTS/pi-session-subagents.sh" "$SESSION"
-# Filter by type, show more prompt
 # Filter by type, show more prompt
 bash "$SCRIPTS/pi-session-subagents.sh" "$SESSION" --type fuxi --prompt-len 500
 # Hide prompts
@@ -196,10 +196,6 @@ jq -r 'select(.type=="message" and .message.role=="user") |
   if type=="string" then .
   else map(select(.type=="text") | .text) | join("")
   end' "$SESSION"
-
-# Cumulative cost
-jq -rs '[.[] | select(.type=="message" and .message.role=="assistant") |
-  .message.usage.cost.total // 0] | add' "$SESSION"
 
 # Model used (most recent)
 jq -r 'select(.type=="message" and .message.role=="assistant") | .message.model' "$SESSION" | tail -1

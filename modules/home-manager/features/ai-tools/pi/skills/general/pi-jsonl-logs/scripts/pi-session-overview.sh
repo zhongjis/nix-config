@@ -3,7 +3,8 @@
 # Usage: pi-session-overview.sh <session.jsonl>
 #
 # Outputs: entry type breakdown, message roles, tool frequency,
-#          total cost, total tokens, model used, session duration.
+#          cost & tokens (with per-turn averages), model, thinking stats,
+#          session duration.
 
 set -euo pipefail
 
