@@ -1,15 +1,6 @@
 # Parallel Axes
 
-How to run review axes as isolated sub-agent passes when the environment supports it. Reached from the Execution step in `SKILL.md` on Standard or Risky diffs. If your environment has no sub-agents or parallel tasks, ignore this file and run the axes sequentially inline instead.
-
-## When to dispatch
-
-Two gates, both required:
-
-- Your environment provides sub-agents or parallel tasks.
-- The diff is Standard or Risky and sizeable enough that isolation pays for the dispatch overhead.
-
-A small or Trivial diff runs inline even when sub-agents are available — the overhead isn't worth it.
+How to run review axes as isolated sub-agent passes — the *how*. `SKILL.md` § Execution owns the *when* (required whenever the environment exposes a task or sub-agent tool and the risk is not Trivial); if no such tool exists, ignore this file and run the axes sequentially inline.
 
 ## What to dispatch (fan-out control)
 
@@ -28,7 +19,7 @@ A dispatched task shares none of the main context, so its brief must stand alone
 1. **Diff access** — the exact diff command (`git diff <base>...HEAD`) and the commit list, or the diff contents.
 2. **Foundation brief** — the behavior delta and the axis triage from step 3 of the process.
 3. **Axis assignment** — which axis or axes this task owns, with the matching section(s) of `axis-checklists.md` pasted in full; the task cannot open files the main agent read.
-4. **Report contract** — "Report findings for your assigned axis only. Tag each with the axis name, a severity (`[BLOCKER]` / `[MAJOR]` / `[SUGGESTION]` / `[NIT]` / `[KUDOS]`), and a file:line. Quote the code or spec line for each. Score this axis's confidence 1-5. If you find nothing, say so explicitly. Under 400 words per axis."
+4. **Report contract** — "Report findings for your assigned axis only. Tag each with the axis name, a severity (`[BLOCKER]` / `[MAJOR]` / `[SUGGESTION]` / `[NIT]` / `[KUDOS]`), and a file:line. Quote the code or spec line for each. Score this axis's confidence 1-5, dropping it by 1 for each risk multiplier this axis owns (SKILL.md § Confidence adjustments). If you find nothing, say so explicitly. Under 400 words per axis."
 
 The same brief structure feeds a sequential inline pass — that shared shape is what keeps the two execution modes producing identical review content.
 
