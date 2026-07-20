@@ -1,5 +1,5 @@
 ---
-name: use-open-deisng-canvas
+name: use-open-design-canvas
 description: Commission, inspect, supervise, and refine Open Design canvas work through its MCP server.
 argument-hint: "[what to generate, inspect, or refine]"
 disable-model-invocation: true
