@@ -180,65 +180,13 @@ gh search code "functionName" --repo owner/repo --language typescript
 
 #### Tier 2: Clone to /tmp (deep investigation)
 
-For thorough exploration — call graph tracing, multi-file analysis, architecture understanding:
+For thorough exploration — call graph tracing, multi-file analysis, architecture understanding — clone shallowly to a deterministic cache path under `/tmp/agent-repos/`, then use full local search tooling on the clone. For the complete safe-clone and sparse-checkout scripts, see `references/remote-clone.md`.
 
-```bash
-# 1. Check repo size BEFORE cloning (skip clone for repos >500MB)
-gh api repos/{owner}/{repo} --jq '.size'
-
-# 2. Choose a deterministic cache path
-dest=/tmp/agent-repos/owner-repo
-mkdir -p /tmp/agent-repos
-
-# 3. If the path exists, inspect it first. Never rm first.
-if [ -d "$dest/.git" ]; then
-  actual_remote=$(git -C "$dest" remote get-url origin 2>/dev/null || true)
-  expected_remote="https://github.com/owner/repo.git"
-
-  if [ "$actual_remote" = "$expected_remote" ] || [ "$actual_remote" = "git@github.com:owner/repo.git" ]; then
-    if [ -n "$(git -C "$dest" status --short)" ]; then
-      echo "Existing clone has local changes; use a different destination."
-      exit 1
-    fi
-    git -C "$dest" pull --ff-only --depth 1
-  else
-    echo "Existing clone has different origin: $actual_remote"
-    echo "Use a different destination; remove only as last resort after manual confirmation."
-    exit 1
-  fi
-elif [ -e "$dest" ]; then
-  echo "Destination exists but is not a git repo: $dest"
-  echo "Inspect it; use a different destination unless you can prove it is disposable."
-  exit 1
-else
-  gh repo clone owner/repo "$dest" -- --depth 1
-fi
-
-# 4. Use full local search tooling on the clone
-```
-
-**Size guard**: Check `gh api repos/{owner}/{repo} --jq '.size'` first. If size >500000 (KB, ~500MB), skip clone and use API-only. For very large repos, use sparse checkout:
-
-```bash
-# Sparse clone for huge repos — only fetch relevant directories.
-# Same rule: if destination exists, inspect it first; never remove first.
-dest=/tmp/agent-repos/owner-repo-sparse
-expected_remote="https://github.com/owner/repo.git"
-if [ -d "$dest/.git" ]; then
-  actual_remote=$(git -C "$dest" remote get-url origin 2>/dev/null || true)
-  [ "$actual_remote" = "$expected_remote" ] || { echo "Different origin: $actual_remote"; exit 1; }
-elif [ -e "$dest" ]; then
-  echo "Destination exists but is not a git repo: $dest"; exit 1
-else
-  git clone --depth 1 --filter=blob:none --sparse \
-    https://github.com/owner/repo.git "$dest"
-fi
-git -C "$dest" sparse-checkout set src/relevant/path
-```
+**Size guard**: Check `gh api repos/{owner}/{repo} --jq '.size'` first. If size >500000 (KB, ~500MB), skip clone and use API-only (Tier 1) or a sparse checkout (see `references/remote-clone.md`).
 
 **Existing destination policy**: Treat `/tmp/agent-repos/` as a reusable cache, not disposable scratch. Before cloning, always check whether the destination exists. If it exists, confirm it is a git repo and that `origin` matches the repo you intend to inspect. If it matches, reuse or refresh it. If it does not match, prefer a new destination name (for example `/tmp/agent-repos/owner-repo-2`) over deleting anything.
 
-**Removal policy**: Do not clean up cloned repos automatically. `rm -rf` is a last resort, not a setup step and not routine cleanup. Only remove a path after all of these are true:
+**Removal policy**: Do not clean up cloned repos automatically. `rm -rf` is a last resort, not a setup step and not routine cleanup. Never `rm` before inspecting origin. Only remove a path after all of these are true:
 
 1. You inspected the path and confirmed it is under `/tmp/agent-repos/`.
 2. You confirmed the remote and contents are not needed for the current task.
@@ -333,32 +281,7 @@ dest=/tmp/agent-repos/owner-top-repo
 4. Implement locally following both local conventions and proven patterns
 ```
 
-## Step 6: Advanced techniques
-
-### Trace data flow (local)
-```
-1. Find where data is created → Semantic: "Where is user object created?"
-2. Search for variable usage → Grep: "user\\." with context lines
-3. Follow transformations → Read files that modify user
-4. Find where it's consumed → Grep: "user\\." in relevant files
-```
-
-### Find all callsites (local)
-```
-1. Find definition → Grep: "def process_payment"
-2. Find imports → Grep: "from payments.processor import"
-3. Find calls → Grep: "process_payment\\("
-4. Read each for context
-```
-
-### Understand a feature end-to-end (local)
-```
-1. Find API endpoint → Semantic: "user registration endpoint?"
-2. Trace: route → controller → service → database
-3. Find tests → Glob: "**/*auth*test*.py"
-```
-
-### Cross-repo investigation (remote)
+### Pattern: Cross-repo investigation (remote)
 ```
 1. Start with a GitHub issue or PR reference
    gh issue view 123 --repo owner/repo
@@ -435,6 +358,7 @@ git log --grep="feature name"
 ## References
 
 - `references/local-patterns.md` — detailed grep/glob patterns by language, workflow examples, common scenarios
+- `references/remote-clone.md` — safe shallow-clone and sparse-checkout scripts for deep remote investigation
 - [Ripgrep User Guide](https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md)
 - [GitHub Code Search Syntax](https://docs.github.com/en/search-github/github-code-search/understanding-github-code-search-syntax)
 - [Git Blame Guide](https://git-scm.com/docs/git-blame)
