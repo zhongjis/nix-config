@@ -67,6 +67,8 @@ Scale which axes fire and how deep the context work goes to the change's risk.
 
 Isolation is the mechanism that stops one axis from coloring another, so **run the axes as isolated sub-agent passes whenever this environment exposes a task or sub-agent tool** and the risk is not Trivial. This is required, not a preference — dispatch per `references/parallel-axes.md`, which bundles the axes into a few tasks (heavy independent axes each get a task; light axes share one) so isolation doesn't cost eight diff re-feeds.
 
+**Capability floor.** Dispatch each isolated pass to a reasoning-capable agent whose tier matches the Risk dial — a small fast tier may cover a Standard read, but a Risky review needs a top reasoning tier, and Security, Correctness, and Regression never run on the cheapest / fastest tier. A search / recon-only helper is a poor fit for a judgment axis — prefer a general reasoning agent.
+
 Fall back to **sequential inline** passes only when no task or sub-agent tool is exposed, or the risk is Trivial (dispatch overhead outweighs the gain). Inline gives best-effort isolation: reset focus to each axis's brief and write its findings under its heading before the next, and weigh the result accordingly.
 
 If a dispatched axis fails or returns empty, re-run it — a silent drop must never read as "no findings".
@@ -85,7 +87,9 @@ Assign severity **within each axis**. `[BLOCKER]` and `[MAJOR]` are blocking; th
 
 ## Aggregation
 
-Copy each active axis's findings into the report unchanged, under that axis's heading. Build the findings table by grouping stably on (axis, severity), keeping every axis's rows distinct.
+**Re-check dispatched findings first.** Independently verify each dispatched finding against the code and its contract and re-severitize before assembling — dispatched severities are inputs, not final. This is within-axis validation against ground truth, not cross-axis re-judging: keep each axis's grouping intact, and a severity you overturn is also reason to lower that axis's confidence.
+
+Copy the re-checked findings into the report unchanged, under that axis's heading. Build the findings table by grouping stably on (axis, severity), keeping every axis's rows distinct.
 
 - **Completion criteria** — two gates, both required to keep one axis from masking another:
   1. Each active axis ran in its own isolated pass whenever a task or sub-agent tool was exposed; only the Trivial or no-sub-agent fallback runs axes inline.

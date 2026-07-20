@@ -27,4 +27,4 @@ The same brief structure feeds a sequential inline pass — that shared shape is
 
 When the tasks return, assemble them per the **Aggregation** rules in `SKILL.md`: copy each axis's findings in unchanged under its heading, group the table stably by (axis, severity) with every axis's rows kept distinct, list every dispatched axis including the ones that found nothing, then compute the verdict and the minimum confidence last.
 
-Isolation is the point: because each task ran in its own context, no axis could see or be colored by another. That separation is already enforced by the dispatch — carry it through into the report rather than re-judging across axes.
+Isolation is the point: because each task ran in its own context, no axis could see or be colored by another. That separation is already enforced by the dispatch — carry it through into the report rather than re-judging across axes. Carrying separation through is not the same as trusting dispatched severities verbatim: the orchestrator still validates each finding within its axis (SKILL.md § Aggregation).
