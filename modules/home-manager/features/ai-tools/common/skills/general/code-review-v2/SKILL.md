@@ -24,19 +24,21 @@ A review runs as a set of independent **axes** — each a single lens (correctne
 
 ## Review process
 
-Run these steps in order. Steps 1-3 run once, inline, in the main context and build the shared **foundation brief** that every axis reads.
+Run these steps in order. Steps 1-3 run once, inline, in the main reviewing context and build the shared **foundation brief** — a fixed-field record every axis reads verbatim:
 
-1. **Pin scope + mode.** Fix the comparison point and note the mode.
+> **Mode** · **Risk** · **Behavior delta** · **Security depth** · **Active axes**
+
+1. **Pin scope, mode + risk.** Fix the comparison point, note the mode, and classify the change's **Risk** — Trivial / Standard / Risky (see Risk dial; it is scope-level, readable from `git diff --stat` and the touched paths).
    - Local: `git diff <base>...HEAD` (three-dot, so the comparison is against the merge-base) or `jj diff`; `git diff --stat` for scope; `git log <base>..HEAD --oneline` for commits.
    - PR: follow `references/pr-workflow.md` to gather PR metadata and the diff.
    - Confirm the base resolves (`git rev-parse <base>`) and the diff is non-empty before going further — a bad ref or empty diff fails here, not inside an axis.
-2. **Gather context + fetch links.** Read each changed file in full, not just the hunks. For every changed symbol, find its callers. Follow any links you encounter — the PR description, commit messages, linked issues or tickets, a path the user passed — and fetch the ones your environment can reach, so behavior and intent rest on real context. Scale depth to risk (see Risk dial); `references/context-gathering.md` has the concrete caller / history / churn commands.
-3. **Build the foundation brief.** Write down, once:
-   - **Behavior delta** — what observable behavior the change adds, removes, or alters. This is descriptive, not a finding; it feeds every axis.
-   - **Axis triage** — which axes apply and how deep. Record whether the diff touches any **security surface** (input boundary, auth/authz, secrets, deserialization, SQL / shell / HTML sinks, network, file paths) — that decides Security's depth.
-4. **Select active axes.** From the Axis registry, activate every always-on axis plus each conditional axis whose trigger the triage hit.
-5. **Run each active axis in isolation.** Dispatch the axes as isolated passes per the Execution rule (sub-agents whenever this environment exposes a task or sub-agent tool and the risk is not Trivial; otherwise inline). Each axis reads the foundation brief and its section in `references/axis-checklists.md`, then reports findings under its own heading — stating "no findings" when it finds nothing.
-6. **Aggregate + verdict + post.** Combine per the Aggregation rules, render the verdict, and post (PR: via `references/pr-workflow.md`).
+2. **Gather context + fetch links.** Read each changed file in full, not just the hunks. For every changed symbol, find its callers. Follow any links you encounter — the PR description, commit messages, linked issues or tickets, a path the user passed — and fetch the ones your environment can reach, so behavior and intent rest on real context. Scale depth to the Risk you pinned; `references/context-gathering.md` has the concrete caller / history / churn commands.
+3. **Build the foundation brief.** Fill the record once:
+   - **Behavior delta** — what observable behavior the change adds, removes, or alters. Descriptive, not a finding; it feeds every axis.
+   - **Security depth** — whether the diff touches a **security surface** (input boundary, auth/authz, secrets, deserialization, SQL / shell / HTML sinks, network, file paths). This sets Security's depth and may **upgrade** the Risk you pinned in step 1.
+   - **Active axes** — from the Axis registry, every always-on axis plus each conditional axis whose trigger the triage hit.
+4. **Run each active axis in isolation.** Run the axes as isolated passes per the Execution rule. Each axis reads the foundation brief and its section in `references/axis-checklists.md`, then reports findings under its own heading — stating "no findings" when it finds nothing.
+5. **Aggregate + verdict + post.** Combine per the Aggregation rules, render the verdict, and post (PR: via `references/pr-workflow.md`).
 
 ## Axis registry
 
@@ -65,13 +67,13 @@ Scale which axes fire and how deep the context work goes to the change's risk.
 
 ## Execution
 
-Isolation is the mechanism that stops one axis from coloring another, so **run the axes as isolated sub-agent passes whenever this environment exposes a task or sub-agent tool** and the risk is not Trivial. This is required, not a preference — dispatch per `references/parallel-axes.md`, which bundles the axes into a few tasks scaled to risk so isolation doesn't cost eight diff re-feeds. The foundation brief from steps 1-3 is what each isolated pass reads: it *feeds* the dispatch, it is never a reason to skip it. Gathering the context yourself makes you the aggregator who re-checks each pass (§ Aggregation) — not a single reviewer holding every axis in one context, which is the masking this step exists to prevent.
+An **isolated pass** runs one axis in its own fresh context, sharing nothing with the others — so no axis can color another. When your environment offers an isolation mechanism (a sub-agent or task tool is the usual one) and the risk is not Trivial, running the axes as isolated passes is **required, not a preference**: dispatch per `references/parallel-axes.md`, which bundles them into a few passes scaled to risk so isolation doesn't cost eight diff re-feeds. The foundation brief feeds each pass; it never replaces them — you remain the aggregator who re-checks every pass (§ Aggregation).
 
-**Capability floor.** Dispatch each isolated pass to a reasoning-capable agent whose tier matches the Risk dial — a small fast tier may cover a Standard read, but a Risky review needs a top reasoning tier, and Security, Correctness, and Regression never run on the cheapest / fastest tier. A search / recon-only helper is a poor fit for a judgment axis — prefer a general reasoning agent.
+**Capability floor.** Give each pass enough capability and budget for its risk. Security, Correctness, and Regression are judgment axes — never run them as a reduced or recon-only pass; a Risky review needs your strongest reasoning throughout.
 
-Fall back to **sequential inline** passes only when no task or sub-agent tool is exposed, or the risk is Trivial. A thorough foundation is not a third exit — *"I already gathered the context, so dispatching adds nothing"* is the rationalization that folds the axes back into one masking context. When you do fall back inline, run each axis as its own pass: reset focus to that axis's brief, write its findings under its heading, and finish it before the next.
+**Fallback.** Only when no isolation mechanism is available, or the risk is Trivial, fall back to **sequential inline** passes in one shared context. This fallback is weaker — one shared context is exactly where masking happens — so run each axis as its own deliberate pass: reset to that axis's brief, write its findings under its heading, and finish it before the next.
 
-If a dispatched axis fails, stalls, or returns empty, re-run it per `references/parallel-axes.md` — a silent drop must never read as "no findings".
+If an isolated pass fails, stalls, or returns empty, re-run it per `references/parallel-axes.md` — a silent drop must never read as "no findings".
 
 ## Severity
 
@@ -92,7 +94,7 @@ Assign severity **within each axis**. `[BLOCKER]` and `[MAJOR]` are blocking; th
 Copy the re-checked findings into the report unchanged, under that axis's heading. Build the findings table by grouping stably on (axis, severity), keeping every axis's rows distinct.
 
 - **Completion criteria** — two gates, both required to keep one axis from masking another:
-  1. Each active axis ran in its own isolated pass whenever a task or sub-agent tool was exposed; only the Trivial or no-sub-agent fallback runs axes inline.
+  1. Each active axis ran in its own isolated pass whenever an isolation mechanism was available; only the Trivial or no-isolation fallback runs axes inline in one shared context.
   2. Every active axis appears as its own labeled group in the output, including axes that found nothing (which state "no findings").
 - **Verdict** is the only value computed across axes: `REQUEST_CHANGES` if any axis produced a `[BLOCKER]` or `[MAJOR]`, otherwise `COMMENT` or `APPROVE`. Compute it last, from the assembled findings; it never changes an individual finding.
 - **Confidence** — each axis scores itself 1-5, lowering its own score for the risk multipliers it owns (see Confidence adjustments); the overall confidence is the **minimum** across active axes. Name the axis that set it and why.
@@ -106,6 +108,7 @@ Each axis drops its own score by 1 (floor 1) for every multiplier it carries. Tw
 - **Correctness** — complex concurrency or lock management.
 - **Tests** — missing or inadequate coverage for the change.
 - **Every active axis** — a large cross-cutting refactor, or an unfamiliar language / domain.
+- **Any axis folded inline after a failed isolated pass** — drop 1 and flag the fallback in that axis's output group, so a degraded read never passes as a clean one. (The Trivial / no-isolation baseline, where every axis runs inline by design, carries no such penalty.)
 
 ## Output
 
@@ -157,7 +160,7 @@ For PR reviews, the inline-vs-summary strategy, GitHub comment formatting rules,
 ## References
 
 - `references/axis-checklists.md` — per-axis deep checklists; load the sections for the active axes.
-- `references/parallel-axes.md` — sub-agent dispatch, the self-contained brief template, bundling, and aggregation mechanics.
+- `references/parallel-axes.md` — isolated-pass dispatch, the self-contained brief template, bundling, and aggregation mechanics.
 - `references/context-gathering.md` — the concrete caller / history / churn commands for the Gather-context step, scaled to the Risk dial.
 - `references/pr-workflow.md` — GitHub PR pipeline: collect prior feedback, incremental re-review scoping, atomic review API, AI attribution footer, comment formatting.
 - `references/language-patterns.md` — Python / TypeScript and cross-language bad/good examples, applied within Correctness, Standards, and Security.
