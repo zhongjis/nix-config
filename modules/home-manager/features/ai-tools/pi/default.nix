@@ -146,7 +146,7 @@
     # Retry
     retry = {
       enabled = true;
-      maxRetries = 3;
+      maxRetries = 5;
       baseDelayMs = 2000;
       maxDelayMs = 60000;
     };
