@@ -65,13 +65,13 @@ Scale which axes fire and how deep the context work goes to the change's risk.
 
 ## Execution
 
-Isolation is the mechanism that stops one axis from coloring another, so **run the axes as isolated sub-agent passes whenever this environment exposes a task or sub-agent tool** and the risk is not Trivial. This is required, not a preference — dispatch per `references/parallel-axes.md`, which bundles the axes into a few tasks (heavy independent axes each get a task; light axes share one) so isolation doesn't cost eight diff re-feeds.
+Isolation is the mechanism that stops one axis from coloring another, so **run the axes as isolated sub-agent passes whenever this environment exposes a task or sub-agent tool** and the risk is not Trivial. This is required, not a preference — dispatch per `references/parallel-axes.md`, which bundles the axes into a few tasks scaled to risk so isolation doesn't cost eight diff re-feeds. The foundation brief from steps 1-3 is what each isolated pass reads: it *feeds* the dispatch, it is never a reason to skip it. Gathering the context yourself makes you the aggregator who re-checks each pass (§ Aggregation) — not a single reviewer holding every axis in one context, which is the masking this step exists to prevent.
 
 **Capability floor.** Dispatch each isolated pass to a reasoning-capable agent whose tier matches the Risk dial — a small fast tier may cover a Standard read, but a Risky review needs a top reasoning tier, and Security, Correctness, and Regression never run on the cheapest / fastest tier. A search / recon-only helper is a poor fit for a judgment axis — prefer a general reasoning agent.
 
-Fall back to **sequential inline** passes only when no task or sub-agent tool is exposed, or the risk is Trivial (dispatch overhead outweighs the gain). Inline gives best-effort isolation: reset focus to each axis's brief and write its findings under its heading before the next, and weigh the result accordingly.
+Fall back to **sequential inline** passes only when no task or sub-agent tool is exposed, or the risk is Trivial. A thorough foundation is not a third exit — *"I already gathered the context, so dispatching adds nothing"* is the rationalization that folds the axes back into one masking context. When you do fall back inline, run each axis as its own pass: reset focus to that axis's brief, write its findings under its heading, and finish it before the next.
 
-If a dispatched axis fails or returns empty, re-run it — a silent drop must never read as "no findings".
+If a dispatched axis fails, stalls, or returns empty, re-run it per `references/parallel-axes.md` — a silent drop must never read as "no findings".
 
 ## Severity
 

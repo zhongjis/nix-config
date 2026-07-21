@@ -4,13 +4,13 @@ How to run review axes as isolated sub-agent passes — the *how*. `SKILL.md` §
 
 ## What to dispatch (fan-out control)
 
-Spawning one sub-agent per axis re-feeds the diff to eight tasks and wastes context. Group instead:
+Spawning one sub-agent per axis re-feeds the diff to eight tasks and wastes context. Group into a few tasks scaled to risk:
 
-- **Heavy, independent axes → one task each:** Security, Regression, Performance. Each does deep, mostly separate work.
-- **Light axes → one bundled task:** Correctness + Standards, plus any active conditional axis that is cheap (Tests, Observability).
-- **Spec** rides with the bundle, unless the spec is large — then give it its own task.
+- **Standard risk → two tasks:** the judgment-heavy axes (Correctness, Regression, Security) in one, the lighter axes (Standards, Spec, Tests, Observability, Performance) in the other.
+- **Risky diff → split the heavy task further** so no pass carries more than its budget can reason about — e.g. Security alone, Regression + Correctness together.
+- **Spec** rides with the light bundle, unless the spec is large — then give it its own task.
 
-Scale granularity to risk: at Standard risk, one heavy task plus one bundle is often enough; reserve the full split for Risky diffs.
+The task count follows the diff, not a fixed number: keep the judgment-heavy axes off the cheapest tier (SKILL.md § Execution), and never split so fine that a task's budget stretches thin enough to stall.
 
 ## Self-contained brief (every task carries this)
 
@@ -20,8 +20,13 @@ A dispatched task shares none of the main context, so its brief must stand alone
 2. **Foundation brief** — the behavior delta and the axis triage from step 3 of the process.
 3. **Axis assignment** — which axis or axes this task owns, with the matching section(s) of `axis-checklists.md` pasted in full; the task cannot open files the main agent read.
 4. **Report contract** — "Report findings for your assigned axis only. Tag each with the axis name, a severity (`[BLOCKER]` / `[MAJOR]` / `[SUGGESTION]` / `[NIT]` / `[KUDOS]`), and a file:line. Quote the code or spec line for each. Score this axis's confidence 1-5, dropping it by 1 for each risk multiplier this axis owns (SKILL.md § Confidence adjustments). If you find nothing, say so explicitly. Under 400 words per axis."
+5. **Budget** — a tool-call ceiling scaled to risk: roughly ~8 for a Standard read, ~15 for a Risky deep pass. Read and reason from the diff and the files it touches; don't run builds or the full test suite unless your axis (Tests, sometimes Correctness) needs execution to judge. A pass that reasons tightly from the code beats one that stalls exploring.
 
 The same brief structure feeds a sequential inline pass — that shared shape is what keeps the two execution modes producing identical review content.
+
+## When a pass stalls or comes back empty
+
+A dispatched pass that times out, stalls, or returns empty is not "no findings" — re-run it once, tighter: halve the tool-call ceiling, forbid build and test runs, and point it at the specific file regions to read. If the re-run also fails, fold that axis into your own inline pass and say so in the report, so the axis stays covered and the fallback is visible.
 
 ## Aggregation
 
