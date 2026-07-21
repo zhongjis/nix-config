@@ -17,7 +17,13 @@ gh api repos/{owner}/{repo}/pulls/{number}/comments --paginate # line-specific c
 gh api repos/{owner}/{repo}/pulls/{number}/reviews --paginate  # review summaries / states
 ```
 
-Treat issues other reviewers already raised as prior art — your findings must be net-new. Reply in the existing thread rather than reposting; add a fresh comment only with materially new information (a different root cause, higher severity, a more precise line, or a fix the thread lacks). When in doubt, collapse the duplicate — the goal is signal.
+Treat issues other reviewers already raised as prior art — your findings must be net-new. Reply in the existing thread rather than reposting; add a fresh comment only with materially new information (a different root cause, higher severity, a more precise line, or a fix the thread lacks). When in doubt, don't repost the duplicate — surface acknowledged overlaps only in the collapsed **Already raised by others** list (see Progressive disclosure), so prior discussion is credited without doubling the noise.
+
+## 2b. Scope a re-review to new commits
+
+If a prior code-review-v2 review already exists on this PR, scope this pass to what changed since it. Find that review in the `gh api repos/{owner}/{repo}/pulls/{number}/reviews` output by matching **both** the `<!-- code-review-v2 -->` marker in its `body` **and** an author login equal to the current `gh` user (`gh api user -q .login`) — match both, or you may grab another tool's review. Read that review's `commit_id` and review only the diff since that SHA (`git diff <sha>...HEAD`), then open the new summary body with "Incremental review since `<sha>` — prior findings not repeated." so the author knows what was and wasn't re-read.
+
+"Prior findings not repeated" governs *findings*, not unresolved *risk*: any earlier `[BLOCKER]` or `[MAJOR]` still unfixed at the new head must be re-surfaced (reference it by its ID), never silently dropped. A missed marker only costs a safe full re-review; a false match mis-scopes, which is why the author-login match is mandatory.
 
 ## 3. Submit as one atomic review
 
@@ -63,6 +69,22 @@ gh pr review <number> --approve --body "..."
 gh pr review <number> --request-changes --body "..."
 ```
 
+## Attribution footer (always, summary body only)
+
+The review posts under the human's own GitHub identity and carries a verdict in their name, so the summary body MUST end with an attribution footer — the only signal that a human didn't hand-write it. Append it to the summary body only, never to inline comments. Two parts, in order:
+
+1. **Visible credit line** (non-suppressible) — names the skill and its multi-axis method, so the review reads as a rigorous pass rather than ad-hoc AI. One line, e.g.:
+
+   > 🔍 Reviewed with **[code-review-v2](https://github.com/zhongjis/nix-config)** — multi-axis AI review (correctness · standards · regression · security), each axis run in isolation so none masks another. Sharp eyes, no ego; a human still owns the merge.
+
+2. **Invisible self-ID marker** — an HTML comment on its own line, so a later run can recognize this review as its own (see §2b):
+
+   ```
+   <!-- code-review-v2 -->
+   ```
+
+Keep the visible line even on a clean `APPROVE`: undisclosed AI authorship under a human identity is exactly what this footer prevents. The marker is not load-bearing — if it is ever missing or altered, re-review just falls back to a full pass.
+
 ## Inline vs summary
 
 The summary is an index; the inlines are the content.
@@ -76,6 +98,8 @@ Don't restate inline content in the summary — GitHub renders them in different
 ## Progressive disclosure in the summary
 
 Keep the verdict and findings table above the fold. Genuinely secondary, summary-only sections — a long per-axis or per-file confidence table, strengths / KUDOS, methodology notes — can go in `<details>` blocks. Blockers and majors are never collapsed.
+
+- **Already raised by others** — when your findings overlap comments already on the PR, list those overlaps here, one line each linking the existing thread, instead of reposting them. Appears only when overlaps exist, and never affects the verdict.
 
 ## GitHub comment formatting
 

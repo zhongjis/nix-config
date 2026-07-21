@@ -146,7 +146,7 @@ Only files whose confidence deviates from the overall — omit files that match 
 [one-line justification]
 ````
 
-For PR reviews, the inline-vs-summary strategy, GitHub comment formatting rules, and the atomic-review pipeline live in `references/pr-workflow.md`.
+For PR reviews, the inline-vs-summary strategy, GitHub comment formatting rules, the atomic-review pipeline, the AI attribution footer, and incremental re-review scoping live in `references/pr-workflow.md`.
 
 ## Feedback craft
 
@@ -159,5 +159,5 @@ For PR reviews, the inline-vs-summary strategy, GitHub comment formatting rules,
 - `references/axis-checklists.md` — per-axis deep checklists; load the sections for the active axes.
 - `references/parallel-axes.md` — sub-agent dispatch, the self-contained brief template, bundling, and aggregation mechanics.
 - `references/context-gathering.md` — the concrete caller / history / churn commands for the Gather-context step, scaled to the Risk dial.
-- `references/pr-workflow.md` — GitHub PR pipeline: collect prior feedback, atomic review API, comment formatting.
+- `references/pr-workflow.md` — GitHub PR pipeline: collect prior feedback, incremental re-review scoping, atomic review API, AI attribution footer, comment formatting.
 - `references/language-patterns.md` — Python / TypeScript and cross-language bad/good examples, applied within Correctness, Standards, and Security.
