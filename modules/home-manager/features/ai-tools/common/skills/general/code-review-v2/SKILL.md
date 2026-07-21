@@ -89,7 +89,7 @@ Assign severity **within each axis**. `[BLOCKER]` and `[MAJOR]` are blocking; th
 
 ## Aggregation
 
-**Re-check dispatched findings first.** Independently verify each dispatched finding against the code and its contract and re-severitize before assembling — dispatched severities are inputs, not final. This is within-axis validation against ground truth, not cross-axis re-judging: keep each axis's grouping intact, and a severity you overturn is also reason to lower that axis's confidence.
+**Re-check dispatched findings first.** Independently verify each dispatched finding against the code and its contract and re-severitize before assembling — dispatched severities are inputs, not final. This is within-axis validation against ground truth, not cross-axis re-judging: keep each axis's grouping intact, and a severity you overturn is also reason to lower that axis's confidence. Tighten each finding's prose in the same pass — active voice, no filler, no puffery (§ Feedback craft); a finding that reads loose isn't done.
 
 Copy the re-checked findings into the report unchanged, under that axis's heading. Build the findings table by grouping stably on (axis, severity), keeping every axis's rows distinct.
 
@@ -153,7 +153,7 @@ For PR reviews, the inline-vs-summary strategy, GitHub comment formatting rules,
 
 ## Feedback craft
 
-- **Write it clearly.** Run the `/writing-clearly-and-concisely` skill and apply it to every finding, the summary, and PR comments — plain, tight, no filler.
+- **Write it tight.** Apply to every finding, the summary, and PR comments: active voice; positive form (say what *is*, not what isn't); cut needless words; concrete and specific over vague; no AI puffery (`delve`, `leverage`, `seamless`, `robust`, `crucial`, `testament`). See `writing-clearly-and-concisely` for depth.
 - **Ask, don't assert.** "What happens when this input is empty?" invites reflection more than a flat claim.
 - **Suggest, don't command.** "Consider a Map here for O(1) lookups" over "Use a Map." Offer alternatives as possibilities.
 
