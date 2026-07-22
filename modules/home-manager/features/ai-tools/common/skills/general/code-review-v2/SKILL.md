@@ -95,7 +95,7 @@ Copy the re-checked findings into the report unchanged, under that axis's headin
 
 - **Completion criteria** — two gates, both required to keep one axis from masking another:
   1. Each active axis ran in its own isolated pass whenever an isolation mechanism was available; only the Trivial or no-isolation fallback runs axes inline in one shared context.
-  2. Every active axis appears as its own labeled group in the output, including axes that found nothing (which state "no findings").
+  2. Every active axis is accounted for — it ran and its result is recorded, so none is silently dropped. A first/full review renders each axis as its own labeled group, including those that found nothing (which state "no findings"); an incremental re-review indexes only new findings and omits the empty axes (`references/pr-workflow.md` § 2c).
 - **Verdict** is the only value computed across axes: `REQUEST_CHANGES` if any axis produced a `[BLOCKER]` or `[MAJOR]`, otherwise `COMMENT` or `APPROVE`. Compute it last, from the assembled findings; it never changes an individual finding.
 - **Confidence** — each axis scores itself 1-5, lowering its own score for the risk multipliers it owns (see Confidence adjustments); the overall confidence is the **minimum** across active axes. Name the axis that set it and why.
 
@@ -112,7 +112,7 @@ Each axis drops its own score by 1 (floor 1) for every multiplier it carries. Tw
 
 ## Output
 
-Use this skeleton for both modes. It is an index into the findings, not a restatement of them. Keep the verdict and findings table above the fold; blockers and majors are never collapsed. Secondary summary-only material — the per-file confidence table, strengths — goes in `<details>` on large reviews.
+Use this skeleton for a first/full review in both modes. It is an index into the findings, not a restatement of them. Keep the verdict and findings table above the fold; blockers and majors are never collapsed. Secondary summary-only material — the per-file confidence table, strengths — goes in `<details>` on large reviews. A PR **incremental re-review** uses the lean output contract in `references/pr-workflow.md` § 2c instead of re-rendering this skeleton.
 
 ````markdown
 ## Code Review Summary
@@ -126,7 +126,7 @@ Use this skeleton for both modes. It is an index into the findings, not a restat
 | B1 | Security | [BLOCKER] | path/to/file:42 | one line — full detail inline |
 | M1 | Regression | [MAJOR] | path/to/other:15 | one line — full detail inline |
 
-Axes with no findings are listed explicitly, e.g. "Correctness — no findings".
+On a first/full review, axes with no findings are listed explicitly, e.g. "Correctness — no findings". An incremental re-review omits them and indexes only new findings (`references/pr-workflow.md` § 2c).
 
 <details><summary>Per-file confidence</summary>
 
@@ -149,7 +149,7 @@ Only files whose confidence deviates from the overall — omit files that match 
 [one-line justification]
 ````
 
-For PR reviews, the inline-vs-summary strategy, GitHub comment formatting rules, the atomic-review pipeline, the AI attribution footer, and incremental re-review scoping live in `references/pr-workflow.md`.
+For PR reviews, the inline-vs-summary strategy, GitHub comment formatting rules, the atomic-review pipeline, the AI attribution footer, and incremental re-review scoping and output live in `references/pr-workflow.md`.
 
 ## Feedback craft
 
@@ -162,5 +162,5 @@ For PR reviews, the inline-vs-summary strategy, GitHub comment formatting rules,
 - `references/axis-checklists.md` — per-axis deep checklists; load the sections for the active axes.
 - `references/parallel-axes.md` — isolated-pass dispatch, the self-contained brief template, bundling, and aggregation mechanics.
 - `references/context-gathering.md` — the concrete caller / history / churn commands for the Gather-context step, scaled to the Risk dial.
-- `references/pr-workflow.md` — GitHub PR pipeline: collect prior feedback, incremental re-review scoping, atomic review API, AI attribution footer, comment formatting.
+- `references/pr-workflow.md` — GitHub PR pipeline: collect prior feedback, incremental re-review scoping and output, atomic review API, AI attribution footer, comment formatting.
 - `references/language-patterns.md` — Python / TypeScript and cross-language bad/good examples, applied within Correctness, Standards, and Security.

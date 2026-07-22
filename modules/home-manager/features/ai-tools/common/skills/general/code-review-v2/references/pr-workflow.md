@@ -25,6 +25,15 @@ If a prior code-review-v2 review already exists on this PR, scope this pass to w
 
 "Prior findings not repeated" governs *findings*, not unresolved *risk*: any earlier `[BLOCKER]` or `[MAJOR]` still unfixed at the new head must be re-surfaced (reference it by its ID), never silently dropped. A missed marker only costs a safe full re-review; a false match mis-scopes, which is why the author-login match is mandatory.
 
+## 2c. Incremental output
+
+The incremental summary is an index of what's *new*, not a re-render of § Output. Reuse § Output by reference — same findings-table format, verdict computation (§ Aggregation), and attribution footer (§ Attribution footer) — and change only these:
+
+- **Findings table: new rows only** (findings net-new since `<sha>`). If no axis has a new finding, drop the table and write one line — "No new findings since `<sha>`."
+- **Omit axes that found nothing.** Every axis still runs and is accounted for (§ Aggregation), but an incremental summary indexes only new findings — it does not list the empty axes the way a first review does.
+- **Resolved prior findings stay silent** — GitHub already marks their threads resolved or outdated. At most one credit line, e.g. "Resolved: M1, S1–S5, N1–N5"; never a per-finding resolution table.
+- **Re-surface unresolved priors by ID.** Any earlier `[BLOCKER]`/`[MAJOR]` still unfixed at the new head is listed by its ID (per § 2b), and the verdict is computed over the new findings **plus** those unresolved priors — so a head that resolves everything flips to `APPROVE`.
+
 ## 3. Submit as one atomic review
 
 Build a temporary JSON file with the summary body, verdict event, and any inline comments, then submit it as a single review, so the summary lands in the Conversation tab and the inline comments in the Files Changed tab, grouped as one review.
