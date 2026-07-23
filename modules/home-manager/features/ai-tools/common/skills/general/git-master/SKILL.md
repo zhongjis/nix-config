@@ -1,8 +1,7 @@
 ---
 name: git-master
 upstream: "https://github.com/code-yeongyu/oh-my-openagent/tree/dev/packages/shared-skills/skills/git-master"
-description: "MUST USE for ANY git operations. Atomic commits, rebase/squash, history search (blame, bisect, log -S). Recommended: load for delegated git work or focused git-only sessions to save context. Triggers: 'commit', 'rebase', 'squash', 'who wrote', 'when was X added', 'find the commit that'."
----
+description: "MUST USE whenever a task needs a commit or git-history investigation. Covers atomic commits, staging, commit-message style, rebase, squash, fixup/autosquash, blame, bisect, reflog, git log -S/-G, and questions like who wrote this or when was this added. Do not use for ordinary code edits unless the user asks for git work."
 
 # Git Master
 
@@ -36,6 +35,10 @@ git merge-base HEAD origin/master
 ```
 
 Missing upstream or missing `main`/`master` is normal. Fall back to the best available branch or report the missing fact. Never treat a failed lookup as proof.
+
+## PR Body Evidence Attachments
+
+When a PR body needs screenshots or terminal PNGs, use the repo reference at `reference/github-attachment-upload.md`. The allowed hosting path is GitHub user attachments from the authenticated web attachment flow; never commit temporary images, never use GitHub Releases for PR evidence, and never use external image hosts. Do not log browser cookies, CSRF tokens, S3 form fields, or upload headers.
 
 ## Commit Mode
 
@@ -98,4 +101,4 @@ Before finishing:
 
 - Run the most relevant verification available for the changed behavior or history operation.
 - Report commands that passed and any command you could not run.
-- Leave the worktree state explicit.
+- Leave the worktree state explicit.-
