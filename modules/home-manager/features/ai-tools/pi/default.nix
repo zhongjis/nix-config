@@ -165,6 +165,7 @@
       "git:github.com/aliou/pi-guardrails@v0.15.0"
       "git:github.com/davebcn87/pi-autoresearch@v1.6.0"
       "git:github.com/nicobailon/pi-web-access@v0.13.0"
+      "git:github.com/nicobailon/pi-interactive-shell@v0.13.0"
       "git:github.com/aliou/pi-processes@v0.9.4"
       "git:github.com/dbachelder/pi-btw@v0.4.1"
       # "git:github.com/ttttmr/pi-context@e5263cc46ae2e9b3e35c12193d97a01e4efeb9f5"
