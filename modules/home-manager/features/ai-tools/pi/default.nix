@@ -55,9 +55,9 @@
   };
 
   piMcporterSettings = {
-    configPath = "${config.home.homeDirectory}/.mcporter/mcporter.json";
-    timeoutMs = 30000;
-    mode = "lazy";
+    version = 1;
+    defaultExposure = "match";
+    callTimeoutMs = 30000;
   };
 
   localLlamaModels = [
@@ -160,7 +160,7 @@
 
     # Resources
     packages = [
-      "git:github.com/mavam/pi-mcporter@v0.5.0"
+      "git:github.com/mavam/pi-mcporter@v1.0.1"
       "git:github.com/RimuruW/pi-hashline-edit@v0.8.3"
       "git:github.com/aliou/pi-guardrails@v0.15.0"
       "git:github.com/davebcn87/pi-autoresearch@v1.6.0"
@@ -239,11 +239,6 @@ in {
     instructions =
       commonInstructions
       ++ [
-        (
-          if aiProfileHelpers.isPersonal
-          then "${./instructions/mcporter.personal.md}"
-          else "${./instructions/mcporter.work.md}"
-        )
         "${./instructions/shell-tools.md}"
       ];
     settings = piSettings;

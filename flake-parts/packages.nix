@@ -58,18 +58,6 @@
           base = inputs.llm-agents.packages.${system}.oh-my-opencode;
         };
 
-        sync-mcporter-instructions = pkgs.writeShellApplication {
-          name = "sync-mcporter-instructions";
-          runtimeInputs = [
-            inputs.llm-agents.packages.${system}.mcporter
-            pkgs.coreutils
-            pkgs.diffutils
-            pkgs.git
-            pkgs.jq
-          ];
-          text = builtins.readFile ../scripts/sync-mcporter-instructions.sh;
-        };
-
         download-llamacpp-models = pkgs.writeShellApplication {
           name = "download-llamacpp-models";
           runtimeInputs = [
