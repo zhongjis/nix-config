@@ -7,7 +7,6 @@ in {
   imports = [
     ./lsp
     ./cmp.nix
-    ./copilot.nix
     ./gitsigns.nix
     ./mini.nix
     ./oil.nix
