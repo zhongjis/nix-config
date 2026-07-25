@@ -56,7 +56,7 @@
 
   piMcporterSettings = {
     version = 1;
-    defaultExposure = "match";
+    defaultExposure = "index";
     callTimeoutMs = 30000;
   };
 
