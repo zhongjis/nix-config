@@ -34,6 +34,9 @@
     extraArgs = ["bun2nix"];
     # No updateScript upstream yet; registered but not tracked by the updater.
   };
+  next-devtools-mcp = {
+    path = ./next-devtools-mcp.nix;
+  };
   before-and-after = {
     path = ./before-and-after.nix;
     extraArgs = ["agentBrowser"];

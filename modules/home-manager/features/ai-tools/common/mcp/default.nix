@@ -10,6 +10,7 @@
   secretPath_context7 = config.sops.secrets.context7_api_key.path;
   secretPath_exa = config.sops.secrets.exa_api_key.path;
   openDesignDaemon = pkgs.open-design-daemon;
+  nextDevtoolsMcp = inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.next-devtools-mcp;
 
   # MCPs available to all profiles
   commonMcps = {
@@ -30,6 +31,9 @@
         "--daemon-url"
         "http://127.0.0.1:${toString config.services.open-design.port}"
       ];
+    };
+    next-devtools = {
+      command = "${nextDevtoolsMcp}/bin/next-devtools-mcp";
     };
   };
 
