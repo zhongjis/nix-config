@@ -32,9 +32,6 @@
         "http://127.0.0.1:${toString config.services.open-design.port}"
       ];
     };
-    next-devtools = {
-      command = "${nextDevtoolsMcp}/bin/next-devtools-mcp";
-    };
   };
 
   # MCPs only for work profile
@@ -43,6 +40,9 @@
 
   # MCPs only for personal profile
   personalMcps = {
+    next-devtools = {
+      command = "${nextDevtoolsMcp}/bin/next-devtools-mcp";
+    };
     flux = {
       command = "nix";
       args = [
