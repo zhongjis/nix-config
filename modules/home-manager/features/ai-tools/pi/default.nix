@@ -162,13 +162,11 @@
     packages = [
       "git:github.com/mavam/pi-mcporter@v1.0.1"
       "git:github.com/RimuruW/pi-hashline-edit@v0.8.3"
-      "git:github.com/aliou/pi-guardrails@v0.15.0"
       "git:github.com/davebcn87/pi-autoresearch@v1.6.0"
       "git:github.com/nicobailon/pi-web-access@v0.13.0"
       "git:github.com/nicobailon/pi-interactive-shell@v0.13.0"
       "git:github.com/aliou/pi-processes@v0.9.4"
       "git:github.com/dbachelder/pi-btw@v0.4.1"
-      # "git:github.com/ttttmr/pi-context@e5263cc46ae2e9b3e35c12193d97a01e4efeb9f5"
       {
         source = "git:github.com/backnotprop/plannotator@v0.21.2";
         extensions = ["apps/pi-extension"];
@@ -184,6 +182,11 @@
   workOverrides = {
     defaultProvider = "anthropic";
     defaultModel = "claude-opus-4-7";
+    packages =
+      sharedSettings.packages
+      ++ [
+        "git:github.com/aliou/pi-guardrails@v0.15.0"
+      ];
   };
 
   personalOverrides = {
@@ -195,12 +198,7 @@
     transport = "sse";
     packages =
       sharedSettings.packages
-      ++ [
-        # context-mode: built from a GitHub clone with bun (packages/context-mode),
-        # consumed as a local-path pi package (its pi.extensions + skills load from
-        # the Nix store). Replaces the former git:github.com/ttttmr/pi-context entry.
-        # "${inputs.self.packages.${system}.context-mode}"
-      ];
+      ++ [];
   };
 
   piSettings = lib.recursiveUpdate sharedSettings (
