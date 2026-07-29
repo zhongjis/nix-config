@@ -25,7 +25,7 @@ The Skills CLI (`npx skills`) is a search tool for the open agent skills ecosyst
 
 **Key command:**
 
-- `npx skills find [query]` - Search for skills interactively or by keyword
+- `npx skills find [query] [--owner <owner>]` - Search for skills interactively or by keyword, optionally scoped to a GitHub owner
 
 **Browse skills at:** https://skills.sh/
 
@@ -39,12 +39,16 @@ When a user asks for help with something, identify:
 2. The specific task (e.g., writing tests, creating animations, reviewing PRs)
 3. Whether this is a common enough task that a skill likely exists
 
-### Step 2: Search for Skills
+### Step 2: Check the Leaderboard First
 
-Run the find command with a relevant query:
+Check the [skills.sh leaderboard](https://skills.sh/) for established skills in the relevant domain. The leaderboard ranks skills by total installs and can surface widely used options before a broader search.
+
+### Step 3: Search for Skills
+
+If the leaderboard does not cover the user's need, run the find command with a relevant query:
 
 ```bash
-npx skills find [query]
+npx skills find [query] [--owner <owner>]
 ```
 
 For example:
@@ -53,27 +57,29 @@ For example:
 - User asks "can you help me with PR reviews?" -> `npx skills find pr review`
 - User asks "I need to create a changelog" -> `npx skills find changelog`
 
-The command will return results like:
+### Step 4: Verify Quality Before Recommending
 
-```
-Install with npx skills add <owner/repo@skill>
+Do not recommend a skill based only on its search rank. Verify:
 
-vercel-labs/agent-skills@vercel-react-best-practices
-└ https://skills.sh/vercel-labs/agent-skills/vercel-react-best-practices
-```
+1. **Install count** — Prefer established skills with meaningful usage; flag low adoption
+2. **Source reputation** — Prefer known maintainers and official project sources
+3. **Repository activity** — Check stars, recent maintenance, and unresolved issues
 
-### Step 3: Present Options to the User
+### Step 5: Present Options to the User
 
 When you find relevant skills, present them to the user with:
 
 1. The skill name and what it does
-2. The source URL to learn more at skills.sh
+2. The install count and source
+3. The source URL to learn more at skills.sh
 
 Example response:
 
 ```
 I found a skill that might help! The "vercel-react-best-practices" skill provides
 React and Next.js performance optimization guidelines from Vercel Engineering.
+Source: vercel-labs/agent-skills
+Installs: <current install count>
 
 Learn more: https://skills.sh/vercel-labs/agent-skills/vercel-react-best-practices
 
