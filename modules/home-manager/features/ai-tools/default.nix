@@ -45,12 +45,12 @@ in {
     };
 
     home.packages = [
-      llmAgentsPackages.gitnexus
       llmAgentsPackages.qmd
       llmAgentsPackages.beads
       llmAgentsPackages.herdr
       llmAgentsPackages.codegraph
       llmAgentsPackages.agentsview
+      llmAgentsPackages.skills
       inputs.self.packages.${system}.before-and-after
     ];
   };
