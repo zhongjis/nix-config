@@ -6,6 +6,7 @@ adaptedFrom:
 description: >
   Address unresolved pull request review comments and threads to closure.
 disable-model-invocation: true
+companions: [gh, writing-clearly-and-concisely]
 ---
 
 # Address PR Review Threads
@@ -79,7 +80,7 @@ If code changed and the confirmed plan includes publishing, create one descripti
 
 ### 8. Reply in addressed threads
 
-Reply in the existing thread for every `fix` or `disagree` handled in this pass. Keep replies brief: `Fixed` plus a note when the implementation differs, or `Not changing this - <technical reason>`. Complete when every handled thread has exactly one closing reply.
+Load writing-clearly-and-concisely skill first, then reply in the existing thread for every `fix` or `disagree` handled in this pass. Keep replies brief: `Fixed` plus a note when the implementation differs, or `Not changing this - <technical reason>`. Complete when every handled thread has exactly one closing reply.
 
 ### 9. Resolve handled threads
 
