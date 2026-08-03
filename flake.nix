@@ -79,6 +79,7 @@
       url = "github:njbrake/agent-of-empires";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    agent-skills.url = "github:zhongjis/agent-skills";
     llm-agents.url = "github:numtide/llm-agents.nix";
     bun2nix = {
       url = "github:nix-community/bun2nix";

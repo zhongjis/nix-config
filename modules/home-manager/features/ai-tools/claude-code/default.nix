@@ -5,14 +5,17 @@
   commonSkills,
   claudeCodeLocalSkills,
   commonInstructions,
+  aiProfileHelpers,
   ...
 }: let
   inherit (pkgs.stdenv.hostPlatform) system;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
+  externalSkills = inputs.agent-skills.lib.skillsFor {
+    profile = aiProfileHelpers.profile;
+  };
 
-  # Merge pre-filtered common skills and Claude Code-specific skills (from ./skills)
-  # Both are already profile-filtered via _module.args
-  allSkills = commonSkills // claudeCodeLocalSkills;
+  # Tool-specific skills override shared skills on name collisions.
+  allSkills = commonSkills // externalSkills // claudeCodeLocalSkills;
 
   # Convert commonInstructions (list of paths) to an attrset for `rules`
   # e.g. /nix/store/...-nix-environment.md → { "nix-environment" = /nix/store/...; }

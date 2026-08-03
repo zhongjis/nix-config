@@ -38,6 +38,21 @@
         "type": "github"
       }
     },
+    "agent-skills": {
+      "locked": {
+        "lastModified": 1785543515,
+        "narHash": "sha256-mE7ogeQJZn84cxf6HtVjH8BDnZSpPcE05I2lcEfqq8A=",
+        "owner": "zhongjis",
+        "repo": "agent-skills",
+        "rev": "c23d4abdb1ab54ea024b07ef72ff63deb72bf836",
+        "type": "github"
+      },
+      "original": {
+        "owner": "zhongjis",
+        "repo": "agent-skills",
+        "type": "github"
+      }
+    },
     "aquamarine": {
       "inputs": {
         "hyprutils": [
@@ -2126,6 +2141,7 @@
       "inputs": {
         "aerospace-tap": "aerospace-tap",
         "agent-of-empires": "agent-of-empires",
+        "agent-skills": "agent-skills",
         "bun2nix": "bun2nix",
         "colmena": "colmena",
         "determinate": "determinate",

@@ -12,7 +12,11 @@
   inherit (pkgs.stdenv.hostPlatform) system;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
   sopsFile = inputs.self + "/secrets/ai-tokens.yaml";
-  allSkills = commonSkills // piLocalSkills;
+  externalSkills = inputs.agent-skills.lib.skillsFor {
+    profile = aiProfileHelpers.profile;
+    harness = "pi";
+  };
+  allSkills = commonSkills // externalSkills // piLocalSkills;
 
   convertEnvPlaceholders = value:
     if builtins.isString value
