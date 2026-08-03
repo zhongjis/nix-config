@@ -95,7 +95,7 @@ Copy the re-checked findings into the report unchanged, under that axis's headin
 
 - **Completion criteria** — two gates, both required to keep one axis from masking another:
   1. Each active axis ran in its own isolated pass whenever an isolation mechanism was available; only the Trivial or no-isolation fallback runs axes inline in one shared context.
-  2. Every active axis is accounted for — it ran and its result is recorded, so none is silently dropped. A first/full review renders each axis as its own labeled group, including those that found nothing (which state "no findings"); an incremental re-review indexes only new findings and omits the empty axes (`references/pr-workflow.md` § 2c).
+  2. Every active axis is accounted for — it ran and its result is recorded, so none is silently dropped. A first/full review renders each axis as its own labeled group, including those that found nothing (which state "no findings"); an incremental re-review follows the § 2c contract — it MUST open with the § 2c opener line and index only new findings (no empty axes, no Strengths), never re-rendering this first-review skeleton (`references/pr-workflow.md` § 2c).
 - **Verdict** is the only value computed across axes: `REQUEST_CHANGES` if any axis produced a `[BLOCKER]` or `[MAJOR]`, otherwise `COMMENT` or `APPROVE`. Compute it last, from the assembled findings; it never changes an individual finding.
 - **Confidence** — each axis scores itself 1-5, lowering its own score for the risk multipliers it owns (see Confidence adjustments); the overall confidence is the **minimum** across active axes. Name the axis that set it and why.
 
@@ -112,7 +112,7 @@ Each axis drops its own score by 1 (floor 1) for every multiplier it carries. Tw
 
 ## Output
 
-Use this skeleton for a first/full review in both modes. It is an index into the findings, not a restatement of them. Keep the verdict and findings table above the fold; blockers and majors are never collapsed. Secondary summary-only material — the per-file confidence table, strengths — goes in `<details>` on large reviews. A PR **incremental re-review** uses the lean output contract in `references/pr-workflow.md` § 2c instead of re-rendering this skeleton.
+Use this skeleton for a first/full review in both modes. It is an index into the findings, not a restatement of them. Keep the verdict and findings table above the fold; blockers and majors are never collapsed. The **verification / methodology note is always collapsed** in `<details>`, whatever the review size; the per-file confidence table and strengths collapse on large reviews. A PR **incremental re-review** uses the lean output contract in `references/pr-workflow.md` § 2c instead of re-rendering this skeleton.
 
 ````markdown
 ## Code Review Summary
@@ -141,6 +141,12 @@ Only files whose confidence deviates from the overall — omit files that match 
 <details><summary>Strengths</summary>
 
 - `[KUDOS]` — exemplary section worth reinforcing.
+
+</details>
+
+<details><summary>Verification</summary>
+
+Commands, suites, and live checks run to ground the review, with results. Always collapsed, whatever the review size.
 
 </details>
 

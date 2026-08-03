@@ -21,18 +21,19 @@ Treat issues other reviewers already raised as prior art — your findings must 
 
 ## 2b. Scope a re-review to new commits
 
-If a prior code-review-v2 review already exists on this PR, scope this pass to what changed since it. Find that review in the `gh api repos/{owner}/{repo}/pulls/{number}/reviews` output by matching **both** the `<!-- code-review-v2 -->` marker in its `body` **and** an author login equal to the current `gh` user (`gh api user -q .login`) — match both, or you may grab another tool's review. Read that review's `commit_id` and review only the diff since that SHA (`git diff <sha>...HEAD`), then open the new summary body with "Incremental review since `<sha>` — prior findings not repeated." so the author knows what was and wasn't re-read.
+If a prior code-review-v2 review already exists on this PR, scope this pass to what changed since it. Find that review in the `gh api repos/{owner}/{repo}/pulls/{number}/reviews` output by matching **both** the `<!-- code-review-v2 -->` marker in its `body` **and** an author login equal to the current `gh` user (`gh api user -q .login`) — match both, or you may grab another tool's review. Read that review's `commit_id`, enumerate the new commits (`git log <sha>..HEAD --oneline`) and their files (`git diff --stat <sha>...HEAD`), and review only that diff (`git diff <sha>...HEAD`) — the scope is those new commits, not a re-scan of the whole PR. Open the new summary body with the exact opener line "Incremental review since `<sha>` — prior findings not repeated." so the author knows what was and wasn't re-read.
 
 "Prior findings not repeated" governs *findings*, not unresolved *risk*: any earlier `[BLOCKER]` or `[MAJOR]` still unfixed at the new head must be re-surfaced (reference it by its ID), never silently dropped. A missed marker only costs a safe full re-review; a false match mis-scopes, which is why the author-login match is mandatory.
 
 ## 2c. Incremental output
 
-The incremental summary is an index of what's *new*, not a re-render of § Output. Reuse § Output by reference — same findings-table format, verdict computation (§ Aggregation), and attribution footer (§ Attribution footer) — and change only these:
+The incremental summary is a **binding contract**, not the § Output skeleton. It MUST open with the exact opener line from § 2b ("Incremental review since `<sha>` — prior findings not repeated."); a summary that re-renders the first-review skeleton — Strengths, empty axes, a restated prior — has ignored this contract. Reuse § Output only by reference — same findings-table format, verdict computation (§ Aggregation), and attribution footer (§ Attribution footer) — and change these:
 
 - **Findings table: new rows only** (findings net-new since `<sha>`). If no axis has a new finding, drop the table and write one line — "No new findings since `<sha>`."
 - **Omit axes that found nothing.** Every axis still runs and is accounted for (§ Aggregation), but an incremental summary indexes only new findings — it does not list the empty axes the way a first review does.
-- **Resolved prior findings stay silent** — GitHub already marks their threads resolved or outdated. At most one credit line, e.g. "Resolved: M1, S1–S5, N1–N5"; never a per-finding resolution table.
-- **Re-surface unresolved priors by ID.** Any earlier `[BLOCKER]`/`[MAJOR]` still unfixed at the new head is listed by its ID (per § 2b), and the verdict is computed over the new findings **plus** those unresolved priors — so a head that resolves everything flips to `APPROVE`.
+- **No Strengths / KUDOS section.** Strengths belong to a first/full review; an incremental pass indexes findings only.
+- **Resolved prior findings stay silent** — GitHub already marks their threads resolved or outdated. At most one credit line, e.g. "Resolved: M1, S1–S5, N1–N5"; never a per-finding resolution table and never a prose "what's now fixed" recap.
+- **Reference unresolved priors by ID — never restate them.** Any earlier `[BLOCKER]`/`[MAJOR]` still unfixed at the new head is listed by its ID (per § 2b) as one line, with no fresh write-up. For a prior raised by another reviewer, reply in that thread or link it under **Already raised by others** (§ Progressive disclosure) rather than reposting. The verdict is computed over the new findings **plus** those unresolved priors — so a head that resolves everything flips to `APPROVE`.
 
 ## 3. Submit as one atomic review
 
@@ -106,7 +107,7 @@ Don't restate inline content in the summary — GitHub renders them in different
 
 ## Progressive disclosure in the summary
 
-Keep the verdict and findings table above the fold. Genuinely secondary, summary-only sections — a long per-axis or per-file confidence table, strengths / KUDOS, methodology notes — can go in `<details>` blocks. Blockers and majors are never collapsed.
+Keep the verdict and findings table above the fold. Genuinely secondary, summary-only sections — a long per-axis or per-file confidence table, strengths / KUDOS — can go in `<details>` blocks; the verification / methodology note is always collapsed (§ Output). Blockers and majors are never collapsed.
 
 - **Already raised by others** — when your findings overlap comments already on the PR, list those overlaps here, one line each linking the existing thread, instead of reposting them. Appears only when overlaps exist, and never affects the verdict.
 
