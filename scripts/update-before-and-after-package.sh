@@ -11,7 +11,7 @@ Options:
   --check           fail if package or skill is not up to date; do not write
   --package PATH    package file to update (default: packages/before-and-after.nix)
   --skill-dir PATH  vendored skill dir to update
-                   (default: modules/home-manager/features/ai-tools/common/skills/personal/before-and-after)
+                   (default: ../agent-skills/skills/common-general/before-and-after)
   --no-format       skip running alejandra after writing
   -h, --help        show this help
 
@@ -23,7 +23,7 @@ EOF
 check_mode=0
 format_file=1
 package_path="packages/before-and-after.nix"
-skill_dir="modules/home-manager/features/ai-tools/common/skills/personal/before-and-after"
+skill_dir="../agent-skills/skills/common-general/before-and-after"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in

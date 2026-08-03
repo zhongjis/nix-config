@@ -22,10 +22,7 @@ Use the narrowest layer that fits: common when a skill should work everywhere, p
 ai-tools/
 ├── default.nix              # Imports common + tool modules; defines aiProfile
 ├── common/
-│   ├── skills/              # Shared skills, auto-discovered by profile
-│   │   ├── general/         # Available to all profiles
-│   │   ├── work/            # Work profile only
-│   │   └── personal/        # Personal profile only
+│   ├── skills/              # Selects common profile skills from agent-skills
 │   ├── instructions/        # Shared instruction markdown, profile-filtered
 │   ├── agents/              # Shared agent config
 │   └── mcp/                 # Shared MCP server config
@@ -51,13 +48,12 @@ The profile also filters skills, instructions, MCP servers, plugins, and tool-sp
 
 Skills are directories containing `SKILL.md`. Each skill may also include references, templates, scripts, or assets.
 
-Auto-discovery rules:
+Selection rules:
 
 - Directory names become skill names.
-- Prefix a directory with `disabled-` to skip it.
-- Common skills are discovered from `common/skills/{general,work,personal}`.
-- Tool-specific skills are discovered from each tool's `skills/{general,work,personal}` directory.
-- Tool-specific skills override common skills with the same name.
+- The `agent-skills` flake input filters common skills by AI profile.
+- Harness selectors add Claude Code- or Pi-specific skills.
+- Harness-specific skills override common skills with the same name.
 
 Prefer common skills. Use tool-specific skills only for tool-dependent behavior or intentional overrides.
 
@@ -77,7 +73,7 @@ Use skills as the workflow spine:
 | Build or fix test-first | `tdd` |
 | Review code | `code-review`; use `multi-reviewer` only when a panel review is requested |
 | Address PR feedback | `address-comments` |
-| Maintain skill set | `skill-maintainer` for vendoring and sync; `skill-creator` for creating or changing skills; `writing-great-skills` as the quality rubric |
+| Maintain skill set | `skill-maintainer` for vendoring and sync; Claude Code's `skill-creator` for creation and evals; `writing-great-skills` as the quality rubric |
 | Handoff long context | `handoff`; use `context-management` for long messy sessions |
 | Clean docs after milestone | `neat-freak` |
 
@@ -89,12 +85,12 @@ Choose the target by scope:
 
 | Need | Location |
 | --- | --- |
-| Shared across tools and profiles | `common/skills/general/<skill>/` |
-| Shared across tools, work only | `common/skills/work/<skill>/` |
-| Shared across tools, personal only | `common/skills/personal/<skill>/` |
-| Tool-specific behavior for all profiles | `<tool>/skills/general/<skill>/` |
-| Tool-specific work behavior | `<tool>/skills/work/<skill>/` |
-| Tool-specific personal behavior | `<tool>/skills/personal/<skill>/` |
+| Shared across tools and profiles | `<agent-skills>/skills/common-general/<skill>/` |
+| Shared across tools, work only | `<agent-skills>/skills/common-work/<skill>/` |
+| Shared across tools, personal only | `<agent-skills>/skills/common-personal/<skill>/` |
+| Harness-specific behavior for all profiles | `<agent-skills>/skills/<harness>-general/<skill>/` |
+| Harness-specific work behavior | `<agent-skills>/skills/<harness>-work/<skill>/` |
+| Harness-specific personal behavior | `<agent-skills>/skills/<harness>-personal/<skill>/` |
 
 Each `SKILL.md` must have frontmatter:
 
@@ -125,23 +121,23 @@ Rules:
 - Genericize shared skills so they are not tied to one AI vendor.
 - Keep local edits small and documented in the changed skill.
 - Prefer allowlists over bulk vendoring from large upstream repos.
-- Run `nix flake check` after changes when possible.
+- Run the selector, Skills CLI, and flake checks in `agent-skills` after changes.
+- Push the catalog commit before updating this repo's `agent-skills` lock.
 
-For private or work-specific upstreams, vendor into the private repo or a `work/` profile path. Never copy private content into this public repo.
+Private or work-internal skills belong only in the private repo. Use public `work` profile groups only for public-safe skills that should be selected on work hosts.
 
 ## Tool-specific wiring
 
-Common skills feed the tool modules through `_module.args.commonSkills`. Tool modules then merge their own filtered local skills.
+Common skills feed the tool modules through `_module.args.commonSkills`. Claude Code and Pi request harness-specific selections directly from the same flake input.
 
 Current consumers:
 
-- OpenCode merges `commonSkills` with `opencode/skills/*`.
-- Claude Code merges `commonSkills` with `claude-code/skills/*`.
-- Factory symlinks `commonSkills` plus `factory/skills/*` into `~/.factory/skills/`.
-- OMP exposes `omp/skills/*` for OMP-specific use.
-- Codex and Pi-family modules use shared configuration where supported, but not every resource type maps one-to-one across tools.
+- OpenCode, Factory, OMP, and Codex consume the common profile selection.
+- Claude Code consumes the `claude-code` harness selection.
+- Pi consumes the `pi` harness selection.
+- Factory also merges its external Impeccable skills.
 
-When a tool needs different behavior, add a tool-specific override with the same skill name. Otherwise, keep the skill in `common/skills/`.
+When a harness needs different behavior, add an override with the same skill name to its `agent-skills` harness group. Otherwise, keep the skill in a common group.
 
 ## Instructions, agents, MCP, and plugins
 

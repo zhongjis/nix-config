@@ -4,7 +4,6 @@
   pkgs,
   lib,
   commonSkills,
-  piLocalSkills,
   commonInstructions,
   aiProfileHelpers,
   ...
@@ -16,7 +15,7 @@
     profile = aiProfileHelpers.profile;
     harness = "pi";
   };
-  allSkills = commonSkills // externalSkills // piLocalSkills;
+  allSkills = commonSkills // externalSkills;
 
   convertEnvPlaceholders = value:
     if builtins.isString value
@@ -214,7 +213,6 @@ in {
   imports = [
     ../../../../../custom-home-manager-options/pi
     ./lsp.nix
-    ./skills
   ];
 
   home.packages = [

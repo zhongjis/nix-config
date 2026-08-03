@@ -3,7 +3,6 @@
   pkgs,
   lib,
   commonSkills,
-  claudeCodeLocalSkills,
   commonInstructions,
   aiProfileHelpers,
   ...
@@ -12,10 +11,11 @@
   llmAgentsPackages = inputs.llm-agents.packages.${system};
   externalSkills = inputs.agent-skills.lib.skillsFor {
     profile = aiProfileHelpers.profile;
+    harness = "claude-code";
   };
 
   # Tool-specific skills override shared skills on name collisions.
-  allSkills = commonSkills // externalSkills // claudeCodeLocalSkills;
+  allSkills = commonSkills // externalSkills;
 
   # Convert commonInstructions (list of paths) to an attrset for `rules`
   # e.g. /nix/store/...-nix-environment.md → { "nix-environment" = /nix/store/...; }
@@ -30,10 +30,9 @@
     commonInstructions);
 in {
   imports = [
-    ../common/skills # Provides commonSkills via _module.args (already filtered by profile)
+    ../common/skills
     ../common/mcp
     ../common/agents
-    ./skills # Provides claudeCodeLocalSkills via _module.args (already filtered by profile)
   ];
 
   home.packages = [

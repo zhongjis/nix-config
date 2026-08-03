@@ -21,7 +21,7 @@ Run from the repo root:
 ## BOOTSTRAP AND MAINTENANCE
 
 - Set `myHomeManager.aiProfile` in `hosts/{name}/home.nix` before enabling ai-tools; profile helpers and profile-filtered content depend on it
-- Skills and `common/instructions/*` files are auto-discovered from the correct profile subtree; place them in the right directory and do not add manual registration. Tool-specific instructions, MCP servers, and shared agents stay defined in their respective `default.nix` files
+- Skills come from the `agent-skills` flake input through `lib.skillsFor`; maintain them in the sibling `agent-skills` repository. `common/instructions/*` files remain locally auto-discovered. Tool-specific instructions, MCP servers, and shared agents stay defined in their respective `default.nix` files
 - For upstream/shared skill sync and update policy, follow the `skill-maintainer` workflow instead of inventing ad hoc local conventions here
 
 ## LSP OWNERSHIP
@@ -39,10 +39,7 @@ ai-tools/
 ├── default.nix              # Imports common + tool modules, defines aiProfile option
 ├── profile-option.nix       # aiProfile enum + helpers
 ├── common/                  # Shared across all tools
-│   ├── skills/              # Auto-discovered skill directories
-│   │   ├── general/         # All systems (~35 skills)
-│   │   ├── work/            # Work profile only
-│   │   └── personal/        # Personal profile only
+│   ├── skills/              # Selects common profile skills from agent-skills
 │   ├── instructions/        # Markdown instruction files
 │   │   ├── general/         # All systems
 │   │   ├── work/            # Work profile only
@@ -60,24 +57,24 @@ ai-tools/
 │   ├── provider.nix         # LLM provider config
 │   ├── formatters.nix       # Code formatters
 │   └── lsp.nix              # OpenCode adapter from commonLsp to programs.opencode.settings.lsp
-├── claude-code/             # Claude Code-specific (skills, agents, instructions)
-├── pi/                      # Pi-specific settings, skills, instructions, and LSP adapter
+├── claude-code/             # Claude Code-specific settings, agents, and instructions
+├── pi/                      # Pi-specific settings, instructions, and LSP adapter
 └── factory/                 # Factory.ai-specific (skills only, via home.file symlinks)
 ```
 
-## SKILL AUTO-DISCOVERY
+## SKILL SELECTION
 
-Skills are directories containing `SKILL.md`. Auto-discovered at Nix eval time:
+The `agent-skills` flake discovers canonical skill directories. Nix selects them at eval time:
 
 ```nix
-discoverSkills = profileDir: let
-  dirs = myLib.dirsIn profileDir;
-  enabledDirs = lib.filterAttrs (name: _: !(lib.hasPrefix "disabled-" name)) dirs;
-in lib.mapAttrs (name: _: profileDir + "/${name}") enabledDirs;
+inputs.agent-skills.lib.skillsFor {
+  profile = aiProfileHelpers.profile;
+  harness = "pi";
+}
 ```
 
-- **Disable a skill**: prefix directory with `disabled-` (e.g., `disabled-find-skills/`)
-- **Merge order**: common skills → tool-specific skills (tool overrides common on name collision)
+- **Canonical layout**: `skills/common-{general,work,personal}` and `skills/<harness>-{general,work,personal}`
+- **Merge order**: common skills → harness-specific skills (harness overrides common on name collision)
 - **Exposed via**: `_module.args.commonSkills`, merged into `programs.opencode.skills` / `programs.claude-code.skills` / `programs.pi.skills` / `home.file` (factory)
 
 ## SKILL CONVENTIONS
@@ -107,9 +104,10 @@ Defined in `common/mcp/default.nix`. General: nixos-docs, context7, mcp-k8s. Per
 
 ## ADDING NEW SKILLS
 
-1. Create directory in appropriate location (general/work/personal, common or tool-specific)
+1. In the sibling `agent-skills` repository, create the skill under the appropriate common or harness-specific profile directory
 2. Add `SKILL.md` with YAML frontmatter (`name`, `description`)
 3. If from external source, add `upstream` field (singular canonical URL). If adapting from a prior source alongside a new canonical upstream, add `adaptedFrom` as a YAML list of informational-only lineage URLs.
 4. Genericize vendor-specific content for local/shared skills; preserve intentional upstream/generated packaging when that structure is the source artifact
-5. Apply from the repo root with `nh home switch .`, then run `nix flake check` (auto-discovered, no registration needed)
+5. Run the agent-skills selector, Skills CLI, and flake checks; push the catalog commit
+6. Update the `agent-skills` input here, run `nix flake check`, then apply with `nh home switch .`
 For contributor-oriented build, validation, or generation steps inside a skill directory, document them in that skill's `README.md`, not here.

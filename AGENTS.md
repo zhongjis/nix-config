@@ -44,7 +44,7 @@ Run from the repo root:
 | Add cross-platform HM feature     | `modules/home-manager/features/`                                                 | See `modules/home-manager/AGENTS.md`                                                                    |
 | Add Linux desktop HM feature      | `modules/home-manager-linux/features/` or `modules/home-manager-linux/services/` | See `modules/home-manager-linux/AGENTS.md`                                                              |
 | Add Darwin system feature         | `modules/darwin/features/`                                                       | See `modules/darwin/AGENTS.md`                                                                          |
-| Add AI skill                      | `modules/home-manager/features/ai-tools/common/skills/general/`                  | See `modules/home-manager/features/ai-tools/AGENTS.md`                                                  |
+| Add AI skill                      | Sibling `agent-skills/skills/` catalog                                            | See `modules/home-manager/features/ai-tools/AGENTS.md`                                                  |
 | Add neovim plugin                 | `modules/home-manager/features/neovim/nvf/plugins/`                              | See `modules/home-manager/features/neovim/AGENTS.md`                                                    |
 | Add custom package                | `packages/`                                                                      | See nix-package-creator skill                                                                           |
 | Add dev template                  | `templates/` + register in `flake-parts/templates.nix`                           |                                                                                                         |
@@ -90,4 +90,3 @@ Run from the repo root:
 | `modules/home-manager/features/neovim/`   | ✅        | NVF framework, plugin patterns                     |
 
 For AI skill rules, follow `modules/home-manager/features/ai-tools/AGENTS.md`.
-
