@@ -1,12 +1,12 @@
-{
-  lib,
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   imports = [
     ./instructions
-    ./skills
     ./mcp
     ./lsp.nix
+  ];
+
+  # Python dependency required by skills with Python helpers.
+  home.packages = with pkgs; [
+    python312
   ];
 }

@@ -2,15 +2,19 @@
   inputs,
   pkgs,
   commonInstructions,
+  aiProfileHelpers,
   ...
 }: let
   inherit (pkgs.stdenv.hostPlatform) system;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
   selfPackages = inputs.self.packages.${system};
+  selectedSkills = inputs.agent-skills.lib.skillsFor {
+    profile = aiProfileHelpers.profile;
+    harness = "opencode";
+  };
 in {
   imports = [
     ../common
-    ./skills
     ./agents
     ./formatters.nix
     ./permission.nix
@@ -34,6 +38,7 @@ in {
     };
     impeccable.enable = true;
     rtk.enable = true;
+    skills = selectedSkills;
 
     settings = {
       share = "disabled";

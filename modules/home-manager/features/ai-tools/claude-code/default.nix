@@ -2,20 +2,16 @@
   inputs,
   pkgs,
   lib,
-  commonSkills,
   commonInstructions,
   aiProfileHelpers,
   ...
 }: let
   inherit (pkgs.stdenv.hostPlatform) system;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
-  externalSkills = inputs.agent-skills.lib.skillsFor {
+  selectedSkills = inputs.agent-skills.lib.skillsFor {
     profile = aiProfileHelpers.profile;
     harness = "claude-code";
   };
-
-  # Tool-specific skills override shared skills on name collisions.
-  allSkills = commonSkills // externalSkills;
 
   # Convert commonInstructions (list of paths) to an attrset for `rules`
   # e.g. /nix/store/...-nix-environment.md → { "nix-environment" = /nix/store/...; }
@@ -30,7 +26,6 @@
     commonInstructions);
 in {
   imports = [
-    ../common/skills
     ../common/mcp
     ../common/agents
   ];
@@ -48,7 +43,7 @@ in {
       enable = true;
       mode = "ultra";
     };
-    skills = allSkills;
+    skills = selectedSkills;
 
     # Use rules instead of settings.instructions so settings.json is not managed by HM
     rules = instructionRules;

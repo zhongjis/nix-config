@@ -39,7 +39,6 @@ ai-tools/
 ├── default.nix              # Imports common + tool modules, defines aiProfile option
 ├── profile-option.nix       # aiProfile enum + helpers
 ├── common/                  # Shared across all tools
-│   ├── skills/              # Selects common profile skills from agent-skills
 │   ├── instructions/        # Markdown instruction files
 │   │   ├── general/         # All systems
 │   │   ├── work/            # Work profile only
@@ -50,7 +49,6 @@ ai-tools/
 ├── codex/                   # Codex CLI config (global config + shared skills)
 ├── opencode/                # OpenCode-specific
 │   ├── plugins/             # oh-my-opencode plugins
-│   ├── skills/              # OpenCode-only skills
 │   ├── agents/              # Agent definitions
 │   ├── instructions/        # OpenCode-only instructions
 │   ├── permission.nix       # Runtime permission wildcards
@@ -75,7 +73,7 @@ inputs.agent-skills.lib.skillsFor {
 
 - **Canonical layout**: `skills/common-{general,work,personal}` and `skills/<harness>-{general,work,personal}`
 - **Merge order**: common skills → harness-specific skills (harness overrides common on name collision)
-- **Exposed via**: `_module.args.commonSkills`, merged into `programs.opencode.skills` / `programs.claude-code.skills` / `programs.pi.skills` / `home.file` (factory)
+- **Consumed via**: each tool module calls `lib.skillsFor` with its harness; Factory merges that result with Impeccable before creating `home.file` links
 
 ## SKILL CONVENTIONS
 

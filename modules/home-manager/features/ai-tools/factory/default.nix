@@ -1,7 +1,7 @@
 # Factory.ai Module
 #
 # This module configures Factory.ai by:
-# 1. Merging common skills (from ../common/skills) with Factory-specific skills (from ./skills)
+# 1. Merging catalog-selected skills with Impeccable skills
 # 2. Creating symlinks to skill directories in ~/.factory/skills/
 # 3. Assembling ~/.factory/AGENTS.md from common instructions
 #
@@ -10,19 +10,20 @@
 #
 # NOTE: Profile changes require `nh darwin switch .` to take effect.
 {
+  inputs,
   lib,
   aiProfileHelpers,
-  commonSkills,
-  factoryLocalSkills,
+  impeccableFactorySkills,
   commonInstructions,
   ...
 }: let
-  # Merge pre-filtered common skills and Factory-specific skills
-  # Both are already profile-filtered via _module.args
-  allSkills = commonSkills // factoryLocalSkills;
+  catalogSkills = inputs.agent-skills.lib.skillsFor {
+    profile = aiProfileHelpers.profile;
+    harness = "factory";
+  };
+  allSkills = catalogSkills // impeccableFactorySkills;
 in {
   imports = [
-    ../common/skills
     ../common/instructions
     ./skills
   ];

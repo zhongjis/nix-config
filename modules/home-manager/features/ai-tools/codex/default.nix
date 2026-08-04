@@ -3,8 +3,8 @@
   config,
   lib,
   pkgs,
-  commonSkills,
   commonInstructions,
+  aiProfileHelpers,
   ...
 }: let
   inherit (pkgs.stdenv.hostPlatform) system;
@@ -27,6 +27,10 @@
     (map builtins.readFile commonInstructions)
     ++ [(builtins.readFile codexRtkInstructions)]
   );
+  selectedSkills = inputs.agent-skills.lib.skillsFor {
+    profile = aiProfileHelpers.profile;
+    harness = "codex";
+  };
 
   dropNulls = value:
     if builtins.isAttrs value
@@ -104,6 +108,6 @@ in {
     # Codex mutates ~/.codex/config.toml for project trust and local state.
     # Keep Home Manager from owning the live file; seed defaults via programs.codex.seedSettings.
     settings = {};
-    skills = commonSkills;
+    skills = selectedSkills;
   };
 }

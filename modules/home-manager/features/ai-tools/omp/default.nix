@@ -2,15 +2,16 @@
   inputs,
   pkgs,
   lib,
-  commonSkills,
-  ompLocalSkills,
   commonInstructions,
   aiProfileHelpers,
   ...
 }: let
   inherit (pkgs.stdenv.hostPlatform) system;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
-  allSkills = commonSkills // ompLocalSkills;
+  selectedSkills = inputs.agent-skills.lib.skillsFor {
+    profile = aiProfileHelpers.profile;
+    harness = "omp";
+  };
 
   sharedConfig = {
     providers.webSearch = "auto";
@@ -51,10 +52,8 @@
   );
 in {
   imports = [
-    ../common/skills
     ../common/instructions
     ../../../../../custom-home-manager-options/oh-my-pi
-    ./skills
     ./lsp.nix
   ];
 
@@ -64,7 +63,7 @@ in {
 
     impeccable.enable = true;
     settings = ompConfig;
-    skills = allSkills;
+    skills = selectedSkills;
     instructions = commonInstructions;
 
     rtk.enable = true;

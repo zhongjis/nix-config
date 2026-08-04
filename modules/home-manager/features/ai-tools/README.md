@@ -22,11 +22,10 @@ Use the narrowest layer that fits: common when a skill should work everywhere, p
 ai-tools/
 ├── default.nix              # Imports common + tool modules; defines aiProfile
 ├── common/
-│   ├── skills/              # Selects common profile skills from agent-skills
 │   ├── instructions/        # Shared instruction markdown, profile-filtered
 │   ├── agents/              # Shared agent config
 │   └── mcp/                 # Shared MCP server config
-├── opencode/                # OpenCode config, plugins, agents, skills
+├── opencode/                # OpenCode config, plugins, and agents
 ├── claude-code/             # Claude Code config, rules, skills
 ├── factory/                 # Factory skill and instruction symlinks
 ├── omp/                     # OMP-specific config and skill exports
@@ -52,7 +51,7 @@ Selection rules:
 
 - Directory names become skill names.
 - The `agent-skills` flake input filters common skills by AI profile.
-- Harness selectors add Claude Code- or Pi-specific skills.
+- Every tool requests its harness selector, which adds any tool-specific skills.
 - Harness-specific skills override common skills with the same name.
 
 Prefer common skills. Use tool-specific skills only for tool-dependent behavior or intentional overrides.
@@ -128,13 +127,11 @@ Private or work-internal skills belong only in the private repo. Use public `wor
 
 ## Tool-specific wiring
 
-Common skills feed the tool modules through `_module.args.commonSkills`. Claude Code and Pi request harness-specific selections directly from the same flake input.
+Every tool module requests its profile and harness selection directly from the `agent-skills` flake input.
 
 Current consumers:
 
-- OpenCode, Factory, OMP, and Codex consume the common profile selection.
-- Claude Code consumes the `claude-code` harness selection.
-- Pi consumes the `pi` harness selection.
+- Codex, OpenCode, Claude Code, Factory, OMP, and Pi consume their matching harness selection.
 - Factory also merges its external Impeccable skills.
 
 When a harness needs different behavior, add an override with the same skill name to its `agent-skills` harness group. Otherwise, keep the skill in a common group.
