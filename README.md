@@ -2,6 +2,17 @@
 
 This is my personal nix-config. It is always a work in progress as I love tweaking.
 
+## Maintained Dependencies
+
+This flake depends on two repositories that I also maintain:
+
+| Repository | Access | Purpose |
+| ---------- | ------ | ------- |
+| [`zhongjis/nix-config-private`](https://github.com/zhongjis/nix-config-private) | Private | Provides private and work-specific modules through the `nix-config-private` flake input. Evaluation requires GitHub SSH access. |
+| [`zhongjis/agent-skills`](https://github.com/zhongjis/agent-skills) | Public | Provides the canonical AI skill catalog and profile/harness selector through the `agent-skills` flake input. |
+
+`flake.lock` pins both dependencies for reproducible evaluations.
+
 ## Special Thanks
 
 - https://github.com/vimjoyer/
