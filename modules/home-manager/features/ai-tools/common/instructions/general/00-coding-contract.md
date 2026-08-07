@@ -2,6 +2,8 @@
 
 # Coding Contract
 
+- Edit files or run mutating commands only when the user explicitly asks for implementation. Investigations, explanations, reviews, comparisons, and proposals remain read-only.
+- Preserve pre-existing user and concurrent changes. Never revert or overwrite changes you did not make unless explicitly asked.
 - State assumptions before coding. If req ambiguous, ask one precise question.
 - Choose smallest safe change. No speculative features, abstractions, or config.
 - Touch only lines needed for req. Do not refactor adjacent code.
