@@ -40,11 +40,11 @@
     },
     "agent-skills": {
       "locked": {
-        "lastModified": 1786093685,
-        "narHash": "sha256-fIRYJBlvDEFWykpQIukj1pt8/AWCz2Y4mldxcJUTRn8=",
+        "lastModified": 1786269968,
+        "narHash": "sha256-HwzrU1nb+FFxBwyjm9TY1S2bAjXz00qST6neSc1URXY=",
         "owner": "zhongjis",
         "repo": "agent-skills",
-        "rev": "e9da90839471ffdc8ba4dc8983166066be8a7ea1",
+        "rev": "4e1fce177b9658458452aeb13f7723918f6474a6",
         "type": "github"
       },
       "original": {
