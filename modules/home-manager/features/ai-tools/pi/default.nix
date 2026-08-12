@@ -186,7 +186,7 @@
     packages =
       sharedSettings.packages
       ++ [
-        "git:github.com/aliou/pi-guardrails@v0.15.0"
+        # "git:github.com/aliou/pi-guardrails@v0.15.0"
       ];
   };
 
