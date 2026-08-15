@@ -133,8 +133,8 @@
     quietStartup = true;
     doubleEscapeAction = "tree";
     defaultProjectTrust = "always";
-    tuiMode = "fullscreen";
-    fullscreenExitOutput = "resume-hint";
+    # tuiMode = "fullscreen";
+    # fullscreenExitOutput = "resume-hint";
 
     # Warnings
     warnings.anthropicExtraUsage = false;
