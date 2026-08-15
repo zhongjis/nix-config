@@ -129,10 +129,12 @@
     collapseChangelog = true;
     enableInstallTelemetry = false;
     treeFilterMode = "no-tools";
-    editorPaddingX = 1;
+    editorPaddingX = 0;
     quietStartup = true;
     doubleEscapeAction = "tree";
     defaultProjectTrust = "always";
+    tuiMode = "fullscreen";
+    fullscreenExitOutput = "resume-hint";
 
     # Warnings
     warnings.anthropicExtraUsage = false;
@@ -143,6 +145,9 @@
       reserveTokens = 16384;
       keepRecentTokens = 20000;
     };
+
+    # Branch Summary
+    branchSummary.skipPrompt = true;
 
     # Retry
     retry = {
@@ -161,15 +166,15 @@
 
     # Resources
     packages = [
-      "git:github.com/mavam/pi-mcporter@v1.0.1"
-      "git:github.com/RimuruW/pi-hashline-edit@v0.8.3"
-      "git:github.com/davebcn87/pi-autoresearch@v1.6.0"
-      "git:github.com/nicobailon/pi-web-access@v0.13.0"
-      "git:github.com/nicobailon/pi-interactive-shell@v0.13.0"
-      "git:github.com/aliou/pi-processes@v0.9.4"
+      "git:github.com/mavam/pi-mcporter@v1.0.2"
+      "npm:pi-hashline-edit@0.8.3"
+      "git:github.com/davebcn87/pi-autoresearch@v1.6.2"
+      "git:github.com/nicobailon/pi-web-access@v0.23.0"
+      "git:github.com/nicobailon/pi-interactive-shell@v0.15.0"
+      "git:github.com/aliou/pi-processes@v0.10.9"
       "git:github.com/dbachelder/pi-btw@v0.4.1"
       {
-        source = "git:github.com/backnotprop/plannotator@v0.21.2";
+        source = "git:github.com/backnotprop/plannotator@v0.27.3";
         extensions = ["apps/pi-extension"];
         skills = ["apps/pi-extension/skills"];
       }
@@ -191,8 +196,8 @@
   };
 
   personalOverrides = {
-    defaultProvider = "llama-swap";
-    defaultModel = "qwen2.5-coder:14b";
+    # defaultProvider = "llama-swap";
+    # defaultModel = "qwen2.5-coder:14b";
     # Only read by openai-codex provider; ignored by others (no fallback).
     # Options: "sse" (default), "websocket", "websocket-cached", "auto".
     # "websocket-cached" = WS + cached prompt context, no SSE fallback on failure.
