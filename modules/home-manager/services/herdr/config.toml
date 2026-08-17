@@ -40,6 +40,9 @@ delivery = "system"
 [ui.toast.herdr]
 position = "bottom-right"
 
+[experimental]
+kitty_graphics = true
+
 [advanced]
 # Roughly mirrors tmux historyLimit = 100000 (herdr counts bytes; 10MB ~= default).
 scrollback_limit_bytes = 10000000
