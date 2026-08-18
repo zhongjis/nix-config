@@ -173,6 +173,7 @@
       "git:github.com/nicobailon/pi-interactive-shell@v0.15.0"
       "git:github.com/aliou/pi-processes@v0.10.9"
       "git:github.com/dbachelder/pi-btw@v0.4.1"
+      "git:github.com/chandra447/pi-hermes-memory@v0.9.6"
       {
         source = "git:github.com/backnotprop/plannotator@v0.27.3";
         extensions = ["apps/pi-extension"];
