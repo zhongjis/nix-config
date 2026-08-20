@@ -39,6 +39,13 @@
     then map dropNulls (lib.filter (item: item != null) value)
     else value;
 
+  envHeaderVariable = value: let
+    match = builtins.match "[{]env:([A-Za-z_][A-Za-z0-9_]*)[}]" value;
+  in
+    if match != null
+    then builtins.elemAt match 0
+    else null;
+
   normalizeMcpServer = server: let
     isUrlServer = (server.url or null) != null;
     enabled =
@@ -46,6 +53,11 @@
       then server.enabled
       else !(server.disabled or false);
     headers = server.http_headers or server.headers or {};
+    staticHeaders = lib.filterAttrs (_: value: envHeaderVariable value == null) headers;
+    envHeaders =
+      lib.mapAttrs (_: value: envHeaderVariable value)
+      (lib.filterAttrs (_: value: envHeaderVariable value != null) headers)
+      // (server.env_http_headers or {});
     baseServer = {
       inherit enabled;
     };
@@ -57,8 +69,11 @@
         // {
           url = server.url;
         }
-        // lib.optionalAttrs (headers != {}) {
-          http_headers = headers;
+        // lib.optionalAttrs (staticHeaders != {}) {
+          http_headers = staticHeaders;
+        }
+        // lib.optionalAttrs (envHeaders != {}) {
+          env_http_headers = envHeaders;
         }
       else
         baseServer

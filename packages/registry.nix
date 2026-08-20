@@ -36,6 +36,7 @@
   };
   next-devtools-mcp = {
     path = ./next-devtools-mcp.nix;
+    updatable = true;
   };
   before-and-after = {
     path = ./before-and-after.nix;

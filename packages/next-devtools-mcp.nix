@@ -47,6 +47,8 @@ in
       runHook postInstall
     '';
 
+    passthru.updateScript = pkgs.nix-update-script {extraArgs = ["--flake"];};
+
     meta = {
       description = "Next.js development tools MCP server with stdio transport";
       homepage = "https://github.com/vercel/next-devtools-mcp";
