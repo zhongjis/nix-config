@@ -78,7 +78,7 @@ This flake provides reusable development environment templates. Use them to quic
 | Template  | Description                       | Includes                |
 | --------- | --------------------------------- | ----------------------- |
 | `java8`   | Java 8 development environment    | JDK 8, Maven, Lombok    |
-| `nodejs22`| Node.js 22 development environment| Node.js 22, pnpm        |
+| `nodejs26`| Node.js 26 development environment| Node.js 26, pnpm, agent-browser |
 
 ### Using Templates
 
@@ -86,7 +86,7 @@ This flake provides reusable development environment templates. Use them to quic
 
 ```bash
 # Create a new directory with the template
-nix flake new -t github:zhongjis/nix-config#nodejs22 ./my-project
+nix flake new -t github:zhongjis/nix-config#nodejs26 ./my-project
 
 # Or initialize in current directory
 nix flake new -t github:zhongjis/nix-config#java8 .

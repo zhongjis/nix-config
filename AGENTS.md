@@ -31,7 +31,7 @@ Run from the repo root:
 - `nix flake check`
 - `nix build .#neovim`
 - `nix build .#helium`
-- `nix develop .#nodejs22`
+- `nix develop .#nodejs26`
 - `nix develop .#java8`
 - `nh search <query>`
 
