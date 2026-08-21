@@ -25,6 +25,10 @@
         CONTEXT7_API_KEY = "{env:CONTEXT7_API_KEY}";
       };
     };
+    shadcn = {
+      command = "${pkgs.nodejs_24}/bin/npx";
+      args = ["--yes" "shadcn@latest" "mcp"];
+    };
     open-design = {
       command = "${openDesignDaemon}/bin/od";
       args = [

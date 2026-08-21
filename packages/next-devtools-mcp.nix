@@ -22,7 +22,7 @@ in
     };
 
     nativeBuildInputs = [
-      pkgs.nodejs_22
+      pkgs.nodejs_24
       pkgs.makeWrapper
       pkgs.pnpm
       pkgs.pnpmConfigHook
@@ -41,7 +41,7 @@ in
 
       mkdir -p $out/lib/node_modules/${pname} $out/bin
       cp -r dist node_modules package.json $out/lib/node_modules/${pname}/
-      makeWrapper ${pkgs.nodejs_22}/bin/node $out/bin/next-devtools-mcp \
+      makeWrapper ${pkgs.nodejs_24}/bin/node $out/bin/next-devtools-mcp \
         --add-flags $out/lib/node_modules/${pname}/dist/index.js
 
       runHook postInstall
