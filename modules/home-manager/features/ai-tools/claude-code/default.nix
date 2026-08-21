@@ -38,7 +38,6 @@ in {
     enable = true;
     enableMcpIntegration = false;
     package = llmAgentsPackages.claude-code;
-    impeccable.enable = false;
     caveman = {
       enable = true;
       mode = "ultra";

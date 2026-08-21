@@ -73,7 +73,7 @@ inputs.agent-skills.lib.skillsFor {
 
 - **Canonical layout**: `skills/common-{general,work,personal}` and `skills/<harness>-{general,work,personal}`
 - **Merge order**: common skills → harness-specific skills (harness overrides common on name collision)
-- **Consumed via**: each tool module calls `lib.skillsFor` with its harness; Factory merges that result with Impeccable before creating `home.file` links
+- **Consumed via**: each tool module calls `lib.skillsFor` with its harness; Factory creates `home.file` links from that selection
 
 ## SKILL CONVENTIONS
 

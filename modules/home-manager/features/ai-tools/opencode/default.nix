@@ -36,7 +36,6 @@ in {
       enable = true;
       mode = "ultra";
     };
-    impeccable.enable = true;
     rtk.enable = true;
     skills = selectedSkills;
 

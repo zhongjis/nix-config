@@ -43,11 +43,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1787156361,
-        "narHash": "sha256-0IRAtlo/cXJWbEroRy0TzyrhLLRYOtOEqKA4aMkvcRk=",
+        "lastModified": 1787298780,
+        "narHash": "sha256-8u9/fydKHkOhuJSQvQVil/s9uRavoPwK7F6BfT6TUYg=",
         "owner": "zhongjis",
         "repo": "agent-skills",
-        "rev": "b525067e88b12b597b2aeea713a10d080b96d49e",
+        "rev": "87286841f6bc17baf8ec09be544cf47d8762f90f",
         "type": "github"
       },
       "original": {
@@ -1324,22 +1324,6 @@
         "type": "github"
       }
     },
-    "impeccable": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1786749340,
-        "narHash": "sha256-/SCtUmQI3laFrDa9IWia72lwpHJq4Asc2dXEZcJX3W8=",
-        "owner": "pbakaus",
-        "repo": "impeccable",
-        "rev": "7b646bafd60b9dd9828ce5c4c1a25691702c9e92",
-        "type": "github"
-      },
-      "original": {
-        "owner": "pbakaus",
-        "repo": "impeccable",
-        "type": "github"
-      }
-    },
     "import-tree": {
       "locked": {
         "lastModified": 1778781969,
@@ -2173,7 +2157,6 @@
         "hypr-dynamic-cursors": "hypr-dynamic-cursors",
         "hyprland": "hyprland",
         "hyprland-plugins": "hyprland-plugins",
-        "impeccable": "impeccable",
         "import-tree": "import-tree",
         "llm-agents": "llm-agents",
         "minimal-tmux": "minimal-tmux",

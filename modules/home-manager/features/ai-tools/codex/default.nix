@@ -112,7 +112,6 @@ in {
   programs.codex = {
     enable = true;
     seedSettings = codexSeedSettings;
-    impeccable.enable = true;
     caveman = {
       enable = true;
       mode = "ultra";

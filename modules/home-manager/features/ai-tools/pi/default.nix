@@ -237,7 +237,6 @@ in {
     enable = true;
     package = llmAgentsPackages.pi;
     opencodeApiKeyFile = config.sops.secrets.opencode_zen_api_key.path;
-    impeccable.enable = true;
     rtk.enable = true;
     skills = selectedSkills;
     instructions =

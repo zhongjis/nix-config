@@ -61,7 +61,6 @@ in {
     enable = true;
     package = llmAgentsPackages.omp;
 
-    impeccable.enable = true;
     settings = ompConfig;
     skills = selectedSkills;
     instructions = commonInstructions;

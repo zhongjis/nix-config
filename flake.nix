@@ -85,10 +85,6 @@
       url = "github:nix-community/bun2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    impeccable = {
-      url = "github:pbakaus/impeccable";
-      flake = false;
-    };
     open-design = {
       url = "github:nexu-io/open-design";
       inputs.nixpkgs.follows = "nixpkgs";

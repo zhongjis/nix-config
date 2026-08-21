@@ -131,8 +131,7 @@ Every tool module requests its profile and harness selection directly from the `
 
 Current consumers:
 
-- Codex, OpenCode, Claude Code, Factory, OMP, and Pi consume their matching harness selection.
-- Factory also merges its external Impeccable skills.
+- Codex, OpenCode, Claude Code, Factory, OMP, and Pi consume their matching harness selection, including common Impeccable.
 
 When a harness needs different behavior, add an override with the same skill name to its `agent-skills` harness group. Otherwise, keep the skill in a common group.
 
