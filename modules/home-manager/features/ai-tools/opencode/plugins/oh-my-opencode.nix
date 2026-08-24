@@ -19,7 +19,7 @@
 
     "[opencode]" = {
       # Impeccable enforcement
-      agents.artistry.prompt_append = "Always use impeccable skill for UI work";
+      categories.visual-engineering.prompt_append = "Always load and follow the impeccable skill for UI/UX design and implementation work.";
 
       # Disable all Claude Code compatibility features
       claude_code = {
@@ -31,7 +31,7 @@
         hooks = false;
       };
 
-      disabled_skills = ["playwright" "frontend-ui-ux"];
+      disabled_skills = ["playwright" "frontend"];
       disabled_hooks = ["comment-checker"];
 
       hashline_edit = true;
