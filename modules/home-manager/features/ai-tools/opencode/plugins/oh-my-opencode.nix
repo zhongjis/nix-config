@@ -3,361 +3,83 @@
   lib,
   config,
   hasPlugin,
-  aiProfileHelpers,
   ...
 }: let
   jsonFormat = pkgs.formats.json {};
   cfg = config.programs.opencode.ohMyOpenCode;
 
-  # Base oh-my-opencode configuration shared between profiles
   sharedConfig = {
-    "$schema" = "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json";
+    "$schema" = "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/omo.schema.json";
+    _migrations = [
+      "2026-07-opencode-config-unification"
+      "2026-07-codex-config-jsonc"
+      "2026-08-reasoning-unification"
+    ];
+    profiles = {};
 
-    # Impeccable enforcement
-    agents.artistry.prompt_append = "Always use impeccable skill for UI work";
+    "[opencode]" = {
+      # Impeccable enforcement
+      agents.artistry.prompt_append = "Always use impeccable skill for UI work";
 
-    # Disable all Claude Code compatibility features
-    claude_code = {
-      mcp = false;
-      skills = false;
-      agents = false;
-      commands = false;
-      plugins = false;
-      hooks = false;
-    };
+      # Disable all Claude Code compatibility features
+      claude_code = {
+        mcp = false;
+        skills = false;
+        agents = false;
+        commands = false;
+        plugins = false;
+        hooks = false;
+      };
 
-    # skills and hooks
-    disabled_skills = ["playwright" "frontend-ui-ux"];
-    disabled_hooks = ["comment-checker"];
+      disabled_skills = ["playwright" "frontend-ui-ux"];
+      disabled_hooks = ["comment-checker"];
 
-    # hashline edit
-    hashline_edit = true;
+      hashline_edit = true;
 
-    # team mode
-    team_mode = {
-      enabled = true;
-      max_parallel_members = 4;
-      max_members = 8;
-      tmux_visualization = false;
-    };
+      team_mode = {
+        enabled = true;
+        tmux_visualization = false;
+        max_parallel_members = 4;
+        max_members = 8;
+        max_messages_per_run = 10000;
+        max_wall_clock_minutes = 120;
+        max_member_turns = 500;
+        message_payload_max_bytes = 32768;
+        recipient_unread_max_bytes = 262144;
+        mailbox_poll_interval_ms = 3000;
+      };
 
-    # runtime fallback
-    runtime_fallback = true;
+      runtime_fallback = true;
 
-    # git master
-    git_master = {
-      commit_footer = false;
-      include_co_authored_by = false;
-    };
+      git_master = {
+        commit_footer = false;
+        include_co_authored_by = false;
+        git_env_prefix = "GIT_MASTER=1";
+      };
 
-    # others
-    browser_automation_engine.provider = "agent-browser";
-  };
-
-  # Profile-specific overrides
-  # Providers: OpenAI/ChatGPT Plus, GitHub Copilot, OpenCode Go.
-  # No direct Claude subscription: keep Claude-family agents on Copilot Claude where possible,
-  # then fall back to OpenCode Go Claude-like models before GPT.
-  personalOverrides = {
-    runtime_fallback.enabled = true;
-    agents = {
-      sisyphus = {
-        model = "openai/gpt-5.5";
-        variant = "medium";
-      };
-      hephaestus = {
-        model = "openai/gpt-5.5";
-        variant = "medium";
-      };
-      oracle = {
-        model = "openai/gpt-5.5";
-        variant = "high";
-      };
-      librarian.model = "openai/gpt-5.4-mini-fast";
-      explore.model = "openai/gpt-5.4-mini-fast";
-      multimodal-looker = {
-        model = "openai/gpt-5.5";
-        variant = "medium";
-      };
-      prometheus = {
-        model = "openai/gpt-5.5";
-        variant = "high";
-      };
-      metis = {
-        model = "openai/gpt-5.5";
-        variant = "high";
-      };
-      momus = {
-        model = "openai/gpt-5.5";
-        variant = "xhigh";
-      };
-      atlas = {
-        model = "openai/gpt-5.5";
-        variant = "medium";
-      };
-    };
-    categories = {
-      visual-engineering = {
-        # model = "github-copilot/gemini-3.1-pro-preview";
-        # variant = "high";
-        model = "openai/gpt-5.5";
-        variant = "high";
-        fallback_models = [
-          {
-            model = "openai/gpt-5.5";
-            variant = "high";
-          }
-          {model = "opencode-go/glm-5.1";}
-        ];
-      };
-      ultrabrain = {
-        model = "openai/gpt-5.5";
-        variant = "xhigh";
-        fallback_models = [
-          {model = "opencode-go/glm-5.1";}
-        ];
-      };
-      deep = {
-        model = "openai/gpt-5.5";
-        variant = "medium";
-      };
-      artistry = {
-        model = "github-copilot/gemini-3.1-pro-preview";
-        variant = "high";
-        fallback_models = [
-          {model = "opencode-go/glm-5.1";}
-          {
-            model = "openai/gpt-5.5";
-            variant = "high";
-          }
-        ];
-      };
-      quick = {
-        model = "openai/gpt-5.4-mini";
-      };
-      unspecified-high = {
-        model = "openai/gpt-5.5";
-        variant = "xhigh";
-      };
-      unspecified-low = {
-        model = "opencode-go/kimi-k2.6";
-        fallback_models = [
-          {
-            model = "openai/gpt-5.5";
-            variant = "medium";
-          }
-        ];
-      };
-      writing = {
-        model = "github-copilot/gemini-3-flash-preview";
-        fallback_models = [
-          {model = "openai/gpt-5.4-mini";}
-        ];
-      };
+      browser_automation_engine.provider = "agent-browser";
     };
   };
-
-  workOverrides = {
-    # --- mixed GitHub Copilot + Bedrock (Anthropic) + openai configuration ---
-    runtime_fallback.enabled = true;
-    agents = {
-      sisyphus = {
-        model = "anthropic/claude-opus-4-8";
-        variant = "max";
-        fallback_models = [
-          {
-            model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
-            variant = "max";
-          }
-        ];
-      };
-      metis = {
-        model = "github-copilot/claude-opus-4.8";
-        variant = "max";
-        fallback_models = [
-          {
-            model = "anthropic/claude-opus-4-8";
-            variant = "max";
-          }
-          {
-            model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
-            variant = "max";
-          }
-        ];
-      };
-
-      prometheus = {
-        model = "anthropic/claude-opus-4-8";
-        variant = "max";
-        fallback_models = [
-          {
-            model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
-            variant = "max";
-          }
-        ];
-      };
-      atlas = {
-        model = "anthropic/claude-sonnet-4-6";
-        variant = "medium";
-        fallback_models = [
-          {
-            model = "amazon-bedrock/us.anthropic.claude-sonnet-4-6";
-            variant = "medium";
-          }
-        ];
-      };
-
-      hephaestus.disabled = true;
-
-      oracle = {
-        model = "github-copilot/gemini-3.1-pro-preview";
-        variant = "high";
-        fallback_models = [
-          {
-            model = "anthropic/claude-opus-4-8";
-            variant = "max";
-          }
-          {
-            model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
-            variant = "max";
-          }
-        ];
-      };
-      momus = {
-        model = "anthropic/claude-opus-4-8";
-        variant = "max";
-        fallback_models = [
-          {
-            model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
-            variant = "max";
-          }
-        ];
-      };
-
-      multimodal-looker = {
-        model = "github-copilot/gpt-5.5";
-        variant = "medium";
-      };
-      librarian = {
-        model = "github-copilot/gpt-5.4-mini-fast";
-        fallback_models = [
-          {model = "anthropic/claude-haiku-4-5";}
-          {model = "amazon-bedrock/us.anthropic.claude-haiku-4-5";}
-        ];
-      };
-      explore = {
-        model = "anthropic/claude-haiku-4-5";
-        fallback_models = [
-          {model = "amazon-bedrock/us.anthropic.claude-haiku-4-5";}
-        ];
-      };
-    };
-    categories = {
-      visual-engineering = {
-        model = "github-copilot/gemini-3.1-pro-preview";
-        variant = "high";
-        fallback_models = [
-          {
-            model = "anthropic/claude-opus-4-8";
-            variant = "max";
-          }
-          {
-            model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
-            variant = "max";
-          }
-        ];
-      };
-      ultrabrain = {
-        model = "github-copilot/gemini-3.1-pro-preview";
-        variant = "high";
-        fallback_models = [
-          {
-            model = "anthropic/claude-opus-4-8";
-            variant = "max";
-          }
-          {
-            model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
-            variant = "max";
-          }
-        ];
-      };
-      deep = {
-        model = "anthropic/claude-opus-4-8";
-        variant = "max";
-        fallback_models = [
-          {
-            model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
-            variant = "max";
-          }
-        ];
-      };
-      artistry = {
-        model = "github-copilot/gemini-3.1-pro-preview";
-        variant = "high";
-        fallback_models = [
-          {
-            model = "anthropic/claude-opus-4-8";
-            variant = "max";
-          }
-          {
-            model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
-            variant = "max";
-          }
-        ];
-      };
-      quick = {
-        model = "anthropic/claude-haiku-4-5";
-        fallback_models = [
-          {model = "amazon-bedrock/us.anthropic.claude-haiku-4-5";}
-        ];
-      };
-      unspecified-high = {
-        model = "anthropic/claude-opus-4-8";
-        variant = "max";
-        fallback_models = [
-          {
-            model = "amazon-bedrock/us.anthropic.claude-opus-4-8";
-            variant = "max";
-          }
-        ];
-      };
-      unspecified-low = {
-        model = "anthropic/claude-sonnet-4-6";
-        fallback_models = [{model = "amazon-bedrock/us.anthropic.claude-sonnet-4-6";}];
-      };
-      writing = {
-        model = "github-copilot/gemini-3-flash-preview";
-        fallback_models = [{model = "amazon-bedrock/us.anthropic.claude-sonnet-4-6";}];
-      };
-    };
-  };
-
-  profileOverrides =
-    if aiProfileHelpers.isWork
-    then workOverrides
-    else personalOverrides;
-
-  baseConfig = lib.recursiveUpdate sharedConfig profileOverrides;
 in {
   options.programs.opencode.ohMyOpenCode = {
     settings = lib.mkOption {
       type = jsonFormat.type;
       default = {};
       description = ''
-        Oh My OpenCode configuration attrset.
-        This will be serialized to JSON and placed at
-        ~/.config/opencode/oh-my-openagent.jsonc.
+        Oh My OpenAgent unified configuration attrset.
+        This will be serialized to JSON and placed at ~/.omo/omo.jsonc.
         Other plugin modules can merge additional settings into this option.
       '';
     };
   };
 
   config = lib.mkIf (hasPlugin "oh-my-opencode") {
-    # Set the base configuration
-    programs.opencode.ohMyOpenCode.settings = baseConfig;
+    programs.opencode.ohMyOpenCode.settings = sharedConfig;
 
-    # Generate oh-my-openagent.jsonc from the final merged attrset
-    xdg.configFile."opencode/oh-my-openagent.jsonc".text =
-      builtins.toJSON cfg.settings;
+    # Force replacement of OMO's mutable migration output with a Nix store symlink.
+    home.file.".omo/omo.jsonc" = {
+      text = builtins.toJSON cfg.settings;
+      force = true;
+    };
   };
 }
