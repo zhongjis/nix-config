@@ -169,7 +169,7 @@
       "git:github.com/mavam/pi-mcporter@v1.0.2"
       "git:github.com/jesseylin/pi-hashline-edit@v0.8.3"
       # "git:github.com/davebcn87/pi-autoresearch@v1.6.2"
-      "git:github.com/nicobailon/pi-web-access@v0.23.0"
+      "git:github.com/nicobailon/pi-web-access@v0.24.2"
       "git:github.com/nicobailon/pi-interactive-shell@v0.15.0"
       "git:github.com/aliou/pi-processes@v0.10.9"
       "git:github.com/dbachelder/pi-btw@v0.4.1"
