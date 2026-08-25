@@ -123,7 +123,12 @@ in
 
       for executable in "$appRoot/lark" "$appRoot/vulcan/vulcan" "$appRoot/video_conference_sdk"; do
         if [ -x "$executable" ]; then
+          wrapperArgs=()
+          if [ "$executable" = "$appRoot/lark" ]; then
+            wrapperArgs+=(--add-flags "--ozone-platform=wayland")
+          fi
           wrapProgram "$executable" \
+            "''${wrapperArgs[@]}" \
             --set LARK_UPDATE_DISALLOW_AUTO_UPDATE 1 \
             --prefix PATH : ${lib.makeBinPath [pkgs.xdg-utils]} \
             --prefix XDG_DATA_DIRS : "$XDG_ICON_DIRS:$GSETTINGS_SCHEMAS_PATH" \
