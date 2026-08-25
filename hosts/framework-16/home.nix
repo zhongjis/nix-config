@@ -68,5 +68,7 @@ in {
   home.stateVersion = "23.11";
   home.packages = with pkgs; [
     inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.fincept-terminal
+    inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.lark
+    inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.lark-cli
   ];
 }

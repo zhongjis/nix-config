@@ -57,4 +57,16 @@
     linuxOnly = true;
     updatable = true;
   };
+  lark = {
+    path = ./lark.nix;
+    linuxOnly = true;
+    updatable = true;
+    selfUpdateScript = true;
+  };
+  lark-cli = {
+    path = ./lark-cli.nix;
+    linuxOnly = true;
+    updatable = true;
+    selfUpdateScript = true;
+  };
 }
