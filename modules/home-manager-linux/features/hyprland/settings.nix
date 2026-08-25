@@ -29,7 +29,7 @@
       # Larger grab area for easier window edge resizing (fixes border overlap feeling)
       extend_border_grab_area = 15;
 
-      layout = "dwindle";
+      layout = "hy3";
     };
 
     # https://wiki.hyprland.org/Configuring/Variables/#decoration

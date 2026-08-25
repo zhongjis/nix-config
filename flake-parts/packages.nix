@@ -6,6 +6,11 @@
     system,
     ...
   }: {
+    _module.args.pkgs = import inputs.nixpkgs {
+      inherit system;
+      config.allowUnfree = true;
+    };
+
     packages = let
       registry = import ../packages/registry.nix;
       argSources = {

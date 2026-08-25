@@ -92,17 +92,17 @@
     };
 
     ## hyprland
-    hyprland.url = "github:hyprwm/Hyprland/v0.55.4";
+    hyprland.url = "github:hyprwm/Hyprland/v0.56.0";
     hyprland-plugins = {
-      url = "github:hyprwm/hyprland-plugins";
+      url = "github:hyprwm/hyprland-plugins/7644cecdb947060682891a0db2a0cdc5c0b9e704";
       inputs.hyprland.follows = "hyprland";
     };
     hy3 = {
-      url = "github:outfoxxed/hy3";
+      url = "github:outfoxxed/hy3/hl0.56.0.1";
       inputs.hyprland.follows = "hyprland";
     };
     hypr-dynamic-cursors = {
-      url = "github:VirtCode/hypr-dynamic-cursors";
+      url = "github:VirtCode/hypr-dynamic-cursors/f5ba36c7622098b53bf62ddb8ddf03b914abbdf8";
       inputs.hyprland.follows = "hyprland";
     };
 

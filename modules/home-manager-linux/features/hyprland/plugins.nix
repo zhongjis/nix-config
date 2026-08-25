@@ -1,31 +1,26 @@
 {
-  config,
-  lib,
   pkgs,
   inputs,
   ...
-}: let
-in {
-  # hyprland
+}: {
   wayland.windowManager.hyprland = {
-    # plugins = with pkgs; [
-    plugins = with inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system};
-      [
-        # csgo-vulkan-fix
-      ]
+    plugins =
+      (with inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}; [
+        borders-plus-plus
+        csgo-vulkan-fix
+        hyprbars
+        hyprfocus
+      ])
       ++ [
-        # inputs.hy3.packages.${pkgs.stdenv.hostPlatform.system}.hy3
-        # inputs.hypr-dynamic-cursors.packages.${pkgs.stdenv.hostPlatform.system}.hypr-dynamic-cursors
+        inputs.hy3.packages.${pkgs.stdenv.hostPlatform.system}.hy3
+        inputs.hypr-dynamic-cursors.packages.${pkgs.stdenv.hostPlatform.system}.hypr-dynamic-cursors
       ];
-    settings = {
-      # NOTE: dynamic-cursors plugin not loaded - config commented out
-      # "plugin:dynamic-cursors" = {
-      #   mode = "none";
-      #   shake = {
-      #     threadhold = 10.0;
-      #     limit = 4.0;
-      #   };
-      # };
+    settings.plugin.dynamic_cursors = {
+      mode = "none";
+      shake = {
+        threshold = 10.0;
+        limit = 4.0;
+      };
     };
   };
 }

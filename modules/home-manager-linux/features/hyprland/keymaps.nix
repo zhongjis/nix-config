@@ -1,7 +1,6 @@
 {
   pkgs,
   lib,
-  inputs,
   ...
 }: let
   close-application-sh =
@@ -52,10 +51,10 @@ in {
       "$cmdMod SHIFT, 4, exec, ${screenshot-sh}"
 
       # Move focus with wmMod + arrow keys
-      "$wmMod, L, movefocus, r"
-      "$wmMod, H, movefocus, l"
-      "$wmMod, K, movefocus, u"
-      "$wmMod, J, movefocus, d"
+      "$wmMod, L, hy3:movefocus, r"
+      "$wmMod, H, hy3:movefocus, l"
+      "$wmMod, K, hy3:movefocus, u"
+      "$wmMod, J, hy3:movefocus, d"
 
       # Switch workspaces with wmMod + [0-9]
       "$wmMod, 1, workspace, 1"

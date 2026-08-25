@@ -4,7 +4,8 @@
   lib,
   ...
 }: let
-  hyprland-pkgs-unstable = inputs.hyprland.inputs.nixpkgs.legacyPackages.${pkgs.stdenv.hostPlatform.system};
+  system = pkgs.stdenv.hostPlatform.system;
+  hyprland-pkgs-unstable = inputs.hyprland.inputs.nixpkgs.legacyPackages.${system};
 in {
   services.xserver.enable = true;
   services.displayManager.defaultSession = "hyprland";
@@ -14,8 +15,8 @@ in {
     enable = true;
 
     # hyprland git
-    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-    portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+    package = inputs.hyprland.packages.${system}.hyprland;
+    portalPackage = inputs.hyprland.packages.${system}.xdg-desktop-portal-hyprland;
 
     xwayland.enable = true;
     withUWSM = false;
