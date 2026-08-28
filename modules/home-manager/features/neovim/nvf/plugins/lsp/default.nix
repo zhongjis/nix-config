@@ -41,7 +41,7 @@
     # Lua
     lua = {
       enable = true;
-      lsp.lazydev.enable = true;
+      extensions.lazydev.enable = true;
     };
 
     # Java - for Spring Framework development
