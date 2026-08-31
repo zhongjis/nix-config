@@ -50,8 +50,10 @@ in {
       llmAgentsPackages.codegraph
       llmAgentsPackages.agentsview
       llmAgentsPackages.skills
-      llmAgentsPackages.chatgpt
       inputs.self.packages.${system}.before-and-after
+    ]
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+      llmAgentsPackages.chatgpt
     ];
   };
 }
