@@ -13,6 +13,7 @@ in {
   environment.systemPackages = with pkgs;
     [
       php
+      bazelisk
 
       # **java17**
       # (maven.override {jdk_headless = jdk17;})
