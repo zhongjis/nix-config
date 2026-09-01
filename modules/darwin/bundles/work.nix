@@ -15,6 +15,8 @@ in {
       php
       bazelisk
 
+      bazel_8
+
       # **java17**
       # (maven.override {jdk_headless = jdk17;})
       # jdk17
@@ -28,6 +30,7 @@ in {
       kubectl
       kustomize
       kubectx
+      kubelogin
       yq # format output formatting
 
       # git

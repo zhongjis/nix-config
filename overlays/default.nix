@@ -30,18 +30,22 @@
     #     hash = "sha256-2Wp426uBn1V1AXNERESZW1Ax69zBW3ev672NvAKvNPQ=";
     #   };
     # });
-    # kubelogin = prev.kubelogin.overrideAttrs (oldAttrs: rec {
-    #   version = "0.1.9";
+    kubelogin = prev.kubelogin.overrideAttrs (oldAttrs: rec {
+      version = "0.1.9";
 
-    #   src = prev.fetchFromGitHub {
-    #     owner = "Azure";
-    #     repo = "kubelogin";
-    #     rev = "v${version}";
-    #     sha256 = "sha256-u9Fj2YkHVbFHpxrrxdYrRBvbGsLvxQQlsPHf4++L0g0=";
-    #   };
+      src = prev.fetchFromGitHub {
+        owner = "Azure";
+        repo = "kubelogin";
+        rev = "v${version}";
+        sha256 = "sha256-u9Fj2YkHVbFHpxrrxdYrRBvbGsLvxQQlsPHf4++L0g0=";
+      };
 
-    #   vendorHash = "sha256-HYUI0x4fCA8nhIHPguGCJ+F36fxb7m97bgyigwiXWd8=";
-    # });
+      vendorHash = "sha256-HYUI0x4fCA8nhIHPguGCJ+F36fxb7m97bgyigwiXWd8=";
+
+      # nixpkgs' current kubelogin patch targets the 0.2.x pop-token code and
+      # does not apply to the 0.1.9 source tree; drop it for the pinned build.
+      patches = [];
+    });
   };
 
   # When applied, the unstable nixpkgs set (declared in the flake inputs) will
