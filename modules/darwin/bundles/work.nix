@@ -17,6 +17,8 @@ in {
 
       bazel_8
 
+      smimesign
+
       # **java17**
       # (maven.override {jdk_headless = jdk17;})
       # jdk17
