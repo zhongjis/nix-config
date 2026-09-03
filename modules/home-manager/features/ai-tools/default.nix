@@ -43,17 +43,19 @@ in {
       isPersonal = cfg == "personal";
     };
 
-    home.packages = [
-      llmAgentsPackages.qmd
-      llmAgentsPackages.beads
-      llmAgentsPackages.herdr
-      llmAgentsPackages.codegraph
-      llmAgentsPackages.agentsview
-      llmAgentsPackages.skills
-      inputs.self.packages.${system}.before-and-after
-    ]
-    ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
-      llmAgentsPackages.chatgpt
-    ];
+    home.packages =
+      [
+        llmAgentsPackages.qmd
+        llmAgentsPackages.beads
+        llmAgentsPackages.herdr
+        llmAgentsPackages.codegraph
+        llmAgentsPackages.agentsview
+        llmAgentsPackages.skills
+        inputs.self.packages.${system}.before-and-after
+        inputs.self.packages.${system}.likec4
+      ]
+      ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+        llmAgentsPackages.chatgpt
+      ];
   };
 }

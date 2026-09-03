@@ -38,6 +38,10 @@
     path = ./next-devtools-mcp.nix;
     updatable = true;
   };
+  likec4 = {
+    path = ./likec4.nix;
+    updatable = true;
+  };
   before-and-after = {
     path = ./before-and-after.nix;
     extraArgs = ["agentBrowser"];
