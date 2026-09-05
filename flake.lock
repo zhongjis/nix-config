@@ -43,11 +43,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1788457263,
-        "narHash": "sha256-EvmGns+Wtm5zi5G3OXUU0AdPtPnSd62q3hKoM5vp4Ck=",
+        "lastModified": 1788547748,
+        "narHash": "sha256-Ius8S+M2u2E00DxtkuyeAEHpJxZifQK19tjMaQNw2tQ=",
         "owner": "zhongjis",
         "repo": "agent-skills",
-        "rev": "a734d5b4f1d7d76fe4f120e5f18c6610d25ab2f1",
+        "rev": "9fe0a61b122d5715e6e27ba74da2397c235f7fbe",
         "type": "github"
       },
       "original": {
@@ -2016,11 +2016,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1787776375,
-        "narHash": "sha256-gxa6C1+Xfl0ys5h0X/ocusbwT3ABIdX38mrX3MRmPnM=",
+        "lastModified": 1788494938,
+        "narHash": "sha256-ozY1uUiOLXt3KLpUQwu8Y1DG+lKa53Gke7NW9gvUu3I=",
         "owner": "NotAShelf",
         "repo": "nvf",
-        "rev": "f019fe83c224eedb145982a9a26b764e7cb2fdd0",
+        "rev": "5e4f212f8720c17fdd06f5c57591f251aff67453",
         "type": "github"
       },
       "original": {
