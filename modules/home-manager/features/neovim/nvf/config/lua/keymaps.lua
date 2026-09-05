@@ -15,11 +15,14 @@ vim.keymap.set("x", "p", [["_dP]])
 map("<leader>e", vim.diagnostic.open_float, "Show diagnostic [E]rror messages")
 
 map("<leader>tf", function()
-  if vim.b.disable_autoformat or vim.g.disable_autoformat then
+  if vim.b.disableFormatSave or not vim.g.formatsave then
+    vim.cmd("FormatEnable!")
     vim.cmd("FormatEnable")
-    vim.notify("AutoFormt Enabled")
+    vim.notify("AutoFormat Enabled")
   else
     vim.cmd("FormatDisable")
-    vim.notify("AutoFormt Disabled")
+    vim.notify("AutoFormat Disabled")
   end
 end, "Toggle [F]ormat")
+
+map("<leader>lf", "<cmd>Format<CR>", "Format buffer")

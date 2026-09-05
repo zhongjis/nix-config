@@ -28,7 +28,7 @@ vim.opt.ignorecase = true -- Ignore case when searching
 vim.opt.smartcase = true -- Override ignorecase if search contains uppercase letters
 
 -- Files and backups
-vim.opt.swapfile = false -- Disable swap file creation
+vim.opt.swapfile = true -- Enable swap recovery
 vim.opt.backup = false -- Disable backup file creation
 vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir" -- Set undo directory
 vim.opt.undofile = true -- Enable persistent undo

@@ -12,6 +12,8 @@
   ];
 
   vim.languages.enableFormat = true;
+  vim.lsp.formatOnSave = true;
+  vim.lsp.mappings.format = null;
   vim.formatter.conform-nvim = {
     enable = true;
     setupOpts = {
@@ -25,12 +27,6 @@
             "--column-width"
             "85"
             "--sort-requires"
-          ];
-        };
-        black = {
-          prepend_args = [
-            "--line-length"
-            "85"
           ];
         };
         shfmt = {
@@ -64,30 +60,7 @@
         html = ["prettierd"];
         graphql = ["prettierd"];
       };
-      format_on_save = {
-        _type = "lua-inline";
-        expr = ''
-          function(bufnr)
-                -- Disable with a global or buffer-local variable
-                if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
-                  return
-                end
-
-                -- Disable "format_on_save lsp_fallback" for languages that don't
-                -- have a well standardized coding style. You can add additional
-                -- languages here or re-enable it for the disabled ones.
-                local disable_filetypes =
-                  { c = true, cpp = true, typescript = true, javascript = true, yaml = true }
-                return {
-                  timeout_ms = 500,
-                  lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
-                }
-              end
-        '';
-        format_after_save = {
-          lsp_format = "fallback";
-        };
-      };
+      format_after_save = null;
     };
   };
 }

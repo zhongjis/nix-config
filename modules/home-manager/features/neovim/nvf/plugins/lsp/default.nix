@@ -57,7 +57,11 @@
     yaml.enable = true;
 
     # Python
-    python.enable = true;
+    python = {
+      enable = true;
+      lsp.servers = ["basedpyright" "ruff"];
+      extraDiagnostics.enable = false;
+    };
 
     # CSS
     css.enable = true;
@@ -73,13 +77,45 @@
     # TypeScript/JavaScript
     typescript = {
       enable = true;
+      extraDiagnostics.enable = false;
       extensions.ts-error-translator.enable = true;
       format.type = ["prettier"];
+    };
+    tsx = {
+      enable = true;
+      extraDiagnostics.enable = false;
     };
   };
 
   # Tailwind CSS
   vim.lsp.presets.tailwindcss-language-server.enable = true;
+
+  vim.lsp.servers = {
+    basedpyright.settings.basedpyright = {
+      analysis = {
+        typeCheckingMode = "standard";
+        autoImportCompletions = true;
+      };
+      disableOrganizeImports = true;
+    };
+    ruff.on_attach = lib.generators.mkLuaInline ''
+      function(client)
+        client.server_capabilities.hoverProvider = false
+      end
+    '';
+    typescript-language-server.init_options.preferences = {
+      includeCompletionsForModuleExports = true;
+      includeCompletionsForImportStatements = true;
+      includePackageJsonAutoImports = "auto";
+      includeInlayParameterNameHints = "all";
+      includeInlayParameterNameHintsWhenArgumentMatchesName = false;
+      includeInlayFunctionParameterTypeHints = true;
+      includeInlayVariableTypeHints = true;
+      includeInlayPropertyDeclarationTypeHints = true;
+      includeInlayFunctionLikeReturnTypeHints = true;
+      includeInlayEnumMemberValueHints = true;
+    };
+  };
 
   # Advanced LSP settings via Lua configuration
   # These settings are applied after LSP servers are attached
@@ -163,59 +199,6 @@
                 "akka.actor.typed.javadsl",
                 "com.github.swagger.akka.javadsl",
               },
-            },
-          })
-          client:notify("workspace/didChangeConfiguration", { settings = client.settings })
-        end
-
-        -- Python (pyright) settings
-        if client.name == "pyright" then
-          client.settings = vim.tbl_deep_extend("force", client.settings or {}, {
-            python = {
-              analysis = {
-                typeCheckingMode = "standard",
-                autoImportCompletions = true,
-                autoSearchPaths = true,
-                useLibraryCodeForTypes = true,
-                diagnosticMode = "openFilesOnly",
-              },
-            },
-          })
-          client:notify("workspace/didChangeConfiguration", { settings = client.settings })
-        end
-
-        -- TypeScript/JavaScript settings
-        if client.name == "ts_ls" or client.name == "tsserver" or client.name == "vtsls" then
-          client.settings = vim.tbl_deep_extend("force", client.settings or {}, {
-            typescript = {
-              inlayHints = {
-                includeInlayParameterNameHints = "all",
-                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-                includeInlayFunctionParameterTypeHints = true,
-                includeInlayVariableTypeHints = true,
-                includeInlayPropertyDeclarationTypeHints = true,
-                includeInlayFunctionLikeReturnTypeHints = true,
-                includeInlayEnumMemberValueHints = true,
-              },
-              suggest = {
-                includeCompletionsForModuleExports = true,
-              },
-              updateImportsOnFileMove = { enabled = "always" },
-            },
-            javascript = {
-              inlayHints = {
-                includeInlayParameterNameHints = "all",
-                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-                includeInlayFunctionParameterTypeHints = true,
-                includeInlayVariableTypeHints = true,
-                includeInlayPropertyDeclarationTypeHints = true,
-                includeInlayFunctionLikeReturnTypeHints = true,
-                includeInlayEnumMemberValueHints = true,
-              },
-              suggest = {
-                includeCompletionsForModuleExports = true,
-              },
-              updateImportsOnFileMove = { enabled = "always" },
             },
           })
           client:notify("workspace/didChangeConfiguration", { settings = client.settings })

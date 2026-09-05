@@ -28,11 +28,6 @@
     {
       enable = true;
       clear = true;
-      name = "AutoSaveBuffer";
-    }
-    {
-      enable = true;
-      clear = true;
       name = "FiletypeIndent";
     }
     {
@@ -133,39 +128,6 @@
       event = ["VimResized"];
       pattern = ["*"];
       command = "wincmd =";
-    }
-
-    # Auto-save
-    {
-      desc = "Auto save when leave buffer";
-      group = "AutoSaveBuffer";
-      event = ["BufLeave" "FocusLost"];
-      pattern = ["*"];
-      callback = {
-        _type = "lua-inline";
-        expr = ''
-          function()
-            local filetype = vim.bo.filetype
-            local buftype = vim.bo.buftype
-            local excluded_filetypes = {
-              oil = true,
-              harpoon = true,
-              trouble = true,
-              TelescopePrompt = true,
-              lazy = true,
-              mason = true,
-              [""] = true,
-            }
-            if not excluded_filetypes[filetype]
-              and buftype ~= "nofile"
-              and buftype ~= "prompt"
-              and vim.bo.modified
-            then
-              vim.cmd("silent! wa")
-            end
-          end
-        '';
-      };
     }
 
     # Filetype-specific indentation (2 spaces)
