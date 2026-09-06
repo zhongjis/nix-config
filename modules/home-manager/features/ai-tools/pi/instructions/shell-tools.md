@@ -11,27 +11,12 @@ components, and "how does X work?" questions.
 For known targets, use `read` for a known path and `rg` for exact text, literals, config, or docs.
 Use `fd` for paths/files and `ast-grep` for syntax-shaped patterns that regex cannot safely match.
 
-Do not reconstruct indexed architecture or code flow with `rg` or `read` when CodeGraph is available.
-Fall back to direct tools for generated or non-indexed files, or details CodeGraph did not cover.
+Use CodeGraph evidence for indexed architecture and code flow rather than reconstructing it with `rg` or `read`. Fall back to direct tools when CodeGraph is unavailable, files are generated or non-indexed, or graph evidence is incomplete.
+
+## POSIX fallbacks
+
+For local interactive discovery, use `fd`, `rg`, and `ast-grep` first. If falling back because a modern tool is missing, confirm its absence with `command -v` before using POSIX `find` or `grep`. If the modern tool cannot preserve the required semantics, explain the limitation before using a POSIX alternative.
 
 ## Detailed command guidance
 
-Detailed command conversions, ignore/hidden semantics, exact-name/depth searches, and advanced patterns or options live in the matching `fd`, `rg`, and `ast-grep` skills. Load the relevant skill when those details are needed.
-
-## Exceptions (use POSIX tools only when)
-
-1. Target environment lacks the modern tool. Check availability with `command -v` before using the POSIX fallback.
-2. `find -empty`, `find -newer`, or complex boolean combinations `fd` cannot express. Note why in the command.
-3. POSIX shell scripts being committed to repos without `fd`/`rg` as dependencies.
-4. Exact requested behavior cannot be preserved with the available modern tool or options. State the semantic difference.
-
-## Verification
-
-Before using `find` or `grep` for local interactive discovery, confirm an exception applies; otherwise use the modern tool.
-
-## Escalation
-
-Load the matching skill when:
-
-- `ast-grep` pattern needs more than a one-liner → load `ast-grep` skill (has `REFERENCE.md`)
-- Two `fd`/`rg` attempts fail on flag combos (size, time, boolean, type filters) → load `fd` or `rg` skill instead of guessing again
+When command syntax or semantics are uncertain, consult the matching `fd`, `rg`, or `ast-grep` skill for conversions, ignore/hidden behavior, search options, and advanced patterns.
