@@ -36,7 +36,7 @@
   myHomeManager.zsh.enable = lib.mkDefault true;
   myHomeManager.starship.enable = lib.mkDefault true;
   myHomeManager.zed.enable =
-    if pkgs.stdenv.isDarwin
+    if pkgs.stdenv.hostPlatform.isDarwin
     then lib.mkDefault false
     else lib.mkDefault true;
 

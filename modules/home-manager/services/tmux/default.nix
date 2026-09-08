@@ -5,7 +5,7 @@
   ...
 }: let
   keyboardCmd =
-    if pkgs.stdenv.isDarwin
+    if pkgs.stdenv.hostPlatform.isDarwin
     then "xclip -in -selection clipboard"
     else "tmux show-buffer | wl-copy";
 in {

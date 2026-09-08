@@ -11,7 +11,7 @@
     (builtins.readFile ./scripts/screenshot.sh);
 in {
   home.packages = with pkgs;
-    lib.optionals stdenv.isLinux [
+    lib.optionals stdenv.hostPlatform.isLinux [
       grimblast
     ];
 

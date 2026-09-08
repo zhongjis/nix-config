@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   programs.distrobox = {
     enable =
-      if pkgs.stdenv.isDarwin
+      if pkgs.stdenv.hostPlatform.isDarwin
       then false
       else true;
     enableSystemdUnit = true;

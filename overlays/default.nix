@@ -18,7 +18,7 @@
     open-design-daemon = inputs.open-design.packages.${final.stdenv.hostPlatform.system}.daemon.overrideAttrs (old: {
       nativeBuildInputs =
         (old.nativeBuildInputs or [])
-        ++ final.lib.optionals final.stdenv.isDarwin [final.cctools];
+        ++ final.lib.optionals final.stdenv.hostPlatform.isDarwin [final.cctools];
     });
 
     # jdk = prev."jdk${toString 17}";

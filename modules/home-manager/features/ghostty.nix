@@ -3,7 +3,7 @@
     enable = true;
     enableZshIntegration = true;
     package =
-      if pkgs.stdenv.isDarwin
+      if pkgs.stdenv.hostPlatform.isDarwin
       then null
       else pkgs.ghostty; # package managed by system
     settings = {

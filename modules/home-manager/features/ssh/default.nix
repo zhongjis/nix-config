@@ -4,7 +4,7 @@
   ...
 }: let
   darwinKeychainOption =
-    if pkgs.stdenv.isDarwin
+    if pkgs.stdenv.hostPlatform.isDarwin
     then {
       UseKeychain = "yes";
     }
@@ -29,7 +29,7 @@ in {
   };
 
   # temp fix. more details see https://github.com/Mic92/sops-nix/issues/890
-  launchd.agents.sops-nix = pkgs.lib.mkIf pkgs.stdenv.isDarwin {
+  launchd.agents.sops-nix = pkgs.lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
     enable = true;
     config = {
       EnvironmentVariables = {

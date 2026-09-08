@@ -27,7 +27,7 @@
       proggyfonts
       inter
     ]
-    ++ lib.optionals pkgs.stdenv.isDarwin [
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
       sketchybar-app-font
     ];
 }

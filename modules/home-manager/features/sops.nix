@@ -15,5 +15,5 @@
     validateSopsFiles = true;
   };
 
-  systemd.user.services.mbsync.Unit.After = lib.mkIf pkgs.stdenv.isLinux ["sops-nix.service"];
+  systemd.user.services.mbsync.Unit.After = lib.mkIf pkgs.stdenv.hostPlatform.isLinux ["sops-nix.service"];
 }
