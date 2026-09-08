@@ -12,6 +12,7 @@
     ++ inputs.nix-config-private.homeModules.zshen-nix-config-private;
 
   zshen-private-flake.adobe-marketo-flex.enable = true;
+  zshen-private-flake.adobe-slack-mcp.enable = true;
 
   # Enable sops-nix secrets (you have the age key at ~/.config/sops/age/keys.txt)
   zshen-private-flake.enableSecrets = true;
