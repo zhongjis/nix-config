@@ -45,6 +45,11 @@ in {
 
   gtk.gtk4.theme = lib.mkForce config.gtk.theme;
 
+  # stylix.cursor is applied only on Linux, but its x11/gtk targets still set
+  # home.pointerCursor.*.enable on Darwin, where pointerCursor.name is never
+  # defined -> eval error. Drop the cursor on Darwin so those blocks no-op.
+  stylix.cursor = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin (lib.mkForce null);
+
   stylix.targets = {
     waybar.enable = false;
     # neovim.enable = false;
