@@ -6,8 +6,11 @@
 }: let
   startScripts = {
     xdg = pkgs.writeShellScriptBin "xdg" ''
-      systemctl --user import-environment PATH &
-      systemctl --user restart xdg-desktop-portal.service &
+      if ! uwsm check is-active hyprland.desktop; then
+        systemctl --user import-environment PATH
+        dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+        systemctl --user restart xdg-desktop-portal.service
+      fi
     '';
     applications = pkgs.writeShellScriptBin "applications" ''
       solaar --window=hide&
@@ -64,7 +67,6 @@ in {
         # "${lib.getExe pkgs.wlr-randr} --output 1 --primary"
 
         "nextcloud"
-        "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "wl-paste --type text --watch cliphist store" # Stores only text data
         "systemctl --user start hyprpolkitagent"
         "systemctl --user start hyprpaper"

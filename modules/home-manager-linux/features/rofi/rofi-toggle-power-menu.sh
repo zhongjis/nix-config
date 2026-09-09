@@ -8,17 +8,17 @@ else
   suspend="systemctl suspend && i3lock -i ~/.config/walls/VIM.png"
 fi
 
-# special method for loggin out :(
-if [ "$DESKTOP_SESSION" = "i3" ]; then
-  logout="killall i3"
-elif [ "$DESKTOP_SESSION" = "hyprland" ]; then
-  logout="killall Hyprland"
-elif [ "$DESKTOP_SESSION" = "sway" ]; then
-  logout="killall sway"
-else
-  logout="killall Hyprland"
-  # logout="loginctl terminate-user $USER"
-fi
+logout() {
+  if [ "$DESKTOP_SESSION" = "i3" ]; then
+    killall i3
+  elif [ "$DESKTOP_SESSION" = "sway" ]; then
+    killall sway
+  elif uwsm check is-active hyprland.desktop; then
+    uwsm stop
+  else
+    hyprctl dispatch exit
+  fi
+}
 
 # Present the power menu dependin od display server
 
@@ -32,8 +32,8 @@ chosen=$(printf "Log Out\nSuspend\nRestart\nPower OFF" | rofi -dmenu -i -theme-s
 
 # Perform the action based on user choice
 case "$chosen" in
-  "Log Out") $logout ;;
-  "Suspend") eval $suspend ;;
+  "Log Out") logout ;;
+  "Suspend") eval "$suspend" ;;
   "Restart") systemctl reboot ;;
   "Power OFF") systemctl poweroff ;;
   *) exit 1 ;;
