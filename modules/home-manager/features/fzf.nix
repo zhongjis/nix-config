@@ -9,8 +9,8 @@
       "--prompt ⟫"
     ];
 
-    changeDirWidgetCommand = "fd --type d";
-    changeDirWidgetOptions = [
+    changeDirWidget.command = "fd --type d";
+    changeDirWidget.options = [
       "--preview 'tree -C {} | head -200'"
     ];
   };
