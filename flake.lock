@@ -43,11 +43,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1789199991,
-        "narHash": "sha256-ljFok2ciN5KRZ/oka8nKEmd5Ed+FFkENEFwAyur+Xqs=",
+        "lastModified": 1789207395,
+        "narHash": "sha256-MPStRK0AaJr+Zh1RZFATCqCYygO2tNr76uJ3sjU02tM=",
         "owner": "zhongjis",
         "repo": "agent-skills",
-        "rev": "b033a4236b3846664439075d60ad159960f4bf5d",
+        "rev": "d5fc6750d13d4b98b663d27af4c176b63b07fbe2",
         "type": "github"
       },
       "original": {
