@@ -3,16 +3,16 @@
   lib,
 }: let
   pname = "lark-cli";
-  version = "1.0.93";
+  version = "1.0.95";
 
   srcs = {
     x86_64-linux = {
       arch = "amd64";
-      sha256 = "sha256-EAMYSaGIS/kWXLAd5HECtIR/uoG7nrdvQWgSXql0bFE=";
+      sha256 = "sha256-faktQmt9AAkIx2o2uHp9A1fCcN6/THFJu8YBCyDSVB4=";
     };
     aarch64-linux = {
       arch = "arm64";
-      sha256 = "sha256-gAgyu4Swv3RXn0neMhmy6ouecgScWj7SOWgOTLwxR0w=";
+      sha256 = "sha256-BjASpjuyJHmFXjNdkizFiLiD4A0RXeUdp2qP/iLbmHo=";
     };
   };
 
