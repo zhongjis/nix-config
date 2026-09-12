@@ -171,7 +171,7 @@
       # "git:github.com/davebcn87/pi-autoresearch@v1.6.2"
       "git:github.com/nicobailon/pi-web-access@v0.24.2"
       "git:github.com/nicobailon/pi-interactive-shell@v0.15.0"
-      "git:github.com/aliou/pi-processes@v0.10.9"
+      # "git:github.com/aliou/pi-processes@v0.10.9"
       # "git:github.com/chandra447/pi-hermes-memory@v0.9.6"
       {
         source = "git:github.com/backnotprop/plannotator@v0.27.3";
@@ -187,7 +187,7 @@
 
   workOverrides = {
     defaultProvider = "anthropic";
-    defaultModel = "claude-opus-4-7";
+    defaultModel = "claude-opus-4-8";
     packages =
       sharedSettings.packages
       ++ [
