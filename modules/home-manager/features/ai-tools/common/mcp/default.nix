@@ -27,7 +27,10 @@
       };
     };
     shadcn = {
-      command = "${pkgs.nodejs_24}/bin/npx";
+      command = lib.getExe (pkgs.writeShellScriptBin "shadcn-mcp" ''
+        export PATH="${lib.makeBinPath [pkgs.nodejs_24]}''${PATH:+:$PATH}"
+        exec ${pkgs.nodejs_24}/bin/npx "$@"
+      '');
       args = ["--yes" "shadcn@latest" "mcp"];
     };
     likec4 = {
