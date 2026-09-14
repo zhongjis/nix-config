@@ -24,6 +24,7 @@
   };
   myHomeManager.aiProfile = "work";
   myHomeManager.obsidian.enable = true;
+  myHomeManager.secretspec.enable = true;
   myHomeManager.services.open-design.enable = true;
 
   home.username = "zshen";
