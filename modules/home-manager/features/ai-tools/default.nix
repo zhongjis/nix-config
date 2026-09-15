@@ -43,6 +43,10 @@ in {
       isPersonal = cfg == "personal";
     };
 
+    home.sessionVariables = {
+      OMO_CODING_AGENT_DIR = "${config.home.homeDirectory}/.omo/agent";
+    };
+
     home.packages =
       [
         llmAgentsPackages.qmd
@@ -51,6 +55,7 @@ in {
         llmAgentsPackages.codegraph
         llmAgentsPackages.agentsview
         llmAgentsPackages.skills
+        llmAgentsPackages.omo-ai
         inputs.self.packages.${system}.before-and-after
         inputs.self.packages.${system}.likec4
       ]
