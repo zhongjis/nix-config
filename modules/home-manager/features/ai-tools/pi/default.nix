@@ -172,8 +172,7 @@
       "git:github.com/nicobailon/pi-web-access@v0.24.2"
       "git:github.com/nicobailon/pi-interactive-shell@v0.15.0"
       "git:github.com/nicobailon/pi-intercom@v0.13.0"
-      # "git:github.com/aliou/pi-processes@v0.10.9"
-      # "git:github.com/chandra447/pi-hermes-memory@v0.9.6"
+      "git:github.com/chandra447/pi-hermes-memory@v0.9.6"
       {
         source = "git:github.com/backnotprop/plannotator@v0.27.3";
         extensions = ["apps/pi-extension"];
