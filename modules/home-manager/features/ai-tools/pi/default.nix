@@ -204,7 +204,9 @@
     transport = "sse";
     packages =
       sharedSettings.packages
-      ++ [];
+      ++ [
+        "git:github.com/Rahularya01/pi-antigravity"
+      ];
   };
 
   piSettings = lib.recursiveUpdate sharedSettings (
