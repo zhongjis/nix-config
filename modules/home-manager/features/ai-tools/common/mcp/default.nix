@@ -11,7 +11,6 @@
   secretPath_exa = config.sops.secrets.exa_api_key.path;
   secretPath_linear = config.sops.secrets.linear_api_key.path;
   openDesignDaemon = pkgs.open-design-daemon;
-  likec4 = inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.likec4;
   nextDevtoolsMcp = inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.next-devtools-mcp;
 
   # MCPs available to all profiles
@@ -32,10 +31,6 @@
         exec ${pkgs.nodejs_24}/bin/npx "$@"
       '');
       args = ["--yes" "shadcn@latest" "mcp"];
-    };
-    likec4 = {
-      command = "${likec4}/bin/likec4";
-      args = ["mcp"];
     };
     open-design = {
       command = "${openDesignDaemon}/bin/od";

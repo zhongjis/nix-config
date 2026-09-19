@@ -57,7 +57,6 @@ in {
         llmAgentsPackages.skills
         llmAgentsPackages.omo-ai
         inputs.self.packages.${system}.before-and-after
-        inputs.self.packages.${system}.likec4
       ]
       ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
         llmAgentsPackages.chatgpt
