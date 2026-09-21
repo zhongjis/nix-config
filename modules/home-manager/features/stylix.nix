@@ -30,9 +30,12 @@ in {
               modules =
                 lib.modules
                 // {
+                  # hm.nix passes `./nvf.nix` as a path value, but nvfModule is a
+                  # string (set + string coerces via outPath), so `==` never matches.
+                  # Compare via toString so the patched module actually gets swapped in.
                   importApply = module:
                     lib.modules.importApply (
-                      if module == nvfModule
+                      if toString module == toString nvfModule
                       then patchedNvfModule
                       else module
                     );

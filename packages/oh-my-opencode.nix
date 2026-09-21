@@ -6,7 +6,6 @@
   aliasNames = [
     "oh-my-opencode"
     "oh-my-openagent"
-    "omo"
     "omo-agent-toolkit"
     "lazycodex"
     "lazycodex-ai"
