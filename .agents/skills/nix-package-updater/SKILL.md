@@ -1,6 +1,6 @@
 ---
 name: nix-package-updater
-description: Update custom Nix packages in this repository (Helium, DevToys, agent-browser, opencode-morph-fast-apply). Use when a new version of these packages is released or when dependency hashes need updating. Triggers on "update helium", "bump devtoys version", "fix agent-browser hash", or "update custom packages".
+description: Update custom Nix packages in this repository (Helium, DevToys, agent-browser). Use when a new version of these packages is released or when dependency hashes need updating. Triggers on "update helium", "bump devtoys version", "fix agent-browser hash", or "update custom packages".
 ---
 
 # Nix Package Updater
@@ -17,10 +17,9 @@ Updating these packages involves a systematic process of:
 3.  Recalculating cryptographic hashes for sources and dependencies.
 4.  Verifying the build and installation phases.
 
-The four primary custom packages handled by this skill are:
+The three primary custom packages handled by this skill are:
 - **Helium** (`packages/helium.nix`): A lightweight web browser distributed as an AppImage.
 - **DevToys** (`packages/devtoys.nix`): A Swiss Army knife for developers, extracted from a Debian package.
-- **opencode-morph-fast-apply** (`packages/opencode-morph-fast-apply.nix`): An OpenCode plugin built using `buildNpmPackage`.
 - **agent-browser** (`packages/agent-browser.nix`): A complex tool combining a pnpm-based Node.js app and a Rust CLI.
 
 ## 2. Quick Start
@@ -82,35 +81,6 @@ DevToys is updated by extracting a `.deb` file using `dpkg-deb`.
 **Verification**: Since DevToys relies on `makeWrapper` to set the execution environment, verify the wrapper:
 ```bash
 cat result/bin/devtoys # Should show the shell script invoking the real binary
-```
-
-### npm Package (opencode-morph-fast-apply.nix)
-
-This package uses the `buildNpmPackage` helper. It is often pinned to a specific commit because it is a fast-moving plugin.
-
-**File**: `packages/opencode-morph-fast-apply.nix`
-
-**Update Procedure**:
-1.  Identify the new commit hash on [GitHub](https://github.com/JRedeker/opencode-morph-fast-apply).
-2.  Update `version` (use the date or the version from `package.json`).
-3.  Update `src.rev` with the new commit hash.
-4.  Update `src.sha256` using `lib.fakeHash`.
-5.  Update `npmDepsHash` using `lib.fakeHash`. This hash represents the `node_modules` state and must be updated whenever `package-lock.json` changes.
-
-```nix
-pkgs.buildNpmPackage {
-  pname = "opencode-morph-fast-apply";
-  version = "1.5.1"; # Update
-
-  src = pkgs.fetchFromGitHub {
-    owner = "JRedeker";
-    repo = "opencode-morph-fast-apply";
-    rev = "new-rev-here"; # Update
-    sha256 = lib.fakeHash; # Update
-  };
-
-  npmDepsHash = lib.fakeHash; # Update
-}
 ```
 
 ### pnpm + Rust (agent-browser.nix)

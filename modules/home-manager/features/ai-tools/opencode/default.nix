@@ -7,7 +7,6 @@
 }: let
   inherit (pkgs.stdenv.hostPlatform) system;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
-  selfPackages = inputs.self.packages.${system};
   selectedSkills = inputs.agent-skills.lib.skillsFor {
     profile = aiProfileHelpers.profile;
     harness = "opencode";
@@ -24,7 +23,11 @@ in {
   ];
 
   home.packages = [
-    selfPackages.oh-my-opencode
+    llmAgentsPackages.oh-my-opencode
+    # opencode 2 CLI, available as `opencode2` alongside the v1 `opencode`.
+    # ponytail: coexist only. Full migration (programs.opencode.package = opencode2)
+    # is blocked until oh-my-opencode + plugins ship v2-SDK builds; v1 plugins do not run in v2.
+    llmAgentsPackages.opencode2
   ];
 
   programs.opencode = {

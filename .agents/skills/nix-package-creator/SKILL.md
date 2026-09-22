@@ -47,7 +47,6 @@ Before writing a derivation, **read existing packages** for battle-tested patter
 | Quounter | AppImage (single-arch, Tauri) | `packages/quounter.nix` | Direct `fetchurl`, no AppRun fix needed |
 | DevToys | Deb extraction | `packages/devtoys.nix` | `dpkg-deb` + `makeWrapper` + `autoPatchelfHook` |
 | Agent Browser | pnpm complex build | `packages/agent-browser.nix` | `pnpm.fetchDeps` + `pnpm.configHook` |
-| opencode-morph-fast-apply | Bun package | `packages/opencode-morph-fast-apply.nix` | `bun2nix.mkDerivation` + generated Bun lock Nix |
 
 ## AppImage Packages
 
@@ -172,7 +171,6 @@ After the package builds, ask the user whether they want a GitHub Actions workfl
 
 Use existing repo patterns as references:
 - `scripts/update-helium-package.sh` + `.github/workflows/update-helium.yml` for AppImage release assets and per-architecture hashes.
-- `scripts/update-opencode-morph-fast-apply-package.sh` + `.github/workflows/update-opencode-morph-fast-apply.yml` for GitHub release/tag updates, generated dependency lock files, build verification, and PR creation.
 
 Recommended prompt to user:
 

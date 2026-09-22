@@ -9,8 +9,7 @@
   pluginLib = import ./lib.nix {inherit lib;};
 
   # Nix-built plugins (for packages not on npm or with github: prefix issues)
-  morphFastApplyPkg = inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.opencode-morph-fast-apply;
-  ohMyOpenCodePkg = inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.oh-my-opencode;
+  ohMyOpenCodePkg = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.oh-my-opencode;
 
   # Plugins available to all profiles
   generalPlugins = [
@@ -30,9 +29,7 @@
   ];
 
   # Plugins only for personal profile
-  # Use file:// for Nix-built packages to bypass OpenCode's broken github: handling
   personalPlugins = [
-    "file://${morphFastApplyPkg}/lib/node_modules/opencode-morph-fast-apply/index.ts"
     "opencode-supermemory@latest"
     "@nick-vi/opencode-type-inject@latest"
   ];
@@ -48,7 +45,6 @@
 in {
   imports = [
     ./oh-my-opencode.nix
-    ./morph-fast-apply.nix
     ./supermemory.nix
   ];
 

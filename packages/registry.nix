@@ -23,12 +23,6 @@
 #                         it directly, skipping nix-update -- whose read-only
 #                         metadata eval can choke on IFD (e.g. bun2nix cargoDeps).
 {
-  opencode-morph-fast-apply = {
-    path = ./opencode-morph-fast-apply.nix;
-    extraArgs = ["bun2nix"];
-    updatable = true;
-    selfUpdateScript = true;
-  };
   context-mode = {
     path = ./context-mode;
     extraArgs = ["bun2nix"];

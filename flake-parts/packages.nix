@@ -56,13 +56,6 @@
             modules = [../modules/home-manager/features/neovim/nvf];
           }).neovim;
 
-        oh-my-codex = inputs.llm-agents.packages.${system}.oh-my-codex;
-        oh-my-opencode = import ../packages/oh-my-opencode.nix {
-          inherit pkgs;
-          lib = pkgs.lib;
-          base = inputs.llm-agents.packages.${system}.oh-my-opencode;
-        };
-
         download-llamacpp-models = pkgs.writeShellApplication {
           name = "download-llamacpp-models";
           runtimeInputs = [
