@@ -241,7 +241,13 @@ in {
   programs.pi = {
     enable = true;
     package = llmAgentsPackages.pi;
-    opencodeApiKeyFile = config.sops.secrets.opencode_zen_api_key.path;
+    # ponytail: gates by "work" profile, not literally hostname. Today work==mac-m1-max 1:1,
+    # so this deprovisions opencode/opencode-go for pi on mac only. A future second work-host
+    # would also lose it; upgrade path = switch to hostname/currentSystemName if that happens.
+    opencodeApiKeyFile =
+      if aiProfileHelpers.isWork
+      then null
+      else config.sops.secrets.opencode_zen_api_key.path;
     rtk.enable = true;
     skills = selectedSkills;
     instructions =
