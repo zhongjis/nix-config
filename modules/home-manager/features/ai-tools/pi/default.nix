@@ -5,11 +5,16 @@
   lib,
   commonInstructions,
   aiProfileHelpers,
+  currentSystemName,
   ...
 }: let
   inherit (pkgs.stdenv.hostPlatform) system;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
-  cliproxyapiEnabled = lib.attrByPath ["myHomeManager" "services" "cliproxyapi" "enable"] false config;
+  cliproxyapiEnabled =
+    currentSystemName
+    == "framework-16"
+    && aiProfileHelpers.isPersonal
+    && lib.attrByPath ["myHomeManager" "services" "cliproxyapi" "enable"] false config;
   sopsFile = inputs.self + "/secrets/ai-tokens.yaml";
   selectedSkills = inputs.agent-skills.lib.skillsFor {
     profile = aiProfileHelpers.profile;

@@ -3,6 +3,7 @@
   inputs,
   lib,
   pkgs,
+  currentSystemName,
   ...
 }: let
   inherit (pkgs.stdenv.hostPlatform) system;
@@ -84,6 +85,13 @@
     exec ${lib.getExe usageKeeper}
   '';
 in {
+  assertions = [
+    {
+      assertion = currentSystemName == "framework-16" && config.myHomeManager.aiProfile == "personal";
+      message = "CLIProxyAPI and CPA Usage Keeper may only be enabled on framework-16 with the personal profile";
+    }
+  ];
+
   sops.secrets.cliproxyapi_management_key = {
     inherit sopsFile;
   };
