@@ -7,16 +7,19 @@
 }: let
   inherit (pkgs.stdenv.hostPlatform) system;
   cliProxyApi = inputs.llm-agents.packages.${system}.cli-proxy-api;
+  sopsFile = inputs.self + "/secrets/ai-tokens.yaml";
   stateDir = "${config.xdg.stateHome}/cliproxyapi";
   authDir = "${stateDir}/auth";
   apiKeyFile = "${stateDir}/api-key";
   configFile = "${stateDir}/config.yaml";
+  managementKeyFile = config.sops.secrets.cliproxyapi_management_key.path;
   yamlQuote = value: "'${lib.replaceStrings ["'"] ["''"] value}'";
   initialize = pkgs.writeShellScript "cliproxyapi-initialize" ''
     stateDir=${lib.escapeShellArg stateDir}
     authDir=${lib.escapeShellArg authDir}
     apiKeyFile=${lib.escapeShellArg apiKeyFile}
     configFile=${lib.escapeShellArg configFile}
+    managementKeyFile=${lib.escapeShellArg managementKeyFile}
 
     ${pkgs.coreutils}/bin/install -d -m 700 "$stateDir" "$authDir"
 
@@ -31,6 +34,8 @@
     ${pkgs.coreutils}/bin/test -s "$apiKeyFile"
     ${pkgs.coreutils}/bin/chmod 600 "$apiKeyFile"
 
+    ${pkgs.coreutils}/bin/test -s "$managementKeyFile"
+    managementKeyYaml="$(${pkgs.python3}/bin/python3 -c 'import json, sys; json.dump(sys.stdin.read(), sys.stdout)' < "$managementKeyFile")"
     apiKey="$(${pkgs.coreutils}/bin/cat "$apiKeyFile")"
     umask 077
     configTmp="$(${pkgs.coreutils}/bin/mktemp "$stateDir/.config.yaml.XXXXXX")"
@@ -41,6 +46,9 @@
       ${lib.escapeShellArg "auth-dir: ${yamlQuote authDir}"} \
       'api-keys:' \
       "  - $apiKey" \
+      'remote-management:' \
+      '  allow-remote: false' \
+      "  secret-key: $managementKeyYaml" \
       'routing:' \
       '  strategy: round-robin' > "$configTmp"
     ${pkgs.coreutils}/bin/chmod 600 "$configTmp"
@@ -48,6 +56,10 @@
     trap - EXIT
   '';
 in {
+  sops.secrets.cliproxyapi_management_key = {
+    inherit sopsFile;
+  };
+
   home.packages = [
     cliProxyApi
     (pkgs.writeShellScriptBin "cliproxyapi-login" ''
@@ -58,7 +70,11 @@ in {
   ];
 
   systemd.user.services.cliproxyapi = {
-    Unit.Description = "CLIProxyAPI";
+    Unit = {
+      Description = "CLIProxyAPI";
+      After = ["sops-nix.service"];
+      Requires = ["sops-nix.service"];
+    };
     Service = {
       ExecStartPre = "${initialize}";
       ExecStart = "${lib.getExe cliProxyApi} --config ${lib.escapeShellArg configFile}";
