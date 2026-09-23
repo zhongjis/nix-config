@@ -9,6 +9,7 @@
 }: let
   inherit (pkgs.stdenv.hostPlatform) system;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
+  cliproxyapiEnabled = lib.attrByPath ["myHomeManager" "services" "cliproxyapi" "enable"] false config;
   sopsFile = inputs.self + "/secrets/ai-tokens.yaml";
   selectedSkills = inputs.agent-skills.lib.skillsFor {
     profile = aiProfileHelpers.profile;
@@ -108,19 +109,66 @@
     }
   ];
 
+  cliproxyapiModels = [
+    {
+      id = "gpt-5.5";
+      reasoning = true;
+      input = ["text" "image"];
+      contextWindow = 278528;
+      maxTokens = 131072;
+    }
+    {
+      id = "gpt-5.6-luna";
+      reasoning = true;
+      input = ["text" "image"];
+      contextWindow = 278528;
+      maxTokens = 131072;
+    }
+    {
+      id = "gpt-5.6-sol";
+      reasoning = true;
+      input = ["text" "image"];
+      contextWindow = 278528;
+      maxTokens = 131072;
+    }
+    {
+      id = "gpt-5.6-terra";
+      reasoning = true;
+      input = ["text" "image"];
+      contextWindow = 278528;
+      maxTokens = 131072;
+    }
+    {
+      id = "gpt-6-astra";
+      reasoning = true;
+      input = ["text" "image"];
+      contextWindow = 278528;
+      maxTokens = 131072;
+    }
+  ];
+
   piModels = {
-    providers = {
-      llama-swap = {
-        baseUrl = "http://127.0.0.1:9292/v1";
-        api = "openai-completions";
-        apiKey = "llama-swap";
-        compat = {
-          supportsDeveloperRole = false;
-          supportsReasoningEffort = false;
+    providers =
+      {
+        llama-swap = {
+          baseUrl = "http://127.0.0.1:9292/v1";
+          api = "openai-completions";
+          apiKey = "llama-swap";
+          compat = {
+            supportsDeveloperRole = false;
+            supportsReasoningEffort = false;
+          };
+          models = localLlamaModels;
         };
-        models = localLlamaModels;
+      }
+      // lib.optionalAttrs cliproxyapiEnabled {
+        cliproxyapi = {
+          baseUrl = "http://127.0.0.1:8317/v1";
+          api = "openai-responses";
+          apiKey = "!cat ${config.xdg.stateHome}/cliproxyapi/api-key";
+          models = cliproxyapiModels;
+        };
       };
-    };
   };
 
   sharedSettings = {
