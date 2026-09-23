@@ -145,6 +145,20 @@
       contextWindow = 278528;
       maxTokens = 131072;
     }
+    {
+      id = "gpt-6-luna";
+      reasoning = true;
+      input = ["text" "image"];
+      contextWindow = 278528;
+      maxTokens = 131072;
+    }
+    {
+      id = "gpt-6-sol";
+      reasoning = true;
+      input = ["text" "image"];
+      contextWindow = 278528;
+      maxTokens = 131072;
+    }
   ];
 
   piModels = {
