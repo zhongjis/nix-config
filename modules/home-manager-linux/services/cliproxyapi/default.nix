@@ -7,6 +7,8 @@
 }: let
   inherit (pkgs.stdenv.hostPlatform) system;
   cliProxyApi = inputs.llm-agents.packages.${system}.cli-proxy-api;
+  usageKeeper = inputs.llm-agents.packages.${system}.cpa-usage-keeper;
+  keeperStateDir = "${config.xdg.stateHome}/cpa-usage-keeper";
   sopsFile = inputs.self + "/secrets/ai-tokens.yaml";
   stateDir = "${config.xdg.stateHome}/cliproxyapi";
   authDir = "${stateDir}/auth";
@@ -43,6 +45,7 @@
     ${pkgs.coreutils}/bin/printf '%s\n' \
       'host: 127.0.0.1' \
       'port: 8317' \
+      'usage-statistics-enabled: true' \
       ${lib.escapeShellArg "auth-dir: ${yamlQuote authDir}"} \
       'api-keys:' \
       "  - $apiKey" \
@@ -54,6 +57,31 @@
     ${pkgs.coreutils}/bin/chmod 600 "$configTmp"
     ${pkgs.coreutils}/bin/mv -f "$configTmp" "$configFile"
     trap - EXIT
+  '';
+  startKeeper = pkgs.writeShellScript "cpa-usage-keeper-start" ''
+    set -euo pipefail
+    umask 077
+    stateDir=${lib.escapeShellArg keeperStateDir}
+    passwordFile="$stateDir/login-password"
+    managementKeyFile=${lib.escapeShellArg managementKeyFile}
+
+    test -f "$managementKeyFile" && test -s "$managementKeyFile"
+    CPA_MANAGEMENT_KEY="$(< "$managementKeyFile")"
+    test -n "$CPA_MANAGEMENT_KEY"
+
+    ${pkgs.coreutils}/bin/install -d -m 700 "$stateDir"
+    test ! -L "$passwordFile"
+    if [ ! -e "$passwordFile" ]; then
+      password="$(${pkgs.coreutils}/bin/od -An -N32 -tx1 /dev/urandom | ${pkgs.coreutils}/bin/tr -d ' \n')"
+      (set -C; printf '%s\n' "$password" > "$passwordFile")
+      unset password
+    fi
+    test -f "$passwordFile" && test -s "$passwordFile"
+    ${pkgs.coreutils}/bin/chmod 600 "$passwordFile"
+    LOGIN_PASSWORD="$(< "$passwordFile")"
+    test -n "$LOGIN_PASSWORD"
+    export CPA_MANAGEMENT_KEY LOGIN_PASSWORD
+    exec ${lib.getExe usageKeeper}
   '';
 in {
   sops.secrets.cliproxyapi_management_key = {
@@ -87,6 +115,38 @@ in {
       ProtectHome = "read-only";
       StateDirectory = "cliproxyapi";
       StateDirectoryMode = "0700";
+      RestrictAddressFamilies = ["AF_UNIX" "AF_INET" "AF_INET6"];
+      RestrictSUIDSGID = true;
+      LockPersonality = true;
+    };
+    Install.WantedBy = ["default.target"];
+  };
+
+  systemd.user.services.cpa-usage-keeper = {
+    Unit = {
+      Description = "CPA Usage Keeper";
+      After = ["cliproxyapi.service" "sops-nix.service"];
+      Requires = ["cliproxyapi.service" "sops-nix.service"];
+    };
+    Service = {
+      ExecStart = "${startKeeper}";
+      Environment = [
+        "APP_HOST=127.0.0.1"
+        "APP_PORT=19487"
+        "CPA_BASE_URL=http://127.0.0.1:8317"
+        "AUTH_ENABLED=true"
+        "WORK_DIR=${keeperStateDir}"
+      ];
+      Restart = "on-failure";
+      RestartSec = "5s";
+      UMask = "0077";
+      NoNewPrivileges = true;
+      PrivateTmp = true;
+      ProtectSystem = "strict";
+      ProtectHome = "read-only";
+      StateDirectory = "cpa-usage-keeper";
+      StateDirectoryMode = "0700";
+      ReadWritePaths = [keeperStateDir];
       RestrictAddressFamilies = ["AF_UNIX" "AF_INET" "AF_INET6"];
       RestrictSUIDSGID = true;
       LockPersonality = true;
