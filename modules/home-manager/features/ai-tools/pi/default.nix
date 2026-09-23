@@ -119,50 +119,50 @@
       id = "gpt-5.5";
       reasoning = true;
       input = ["text" "image"];
-      contextWindow = 278528;
-      maxTokens = 131072;
+      contextWindow = 272000;
+      maxTokens = 128000;
     }
     {
       id = "gpt-5.6-luna";
       reasoning = true;
       input = ["text" "image"];
-      contextWindow = 278528;
-      maxTokens = 131072;
+      contextWindow = 272000;
+      maxTokens = 128000;
     }
     {
       id = "gpt-5.6-sol";
       reasoning = true;
       input = ["text" "image"];
-      contextWindow = 278528;
-      maxTokens = 131072;
+      contextWindow = 272000;
+      maxTokens = 128000;
     }
     {
       id = "gpt-5.6-terra";
       reasoning = true;
       input = ["text" "image"];
-      contextWindow = 278528;
-      maxTokens = 131072;
+      contextWindow = 272000;
+      maxTokens = 128000;
     }
     {
       id = "gpt-6-astra";
       reasoning = true;
       input = ["text" "image"];
-      contextWindow = 278528;
-      maxTokens = 131072;
+      contextWindow = 272000;
+      maxTokens = 128000;
     }
     {
       id = "gpt-6-luna";
       reasoning = true;
       input = ["text" "image"];
-      contextWindow = 278528;
-      maxTokens = 131072;
+      contextWindow = 272000;
+      maxTokens = 128000;
     }
     {
       id = "gpt-6-sol";
       reasoning = true;
       input = ["text" "image"];
-      contextWindow = 278528;
-      maxTokens = 131072;
+      contextWindow = 272000;
+      maxTokens = 128000;
     }
   ];
 
@@ -199,7 +199,7 @@
     editorPaddingX = 0;
     quietStartup = true;
     doubleEscapeAction = "tree";
-    defaultProjectTrust = "always";
+    defaultProjectTrust = "ask";
     # tuiMode = "fullscreen";
     # fullscreenExitOutput = "resume-hint";
 
