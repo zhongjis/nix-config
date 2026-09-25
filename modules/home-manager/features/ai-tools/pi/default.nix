@@ -240,6 +240,8 @@
       "git:github.com/nicobailon/pi-interactive-shell@v0.15.2"
       "git:github.com/nicobailon/pi-intercom@v0.13.0"
       "git:github.com/chandra447/pi-hermes-memory@v0.9.9"
+      "git:github.com/championswimmer/pi-context-usage"
+      "git:github.com/championswimmer/pi-cache-graph"
       {
         source = "git:github.com/backnotprop/plannotator@v0.27.15";
         extensions = ["apps/pi-extension"];
