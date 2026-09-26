@@ -199,9 +199,9 @@
     editorPaddingX = 0;
     quietStartup = true;
     doubleEscapeAction = "tree";
-    defaultProjectTrust = "ask";
-    # tuiMode = "fullscreen";
-    # fullscreenExitOutput = "resume-hint";
+    defaultProjectTrust = "always";
+    tuiMode = "fullscreen";
+    fullscreenExitOutput = "resume-hint";
 
     # Warnings
     warnings.anthropicExtraUsage = false;
