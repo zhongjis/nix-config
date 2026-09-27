@@ -52,6 +52,10 @@ in {
         llmAgentsPackages.agentsview
         llmAgentsPackages.skills
         inputs.self.packages.${system}.before-and-after
+
+        # for before-and-after skill
+        pkgs.imagemagick
+        pkgs.ffmpeg
       ]
       ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
         llmAgentsPackages.chatgpt
