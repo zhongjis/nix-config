@@ -206,7 +206,7 @@
 
   sharedSettings = {
     # UI & Display
-    theme = "dark";
+    theme = "system";
     collapseChangelog = true;
     enableInstallTelemetry = false;
     treeFilterMode = "no-tools";
