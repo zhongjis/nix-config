@@ -245,6 +245,9 @@
     httpIdleTimeoutMs = 30000;
     websocketConnectTimeoutMs = 10000;
 
+    # Tools
+    defaultTools = ["+codemode"];
+
     # Resources
     packages = [
       "git:github.com/mavam/pi-mcporter@v1.0.2"
