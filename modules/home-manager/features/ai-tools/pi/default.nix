@@ -67,6 +67,20 @@
     callTimeoutMs = 30000;
   };
 
+  # pi-web-access reads $XDG_CONFIG_HOME/pi/web-search.json first: Copilot-hosted
+  # web_search on a GPT model, Exa when Copilot search is unavailable.
+  # ponytail: fixed Copilot Business endpoint; another Copilot plan needs its host here.
+  # Upgrade path: derive the Responses URL from Pi's Copilot base URL in pi-web-access.
+  piWorkWebSearch = {
+    openaiSearchProviders = ["github-copilot"];
+    openaiResponsesUrl = "https://api.business.githubcopilot.com/responses";
+    openaiSearchModel = "gpt-6-luna";
+    searchRouting = {
+      providers = ["openai" "exa"];
+      fallbackOn = ["transient" "quota" "network" "invalid-response" "unsupported"];
+    };
+  };
+
   localLlamaModels = [
     {
       id = "qwen3-coder:30b-a3b";
@@ -301,6 +315,10 @@ in {
     };
     ".pi/agent/mcporter.json".text = builtins.toJSON piMcporterSettings;
     ".pi/agent/models.json".text = builtins.toJSON piModels;
+  };
+
+  xdg.configFile = lib.optionalAttrs aiProfileHelpers.isWork {
+    "pi/web-search.json".text = builtins.toJSON piWorkWebSearch;
   };
 
   sops.secrets.opencode_zen_api_key = {
