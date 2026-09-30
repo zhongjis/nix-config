@@ -130,13 +130,6 @@
 
   cliproxyapiModels = [
     {
-      id = "gpt-5.5";
-      reasoning = true;
-      input = ["text" "image"];
-      contextWindow = 272000;
-      maxTokens = 128000;
-    }
-    {
       id = "gpt-5.6-luna";
       reasoning = true;
       input = ["text" "image"];
@@ -173,6 +166,13 @@
     }
     {
       id = "gpt-6-sol";
+      reasoning = true;
+      input = ["text" "image"];
+      contextWindow = 272000;
+      maxTokens = 128000;
+    }
+    {
+      id = "gpt-6.1-sol";
       reasoning = true;
       input = ["text" "image"];
       contextWindow = 272000;
