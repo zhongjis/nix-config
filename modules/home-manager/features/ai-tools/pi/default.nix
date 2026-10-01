@@ -174,6 +174,15 @@
     {
       id = "gpt-6.1-sol";
       reasoning = true;
+      thinkingLevelMap = {
+        off = "low";
+        minimal = "low";
+        low = "low";
+        medium = "medium";
+        high = "high";
+        xhigh = "xhigh";
+        max = "max";
+      };
       input = ["text" "image"];
       contextWindow = 272000;
       maxTokens = 128000;
