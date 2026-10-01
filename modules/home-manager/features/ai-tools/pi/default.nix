@@ -228,7 +228,7 @@
     };
 
     # Branch Summary
-    branchSummary.skipPrompt = true;
+    branchSummary.skipPrompt = false;
 
     # Retry
     retry = {
