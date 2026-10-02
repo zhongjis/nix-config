@@ -32,6 +32,11 @@ Run from the repo root:
 - `pi-config/lsp.json` was removed. `.pi-lsp.json` in pi-config is preserved legacy/non-dreki state; dreki project overrides use `.pi/lsp.json`.
 - Claude Code and Codex do not consume common LSP yet. Treat both as future integrations until projection + generated-config tests exist.
 
+## PI NATIVE PROXY CREDENTIALS
+
+- Pi's native Codex proxy provider uses a public dummy token plus command-backed `X-Api-Key`; real Codex tokens stay private to CLIProxyAPI.
+- Enable `websockets: true` per proxy Codex credential.
+
 ## STRUCTURE
 
 ```

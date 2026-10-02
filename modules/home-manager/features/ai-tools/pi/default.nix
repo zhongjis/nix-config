@@ -205,9 +205,11 @@
       }
       // lib.optionalAttrs cliproxyapiEnabled {
         cliproxyapi = {
-          baseUrl = "http://127.0.0.1:8317/v1";
-          api = "openai-responses";
-          apiKey = "!cat ${config.xdg.stateHome}/cliproxyapi/api-key";
+          baseUrl = "http://127.0.0.1:8317/backend-api/codex";
+          api = "openai-codex-responses";
+          # ponytail: public placeholder satisfies today's account parser; signature validation needs a client/account option, never silently substitute a real token.
+          apiKey = "eyJhbGciOiJub25lIn0.eyJodHRwczovL2FwaS5vcGVuYWkuY29tL2F1dGgiOnsiY2hhdGdwdF9hY2NvdW50X2lkIjoibG9jYWwtY2xpcHJveHlhcGkifX0.placeholder";
+          headers."X-Api-Key" = "!cat ${config.xdg.stateHome}/cliproxyapi/api-key";
           models = cliproxyapiModels;
         };
       };
@@ -293,10 +295,6 @@
   personalOverrides = {
     # defaultProvider = "llama-swap";
     # defaultModel = "qwen2.5-coder:14b";
-    # Only read by openai-codex provider; ignored by others (no fallback).
-    # Options: "sse" (default), "websocket", "websocket-cached", "auto".
-    # "websocket-cached" = WS + cached prompt context, no SSE fallback on failure.
-    transport = "sse";
     packages =
       sharedSettings.packages
       ++ [
