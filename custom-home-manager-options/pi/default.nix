@@ -15,10 +15,6 @@
     })
     entries;
 
-  instructionsText = builtins.concatStringsSep "\n\n" (map builtins.readFile cfg.instructions);
-
-  settingsFile = jsonFormat.generate "pi-settings.json" cfg.settings;
-
   piPackage =
     if cfg.opencodeApiKeyFile == null
     then cfg.package
@@ -63,16 +59,28 @@ in {
       description = "Files or directories exposed under ~/.pi/agent/extensions/.";
     };
 
-    instructions = lib.mkOption {
-      type = types.listOf types.path;
-      default = [];
-      description = "Markdown files concatenated into ~/.pi/agent/AGENTS.md.";
+    context = lib.mkOption {
+      type = types.either types.lines types.path;
+      default = "";
+      description = "Global context written to ~/.pi/agent/AGENTS.md (inline text or a path).";
     };
 
     settings = lib.mkOption {
       type = jsonFormat.type;
       default = {};
       description = "JSON data symlinked to ~/.pi/agent/settings.json. Immutable — pi cannot override it at runtime.";
+    };
+
+    models = lib.mkOption {
+      type = jsonFormat.type;
+      default = {};
+      description = "Custom model providers written to ~/.pi/agent/models.json.";
+    };
+
+    themes = lib.mkOption {
+      type = types.attrsOf jsonFormat.type;
+      default = {};
+      description = "Pi theme JSON files written to ~/.pi/agent/themes/<name>.json; the name field is set from the attribute name.";
     };
   };
 
@@ -86,12 +94,28 @@ in {
 
     home.packages = lib.optional (cfg.package != null) piPackage;
 
-    home.file =
-      mkPathFiles ".pi/agent/skills" cfg.skills
-      // mkPathFiles ".pi/agent/extensions" cfg.extensions
-      // {
-        ".pi/agent/AGENTS.md".text = instructionsText;
-        ".pi/agent/settings.json".source = settingsFile;
-      };
+    home.file = lib.mkMerge [
+      (mkPathFiles ".pi/agent/skills" cfg.skills)
+      (mkPathFiles ".pi/agent/extensions" cfg.extensions)
+      (lib.mkIf (lib.hm.strings.isPathLike cfg.context) {
+        ".pi/agent/AGENTS.md".source = cfg.context;
+      })
+      (lib.mkIf (!lib.hm.strings.isPathLike cfg.context && cfg.context != "") {
+        ".pi/agent/AGENTS.md".text = cfg.context;
+      })
+      (lib.mkIf (cfg.settings != {}) {
+        ".pi/agent/settings.json".source = jsonFormat.generate "pi-settings.json" cfg.settings;
+      })
+      (lib.mkIf (cfg.models != {}) {
+        ".pi/agent/models.json".source = jsonFormat.generate "pi-models.json" cfg.models;
+      })
+      (lib.mkIf (cfg.themes != {}) (
+        lib.mapAttrs' (name: value: {
+          name = ".pi/agent/themes/${name}.json";
+          value.source = jsonFormat.generate "pi-theme-${name}.json" (value // {inherit name;});
+        })
+        cfg.themes
+      ))
+    ];
   };
 }

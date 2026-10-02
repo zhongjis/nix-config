@@ -323,7 +323,6 @@ in {
       brokerArgs = [];
     };
     ".pi/agent/mcporter.json".text = builtins.toJSON piMcporterSettings;
-    ".pi/agent/models.json".text = builtins.toJSON piModels;
   };
 
   xdg.configFile = lib.optionalAttrs aiProfileHelpers.isWork {
@@ -346,11 +345,8 @@ in {
       else config.sops.secrets.opencode_zen_api_key.path;
     rtk.enable = true;
     skills = selectedSkills;
-    instructions =
-      commonInstructions
-      ++ [
-        "${./instructions/shell-tools.md}"
-      ];
+    context = builtins.concatStringsSep "\n\n" (map builtins.readFile (commonInstructions ++ [./instructions/shell-tools.md]));
+    models = piModels;
     settings = piSettings;
   };
 }
