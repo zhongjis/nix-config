@@ -217,7 +217,11 @@
 
   sharedSettings = {
     # UI & Display
-    theme = "system";
+    # The Stylix base16 theme comes from ./stylix-theme.nix.
+    theme =
+      if config.stylix.enable
+      then "stylix"
+      else "system";
     collapseChangelog = true;
     enableInstallTelemetry = false;
     treeFilterMode = "no-tools";
@@ -310,6 +314,7 @@ in {
   imports = [
     ../../../../../custom-home-manager-options/pi
     ./lsp.nix
+    ./stylix-theme.nix
   ];
 
   home.packages = [
