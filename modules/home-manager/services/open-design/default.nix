@@ -7,7 +7,18 @@
   openDesignPackages = inputs.open-design.packages.${system};
 in {
   imports = [
-    inputs.open-design.homeManagerModules.default
+    # ponytail: upstream retired its Nix module, which still reads deprecated
+    # pkgs.stdenv.is{Darwin,Linux}. Shim them here; vendor or drop the module
+    # if the open-design input ever changes.
+    ({pkgs, ...} @ args:
+      inputs.open-design.homeManagerModules.default (args
+        // {
+          pkgs =
+            pkgs
+            // {
+              stdenv = pkgs.stdenv // {inherit (pkgs.stdenv.hostPlatform) isDarwin isLinux;};
+            };
+        }))
   ];
 
   services.open-design = {
