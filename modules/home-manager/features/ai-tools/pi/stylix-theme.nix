@@ -7,6 +7,8 @@ lib.mkIf config.stylix.enable (let
   colors = config.lib.stylix.colors;
   slots = map (i: "base0${lib.toHexString i}") (lib.range 0 15);
   vars = lib.genAttrs slots (slot: colors.withHashtag.${slot});
+  # The editor border stays one color at every thinking level.
+  editorBorder = "base0D";
 
   defaultRoles = {
     accent = "base0D";
@@ -51,13 +53,13 @@ lib.mkIf config.stylix.enable (let
     syntaxType = "base0A";
     syntaxOperator = "base05";
     syntaxPunctuation = "base05";
-    thinkingOff = "base03";
-    thinkingMinimal = "base04";
-    thinkingLow = "base0C";
-    thinkingMedium = "base0D";
-    thinkingHigh = "base0E";
-    thinkingXhigh = "base08";
-    thinkingMax = "base09";
+    thinkingOff = editorBorder;
+    thinkingMinimal = editorBorder;
+    thinkingLow = editorBorder;
+    thinkingMedium = editorBorder;
+    thinkingHigh = editorBorder;
+    thinkingXhigh = editorBorder;
+    thinkingMax = editorBorder;
     bashMode = "base0B";
     scrollbarTrack = "base03";
     scrollbarThumb = "base05";
@@ -69,8 +71,6 @@ lib.mkIf config.stylix.enable (let
   tokyoNightDarkOverrides = {
     error = "base0F";
     toolDiffRemoved = "base0F";
-    thinkingXhigh = "base0F";
-    thinkingMax = "base0F";
     warning = "base0E";
     syntaxNumber = "base0C";
     userMessageBg = "base02";
@@ -82,7 +82,6 @@ lib.mkIf config.stylix.enable (let
     toolOutput = "base05";
     toolDiffContext = "base05";
     syntaxComment = "base05";
-    thinkingMinimal = "base05";
     text = "base08";
     userMessageText = "base08";
     toolTitle = "base08";
@@ -91,7 +90,6 @@ lib.mkIf config.stylix.enable (let
     mdCodeBlockBorder = "base04";
     mdQuoteBorder = "base04";
     mdHr = "base04";
-    thinkingOff = "base04";
   };
 
   resolved =
