@@ -23,7 +23,7 @@
       # init
       initial-command = "zsh -l -c 'cd ~/personal/nix-config && herdr'";
       confirm-close-surface = false;
-      background-opacity = 0.9;
+      background-opacity = 1;
       keybind = [
         "alt+backspace=text:\x1b\x7f"
       ];
