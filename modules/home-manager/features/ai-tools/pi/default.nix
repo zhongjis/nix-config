@@ -262,7 +262,6 @@
     # Resources
     packages = [
       "git:github.com/mavam/pi-mcporter@v1.0.2"
-      "git:github.com/jesseylin/pi-hashline-edit@v0.8.3"
       "git:github.com/davebcn87/pi-autoresearch@v1.8.1"
       "git:github.com/nicobailon/pi-web-access@v0.33.0"
       "git:github.com/nicobailon/pi-interactive-shell@v0.17.0"
