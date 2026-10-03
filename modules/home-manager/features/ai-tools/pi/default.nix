@@ -270,7 +270,7 @@
       "git:github.com/nicobailon/pi-web-access@v0.33.0"
       "git:github.com/nicobailon/pi-interactive-shell@v0.17.0"
       "git:github.com/nicobailon/pi-intercom@v0.15.0"
-      "git:github.com/chandra447/pi-hermes-memory"
+      "git:github.com/chandra447/pi-hermes-memory@v0.9.10"
       "git:github.com/championswimmer/pi-context-usage@v2.1.0"
       "git:github.com/championswimmer/pi-cache-graph@v1.0.2"
       {
