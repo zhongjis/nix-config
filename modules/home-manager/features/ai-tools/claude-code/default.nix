@@ -43,8 +43,10 @@ in {
       mode = "ultra";
     };
     skills = selectedSkills;
+    # Research subagents adapted from humanlayer/humanlayer .claude/agents
+    agentsDir = ./agents;
 
     # Use rules instead of settings.instructions so settings.json is not managed by HM
-    rules = instructionRules;
+    rules = instructionRules // {"20-intent-gate" = ./rules/20-intent-gate.md;};
   };
 }
