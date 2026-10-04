@@ -43,11 +43,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1790971918,
-        "narHash": "sha256-9rUi2RyKklf0Xg5b3x9to5FepusjnrFkEUmPU54WUR8=",
+        "lastModified": 1791151939,
+        "narHash": "sha256-zt/F0JVeE8+72iqhBK/2eV2WISV+dJ7mrxDnK0TlRK0=",
         "owner": "zhongjis",
         "repo": "agent-skills",
-        "rev": "d4999e9c7e4e05a78bedd8e6cd66b3b3acaab74e",
+        "rev": "7be2e6723e6d861c3587cba969a0f4b837cb6461",
         "type": "github"
       },
       "original": {
@@ -1347,11 +1347,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1791001326,
-        "narHash": "sha256-pwJhtpRcNX1pJ9luUy3Eh1EYUFsZjv5m2xSqZ1hEhMU=",
+        "lastModified": 1791149024,
+        "narHash": "sha256-ooUuzcRXYqecZCW5rC27uqdlGlCNdGkyaz5fetKHwJI=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "83984ebbbe5322b261d9fdc24eb15cf44f23abec",
+        "rev": "59d0417c2017794f8872b5556f133c8b0b413734",
         "type": "github"
       },
       "original": {
