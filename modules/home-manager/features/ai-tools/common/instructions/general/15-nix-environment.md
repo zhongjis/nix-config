@@ -1,6 +1,9 @@
 # Nix Environment Awareness
 
-**Context:** This environment uses the Nix package manager. Prefer ephemeral or project-scoped execution over mutating the host. If asked to edit the user's personal Nix config, use `~/personal/nix-config`.
+**Context:** This environment uses the Nix package manager. Prefer ephemeral or project-scoped execution over mutating the host.
+
+If asked to edit the user's personal Nix config, use `~/personal/nix-config`.
+If asked to edit the agent skills provisioned by Nix config, use `~/personal/agent-skills`.
 
 ## Command Selection
 
