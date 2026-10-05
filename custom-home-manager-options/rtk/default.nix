@@ -82,6 +82,19 @@ in {
         }
       ];
     }
+    (lib.mkIf (opencodeRtkCfg.enable || ompRtkCfg.enable || piRtkCfg.enable) {
+      home.file."rtk/config.toml" = {
+        target =
+          if pkgs.stdenv.hostPlatform.isDarwin
+          then "Library/Application Support/rtk/config.toml"
+          else "${config.xdg.configHome}/rtk/config.toml";
+        source = (pkgs.formats.toml {}).generate "rtk-config.toml" {
+          hooks.exclude_commands = ["pnpm lint" "pnpm run lint" "biome"];
+          telemetry.enabled = false;
+          retriever.mode = "tee";
+        };
+      };
+    })
     (lib.mkIf opencodeRtkCfg.enable {
       home.packages = [defaultRtkPackage];
       xdg.configFile."opencode/plugins/rtk.ts".source =
