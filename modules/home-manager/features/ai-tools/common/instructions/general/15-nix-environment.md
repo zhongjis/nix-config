@@ -2,9 +2,6 @@
 
 **Context:** This environment uses the Nix package manager. Prefer ephemeral or project-scoped execution over mutating the host.
 
-If asked to edit the user's personal Nix config, use `~/personal/nix-config`.
-If asked to edit the agent skills provisioned by Nix config, use `~/personal/agent-skills`.
-
 ## Command Selection
 
 - Use the project’s existing environment and package manager. Reuse an already-loaded environment. Otherwise, inspect `.envrc` when present and prefer the project’s approved direnv setup; use `nix develop` when no applicable direnv setup exists and the flake provides a suitable dev shell. Do not automatically authorize an untrusted `.envrc`.
