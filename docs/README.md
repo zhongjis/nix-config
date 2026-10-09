@@ -14,7 +14,7 @@ Behavioral conflicts resolve in this order:
 
 `docs/references/` provides evidence only, never policy.
 
-`CONTEXT.md` (when present) is authoritative for vocabulary, not system behavior.
+`GLOSSARY.md` (when present) is authoritative for vocabulary, not system behavior.
 
 ## Buckets
 
@@ -37,5 +37,5 @@ ADR history is append-only; supersede via a new ADR with reciprocal links.
 ## Related
 
 - Root `AGENTS.md` — execution contract for this repo.
-- [`CONTEXT.md`](../CONTEXT.md) — canonical domain language for this repo.
+- [`GLOSSARY.md`](../GLOSSARY.md) — canonical domain language for this repo.
 - Decisions — [ADR 0001: Public/private repository split](adr/0001-public-private-repo-split.md).
