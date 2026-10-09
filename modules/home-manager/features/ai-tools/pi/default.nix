@@ -21,37 +21,6 @@
     harness = "pi";
   };
 
-  convertEnvPlaceholders = value:
-    if builtins.isString value
-    then let
-      match = builtins.match "[{]env:([A-Za-z_][A-Za-z0-9_]*)[}]" value;
-    in
-      if match != null
-      then "\${${builtins.elemAt match 0}}"
-      else value
-    else if builtins.isAttrs value
-    then lib.mapAttrs (_: convertEnvPlaceholders) value
-    else if builtins.isList value
-    then map convertEnvPlaceholders value
-    else value;
-
-  # programs.mcp fills every option with a null default; Pi's mcp.json must not
-  # carry null fields, so drop null attrs (recursively) before serializing.
-  # Matches the dropNulls helper in ../codex/default.nix.
-  dropNulls = value:
-    if builtins.isAttrs value
-    then lib.mapAttrs (_: dropNulls) (lib.filterAttrs (_: attrValue: attrValue != null) value)
-    else if builtins.isList value
-    then map dropNulls (lib.filter (item: item != null) value)
-    else value;
-
-  piMcpServers = lib.mapAttrs (_: server: dropNulls (convertEnvPlaceholders server)) config.programs.mcp.servers;
-
-  # pi-config grants read-only agents (Fu Xi, Wenchang) only this server.
-  linearReadonly = lib.optionalAttrs (piMcpServers ? linear) {
-    linear-readonly = piMcpServers.linear // {url = "${piMcpServers.linear.url}/readonly";};
-  };
-
   # pi-web-access reads $XDG_CONFIG_HOME/pi/web-search.json first: Copilot-hosted
   # web_search on a GPT model, Exa when Copilot search is unavailable.
   # ponytail: fixed Copilot Business endpoint; another Copilot plan needs its host here.
@@ -306,7 +275,6 @@ in {
       brokerCommand = lib.getExe pkgs.bun;
       brokerArgs = [];
     };
-    ".pi/agent/mcp.json".text = builtins.toJSON {mcpServers = piMcpServers // linearReadonly;};
   };
 
   xdg.configFile = lib.optionalAttrs aiProfileHelpers.isWork {
@@ -332,5 +300,14 @@ in {
     context = builtins.concatStringsSep "\n\n" (map builtins.readFile (commonInstructions ++ [./instructions/shell-tools.md]));
     models = piModels;
     settings = piSettings;
+    enableMcpIntegration = true;
+    # pi-config grants read-only agents (Fu Xi, Wenchang) only this server.
+    mcpServers = lib.optionalAttrs (config.programs.mcp.servers ? linear) {
+      linear-readonly = {
+        inherit (config.programs.mcp.servers.linear) headers;
+        url = "${config.programs.mcp.servers.linear.url}/readonly";
+      };
+    };
+    keybindings."app.message.followUp" = "ctrl+shift+enter";
   };
 }

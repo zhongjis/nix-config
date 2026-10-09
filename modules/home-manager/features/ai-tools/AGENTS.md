@@ -103,7 +103,7 @@ Plugins configured via `pluginLib` helpers in `opencode/plugins/`:
 
 ## MCP SERVERS
 
-Servers are defined in `common/mcp/default.nix`. Pi consumes them via the generated `~/.pi/agent/mcp.json` in `pi/default.nix` (`{env:X}` → `${X}`), plus a Pi-only `linear-readonly` entry derived from `linear` when present.
+Servers are defined in `common/mcp/default.nix`. Pi consumes them via `programs.pi.enableMcpIntegration` (`custom-home-manager-options/pi`, `{env:X}` → `${X}`); Pi-only servers and per-field overrides go in `programs.pi.mcpServers` in `pi/default.nix`, such as `linear-readonly` derived from `linear` when present.
 
 ## ADDING NEW SKILLS
 

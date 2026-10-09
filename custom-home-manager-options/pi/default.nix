@@ -15,6 +15,29 @@
     })
     entries;
 
+  convertEnvPlaceholders = value:
+    if builtins.isString value
+    then let
+      match = builtins.match "[{]env:([A-Za-z_][A-Za-z0-9_]*)[}]" value;
+    in
+      if match != null
+      then "\${${builtins.elemAt match 0}}"
+      else value
+    else if builtins.isAttrs value
+    then lib.mapAttrs (_: convertEnvPlaceholders) value
+    else if builtins.isList value
+    then map convertEnvPlaceholders value
+    else value;
+
+  sharedMcpServers = lib.optionalAttrs (cfg.enableMcpIntegration && config.programs.mcp.enable) (lib.mapAttrs (_: server:
+    lib.hm.mcp.transformMcpServer {
+      inherit server;
+      mkFileRef = path: "!cat ${lib.escapeShellArg path}";
+    })
+  config.programs.mcp.servers);
+
+  mergedMcpServers = convertEnvPlaceholders (lib.recursiveUpdate sharedMcpServers cfg.mcpServers);
+
   piPackage =
     if cfg.opencodeApiKeyFile == null
     then cfg.package
@@ -77,6 +100,37 @@ in {
       description = "Custom model providers written to ~/.pi/agent/models.json.";
     };
 
+    keybindings = lib.mkOption {
+      type = types.attrsOf (types.either types.str (types.listOf types.str));
+      default = {};
+      example = {"app.message.followUp" = "ctrl+shift+enter";};
+      description = "Keybinding overrides written to ~/.pi/agent/keybindings.json. An empty list disables an action.";
+    };
+
+    enableMcpIntegration = lib.mkOption {
+      type = types.bool;
+      default = false;
+      description = ''
+        Whether to integrate the servers from programs.mcp.servers into
+        ~/.pi/agent/mcp.json. Servers are normalised with
+        lib.hm.mcp.transformMcpServer; environment file references
+        ({ file = path; }) become Pi `!cat <path>` commands.
+        programs.pi.mcpServers is deep-merged on top.
+      '';
+    };
+
+    mcpServers = lib.mkOption {
+      type = types.attrsOf jsonFormat.type;
+      default = {};
+      description = ''
+        MCP servers written to ~/.pi/agent/mcp.json under `mcpServers`. With
+        enableMcpIntegration they are deep-merged (lib.recursiveUpdate) over the
+        shared servers, so set only the fields to change, e.g. `enabled = false`
+        keeps a shared server out of Pi. OpenCode-style `{env:NAME}` placeholders
+        anywhere in the final servers are converted to Pi's `''${NAME}`.
+      '';
+    };
+
     themes = lib.mkOption {
       type = types.attrsOf jsonFormat.type;
       default = {};
@@ -108,6 +162,12 @@ in {
       })
       (lib.mkIf (cfg.models != {}) {
         ".pi/agent/models.json".source = jsonFormat.generate "pi-models.json" cfg.models;
+      })
+      (lib.mkIf (cfg.keybindings != {}) {
+        ".pi/agent/keybindings.json".source = jsonFormat.generate "pi-keybindings.json" cfg.keybindings;
+      })
+      (lib.mkIf (mergedMcpServers != {}) {
+        ".pi/agent/mcp.json".source = jsonFormat.generate "pi-mcp.json" {mcpServers = mergedMcpServers;};
       })
       (lib.mkIf (cfg.themes != {}) (
         lib.mapAttrs' (name: value: {
