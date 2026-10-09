@@ -27,7 +27,7 @@
       match = builtins.match "[{]env:([A-Za-z_][A-Za-z0-9_]*)[}]" value;
     in
       if match != null
-      then "$env:${builtins.elemAt match 0}"
+      then "\${${builtins.elemAt match 0}}"
       else value
     else if builtins.isAttrs value
     then lib.mapAttrs (_: convertEnvPlaceholders) value
@@ -35,9 +35,8 @@
     then map convertEnvPlaceholders value
     else value;
 
-  # mcporter rejects null-valued fields: a stdio server must not carry baseUrl,
-  # a url server must not carry command. programs.mcp fills every option with a
-  # null default, so drop null attrs (recursively) before serializing.
+  # programs.mcp fills every option with a null default; Pi's mcp.json must not
+  # carry null fields, so drop null attrs (recursively) before serializing.
   # Matches the dropNulls helper in ../codex/default.nix.
   dropNulls = value:
     if builtins.isAttrs value
@@ -46,25 +45,11 @@
     then map dropNulls (lib.filter (item: item != null) value)
     else value;
 
-  normalizeMcporterServer = server: let
-    converted = convertEnvPlaceholders server;
-    renamed =
-      if converted ? url && !(converted ? baseUrl)
-      then builtins.removeAttrs (converted // {baseUrl = converted.url;}) ["url"]
-      else converted;
-  in
-    dropNulls renamed;
+  piMcpServers = lib.mapAttrs (_: server: dropNulls (convertEnvPlaceholders server)) config.programs.mcp.servers;
 
-  mcporterConfig = {
-    "$schema" = "https://raw.githubusercontent.com/steipete/mcporter/main/mcporter.schema.json";
-    imports = [];
-    mcpServers = lib.mapAttrs (_: normalizeMcporterServer) config.programs.mcp.servers;
-  };
-
-  piMcporterSettings = {
-    version = 1;
-    defaultExposure = "match";
-    callTimeoutMs = 30000;
+  # pi-config grants read-only agents (Fu Xi, Wenchang) only this server.
+  linearReadonly = lib.optionalAttrs (piMcpServers ? linear) {
+    linear-readonly = piMcpServers.linear // {url = "${piMcpServers.linear.url}/readonly";};
   };
 
   # pi-web-access reads $XDG_CONFIG_HOME/pi/web-search.json first: Copilot-hosted
@@ -265,7 +250,6 @@
 
     # Resources
     packages = [
-      "git:github.com/mavam/pi-mcporter@v1.0.2"
       "git:github.com/davebcn87/pi-autoresearch@v1.8.1"
       "git:github.com/nicobailon/pi-web-access@v0.35.0"
       "git:github.com/nicobailon/pi-interactive-shell@v0.17.0"
@@ -317,17 +301,12 @@ in {
     ./stylix-theme.nix
   ];
 
-  home.packages = [
-    llmAgentsPackages.mcporter
-  ];
-
   home.file = {
-    ".mcporter/mcporter.json".text = builtins.toJSON mcporterConfig;
     ".pi/agent/intercom/config.json".text = builtins.toJSON {
       brokerCommand = lib.getExe pkgs.bun;
       brokerArgs = [];
     };
-    ".pi/agent/mcporter.json".text = builtins.toJSON piMcporterSettings;
+    ".pi/agent/mcp.json".text = builtins.toJSON {mcpServers = piMcpServers // linearReadonly;};
   };
 
   xdg.configFile = lib.optionalAttrs aiProfileHelpers.isWork {

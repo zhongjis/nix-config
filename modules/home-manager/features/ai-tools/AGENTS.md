@@ -103,7 +103,7 @@ Plugins configured via `pluginLib` helpers in `opencode/plugins/`:
 
 ## MCP SERVERS
 
-Defined in `common/mcp/default.nix`. General: nixos-docs, context7, mcp-k8s. Personal: flux-operator-mcp.
+Servers are defined in `common/mcp/default.nix`. Pi consumes them via the generated `~/.pi/agent/mcp.json` in `pi/default.nix` (`{env:X}` → `${X}`), plus a Pi-only `linear-readonly` entry derived from `linear` when present.
 
 ## ADDING NEW SKILLS
 
