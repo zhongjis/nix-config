@@ -49,8 +49,9 @@ in {
         llmAgentsPackages.beads
         llmAgentsPackages.herdr
         llmAgentsPackages.codegraph
-        llmAgentsPackages.agentsview
+        # llmAgentsPackages.agentsview
         llmAgentsPackages.skills
+        llmAgentsPackages.agent-browser
         inputs.self.packages.${system}.before-and-after
 
         # for before-and-after skill
