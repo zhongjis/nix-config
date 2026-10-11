@@ -43,7 +43,8 @@ in {
       mode = "lite";
     };
     skills = selectedSkills;
-    # Research subagents adapted from humanlayer/humanlayer .claude/agents
+    # Research subagents adapted from humanlayer/humanlayer .claude/agents;
+    # implementer subagents adapted from Pi jintong/yunu
     agentsDir = ./agents;
 
     # Use rules instead of settings.instructions so settings.json is not managed by HM
