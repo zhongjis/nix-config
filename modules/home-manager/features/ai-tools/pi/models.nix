@@ -114,7 +114,7 @@
         max = "max";
       };
       input = ["text" "image"];
-      contextWindow = 272000;
+      contextWindow = 500000;
       maxTokens = 128000;
     }
   ];
