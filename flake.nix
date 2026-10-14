@@ -39,7 +39,14 @@
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
 
     ## nix-homebrew
-    nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
+    nix-homebrew = {
+      url = "github:zhaofengli-wip/nix-homebrew";
+      # ponytail: newer homebrew-core needs brew > nix-homebrew's pinned 7.0.4; drop once upstream bumps brew-src.
+      inputs.brew-src = {
+        url = "github:Homebrew/brew/7.0.9";
+        flake = false;
+      };
+    };
     homebrew-core = {
       url = "github:homebrew/homebrew-core";
       flake = false;
