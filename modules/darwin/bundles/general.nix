@@ -66,6 +66,7 @@
       "alfred"
       "bitwarden"
       "ghostty"
+      "vorssaint"
 
       "obsidian"
       "spotify"
