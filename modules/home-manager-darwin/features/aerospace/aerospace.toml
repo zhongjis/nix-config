@@ -226,11 +226,31 @@ run = 'move-node-to-workspace I' # mnemonics I - Intellij Idea
 
 [[on-window-detected]]
 if.app-id = 'com.spotify.client'
-run = 'move-node-to-workspace S' # mnemonics S - Spotify
+run = 'move-node-to-workspace 1' # Spotify
 
 [[on-window-detected]]
 if.app-id = 'com.tinyspeck.slackmacgap'
 run = 'move-node-to-workspace S' # mnemonics S - Slack
+
+[[on-window-detected]]
+if.app-id = 'com.microsoft.Outlook'
+run = 'move-node-to-workspace 2' # Outlook
+
+[[on-window-detected]]
+if.app-id = 'com.microsoft.teams2'
+run = 'move-node-to-workspace 2' # Teams
+
+[[on-window-detected]]
+if.app-id = 'com.insomnia.app'
+run = 'move-node-to-workspace P' # mnemonics P - PostBuster
+
+[[on-window-detected]]
+if.app-id = 'net.imput.helium'
+run = 'move-node-to-workspace Z' # Helium browser
+
+[[on-window-detected]]
+if.app-id = 'com.mitchellh.ghostty'
+run = 'move-node-to-workspace Z' # Ghostty terminal
 
 [[on-window-detected]]
 if.app-id = 'md.obsidian'
