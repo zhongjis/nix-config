@@ -20,15 +20,15 @@
 in {
   programs.pi.settings.packages = lib.mkMerge [
     [
-      "git:github.com/davebcn87/pi-autoresearch@v1.8.1"
-      "git:github.com/nicobailon/pi-web-access@v0.35.0"
-      "git:github.com/nicobailon/pi-interactive-shell@v0.17.0"
-      "git:github.com/nicobailon/pi-intercom@v0.16.0"
+      "git:github.com/davebcn87/pi-autoresearch@v1.9.0"
+      "git:github.com/nicobailon/pi-web-access@v0.40.0"
+      "git:github.com/nicobailon/pi-interactive-shell@v0.17.1"
+      "git:github.com/nicobailon/pi-intercom@v0.17.0"
       "git:github.com/chandra447/pi-hermes-memory@v0.9.10"
       "git:github.com/championswimmer/pi-context-usage@v2.1.0"
       "git:github.com/championswimmer/pi-cache-graph@v1.0.2"
       {
-        source = "git:github.com/backnotprop/plannotator@v0.27.22";
+        source = "git:github.com/backnotprop/plannotator@v0.28.20";
         extensions = ["apps/pi-extension"];
         skills = ["apps/pi-extension/skills"];
       }
