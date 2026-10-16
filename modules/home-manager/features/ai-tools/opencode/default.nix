@@ -37,7 +37,7 @@ in {
     enableMcpIntegration = true;
     caveman = {
       enable = true;
-      mode = "ultra";
+      mode = "full";
     };
     rtk.enable = true;
     skills = selectedSkills;

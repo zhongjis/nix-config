@@ -114,7 +114,7 @@ in {
     seedSettings = codexSeedSettings;
     caveman = {
       enable = true;
-      mode = "ultra";
+      mode = "full";
     };
     package = llmAgentsPackages.codex;
     context = codexContext;

@@ -40,7 +40,7 @@ in {
     package = llmAgentsPackages.claude-code;
     caveman = {
       enable = true;
-      mode = "lite";
+      mode = "full";
     };
     skills = selectedSkills;
     # Research subagents adapted from humanlayer/humanlayer .claude/agents;
