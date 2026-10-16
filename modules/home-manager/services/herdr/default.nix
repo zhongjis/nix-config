@@ -39,8 +39,8 @@ in {
         agent_panel_sort = "priority";
         status_indicators = "symbols";
         sidebar.agents.rows = [
-          ["state_icon" "workspace" "tab"]
-          ["agent" "terminal_title_stripped"]
+          ["state_icon" "workspace" "agent"]
+          ["terminal_title_stripped"]
         ];
         # Auto-name tabs; workspaces use the root pane's repo/folder.
         prompt_new_tab_name = false;
