@@ -36,7 +36,7 @@ in {
         }
       ];
       ui = {
-        agent_panel_sort = "priority";
+        # agent_panel_sort = "priority";
         status_indicators = "symbols";
         sidebar.agents.rows = [
           ["state_icon" "workspace"]
