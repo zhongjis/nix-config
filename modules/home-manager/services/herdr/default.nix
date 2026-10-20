@@ -36,10 +36,39 @@ in {
         }
       ];
       ui = {
-        # agent_panel_sort = "priority";
-        status_indicators = "symbols";
+        # pane_borders = "always";
+        # tab_bar_position = "bottom";
+        tab_bar_right = [
+          {type = "zoom";}
+          {type = "hostname";}
+          {
+            type = "datetime";
+            format = "%H:%M";
+          }
+          {
+            type = "command";
+            command = "~/.config/herdr/status.sh";
+            interval_seconds = 5;
+            timeout_seconds = 2;
+          }
+        ];
+        tab_bar_right_separator = " · ";
+        agent_panel_sort = "priority";
+        # status_indicators = "symbols";
         sidebar.agents.rows = [
           ["state_icon" "workspace"]
+          [
+            {
+              token = "tab";
+              # Auto names are numeric indexes ("1", "2"); hide them, keep user-set names.
+              rules = [
+                {
+                  gt = 0;
+                  hide = true;
+                }
+              ];
+            }
+          ]
           ["terminal_title"]
         ];
         # Auto-name tabs; workspaces use the root pane's repo/folder.
