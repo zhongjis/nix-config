@@ -8,6 +8,11 @@
 
     signing.format = "openpgp";
 
+    ignores = [
+      "**/.claude/settings.local.json"
+      ".icm/"
+    ];
+
     # configure username and email in home.nix
     settings = {
       user = {
