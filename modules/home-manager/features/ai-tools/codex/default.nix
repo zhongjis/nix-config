@@ -117,6 +117,7 @@ in {
       mode = "full";
     };
     package = llmAgentsPackages.codex;
+    icm.enable = true;
     context = codexContext;
     rules = {};
     # Codex mutates ~/.codex/config.toml for project trust and local state.

@@ -40,6 +40,7 @@ in {
       mode = "full";
     };
     rtk.enable = true;
+    icm.enable = true;
     skills = selectedSkills;
 
     settings = {

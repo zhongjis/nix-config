@@ -12,6 +12,7 @@ in {
   imports = [
     ../../../../custom-home-manager-options/caveman
     ../../../../custom-home-manager-options/codex
+    ../../../../custom-home-manager-options/icm
     ../../../../custom-home-manager-options/rtk
     ./common
     ./codex

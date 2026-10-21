@@ -39,6 +39,7 @@ in {
       then null
       else config.sops.secrets.opencode_zen_api_key.path;
     rtk.enable = true;
+    icm.enable = true;
     skills = selectedSkills;
     context = builtins.concatStringsSep "\n\n" (map builtins.readFile (commonInstructions ++ [./instructions/shell-tools.md]));
     enableMcpIntegration = true;

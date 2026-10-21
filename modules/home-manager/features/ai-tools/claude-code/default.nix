@@ -38,6 +38,7 @@ in {
     enable = true;
     enableMcpIntegration = false;
     package = llmAgentsPackages.claude-code;
+    icm.enable = true;
     caveman = {
       enable = true;
       mode = "full";
