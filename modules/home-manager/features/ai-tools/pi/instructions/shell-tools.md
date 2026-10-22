@@ -5,13 +5,16 @@
 ## Relationship to CodeGraph
 
 Use CodeGraph first for questions about indexed code structure: architecture,
-code flow, symbol definitions, callers/callees, impact radius, routes,
+code flow, symbol lookup, callers/callees, impact radius, routes,
 components, and "how does X work?" questions.
+
+Use LSP for symbol-precise facts: definitions, references, hover/type info,
+implementations, and diagnostics.
 
 For known targets, use `read` for a known path and `rg` for exact text, literals, config, or docs.
 Use `fd` for paths/files and `ast-grep` for syntax-shaped patterns that regex cannot safely match.
 
-Use CodeGraph evidence for indexed architecture and code flow rather than reconstructing it with `rg` or `read`. Fall back to direct tools when CodeGraph is unavailable, files are generated or non-indexed, or graph evidence is incomplete.
+Use CodeGraph evidence for indexed architecture and code flow rather than reconstructing it with `rg` or `read`. Fall back to direct tools and LSP when CodeGraph is unavailable, files are generated or non-indexed, or graph evidence is incomplete.
 
 ## POSIX fallbacks
 
