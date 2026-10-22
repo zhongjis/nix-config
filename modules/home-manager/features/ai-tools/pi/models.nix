@@ -60,6 +60,11 @@
 
   cliproxyapiModels = [
     {
+      id = "gemini-4-argon-high";
+      reasoning = true;
+      input = ["text" "image"];
+    }
+    {
       id = "gpt-5.6-luna";
       reasoning = true;
       input = ["text" "image"];
