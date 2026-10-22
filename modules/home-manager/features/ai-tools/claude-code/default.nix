@@ -34,6 +34,9 @@ in {
     llmAgentsPackages.oh-my-claudecode
   ];
 
+  # ICM is the memory store; disable Claude Code's built-in auto memory.
+  home.sessionVariables.CLAUDE_CODE_DISABLE_AUTO_MEMORY = "1";
+
   programs.claude-code = {
     enable = true;
     enableMcpIntegration = false;
