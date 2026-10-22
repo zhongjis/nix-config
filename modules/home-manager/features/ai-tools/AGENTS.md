@@ -32,6 +32,11 @@ Run from the repo root:
 - `pi-config/lsp.json` was removed. `.pi-lsp.json` in pi-config is preserved legacy/non-dreki state; dreki project overrides use `.pi/lsp.json`.
 - Claude Code and Codex do not consume common LSP yet. Treat both as future integrations until projection + generated-config tests exist.
 
+## PI RUNTIME PATCH
+
+- [Pi package override](pi/default.nix) applies the [Codex provider-error patch](pi/patches/codex-provider-errors.patch) and runs the [real-adapter regression driver](pi/tests/codex-provider-errors.mjs) before upstream Bun compilation. Keep terminal diagnostics scalar-only and preserve upstream display and retry behavior.
+- Run the driver with Bun and a patched `@earendil-works/pi-ai` package directory as its argument; it uses injected fetch responses, without network access or credentials.
+
 ## PI NATIVE PROXY CREDENTIALS
 
 - Pi's native Codex proxy provider uses a public dummy token plus command-backed `X-Api-Key`; real Codex tokens stay private to CLIProxyAPI.

@@ -1,0 +1,98 @@
+--- a/node_modules/@earendil-works/pi-ai/dist/api/openai-codex-responses.js
++++ b/node_modules/@earendil-works/pi-ai/dist/api/openai-codex-responses.js
+@@ -300,7 +300,11 @@
+                         statusText: response.statusText,
+                     });
+                     const info = await parseErrorResponse(fakeResponse);
+-                    throw new Error(info.friendlyMessage || info.message);
++                    throw new CodexApiError(info.friendlyMessage || info.message, {
++                        status: response.status,
++                        code: info.errorCode,
++                        errorType: info.errorType,
++                    });
+                 }
+                 catch (error) {
+                     if (error instanceof Error) {
+@@ -344,6 +348,13 @@
+                 delete block.partialJson;
+                 delete block.customInput;
+             }
++            if (error instanceof CodexApiError) {
++                appendAssistantMessageDiagnostic(output, createAssistantMessageDiagnostic("provider_response_failure", error, {
++                    ...(typeof error.status === "number" ? { status: error.status } : {}),
++                    ...(typeof error.code === "string" ? { errorCode: error.code } : {}),
++                    ...(typeof error.errorType === "string" ? { errorType: error.errorType } : {}),
++                }));
++            }
+             output.stopReason = options?.signal?.aborted ? "aborted" : "error";
+             output.errorMessage = formatProviderError(normalizeProviderError(error));
+             stream.push({ type: "error", reason: output.stopReason, error: output });
+@@ -486,11 +497,15 @@
+ }
+ class CodexApiError extends Error {
+     code;
++    status;
++    errorType;
+     payload;
+     constructor(message, options) {
+         super(message);
+         this.name = "CodexApiError";
+         this.code = options?.code;
++        this.status = options?.status;
++        this.errorType = options?.errorType;
+         this.payload = options?.payload;
+         this.cause = options?.cause;
+     }
+@@ -526,6 +541,7 @@
+     const nested = event.error && typeof event.error === "object" ? event.error : undefined;
+     return {
+         code: typeof event.code === "string" ? event.code : typeof nested?.code === "string" ? nested.code : undefined,
++        errorType: typeof nested?.type === "string" ? nested.type : undefined,
+         message: typeof event.message === "string"
+             ? event.message
+             : typeof nested?.message === "string"
+@@ -546,9 +562,10 @@
+         if (!type)
+             continue;
+         if (type === "error") {
+-            const { code, message } = extractCodexEventError(event);
++            const { code, errorType, message } = extractCodexEventError(event);
+             throw new CodexApiError(`Codex error: ${message || code || JSON.stringify(event)}`, {
+                 code,
++                errorType,
+                 payload: event,
+             });
+         }
+@@ -556,7 +573,7 @@
+             const response = event.response;
+             const code = response?.error?.code;
+             const message = response?.error?.message;
+-            throw new CodexApiError(message || "Codex response failed", { code, payload: event });
++            throw new CodexApiError(message || "Codex response failed", { code, errorType: response?.error?.type, payload: event });
+         }
+         if (type === "response.done" || type === "response.completed" || type === "response.incomplete") {
+             const response = event.response;
+@@ -1242,10 +1259,14 @@
+     const raw = await response.text();
+     let message = raw || response.statusText || "Request failed";
+     let friendlyMessage;
++    let errorCode;
++    let errorType;
+     try {
+         const parsed = JSON.parse(raw);
+         const err = parsed?.error;
+         if (err) {
++            errorCode = typeof err.code === "string" ? err.code : undefined;
++            errorType = typeof err.type === "string" ? err.type : undefined;
+             const code = err.code || err.type || "";
+             if (/usage_limit_reached|usage_not_included|rate_limit_exceeded/i.test(code) || response.status === 429) {
+                 const plan = err.plan_type ? ` (${err.plan_type.toLowerCase()} plan)` : "";
+@@ -1259,7 +1280,7 @@
+         }
+     }
+     catch { }
+-    return { message, friendlyMessage };
++    return { message, friendlyMessage, errorCode, errorType };
+ }
+ // ============================================================================
+ // Auth & Headers

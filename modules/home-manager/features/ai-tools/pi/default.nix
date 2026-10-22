@@ -30,7 +30,12 @@ in {
 
   programs.pi = {
     enable = true;
-    package = llmAgentsPackages.pi;
+    package = llmAgentsPackages.pi.overrideAttrs (old: {
+      preInstall = ''
+        patch -p1 < ${./patches/codex-provider-errors.patch}
+        ${lib.getExe pkgs.bun} ${./tests/codex-provider-errors.mjs} "$PWD/node_modules/@earendil-works/pi-ai"
+      '' + (old.preInstall or "");
+    });
     # ponytail: gates by "work" profile, not literally hostname. Today work==mac-m1-max 1:1,
     # so this deprovisions opencode/opencode-go for pi on mac only. A future second work-host
     # would also lose it; upgrade path = switch to hostname/currentSystemName if that happens.
