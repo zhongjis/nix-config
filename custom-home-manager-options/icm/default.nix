@@ -39,8 +39,10 @@
   claudeHooks = {
     SessionStart = [(hookEntry "start" null)];
     PreToolUse = [(hookEntry "pre" "Bash")];
+    PostToolUse = [(hookEntry "post" null)];
     UserPromptSubmit = [(hookEntry "prompt" null)];
     PreCompact = [(hookEntry "compact" null)];
+    SessionEnd = [(hookEntry "end" null)];
   };
 
   # No PostToolUse: Codex fires it on every shell command and floods the store (icm #288).
@@ -211,11 +213,13 @@ in {
         }
       ];
 
-      # Pinned: no LLM summarizer, no raw tool-output dumps. [store].path is left
-      # unset so per-repo .icm/ databases keep working.
+      # summarizer `auto`: hook-driven extraction (Claude Code) runs through the
+      # invoking agent's CLI; Pi's icm extension extracts with Pi's model only
+      # under `auto`. No raw tool-output dumps. [store].path is left unset so
+      # per-repo .icm/ databases keep working.
       programs.icm.settings.extraction = {
         store_raw = false;
-        summarizer.provider = "none";
+        summarizer.provider = "auto";
       };
 
       home.packages = [cfg.package];
