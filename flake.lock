@@ -43,11 +43,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1792533107,
-        "narHash": "sha256-lxPqczj6l75nV7a2w8Jb1lER718WVysD2mTGRTLDxOU=",
+        "lastModified": 1792698391,
+        "narHash": "sha256-SqhdBNbjeEOx0Q+6UaJW+Mrnk+hklt2GlAQSylrFKwE=",
         "ref": "refs/heads/main",
-        "rev": "7a3ad72bacc8c70cda91b138c9d03d58b72dddae",
-        "revCount": 162,
+        "rev": "76e0b6c15eab85a9e0d891780b4f50938a995695",
+        "revCount": 163,
         "type": "git",
         "url": "ssh://git@github.com/zhongjis/agent-skills.git"
       },
@@ -1347,11 +1347,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1792687927,
-        "narHash": "sha256-O8JsXXPl26uxJ2nITotVnq7FAubqzsK4pWhZuh78bDA=",
+        "lastModified": 1792790599,
+        "narHash": "sha256-MJD+l0f+MX0fEL9RkYGiscWuUzmwYmmekelph6eiJh0=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "24cf271f40105749bb82ad318013c372183ef28e",
+        "rev": "c0a8defef94e867d2f3d0c4cbe28d73f51b9ea15",
         "type": "github"
       },
       "original": {
