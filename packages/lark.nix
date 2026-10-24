@@ -3,16 +3,16 @@
   lib,
 }: let
   pname = "lark";
-  version = "7.72.23";
+  version = "8.0.18";
 
   srcs = {
     x86_64-linux = {
-      url = "https://lf16-larkversion.larksuitecdn.com/obj/lark-version-sg/b69ee051/Lark-linux_x64-${version}.deb";
-      sha256 = "sha256-cSKhFlj8DqkTkrMkEYNzP4jRrG6ruyO+LLV24MhNrI8=";
+      url = "https://lf16-larkversion.larksuitecdn.com/obj/lark-version-sg/4c647c08/Lark-linux_x64-${version}.deb";
+      sha256 = "sha256-0WFobFrlLWmaFI12QxCGn1XTyoZtV6fiSWOq+oC2ejw=";
     };
     aarch64-linux = {
-      url = "https://lf16-larkversion.larksuitecdn.com/obj/lark-version-sg/55b582c7/Lark-linux_arm64-${version}.deb";
-      sha256 = "sha256-4hH2kliDzS60SF5bAOBHbdxG5q2G7T+OQM6HQR4Mbtk=";
+      url = "https://lf16-larkversion.larksuitecdn.com/obj/lark-version-sg/25ef09d6/Lark-linux_arm64-${version}.deb";
+      sha256 = "sha256-LT3UrFsNMPCg0/Ylf6aiggMDBle98ReqV5iAZbj6buw=";
     };
   };
 
