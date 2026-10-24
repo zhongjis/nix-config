@@ -3,11 +3,11 @@
   lib,
 }: let
   pname = "fincept-terminal";
-  version = "4.5.0";
+  version = "4.5.1";
 
   src = pkgs.fetchurl {
     url = "https://github.com/Fincept-Corporation/FinceptTerminal/releases/download/v${version}/FinceptTerminal-${version}-linux-x64-setup.run";
-    sha256 = "sha256-KYN8aaMpWZTebpaEuk9Z/TVK0C2gA7NY8W2jjmVYuyw=";
+    sha256 = "sha256-BbV0Mk+YSujpVNQ5sz9kl+SDaYB1mWosss8YmynMPwo=";
     name = "${pname}-${version}.AppImage";
   };
 
