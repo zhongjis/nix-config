@@ -107,6 +107,22 @@
       maxTokens = 128000;
     }
     {
+      id = "gpt-6.1-terra";
+      reasoning = true;
+      thinkingLevelMap = {
+        off = "low";
+        minimal = "low";
+        low = "low";
+        medium = "medium";
+        high = "high";
+        xhigh = "xhigh";
+        max = "max";
+      };
+      input = ["text" "image"];
+      contextWindow = 500000;
+      maxTokens = 128000;
+    }
+    {
       id = "gpt-6.1-sol";
       reasoning = true;
       thinkingLevelMap = {
