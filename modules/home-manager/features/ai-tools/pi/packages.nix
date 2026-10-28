@@ -36,7 +36,7 @@ in {
       # "git:github.com/aliou/pi-guardrails@v0.15.0"
     ])
     (lib.mkIf aiProfileHelpers.isPersonal [
-      "git:github.com/Rahularya01/pi-antigravity"
+      # "git:github.com/Rahularya01/pi-antigravity"
     ])
   ];
 
