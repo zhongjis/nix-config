@@ -8,6 +8,13 @@
   inherit (pkgs.stdenv.hostPlatform) system;
   cfg = config.programs.icm;
   tomlFormat = pkgs.formats.toml {};
+  configuredDatabase = cfg.settings.store.path or "";
+  daemonDatabase =
+    if configuredDatabase == ""
+    then "${config.xdg.dataHome}/icm/memories.db"
+    else if lib.hasPrefix "/" configuredDatabase
+    then configuredDatabase
+    else "${config.home.homeDirectory}/${configuredDatabase}";
 
   defaultIcmPackage =
     if inputs ? llm-agents
@@ -18,7 +25,8 @@
   codexEnabled = config.programs.codex.icm.enable;
   piEnabled = config.programs.pi.icm.enable;
   opencodeEnabled = config.programs.opencode.icm.enable;
-  anyEnabled = claudeEnabled || codexEnabled || piEnabled || opencodeEnabled;
+  anyIntegrationEnabled = claudeEnabled || codexEnabled || piEnabled || opencodeEnabled;
+  anyEnabled = anyIntegrationEnabled || cfg.daemon.enable;
 
   # Stable profile path, not a /nix/store path, so hooks survive package bumps.
   # Also the marker that identifies icm-owned hook entries for removal.
@@ -177,7 +185,16 @@ in {
       type = lib.types.nullOr lib.types.package;
       default = defaultIcmPackage;
       defaultText = lib.literalExpression "inputs.llm-agents.packages.\${pkgs.stdenv.hostPlatform.system}.icm";
-      description = "icm package shared by every agent integration.";
+      description = "icm package shared by every agent integration and the daemon.";
+    };
+
+    daemon = {
+      enable = lib.mkEnableOption "the Linux ICM HTTP user service";
+      address = lib.mkOption {
+        type = lib.types.strMatching "(127[.]0[.]0[.]1|[[]::1[]]):[0-9]+";
+        default = "127.0.0.1:9876";
+        description = "Loopback listen address for the ICM HTTP daemon.";
+      };
     };
 
     settings = lib.mkOption {
@@ -207,20 +224,11 @@ in {
         {
           assertion = cfg.package != null;
           message = ''
-            programs.icm.package must be set when an icm integration is enabled.
+            programs.icm.package must be set when an icm integration or daemon is enabled.
             If you import this module outside this flake, pass the package explicitly or provide inputs.llm-agents.
           '';
         }
       ];
-
-      # summarizer `auto`: hook-driven extraction (Claude Code) runs through the
-      # invoking agent's CLI; Pi's icm extension extracts with Pi's model only
-      # under `auto`. No raw tool-output dumps. [store].path is left unset so
-      # per-repo .icm/ databases keep working.
-      programs.icm.settings.extraction = {
-        store_raw = false;
-        summarizer.provider = "auto";
-      };
 
       home.packages = [cfg.package];
 
@@ -230,6 +238,43 @@ in {
           then "Library/Application Support/dev.icm.icm/config.toml"
           else "${config.xdg.configHome}/icm/config.toml";
         source = tomlFormat.generate "icm-config.toml" cfg.settings;
+      };
+    })
+    (lib.mkIf anyIntegrationEnabled {
+      # summarizer `auto`: hook-driven extraction (Claude Code) runs through the
+      # invoking agent's CLI; Pi's icm extension extracts with Pi's model only
+      # under `auto`. No raw tool-output dumps. [store].path is left unset so
+      # per-repo .icm/ databases keep working.
+      programs.icm.settings.extraction = {
+        store_raw = false;
+        summarizer.provider = "auto";
+      };
+    })
+    (lib.mkIf cfg.daemon.enable {
+      assertions = [
+        {
+          assertion = pkgs.stdenv.hostPlatform.isLinux;
+          message = "programs.icm.daemon requires Linux.";
+        }
+      ];
+    })
+    (lib.mkIf (cfg.daemon.enable && pkgs.stdenv.hostPlatform.isLinux) {
+      xdg.configFile."icm/daemon.json".text = builtins.toJSON {
+        url = "http://${cfg.daemon.address}/mcp";
+        database = daemonDatabase;
+      };
+      systemd.user.services.icm = {
+        Unit = {
+          Description = "ICM HTTP daemon";
+          After = ["network.target"];
+        };
+        Service = {
+          ExecStart = "${lib.getExe cfg.package} --db ${lib.escapeShellArg daemonDatabase} serve --http ${lib.escapeShellArg cfg.daemon.address}";
+          WorkingDirectory = config.home.homeDirectory;
+          Restart = "on-failure";
+          RestartSec = "5s";
+        };
+        Install.WantedBy = ["default.target"];
       };
     })
     (lib.mkIf piEnabled {

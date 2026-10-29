@@ -11,6 +11,7 @@ in {
     ../../modules/home-manager
     ../../modules/home-manager-linux
   ];
+  programs.icm.daemon.enable = true;
   myHomeManager.aiProfile = "personal";
   myHomeManager.bundles.general.enable = true;
   myHomeManager.obsidian.enable = true;

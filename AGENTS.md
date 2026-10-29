@@ -63,6 +63,12 @@ Run from the repo root:
 - Edit secrets with `nix run nixpkgs#sops -- secrets.yaml`; the age key lives at `~/.config/sops/age/keys.txt`.
 - Verify changes with the smallest relevant check. Run `nix flake check` only when broader flake validation is warranted.
 
+## ICM HOME MANAGER
+
+- [The ICM custom module](custom-home-manager-options/icm/default.nix) owns shared agent integration configuration and the optional Linux HTTP user service; its default package comes from `inputs.llm-agents`.
+- The loopback-only daemon publishes `$XDG_CONFIG_HOME/icm/daemon.json` with its MCP URL and absolute database path, matching service `--db`. Nonempty `settings.store.path` resolves against home; otherwise it uses `$XDG_DATA_HOME/icm/memories.db`. CLI settings and standalone extraction defaults remain untouched. [Framework home](hosts/framework-16/home.nix) enables it.
+- Verify module configuration without activation: `nix eval --impure --raw --expr '(import ./tests/icm.nix).drvPath'` ([regression check](tests/icm.nix)).
+
 ## MODULE SYSTEM
 
 - `myLib.extendModules` scans directories for `.nix` files and wraps each with an enable option plus `mkIf`.
