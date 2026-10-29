@@ -36,7 +36,8 @@ in {
         }
       ];
       ui = {
-        # pane_borders = "always";
+        # Frame lone panes too so pane names stay visible.
+        pane_borders = "always";
         # tab_bar_position = "bottom";
         tab_bar_right = [
           {type = "zoom";}
@@ -56,8 +57,9 @@ in {
         agent_panel_sort = "priority";
         # status_indicators = "symbols";
         sidebar.agents.rows = [
-          ["state_icon" "workspace"]
           [
+            "state_icon"
+            "workspace"
             {
               token = "tab";
               # Auto names are numeric indexes ("1", "2"); hide them, keep user-set names.
@@ -65,6 +67,19 @@ in {
                 {
                   gt = 0;
                   hide = true;
+                }
+              ];
+            }
+          ]
+          [
+            {
+              token = "pane";
+              # Unlabeled panes have no value, so the row disappears.
+              # Dim smart-sessions titles; keep manual names bright.
+              rules = [
+                {
+                  starts_with = "[w]";
+                  dim = true;
                 }
               ];
             }
