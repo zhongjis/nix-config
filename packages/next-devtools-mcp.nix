@@ -4,6 +4,7 @@
 }: let
   pname = "next-devtools-mcp";
   version = "0.4.0";
+  pnpm = pkgs.pnpm_12;
 
   src = pkgs.fetchFromGitHub {
     owner = "vercel";
@@ -16,15 +17,15 @@ in
     inherit pname version src;
 
     pnpmDeps = pkgs.fetchPnpmDeps {
-      inherit pname version src;
-      fetcherVersion = 4;
-      hash = "sha256-X0DQ9bRLEDNXpWRqO/2SAkH7U+kpoQUPbsjYZDm/wm8=";
+      inherit pname version src pnpm;
+      fetcherVersion = 5;
+      hash = "sha256-mEBQbcnrEt7T3Q4CZmzyZxudT6KRP/uuOcZGMQc4Ahs=";
     };
 
     nativeBuildInputs = [
       pkgs.nodejs_24
       pkgs.makeWrapper
-      pkgs.pnpm
+      pnpm
       pkgs.pnpmConfigHook
     ];
 
