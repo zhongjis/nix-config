@@ -53,6 +53,7 @@ in {
         # llmAgentsPackages.agentsview
         llmAgentsPackages.skills
         llmAgentsPackages.agent-browser
+        llmAgentsPackages.t3code-desktop
         inputs.self.packages.${system}.before-and-after
 
         # for before-and-after skill
