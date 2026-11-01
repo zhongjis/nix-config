@@ -4,7 +4,7 @@ let
   pkgs = f.nixosConfigurations.framework-16.pkgs;
   lib = pkgs.lib;
   hm = f.homeConfigurations."zshen@framework-16".config;
-  execOnce = hm.wayland.windowManager.hyprland.settings.exec-once;
+  execOnce = map (entry: entry.command) hm.wayland.windowManager.hyprland.settings.startupCommands._var;
   xdg = lib.findFirst (lib.hasSuffix "/bin/xdg") (throw "missing xdg startup") execOnce;
   original = f.inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland.override {
     enableXWayland = c.programs.hyprland.xwayland.enable;

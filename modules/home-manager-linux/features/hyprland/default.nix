@@ -1,14 +1,8 @@
 {
   config,
   lib,
-  pkgs,
   ...
-}: let
-  workspaceToMonitorSetup =
-    lib.mapAttrsToList
-    (id: workspace: "workspace = ${id},monitor:${workspace.monitorId}")
-    config.myHomeManager.hyprland.workspaces;
-in {
+}: {
   imports = [
     ./startup.nix
     ./monitors.nix
@@ -18,75 +12,123 @@ in {
     ./plugins.nix
   ];
 
-  # hyprland
   wayland.windowManager.hyprland = {
     enable = true;
     xwayland.enable = true;
     systemd.enable = false;
-    # NOTE: set the Hyprland and XDPH packages to null to use the ones from the NixOS module
+    # Use the Hyprland and XDPH packages from the NixOS module.
     package = null;
     portalPackage = null;
-    configType = "hyprlang";
-    # See https://wiki.hyprland.org/Configuring/Monitors/
-    settings.monitor =
-      lib.mapAttrsToList
-      (
-        name: m: let
-          resolution = "${toString m.width}x${toString m.height}@${toString m.refreshRate}";
-          position = "${toString m.x}x${toString m.y}";
-          scale = "${toString m.scale}";
-          transform =
-            if m.rotate == 0
-            then ""
-            else "transform,${toString m.rotate}";
-        in "${name},${
+    configType = "lua";
+    importantPrefixes = ["config" "curve"];
+    settings = {
+      # See https://wiki.hypr.land/Configuring/Basics/Monitors/
+      monitor = lib.mapAttrsToList (name: m:
+        {output = name;}
+        // (
           if m.enabled
-          then "${resolution},${position},${scale},${transform},vrr,1"
-          else "disable"
-        }"
-      )
-      (config.myHomeManager.hyprland.monitors);
+          then {
+            mode = "${toString m.width}x${toString m.height}@${toString m.refreshRate}";
+            position = "${toString m.x}x${toString m.y}";
+            scale = toString m.scale;
+            transform = m.rotate;
+            vrr = 1;
+          }
+          else {disabled = true;}
+        ))
+      config.myHomeManager.hyprland.monitors;
 
-    extraConfig = with config.lib.stylix.colors;
-    /*
-    hyprlang
-    */
-      ''
-        ##############################
-        ### WINDOWS AND WORKSPACES ###
-        ##############################
+      ##############################
+      ### WINDOWS AND WORKSPACES ###
+      ##############################
+      workspace_rule =
+        lib.mapAttrsToList (id: workspace: {
+          workspace = id;
+          monitor = workspace.monitorId;
+        })
+        config.myHomeManager.hyprland.workspaces;
 
-        ${lib.concatLines workspaceToMonitorSetup}
-
-        windowrule = workspace special:default, match:class vesktop
-
-        windowrule = workspace name:spotify, match:class spotify
-
-        windowrule = workspace name:obsidian, match:class obsidian
-
-        windowrule = workspace name:gaming, match:class steam
-        windowrule = workspace name:gaming, match:class heroic
-        windowrule = workspace name:gaming, match:class com\.usebottles\.bottles
-        windowrule = workspace name:gaming, match:class steam_proton
-        windowrule = workspace name:gaming, match:class gamescope
-
-        windowrule = workspace name:zen, match:class zen-beta
-        windowrule = workspace name:zen, match:class helium
-
-        # Pavucontrol floating - combine effects in one line
-        windowrule = float on, size 900 800, center on, pin on, match:class org\.pulseaudio\.pavucontrol
-
-        # hide xwaylandvideobridge - combine effects
-        windowrule = opacity 0.0 override, no_anim on, no_initial_focus on, max_size 1 1, no_blur on, no_focus on, match:class xwaylandvideobridge
-
-        # for fcitx5
-        windowrule = pseudo on, match:class fcitx, match:title ^()$
-
-        exec-once = fcitx5 -d -r
-        exec-once = fcitx5-remote -r
-
-        # Browser Picture in Picture - combine effects
-        windowrule = float on, pin on, move 69.5% 4%, match:title Picture-in-Picture
-      '';
+      window_rule =
+        (map (rule: {
+            match.class = rule.class;
+            workspace = rule.workspace;
+          }) [
+            {
+              class = "vesktop";
+              workspace = "special:default";
+            }
+            {
+              class = "spotify";
+              workspace = "name:spotify";
+            }
+            {
+              class = "obsidian";
+              workspace = "name:obsidian";
+            }
+            {
+              class = "steam";
+              workspace = "name:gaming";
+            }
+            {
+              class = "heroic";
+              workspace = "name:gaming";
+            }
+            {
+              class = ''com\.usebottles\.bottles'';
+              workspace = "name:gaming";
+            }
+            {
+              class = "steam_proton";
+              workspace = "name:gaming";
+            }
+            {
+              class = "gamescope";
+              workspace = "name:gaming";
+            }
+            {
+              class = "zen-beta";
+              workspace = "name:zen";
+            }
+            {
+              class = "helium";
+              workspace = "name:zen";
+            }
+          ])
+        ++ [
+          # Pavucontrol floating - combine effects
+          {
+            match.class = ''org\.pulseaudio\.pavucontrol'';
+            float = true;
+            size = "900 800";
+            center = true;
+            pin = true;
+          }
+          # Hide xwaylandvideobridge - combine effects
+          {
+            match.class = "xwaylandvideobridge";
+            opacity = "0.0 override";
+            no_anim = true;
+            no_initial_focus = true;
+            max_size = "1 1";
+            no_blur = true;
+            no_focus = true;
+          }
+          # For fcitx5
+          {
+            match = {
+              class = "fcitx";
+              title = "^()$";
+            };
+            pseudo = true;
+          }
+          # Browser Picture in Picture - combine effects
+          {
+            match.title = "Picture-in-Picture";
+            float = true;
+            pin = true;
+            move = "69.5% 4%";
+          }
+        ];
+    };
   };
 }

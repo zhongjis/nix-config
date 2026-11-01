@@ -9,6 +9,8 @@
   screenshot-sh =
     pkgs.writeShellScript "hyprland-screenshot"
     (builtins.readFile ./scripts/screenshot.sh);
+  inherit (lib.generators) mkLuaInline;
+  bind = key: dispatcher: {_args = [key (mkLuaInline dispatcher)];};
 in {
   home.packages = with pkgs;
     lib.optionals stdenv.hostPlatform.isLinux [
@@ -16,80 +18,80 @@ in {
     ];
 
   ####################
-  ### KEYBINDINGSS ###
+  ### KEYBINDINGS ###
   ####################
-  wayland.windowManager.hyprland.settings = {
-    ###################
-    ### MY PROGRAMS ###
-    ###################
+  wayland.windowManager.hyprland.settings.bind =
+    [
+      # Programs: ALT is the WM modifier, SUPER is the command modifier.
+      (bind "ALT + T" ''hl.dsp.exec_cmd("kitty")'')
+      (bind "SUPER + Q" ''hl.dsp.exec_cmd("${close-application-sh}")'')
+      (bind "ALT + E" ''hl.dsp.exec_cmd("kitty --title yazi sh -c 'yazi'")'')
+      (bind "ALT + V" ''hl.dsp.window.float({ action = "toggle" })'')
+      (bind "SUPER + Space" ''hl.dsp.exec_cmd("rofi-toggle")'')
+      (bind "ALT + Space" ''hl.dsp.exec_cmd("rofi-toggle-cliphist")'')
+      # Dwindle: pseudo and togglesplit bindings intentionally disabled.
+      (bind "ALT + RETURN" ''hl.dsp.window.fullscreen({ mode = "maximized" })'')
+      (bind "ALT + SHIFT + RETURN" ''hl.dsp.window.fullscreen()'')
 
-    # See https://wiki.hyprland.org/Configuring/Keywords/
+      # Screenshot
+      (bind "SUPER + SHIFT + 4" ''hl.dsp.exec_cmd("${screenshot-sh}")'')
 
-    # Set programs that you use
-    "$terminal" = "kitty";
-    "$fileManager" = "kitty --title yazi sh -c 'yazi'";
-    "$menu" = "rofi-toggle";
+      # Resolve plugin dispatchers on use: --verify-config does not load plugins.
+      # Move focus with WM modifier + H/J/K/L, using the hy3 layout.
+      (bind "ALT + L" ''function() hl.plugin.hy3.move_focus("right")() end'')
+      (bind "ALT + H" ''function() hl.plugin.hy3.move_focus("left")() end'')
+      (bind "ALT + K" ''function() hl.plugin.hy3.move_focus("up")() end'')
+      (bind "ALT + J" ''function() hl.plugin.hy3.move_focus("down")() end'')
+    ]
+    ++ lib.concatMap (workspace: [
+      # Switch workspaces; SHIFT moves the active window instead.
+      (bind "ALT + ${workspace.key}" ''hl.dsp.focus({ workspace = "${workspace.id}" })'')
+      (bind "ALT + SHIFT + ${workspace.key}" ''hl.dsp.window.move({ workspace = "${workspace.id}" })'')
+    ]) [
+      {
+        key = "1";
+        id = "1";
+      }
+      {
+        key = "2";
+        id = "2";
+      }
+      {
+        key = "3";
+        id = "3";
+      }
+      {
+        key = "4";
+        id = "4";
+      }
+      {
+        key = "5";
+        id = "5";
+      }
+      {
+        key = "O";
+        id = "name:obsidian";
+      }
+      {
+        key = "G";
+        id = "name:gaming";
+      }
+      {
+        key = "Z";
+        id = "name:zen";
+      }
+    ]
+    ++ [
+      # Special workspace (scratchpad)
+      (bind "ALT + S" ''hl.dsp.workspace.toggle_special("default")'')
+      (bind "ALT + SHIFT + S" ''hl.dsp.window.move({ workspace = "special:default" })'')
 
-    # See https://wiki.hyprland.org/Configuring/Keywords/
-    "$wmMod" = "ALT";
-    "$cmdMod" = "SUPER";
+      # ALT TAB: cycle focus, then raise the active window.
+      (bind "ALT + Tab" ''hl.dsp.window.cycle_next()'')
+      (bind "ALT + Tab" ''hl.dsp.window.bring_to_top()'')
 
-    bind = [
-      # Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
-      "$wmMod, T, exec, $terminal"
-      "$cmdMod, Q, exec, ${close-application-sh}"
-      "$wmMod, E, exec, $fileManager"
-      "$wmMod, V, togglefloating,"
-      "$cmdMod, Space, exec, $menu"
-      "$wmMod, Space, exec, rofi-toggle-cliphist"
-      # "$wmMod, P, pseudo," # dwindle
-      # "$wmMod, J, togglesplit," # dwindle
-      "$wmMod, RETURN, fullscreen, 1"
-      "$wmMod SHIFT, RETURN, fullscreen"
-
-      # screenshot
-      "$cmdMod SHIFT, 4, exec, ${screenshot-sh}"
-
-      # Move focus with wmMod + arrow keys
-      "$wmMod, L, hy3:movefocus, r"
-      "$wmMod, H, hy3:movefocus, l"
-      "$wmMod, K, hy3:movefocus, u"
-      "$wmMod, J, hy3:movefocus, d"
-
-      # Switch workspaces with wmMod + [0-9]
-      "$wmMod, 1, workspace, 1"
-      "$wmMod, 2, workspace, 2"
-      "$wmMod, 3, workspace, 3"
-      "$wmMod, 4, workspace, 4"
-      "$wmMod, 5, workspace, 5"
-
-      "$wmMod, O, workspace, name:obsidian"
-      "$wmMod, G, workspace, name:gaming"
-      "$wmMod, Z, workspace, name:zen"
-
-      # Move active window to a workspace with wmMod + SHIFT + [0-9]
-      "$wmMod SHIFT, 1, movetoworkspace, 1"
-      "$wmMod SHIFT, 2, movetoworkspace, 2"
-      "$wmMod SHIFT, 3, movetoworkspace, 3"
-      "$wmMod SHIFT, 4, movetoworkspace, 4"
-      "$wmMod SHIFT, 5, movetoworkspace, 5"
-
-      "$wmMod SHIFT, O, movetoworkspace, name:obsidian"
-      "$wmMod SHIFT, G, movetoworkspace, name:gaming"
-      "$wmMod SHIFT, Z, movetoworkspace, name:zen"
-
-      # Example special workspace (scratchpad)
-      "$wmMod, S, togglespecialworkspace, default"
-      "$wmMod SHIFT, S, movetoworkspace, special:default"
-
-      # ALT TAB
-      "ALT, Tab, cyclenext"
-      "ALT, Tab, bringactivetotop"
+      # Move/resize with WM modifier + SHIFT + LMB/RMB and dragging.
+      {_args = ["ALT + SHIFT + mouse:272" (mkLuaInline "hl.dsp.window.drag()") {mouse = true;}];}
+      {_args = ["ALT + SHIFT + mouse:273" (mkLuaInline "hl.dsp.window.resize()") {mouse = true;}];}
     ];
-    bindm = [
-      # Move/resize windows with wmMod + LMB/RMB and dragging
-      "$wmMod SHIFT, mouse:272, movewindow"
-      "$wmMod SHIFT, mouse:273, resizewindow"
-    ];
-  };
 }

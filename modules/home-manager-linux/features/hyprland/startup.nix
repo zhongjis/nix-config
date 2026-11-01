@@ -46,7 +46,11 @@ in {
       lib.lists.flatten
       (lib.mapAttrsToList
         (
-          id: workspace: (map (startentry: "[workspace ${id} silent] ${startentry}") workspace.autostart)
+          id: workspace: (map (command: {
+              inherit command;
+              rules.workspace = "${id} silent";
+            })
+            workspace.autostart)
         )
         config.myHomeManager.hyprland.workspaces);
 
@@ -60,8 +64,11 @@ in {
       ${lib.getExe pkgs.socat} - "UNIX-CONNECT:/tmp/hypr/''${HYPRLAND_INSTANCE_SIGNATURE}/.socket2.sock" | while read -r line; do handle "$line"; done
     '';
   in {
-    exec-once =
-      [
+    startupCommands._var =
+      map (command: {inherit command;}) [
+        # For fcitx5
+        "fcitx5 -d -r"
+        "fcitx5-remote -r"
         (lib.getExe monitorScript)
         # TODO: need testing
         # "${lib.getExe pkgs.wlr-randr} --output 1 --primary"
@@ -72,6 +79,20 @@ in {
         "systemctl --user start hyprpaper"
       ]
       ++ autostarts
-      ++ map (s: lib.getExe s) startScriptList;
+      ++ map (s: {command = lib.getExe s;}) startScriptList;
+    on._args = [
+      "hyprland.start"
+      (lib.generators.mkLuaInline
+        /*
+        lua
+        */
+        ''
+          function()
+            for _, entry in ipairs(startupCommands) do
+              hl.exec_cmd(entry.command, entry.rules)
+            end
+          end
+        '')
+    ];
   };
 }
