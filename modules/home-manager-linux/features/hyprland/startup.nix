@@ -73,7 +73,6 @@ in {
         # TODO: need testing
         # "${lib.getExe pkgs.wlr-randr} --output 1 --primary"
 
-        "nextcloud"
         "wl-paste --type text --watch cliphist store" # Stores only text data
         "systemctl --user start hyprpolkitagent"
         "systemctl --user start hyprpaper"
