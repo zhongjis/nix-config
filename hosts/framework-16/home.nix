@@ -15,7 +15,6 @@ in {
   myHomeManager.aiProfile = "personal";
   myHomeManager.bundles.general.enable = true;
   myHomeManager.obsidian.enable = true;
-  myHomeManager.services.open-design.enable = true;
   myHomeManager.services.cliproxyapi.enable = true;
   myHomeManager.hyprland.monitors = {
     "desc:BOE 0x0BC9" = {

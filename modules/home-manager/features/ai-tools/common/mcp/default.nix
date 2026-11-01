@@ -10,7 +10,6 @@
   secretPath_context7 = config.sops.secrets.context7_api_key.path;
   secretPath_exa = config.sops.secrets.exa_api_key.path;
   secretPath_linear = config.sops.secrets.linear_api_key.path;
-  openDesignDaemon = pkgs.open-design-daemon;
   nextDevtoolsMcp = inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.next-devtools-mcp;
 
   # MCPs available to all profiles
@@ -31,14 +30,6 @@
         exec ${pkgs.nodejs_24}/bin/npx "$@"
       '');
       args = ["--yes" "shadcn@latest" "mcp"];
-    };
-    open-design = {
-      command = "${openDesignDaemon}/bin/od";
-      args = [
-        "mcp"
-        "--daemon-url"
-        "http://127.0.0.1:${toString config.services.open-design.port}"
-      ];
     };
   };
 
