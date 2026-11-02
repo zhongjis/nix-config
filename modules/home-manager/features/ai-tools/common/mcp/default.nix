@@ -15,8 +15,7 @@
   # MCPs available to all profiles
   commonMcps = {
     nixos = {
-      command = "nix";
-      args = ["run" "github:utensils/mcp-nixos/v2.4.0" "--"];
+      command = lib.getExe pkgs.mcp-nixos;
     };
     context7 = {
       url = "https://mcp.context7.com/mcp";
@@ -47,11 +46,8 @@
       command = "${nextDevtoolsMcp}/bin/next-devtools-mcp";
     };
     flux = {
-      command = "nix";
+      command = lib.getExe pkgs.fluxcd-operator-mcp;
       args = [
-        "run"
-        "nixpkgs#fluxcd-operator-mcp"
-        "--"
         "serve"
         "--read-only"
         "--mask-secrets"
