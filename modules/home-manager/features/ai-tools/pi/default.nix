@@ -50,9 +50,11 @@ in {
     enableMcpIntegration = true;
     # pi-config grants read-only agents (Fu Xi, Wenchang) only this server.
     mcpServers = lib.optionalAttrs (config.programs.mcp.servers ? linear) {
-      linear-readonly = {
-        inherit (config.programs.mcp.servers.linear) headers;
-        url = "${config.programs.mcp.servers.linear.url}/readonly";
+      linear-readonly = let
+        linear = config.programs.mcp.servers.linear;
+      in {
+        inherit (linear) command;
+        args = map (url: "${url}/readonly") linear.args;
       };
     };
     keybindings."app.message.followUp" = "ctrl+shift+enter";

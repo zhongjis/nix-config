@@ -17,11 +17,13 @@
     nixos = {
       command = lib.getExe pkgs.mcp-nixos;
     };
+    # Credentialed servers read their sops secret at launch, so they work in
+    # shells and GUI-launched apps alike without exporting secrets globally.
     context7 = {
-      url = "https://mcp.context7.com/mcp";
-      headers = {
-        CONTEXT7_API_KEY = "{env:CONTEXT7_API_KEY}";
-      };
+      command = lib.getExe (pkgs.writeShellScriptBin "context7-mcp" ''
+        CONTEXT7_API_KEY="$(<"${secretPath_context7}")" \
+          exec ${lib.getExe pkgs.context7-mcp} "$@"
+      '');
     };
     shadcn = {
       command = lib.getExe (pkgs.writeShellScriptBin "shadcn-mcp" ''
@@ -38,9 +40,13 @@
 
   # MCPs only for personal profile
   personalMcps = {
+    # mcp-proxy sends API_ACCESS_TOKEN as `Authorization: Bearer`.
     linear = {
-      url = "https://mcp.linear.app/mcp";
-      headers.Authorization = "{env:LINEAR_AUTHORIZATION}";
+      command = lib.getExe (pkgs.writeShellScriptBin "linear-mcp" ''
+        API_ACCESS_TOKEN="$(<"${secretPath_linear}")" \
+          exec ${lib.getExe pkgs.mcp-proxy} --transport streamablehttp "$@"
+      '');
+      args = ["https://mcp.linear.app/mcp"];
     };
     next-devtools = {
       command = "${nextDevtoolsMcp}/bin/next-devtools-mcp";
@@ -68,18 +74,6 @@ in {
     inherit sopsFile;
   };
 
-  # Export MCP credentials directly in zsh initialization.
-  # Reads the sops secret files at shell startup.
-  programs.zsh.initContent = lib.mkOrder 100 ''
-    if [[ -r "${secretPath_context7}" ]]; then
-      export CONTEXT7_API_KEY="$(<"${secretPath_context7}")"
-    fi
-    ${lib.optionalString aiProfileHelpers.isPersonal ''
-      if [[ -r "${secretPath_linear}" ]]; then
-        export LINEAR_AUTHORIZATION="Bearer $(<"${secretPath_linear}")"
-      fi
-    ''}
-  '';
   #
   #     if [[ -r "${secretPath_exa}" ]]; then
   #       export EXA_API_KEY="$(<"${secretPath_exa}")"
