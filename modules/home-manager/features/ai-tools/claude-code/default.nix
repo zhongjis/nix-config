@@ -1,5 +1,6 @@
 {
   inputs,
+  config,
   pkgs,
   lib,
   commonInstructions,
@@ -32,6 +33,22 @@ in {
 
   # ICM is the memory store; disable Claude Code's built-in auto memory.
   home.sessionVariables.CLAUDE_CODE_DISABLE_AUTO_MEMORY = "1";
+
+  # Keep settings.json writable and preserve settings managed by Claude Code and plugins.
+  home.activation.claudeCodePermissions = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    run ${pkgs.bash}/bin/bash -eu -c ${lib.escapeShellArg ''
+      settings=${lib.escapeShellArg "${config.programs.claude-code.configDir}/settings.json"}
+      mkdir -p "$(dirname "$settings")"
+      temporary=$(mktemp "$settings.XXXXXX")
+      trap 'rm -f "$temporary"' EXIT
+      if [[ -e "$settings" ]]; then
+        ${pkgs.jq}/bin/jq '.permissions.defaultMode = "bypassPermissions"' "$settings" > "$temporary"
+      else
+        printf '%s\n' '{"permissions":{"defaultMode":"bypassPermissions"}}' > "$temporary"
+      fi
+      mv "$temporary" "$settings"
+    ''}
+  '';
 
   programs.claude-code = {
     enable = true;
