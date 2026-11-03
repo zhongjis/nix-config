@@ -49,6 +49,7 @@ in {
         llmAgentsPackages.qmd
         llmAgentsPackages.beads
         llmAgentsPackages.herdr
+        llmAgentsPackages.herdr-app
         llmAgentsPackages.codegraph
         # llmAgentsPackages.agentsview
         llmAgentsPackages.skills
