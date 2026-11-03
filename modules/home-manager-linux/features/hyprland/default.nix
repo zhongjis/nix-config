@@ -32,7 +32,9 @@
             position = "${toString m.x}x${toString m.y}";
             scale = toString m.scale;
             transform = m.rotate;
-            vrr = 2; # fullscreen-only: always-on VRR flickers dark content on OLED
+            # fullscreen game/video content only: always-on VRR flickers dark
+            # content on OLED, and fullscreen browsers should stay at fixed refresh
+            vrr = 3;
           }
           else {disabled = true;}
         ))
@@ -95,6 +97,11 @@
             }
           ])
         ++ [
+          # Games rarely send a content type; tag them so vrr = 3 triggers
+          {
+            match.class = ''^(steam_app_.*|steam_proton|gamescope)$'';
+            content = "game";
+          }
           # Pavucontrol floating - combine effects
           {
             match.class = ''org\.pulseaudio\.pavucontrol'';
