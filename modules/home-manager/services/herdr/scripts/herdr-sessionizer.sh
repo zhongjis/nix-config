@@ -44,6 +44,22 @@ for path in $deep_paths; do
 done
 [[ -z "$selected_name" ]] && selected_name=$(basename "$selected" | sed 's/\./_/g')
 
+# herdr TUI panes export HERDR_PANE_ID; herdr-app terminals only get
+# herdr-core's HC_* vars. Outside both, default to the TUI.
+if [[ -z "$HERDR_PANE_ID" && -n "$HC_TERMINAL_SOCKET" ]] && command -v herdr-app >/dev/null; then
+  # Reuse an existing space with this name, otherwise create one.
+  existing=$(herdr-app ls 2>/dev/null |
+    jq -r --arg n "$selected_name" '.spaces[]? | select(.name == $n) | .id' |
+    head -n1)
+
+  if [[ -n "$existing" ]]; then
+    herdr-app do space.select "$(jq -nc --arg id "$existing" '{id: $id}')" >/dev/null
+  else
+    herdr-app do space.new "$(jq -nc --arg n "$selected_name" --arg f "$selected" '{name: $n, folder: $f}')" >/dev/null
+  fi
+  exit
+fi
+
 # Reuse an existing workspace with this label, otherwise create one.
 existing=$(herdr workspace list 2>/dev/null |
   jq -r --arg n "$selected_name" \

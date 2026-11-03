@@ -7,7 +7,7 @@
   herdrPkg = inputs.llm-agents.packages.${system}.herdr;
 in {
   home.packages = [
-    pkgs.jq # sessionizer parses `herdr workspace list` JSON
+    pkgs.jq # sessionizer parses herdr / herdr-app JSON
     (pkgs.writeScriptBin "sessionizer" ''
       ${builtins.readFile ./scripts/herdr-sessionizer.sh}
     '')
