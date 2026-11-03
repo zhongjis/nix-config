@@ -13,10 +13,10 @@
                  }
                  catch (error) {
                      if (error instanceof Error) {
-@@ -344,6 +348,13 @@
-                 delete block.partialJson;
-                 delete block.customInput;
-             }
+@@ -341,6 +345,13 @@
+             stream.end();
+         }
+         catch (error) {
 +            if (error instanceof CodexApiError) {
 +                appendAssistantMessageDiagnostic(output, createAssistantMessageDiagnostic("provider_response_failure", error, {
 +                    ...(typeof error.status === "number" ? { status: error.status } : {}),

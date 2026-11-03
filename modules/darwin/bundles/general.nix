@@ -37,6 +37,8 @@
       "nikitabobko/homebrew-tap" = inputs.aerospace-tap;
     };
 
+    trust.casks = ["nikitabobko/tap/aerospace"];
+
     mutableTaps = true;
     autoMigrate = true;
   };
@@ -74,13 +76,8 @@
 
       "google-chrome"
       "helium-browser"
+      "nikitabobko/tap/aerospace"
     ];
-
-    # AeroSpace's cask ships from a third-party tap. Homebrew now refuses to
-    # load casks from untrusted taps, so grant explicit trust for this cask.
-    extraConfig = ''
-      cask "nikitabobko/tap/aerospace", trusted: true
-    '';
 
     masApps = {
       Things3 = 904280696;

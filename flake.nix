@@ -39,14 +39,7 @@
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
 
     ## nix-homebrew
-    nix-homebrew = {
-      url = "github:zhaofengli-wip/nix-homebrew";
-      # ponytail: newer homebrew-core needs brew > nix-homebrew's pinned 7.0.4; drop once upstream bumps brew-src.
-      inputs.brew-src = {
-        url = "github:Homebrew/brew/7.0.9";
-        flake = false;
-      };
-    };
+    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
     homebrew-core = {
       url = "github:homebrew/homebrew-core";
       flake = false;
@@ -82,10 +75,6 @@
       inputs.home-manager.follows = "home-manager";
     };
     zed.url = "github:zed-industries/zed/nightly";
-    agent-of-empires = {
-      url = "github:njbrake/agent-of-empires";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     agent-skills.url = "git+ssh://git@github.com/zhongjis/agent-skills.git";
     llm-agents.url = "github:numtide/llm-agents.nix";
     bun2nix = {

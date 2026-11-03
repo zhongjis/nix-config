@@ -47,7 +47,6 @@
 
   home.packages = [
     inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.hunk
-    inputs.agent-of-empires.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
   home.sessionVariables = {
