@@ -59,6 +59,13 @@ in {
     };
     keys = {
       global."ctrl-shift-f" = "mod.open:picker";
+      # Herdr seeds its default keymap only into a new keys.json; one created by
+      # activation first has none, so keep the terminal clipboard keys here.
+      terminal = {
+        "cmd-c" = "terminal.copy";
+        "cmd-v" = "terminal.paste";
+        "ctrl-v" = "terminal.paste_image";
+      };
       # Settle the focused agent in the herdr-tui sidebar (tui-focus mod).
       "layout:herdr-tui" = {
         "cmd-shift-s" = "tui-focus.settle";
