@@ -57,7 +57,6 @@ in rec {
 
         {
           nixpkgs.overlays = [
-            # inputs.nixpkgs-terraform.overlays.default
             overlays.modifications
             overlays.stable-packages
           ];
@@ -92,7 +91,6 @@ in rec {
       pkgs = import nixpkgs {
         inherit system;
         overlays = [
-          # inputs.nixpkgs-terraform.overlays.default
           overlays.modifications
           overlays.stable-packages
         ];

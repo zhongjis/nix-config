@@ -59,20 +59,13 @@
       url = "github:xremap/nix-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixpkgs-terraform.url = "github:stackbuilders/nixpkgs-terraform";
     stylix = {
       url = "github:danth/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     nvf = {
       url = "github:NotAShelf/nvf";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-    zen-browser = {
-      url = "github:0xc000022070/zen-browser-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
     };
     zed.url = "github:zed-industries/zed/nightly";
     agent-skills.url = "git+ssh://git@github.com/zhongjis/agent-skills.git";
@@ -105,12 +98,6 @@
     # secret management
     sops-nix = {
       url = "github:Mic92/sops-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    # https://github.com/niksingh710/minimal-tmux-status/
-    minimal-tmux = {
-      url = "github:niksingh710/minimal-tmux-status";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };

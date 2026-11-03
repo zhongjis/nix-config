@@ -21,7 +21,7 @@ home-manager/
 │   ├── ai-tools/     # → see features/ai-tools/AGENTS.md
 │   ├── neovim/       # → see features/neovim/AGENTS.md
 │   └── ...           # git, ssh, zsh, stylix, terminals, browsers
-└── services/         # Shared user services (tmux, etc.)
+└── services/         # Shared user services (herdr, etc.)
 ```
 
 ## WHERE TO LOOK

@@ -14,7 +14,6 @@
 
   myHomeManager.neovim.enable = lib.mkDefault true;
   myHomeManager.stylix.enable = lib.mkDefault true;
-  myHomeManager.services.tmux.enable = lib.mkDefault false;
   myHomeManager.services.herdr.enable = lib.mkDefault true;
   myHomeManager.services.herdr-app.enable = lib.mkDefault true;
   myHomeManager.zellij.enable = lib.mkDefault false;
@@ -43,7 +42,6 @@
 
   programs.btop.enable = lib.mkDefault true;
   programs.bun.enable = lib.mkDefault true;
-  programs.zen-browser.enable = lib.mkDefault false;
 
   home.packages = [
     inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.hunk
