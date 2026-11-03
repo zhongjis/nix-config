@@ -32,7 +32,7 @@
             position = "${toString m.x}x${toString m.y}";
             scale = toString m.scale;
             transform = m.rotate;
-            vrr = 1;
+            vrr = 2; # fullscreen-only: always-on VRR flickers dark content on OLED
           }
           else {disabled = true;}
         ))
