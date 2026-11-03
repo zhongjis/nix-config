@@ -33,15 +33,6 @@ in {
   # Autostart necessary processes (like notifications daemons, status bars, etc.)
   # Or execute your favorite apps at launch like this:
   wayland.windowManager.hyprland.settings = let
-    moveToMonitor =
-      lib.mapAttrsToList
-      (id: workspace: "hyprctl dispatch moveworkspacetomonitor ${id} ${workspace.monitorId}")
-      config.myHomeManager.hyprland.workspaces;
-
-    moveToMonitorScript = pkgs.writeShellScriptBin "script" ''
-      ${lib.concatLines moveToMonitor}
-    '';
-
     autostarts =
       lib.lists.flatten
       (lib.mapAttrsToList
@@ -53,23 +44,12 @@ in {
             workspace.autostart)
         )
         config.myHomeManager.hyprland.workspaces);
-
-    monitorScript = pkgs.writeShellScriptBin "script" ''
-      handle() {
-        case $1 in monitoradded*)
-          ${lib.getExe moveToMonitorScript}
-        esac
-      }
-
-      ${lib.getExe pkgs.socat} - "UNIX-CONNECT:/tmp/hypr/''${HYPRLAND_INSTANCE_SIGNATURE}/.socket2.sock" | while read -r line; do handle "$line"; done
-    '';
   in {
     startupCommands._var =
       map (command: {inherit command;}) [
         # For fcitx5
         "fcitx5 -d -r"
         "fcitx5-remote -r"
-        (lib.getExe monitorScript)
         # TODO: need testing
         # "${lib.getExe pkgs.wlr-randr} --output 1 --primary"
 

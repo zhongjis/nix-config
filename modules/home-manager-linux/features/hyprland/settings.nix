@@ -103,9 +103,13 @@
 
       # Example per-device config
       # See https://wiki.hyprland.org/Configuring/Keywords/#per-device-input-configs for more
-      cursor = {
-        no_hardware_cursors = true;
-      };
+    };
+
+    # https://wiki.hypr.land/configuring/core/binds/gestures/
+    gesture = {
+      fingers = 3;
+      direction = "horizontal";
+      action = "workspace";
     };
 
     device = {
