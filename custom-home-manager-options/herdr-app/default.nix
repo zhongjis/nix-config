@@ -73,6 +73,12 @@ in {
       description = "Layouts linked read-only to {file}`$XDG_CONFIG_HOME/herdr-app/layouts/<name>.json`.";
     };
 
+    themes = mkOption {
+      type = types.attrsOf jsonFormat.type;
+      default = {};
+      description = "Themes linked read-only to {file}`$XDG_CONFIG_HOME/herdr-app/themes/<name>.json`.";
+    };
+
     mods = mkOption {
       type = types.attrsOf types.path;
       default = {};
@@ -86,11 +92,17 @@ in {
   config = mkIf cfg.enable {
     home.packages = mkIf (cfg.package != null) [cfg.package];
 
-    xdg.configFile = lib.mapAttrs' (name: layout:
-      lib.nameValuePair "herdr-app/layouts/${name}.json" {
-        source = jsonFormat.generate "herdr-app-layout-${name}.json" layout;
-      })
-    cfg.layouts;
+    xdg.configFile =
+      lib.mapAttrs' (name: layout:
+        lib.nameValuePair "herdr-app/layouts/${name}.json" {
+          source = jsonFormat.generate "herdr-app-layout-${name}.json" layout;
+        })
+      cfg.layouts
+      // lib.mapAttrs' (name: theme:
+        lib.nameValuePair "herdr-app/themes/${name}.json" {
+          source = jsonFormat.generate "herdr-app-theme-${name}.json" theme;
+        })
+      cfg.themes;
 
     home.activation.herdrAppConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
       ${mergeJson "settings.json" cfg.settings}
