@@ -106,8 +106,8 @@ export default class Focus extends View {
       if (grace) cx.timer.after(GRACE, (cx) => cx.notify());
       this.changed[address] = !was ? { s, at: 0, turn } // First sight says nothing about when it changed.
         : s === "working" ? { s, at: was.start ?? now, turn }
-        // A pause for the person, stuck or replying while its sub-agents work: the run keeps its start.
-        : s === "blocked" || s === "done" ? { s, at: now, turn, start: was.s === "working" ? was.at : was.start }
+        // A pause for the person, stuck: the run keeps its start.
+        : s === "blocked" ? { s, at: now, turn, start: was.s === "working" ? was.at : was.start }
         : grace ? { s, at: now, turn, start: was.at } // Stopped: the grace begins.
         : was.start != null && was.s === "idle" ? { ...was, turn } // The turn's end arriving within it.
         : { s, at: now, turn };
@@ -210,8 +210,7 @@ export default class Focus extends View {
     // Pins are the agents list's (t3-agents), one set for both: pinned agents stay up top in pin order, whatever their state.
     const pins = shared("agents.pins") ?? [];
     this.track(every.map((a) => ({
-      address: a.address, s: state(a) === "blocked" ? "blocked" : running(a) ? "working"
-        : state(a) === "done" && kids.get(a.address).includes("working") ? "done" : "idle",
+      address: a.address, s: state(a) === "blocked" ? "blocked" : running(a) ? "working" : "idle",
       turn: term.get(a.address)?.turn ?? 0, excluded: pins.includes(a.address) || Boolean(settledAt(a)),
     })), all, now, cx);
     const mark = (a) => this.changed[a.address];
@@ -525,6 +524,8 @@ export default class Focus extends View {
         : running(a)
           ? pill(t.working, svg("mods/workspace-chrome/spinner.svg").size(16).flex_none().text_color(t.working).spin(900),
             "Working", started(a) > 0 && started(a) < Infinity ? took(started(a), now) : null)
+            // Waiting on sub-agents with a reply not yet seen: a dot, so the reply isn't lost while it stays here.
+            .when(a.status === "done", (el) => el.child(div().size(6).flex_none().rounded_full().bg(t.ansi2)))
           : st === "blocked"
             ? pill(t.blocked, div().size(14).flex_none().rounded(4).bg(t.blocked + "26").text_size(11).font_bold().flex().items_center().justify_center().child("!"), "Needs you")
             : st === "done"

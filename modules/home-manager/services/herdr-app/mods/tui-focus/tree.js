@@ -1,6 +1,6 @@
 // An agent with the sub-agents it started, one reading for Focus cards, the agents list, tabs and pane headers:
-// one stuck anywhere in it needs the person; then its own unread reply; an agent waiting on working sub-agents
-// is still at work.
+// one stuck anywhere in it needs the person; then an agent waiting on working sub-agents is still at work, even
+// with an unread reply (they will wake it, so the next move isn't the person's); else its own word.
 // A copy lives in each mod that uses it (scripts/sync.sh), as name.js does.
 
 // A sub-agent's own word: a sub-agent without a pane isn't in agents(), so its raw word, error counting as
@@ -15,12 +15,12 @@ export function descendants(all, addr) {
   return all.filter((k) => k.parent === addr && k.state === "live").flatMap((k) => [k, ...descendants(all, k.address)]);
 }
 
-// Its own word with what's under it: needing the person first, then its own done, then busy or waiting on
-// sub-agents it will hear back from, else its own. No word of its own: no agent, whatever it started.
+// Its own word with what's under it: needing the person first, then busy or waiting on sub-agents it will hear
+// back from, else its own. No word of its own: no agent, whatever it started.
 export function treeStatus(own, kids) {
   if (own == null) return own;
   if (own === "blocked" || kids.includes("blocked")) return "blocked";
-  return own !== "done" && kids.includes("working") ? "working" : own;
+  return kids.includes("working") ? "working" : own;
 }
 
 // Snapshot once per render, like namer(): what's under each address, as words.
