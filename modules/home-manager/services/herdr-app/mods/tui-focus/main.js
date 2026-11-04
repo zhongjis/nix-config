@@ -9,6 +9,9 @@
 // session (`resume=`) and its terminal's pid (`resume.pid=`). Claude Code's line comes from its own pid file; Pi's
 // from integrations/pi.ts, which this mod installs into Pi. A kept terminal comes back from a reboot as a shell
 // with a new pid in the same pane: the line is typed into it, or, for a settled one, kept as a closed row.
+// Hibernating: an orchestrator worker (a sub-agent labelled `hibernate=ok`) idle past DELAY is exited the same
+// way. Its terminal finishes with `hibernated=<ms>` and `resume=<line>` on it, so its parent can revive it (rm,
+// then run the line); shared "tui-focus.hibernated" lists them for the cards and the sub-agents popup.
 
 import { View, div, image, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
@@ -27,6 +30,8 @@ const GRACE = 2000;
 const byAddress = (x, y) => x.address.localeCompare(y.address);
 // Closed settled agents: [{key, title, space, cwd, program, argv, at}], newest first.
 const CLOSED = "tui-focus.closed";
+// Hibernated workers: [{address, name, parent, cwd, line, at, title, program}], newest first.
+const HIBERNATED = "tui-focus.hibernated";
 // How each agent exits from its prompt, and the resume line it prints then (both checked by hand: Claude Code
 // "Resume this session with: claude --resume <uuid>", Pi "To resume this session: pi --session <id>").
 const EXIT = { "claude-code": ["ctrl+c", "ctrl+c"], pi: ["ctrl+d"] };
@@ -212,14 +217,65 @@ export default class Focus extends View {
           const k = await this.inspect(t.address);
           if (!k || k.state !== "live") continue;
           const prompt = SHELL.test(k.foreground?.name ?? "");
-          if (!prompt && EXIT[k.status?.app]) await this.remember(k);
-          else if (prompt && k.labels?.resume) await this.restore(k);
+          if (!prompt && EXIT[k.status?.app]) {
+            await this.remember(k);
+            if (this.sleepy(k)) await this.hibernate(k, t);
+          } else if (prompt && k.labels?.resume && !k.labels?.hibernated) await this.restore(k);
         }
+        // A hibernated worker revived (a new terminal) or removed (reaped) drops its row.
+        const kept = [];
+        for (const r of shared(HIBERNATED) ?? []) if ((await this.inspect(r.address))?.labels?.hibernated) kept.push(r.address);
+        const rows = shared(HIBERNATED) ?? [];
+        if (kept.length !== rows.length) setShared(HIBERNATED, rows.filter((r) => kept.includes(r.address)));
       } finally {
         this.syncing = false;
         cx.notify();
       }
     });
+  }
+
+  // An orchestrator worker idle (not stuck) past DELAY, once per idle spell. Only its parent works with it, so
+  // focus doesn't hold it back as it does a settled agent.
+  sleepy(k) {
+    return Boolean(k.parent) && k.labels?.hibernate === "ok" && !k.labels?.hibernated && ["idle", "done"].includes(k.status?.state)
+      && k.status_ms > 0 && Date.now() - k.status_ms >= DELAY && !this.tried.has(`hibernate:${k.address}:${k.status_ms}`);
+  }
+
+  // Exits it as retire() does and keeps its resume line on the finished terminal. Labelled first, so neither
+  // this pass nor another window resumes or exits it again meanwhile. Work arriving before a key (its parent
+  // sent some) calls it off; no resume line (a draft in its prompt) too, and it keeps running.
+  async hibernate(k, t) {
+    this.tried.add(`hibernate:${k.address}:${k.status_ms}`);
+    const at = Date.now(), wake = () => hc(["label", k.address, "hibernated="]).catch(() => null);
+    if ((await hc(["label", k.address, `hibernated=${at}`]).catch(() => null))?.code !== 0) return;
+    const read = async () => ((await hc(["read", k.address, "--lines", "80"]).catch(() => null))?.stdout ?? "").match(RESUME) ?? [];
+    const before = (await read()).length;
+    for (const [i, key] of EXIT[k.status.app].entries()) {
+      if (i) await pause();
+      const now = await this.inspect(k.address);
+      if (now?.state !== "live") break;
+      if (!["idle", "done"].includes(now.status?.state)) return void await wake();
+      await hc(["keys", k.address, key]).catch(() => null);
+    }
+    let line = null;
+    for (let i = 0; i < 20 && !line; i++) {
+      await pause();
+      const found = await read();
+      if (found.length > before) line = found.at(-1);
+    }
+    const title = namer()(t);
+    if (!line) {
+      await wake();
+      notify({ title: "Couldn't hibernate", body: `${title}: no resume command appeared, so it was left running.`, level: "warning" });
+      return;
+    }
+    // The worker's browser namespace (start-worker.sh) comes back with it.
+    const ns = (k.argv ?? []).find((x) => x.startsWith("AGENT_BROWSER_NAMESPACE="));
+    const resume = ns ? `env ${ns} ${line}` : line;
+    await hc(["label", k.address, `resume=${resume}`, "resume.pid="]).catch(() => null);
+    const program = t.program && { name: t.program.name, icon: t.program.icon, tint: t.program.tint };
+    setShared(HIBERNATED, [{ address: k.address, name: k.name, parent: k.parent, cwd: k.cwd, line: resume, at, title, program },
+      ...(shared(HIBERNATED) ?? []).filter((r) => r.address !== k.address)]);
   }
 
   // The core's full view of a terminal (pid, foreground, labels, keep, status), or null.
@@ -598,7 +654,7 @@ export default class Focus extends View {
       const branch = ps.find((p) => p.pane === a.pane)?.branch;
       const going = kids.get(a.address).filter((s) => s === "working").length;
       // Live sub-agents, finished ones too: with none working, the line still opens the list.
-      const live = kids.get(a.address).length;
+      const live = kids.get(a.address).length + (shared(HIBERNATED) ?? []).filter((r) => r.parent === a.address).length;
       const pic = icon(a.program, 16, t.muted);
       // Hovered, the corner offers Settle, but only for what's finished: a working or stuck tree stays in sight.
       const offer = !dragging && !this.sweep?.moved && this.hovered === a.address && !busy(a) && !pins.includes(a.address);
@@ -672,7 +728,7 @@ export default class Focus extends View {
             .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
             .on_click((_e, cx) => {
               cx.stop_propagation();
-              openOverlay({ mod: "tui-subagents", kind: "popup", width: 300, height: Math.min(360, 16 + 46 * kids.get(a.address).length), props: { parent: a.address } });
+              openOverlay({ mod: "tui-subagents", kind: "popup", width: 300, height: Math.min(360, 16 + 46 * live), props: { parent: a.address } });
             })
             .child(going ? `${going} sub-agent${going > 1 ? "s" : ""} working` : "view sub-agents")))));
     };
@@ -736,7 +792,8 @@ export default class Focus extends View {
             .on_hover(glow(id)).role("button").accessibility_label("Forget")
             .on_click((_e, cx) => { cx.stop_propagation(); this.hovered = null; forget(r); cx.notify(); })
             .child("×")
-          : div().flex_none().text_size(12).text_color(t.dim).child(`closed ${ago(r.at, now)}`));
+          : h_flex().flex_none().gap(4).items_center().text_size(12).text_color(t.dim)
+            .child(svg("mods/tui-focus/moon.svg").size(12).flex_none().text_color(t.dim)).child(ago(r.at, now)));
     };
 
     // A shelf's header, folding it: label, then count and chevron at the far edge.

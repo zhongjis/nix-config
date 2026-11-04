@@ -1,9 +1,38 @@
 // A popup listing an agent's live sub-agents (props().parent), all the way down; a click peeks at one.
-// Opened from tui-focus cards' "N sub-agents working" line.
+// Opened from tui-focus cards' sub-agents line. Hibernated workers (shared "tui-focus.hibernated") show a moon and
+// how long ago; a click revives one where it was (same name, folder, parent, session), then peeks at it.
 
 import { View, div, image, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { agents, terminals, theme, run, props, closeOverlay, exec } from "herdr";
+import { agents, terminals, theme, run, props, closeOverlay, exec, hc, shared, setShared, notify } from "herdr";
+
+const HIBERNATED = "tui-focus.hibernated";
+
+// As tui-focus times: no "ago", nothing past days.
+function ago(ms, now) {
+  const m = Math.floor((now - ms) / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return `${m}m`;
+  if (m < 1440) return `${Math.floor(m / 60)}h`;
+  return `${Math.floor(m / 1440)}d`;
+}
+
+// The finished terminal goes, and its resume line runs as a new one under the same parent, opted in again.
+async function revive(r) {
+  await hc(["rm", r.address]).catch(() => null);
+  const args = ["run", "--bg", "--json", "--cwd", r.cwd, "--outlive-parent"];
+  if (r.name) args.push("--name", r.name);
+  if (terminals().some((k) => k.address === r.parent && k.state === "live")) args.push("--parent", r.parent);
+  const res = await hc([...args, ...r.line.split(" ")]).catch((e) => ({ code: 1, stderr: String(e) }));
+  if (res.code !== 0) {
+    notify({ title: "Couldn't revive the agent", body: `${r.title}: ${res.stderr.trim()}`, level: "error" });
+    return;
+  }
+  setShared(HIBERNATED, (shared(HIBERNATED) ?? []).filter((x) => x.address !== r.address));
+  const addr = JSON.parse(res.stdout).address;
+  await hc(["label", addr, "hibernate=ok"]).catch(() => null);
+  run("terminal.peek", { terminal: addr });
+}
 
 const icon = (p, size, color) => !p?.icon ? null
   : p.tint ? svg(p.icon).size(size).flex_none().text_color(color) : image(p.icon).w(size).h(size).flex_none();
@@ -51,8 +80,10 @@ export default class SubAgents extends View {
     const color = { working: t.working, blocked: t.blocked, done: t.done, idle: t.idle };
     const rows = tree(terminals(), parent);
     const mine = this.places[parent] ?? {};
+    const under = new Set([parent, ...rows.map((r) => r.k.address)]), now = Date.now();
+    const sleeping = (shared(HIBERNATED) ?? []).filter((r) => under.has(r.parent));
     return v_flex().id("subagents-root").size_full().p(6).gap(2).text_size(13).bg(t.popover).overflow_y_scrollbar()
-      .when(rows.length === 0, (el) => el.child(div().p(8).text_color(t.dim).child("No live sub-agents.")))
+      .when(rows.length === 0 && sleeping.length === 0, (el) => el.child(div().p(8).text_color(t.dim).child("No live sub-agents.")))
       .children(rows.map(({ k, depth }) => {
         const st = word(k);
         // Second line: project and branch, each only when it differs from the parent's.
@@ -69,6 +100,17 @@ export default class SubAgents extends View {
           .when(info.length > 0 || Boolean(pic), (el) => el.child(h_flex().h(18).gap(8).items_center().min_w(0)
             .child(div().flex_1().min_w(0).truncate().text_size(11).text_color(t.dim).child(info.join(" · ")))
             .when(Boolean(pic), (el) => el.child(pic))));
+      }))
+      .children(sleeping.map((r) => {
+        const pic = icon(r.program, 14, t.muted);
+        return h_flex().id(`hib-${r.address}`).flex_none().h(30).px(8).gap(8).items_center().rounded(6)
+          .cursor_pointer().hover((s) => s.bg(t.hover)).role("button").accessibility_label(`Revive ${r.title}`)
+          // Closed after: closing first could cancel the popup's own task.
+          .on_click((_e, cx) => cx.spawn(async () => { await revive(r); closeOverlay(overlay); }))
+          .child(div().flex_1().min_w(0).truncate().text_color(t.muted).child(r.title))
+          .child(h_flex().flex_none().gap(4).items_center().text_size(11).text_color(t.dim)
+            .child(svg("mods/tui-focus/moon.svg").size(11).flex_none().text_color(t.dim)).child(ago(r.at, now)))
+          .when(Boolean(pic), (el) => el.child(pic));
       }));
   }
 }
