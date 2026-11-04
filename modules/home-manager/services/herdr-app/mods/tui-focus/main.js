@@ -6,7 +6,7 @@
 // would, the resume command it prints is kept (shared "tui-focus.closed"), and its pane closes. Clicking that
 // closed row resumes it in a new tab.
 // Reboots: each local Claude Code or Pi terminal is kept by the core and labelled with the line that resumes its
-// session (`resume=`) and its shell's pid (`resume.pid=`). Claude Code's line comes from its own pid file; Pi's
+// session (`resume=`) and its terminal's pid (`resume.pid=`). Claude Code's line comes from its own pid file; Pi's
 // from integrations/pi.ts, which this mod installs into Pi. A kept terminal comes back from a reboot as a shell
 // with a new pid in the same pane: the line is typed into it, or, for a settled one, kept as a closed row.
 
@@ -44,6 +44,8 @@ const closable = (a) => Boolean(EXIT[a.app]) && !a.address.includes("/");
 const REMEMBER = 15000;
 // Where Pi loads integrations/pi.ts from.
 const PI_EXTENSION = ".pi/agent/extensions/herdr-app-session.ts";
+// A shell at its prompt, by the foreground process's name (a login shell's starts with "-").
+const SHELL = /^-?(zsh|bash|fish|sh|dash|nu)$/;
 
 // As T3's sidebar times: no "ago", nothing past days.
 function ago(ms, now) {
@@ -198,21 +200,29 @@ export default class Focus extends View {
     if (r.code !== 0) notify({ title: "Couldn't install the Pi session hook", body: r.stderr.trim(), level: "error" });
   }
 
-  // One pass at a time: labels each live agent's terminal, then resumes recovered shells.
+  // One pass at a time over every local terminal, sub-agents (no pane of their own) included: a running agent's
+  // terminal is labelled, a recovered shell is resumed.
   sessions(cx) {
     if (this.syncing) return;
     this.syncing = true;
     cx.spawn(async (cx) => {
       try {
-        await this.remember();
-        await this.restore(cx);
+        for (const t of terminals()) {
+          if (t.state !== "live" || t.address.includes("/")) continue;
+          const k = await this.inspect(t.address);
+          if (!k || k.state !== "live") continue;
+          const prompt = SHELL.test(k.foreground?.name ?? "");
+          if (!prompt && EXIT[k.status?.app]) await this.remember(k);
+          else if (prompt && k.labels?.resume) await this.restore(k);
+        }
       } finally {
         this.syncing = false;
+        cx.notify();
       }
     });
   }
 
-  // The core's full view of a terminal (pid, foreground, labels, keep), or null.
+  // The core's full view of a terminal (pid, foreground, labels, keep, status), or null.
   async inspect(address) {
     const r = await hc(["get", address, "--json"]).catch(() => null);
     try {
@@ -222,59 +232,52 @@ export default class Focus extends View {
     }
   }
 
-  // While an agent runs: its terminal is kept, and labelled with its resume line and its shell's pid.
-  // Claude Code's session id is in ~/.claude/sessions/<its pid>.json, rewritten on /clear and /resume.
-  async remember() {
-    for (const a of agents()) {
-      if (!closable(a)) continue;
-      const k = await this.inspect(a.address);
-      if (!k || k.state !== "live" || !k.foreground || k.foreground.pid === k.pid) continue;
-      const labels = k.labels ?? {};
-      let line = labels.resume;
-      if (a.app === "claude-code") {
-        const text = await readTextFile(`${home()}/.claude/sessions/${k.foreground.pid}.json`).catch(() => null);
-        let id = null;
-        try {
-          id = text && JSON.parse(text).sessionId;
-        } catch {}
-        if (id) line = `claude --resume ${id}`;
-      }
-      if (!k.keep) await hc(["keep", a.address]).catch(() => null);
-      const set = [];
-      if (line && line !== labels.resume) set.push(`resume=${line}`);
-      if (line && String(k.pid) !== labels["resume.pid"]) set.push(`resume.pid=${k.pid}`);
-      if (set.length) await hc(["label", a.address, ...set]).catch(() => null);
+  // While an agent runs: its terminal is kept, and labelled with its resume line and its terminal's pid.
+  // Claude Code's session id is in ~/.claude/sessions/<its pid>.json, read again every pass. Pi labels
+  // itself (integrations/pi.ts); one started before that was installed is read from its own `--session <id>`.
+  async remember(k) {
+    const labels = k.labels ?? {};
+    let line = labels.resume;
+    if (k.status.app === "claude-code") {
+      const text = await readTextFile(`${home()}/.claude/sessions/${k.foreground?.pid}.json`).catch(() => null);
+      let id = null;
+      try {
+        id = text && JSON.parse(text).sessionId;
+      } catch {}
+      if (id) line = `claude --resume ${id}`;
+    } else if (!line) {
+      const at = (k.argv ?? []).indexOf("--session");
+      if (at >= 0 && k.argv[at + 1]) line = `pi --session ${k.argv[at + 1]}`;
     }
+    if (!line) return;
+    if (!k.keep) await hc(["keep", k.address]).catch(() => null);
+    const set = [];
+    if (line !== labels.resume) set.push(`resume=${line}`);
+    if (String(k.pid) !== labels["resume.pid"]) set.push(`resume.pid=${k.pid}`);
+    if (set.length) await hc(["label", k.address, ...set]).catch(() => null);
   }
 
-  // A labelled terminal whose shell is back at its prompt: the same pid means the agent was quit (forget it); a
-  // new pid means the core recovered it after a loss (a reboot). Recovered: the line is typed into its shell, or
-  // a settled one becomes a closed row and its pane closes. Labels go first, so no second window sends it again.
-  async restore(cx) {
-    for (const t of terminals()) {
-      const line = t.labels?.resume;
-      if (!line || t.state !== "live" || t.address.includes("/")) continue;
-      const k = await this.inspect(t.address);
-      if (!k?.labels?.resume || !k.foreground || k.foreground.pid !== k.pid) continue;
-      if ((await hc(["label", t.address, "resume=", "resume.pid="]).catch(() => null))?.code !== 0) continue;
-      // No pid yet (quit before the first pass labelled it) or the same pid: quit by hand, not lost.
-      const was = k.labels["resume.pid"];
-      if (!was || String(k.pid) === was) continue;
-      if (k.labels.settled) {
-        // The shell's program icon would be wrong here, so the row goes without one.
-        const p = panes().find((p) => p.terminal === t.address);
-        setShared(CLOSED, [{ key: `${t.address}-${Date.now()}`, title: k.labels["pi.session"] || k.labels.where || line.split(" ")[0],
-          space: k.labels["herdr.space"], cwd: k.cwd, program: null, argv: line.split(" "), at: Date.now() }, ...(shared(CLOSED) ?? [])]);
-        if (p) run("pane.close", { pane: p.pane });
-        else await hc(["kill", t.address]).catch(() => null);
-        continue;
-      }
-      // ponytail: the line is sent as soon as the shell owns the terminal; zsh keeps typed input until its prompt
-      // (direnv included). A shell that drops early input would need a prompt check (`hc read --lines 3`) first.
-      const r = await hc(["send", t.address, line]).catch((e) => ({ code: 1, stderr: String(e) }));
-      if (r.code !== 0) notify({ title: "Couldn't resume the agent", body: `${t.address}: ${line}\n${r.stderr.trim()}`, level: "error" });
+  // A labelled terminal whose shell is at its prompt: the same pid means the agent was quit (forget it); a new
+  // pid means the core recovered it after a loss (a reboot). Recovered: the line is typed into its shell, or a
+  // settled one becomes a closed row and its pane closes. Labels go first, so no second window sends it again.
+  async restore(k) {
+    const line = k.labels.resume, was = k.labels["resume.pid"];
+    if ((await hc(["label", k.address, "resume=", "resume.pid="]).catch(() => null))?.code !== 0) return;
+    // No pid yet (quit before a pass labelled it) or the same pid: quit by hand, not lost.
+    if (!was || String(k.pid) === was) return;
+    if (k.labels.settled) {
+      // The shell's program icon would be wrong here, so the row goes without one.
+      setShared(CLOSED, [{ key: `${k.address}-${Date.now()}`, title: k.labels["pi.session"] || k.labels.where || line.split(" ")[0],
+        space: k.labels["herdr.space"], cwd: k.cwd, program: null, argv: line.split(" "), at: Date.now() }, ...(shared(CLOSED) ?? [])]);
+      const p = panes().find((p) => p.terminal === k.address);
+      if (p) run("pane.close", { pane: p.pane });
+      else await hc(["kill", k.address]).catch(() => null);
+      return;
     }
-    cx.notify();
+    // ponytail: the line is sent as soon as the shell owns the terminal; zsh keeps typed input until its prompt
+    // (direnv included). A shell that drops early input would need a prompt check (`hc read --lines 3`) first.
+    const r = await hc(["send", k.address, line]).catch((e) => ({ code: 1, stderr: String(e) }));
+    if (r.code !== 0) notify({ title: "Couldn't resume the agent", body: `${k.address}: ${line}\n${r.stderr.trim()}`, level: "error" });
   }
 
   // Ends a drag or sweep, and hands the keyboard back to the pane that had it, unless the drop moved on to
