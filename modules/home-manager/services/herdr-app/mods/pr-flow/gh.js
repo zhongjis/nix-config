@@ -7,7 +7,9 @@ const PR_FIELDS = [
 ].join(',');
 
 const THREADS_QUERY = `query($owner:String!,$name:String!,$number:Int!){repository(owner:$owner,name:$name){pullRequest(number:$number){
-  reviewThreads(first:100){nodes{isResolved isOutdated path line comments(first:1){nodes{author{login} body}}}}
+  reviewThreads(first:100){nodes{isResolved isOutdated path line comments(first:1){nodes{author{login __typename} body createdAt url}}}}
+  comments(last:50){nodes{author{login __typename} body createdAt url}}
+  reviews(last:50){nodes{author{login __typename} body state submittedAt url}}
   commits(last:1){nodes{commit{committedDate}}}
   closingIssuesReferences(first:10){nodes{number title state stateReason url repository{nameWithOwner}}}
 }}}`;
@@ -60,7 +62,7 @@ export function createGh(exec) {
       const p = parsePrUrl(url);
       const data = await api(p.repo, 'graphql', ['-f', `query=${THREADS_QUERY}`, '-F', `owner=${p.owner}`, '-F', `name=${p.name}`, '-F', `number=${p.number}`]);
       const pull = data.data.repository.pullRequest;
-      return { threads: pull.reviewThreads.nodes, issues: pull.closingIssuesReferences?.nodes ?? [], headCommittedAt: pull.commits.nodes[0]?.commit.committedDate ?? null };
+      return { threads: pull.reviewThreads.nodes, issues: pull.closingIssuesReferences?.nodes ?? [], comments: pull.comments?.nodes ?? [], reviews: pull.reviews?.nodes ?? [], headCommittedAt: pull.commits.nodes[0]?.commit.committedDate ?? null };
     },
     fetchRuns: async (repo, sha) => (await api(repo, `actions/runs?head_sha=${sha}&per_page=50`)).workflow_runs.map((r) => ({
       id: r.id, name: r.name ?? r.display_title ?? 'workflow', status: r.status, conclusion: r.conclusion, url: r.html_url, updatedAt: r.updated_at,

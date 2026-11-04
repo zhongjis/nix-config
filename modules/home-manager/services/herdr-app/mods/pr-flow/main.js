@@ -6,7 +6,7 @@ import { panes, spaces, focused, exec, run, theme, props, settings, shared, setS
 import { createGh, parseRemote, runIdFromUrl } from "./gh.js";
 import { createTracker } from "./tracker.js";
 import { translator, relative, effectiveLang } from "./i18n.js";
-import { facts, steps, openThreads, logTail, flowLine, flowRows, jobSteps, issueState, issueLabel, orgsOf } from "./present.js";
+import { facts, statusRows, conversation, descPreview, logTail, flowLine, flowRows, jobSteps, issueState, issueLabel, orgsOf, orderCards } from "./present.js";
 import { parseDiff } from "./diff.js";
 import { sanitize } from "./text.js";
 import { issueRefs } from "./issue-refs.js";
@@ -38,17 +38,10 @@ function agentDot(status, t) {
   return div().size(7).mx(2).flex_none().rounded(99).bg(color);
 }
 
-function stepMark(tone, t) {
-  const c = toneColor(t, tone);
-  const round = (el) => h_flex().size(20).flex_none().rounded(99).bg(c).items_center().justify_center().child(el);
-  if (tone === "ok") return round(icon("check", 12, t.background));
-  if (tone === "bad") return round(icon("cross", 12, t.background));
-  if (tone === "warn") return round(icon("comment", 11, t.background));
-  const box = h_flex().size(20).flex_none().items_center().justify_center();
-  if (tone === "run") return box.child(icon("spinner", 15, c).spin(900));
-  if (tone === "wait") return box.child(div().size(12).rounded(99).border_2().border_color(c));
-  return box.child(div().size(9).rounded(99).border_1().border_color(t.dim));
-}
+// The status list's field column; values line up after it.
+const FIELD_W = 64;
+const valueColor = (t, tone) => ({ bad: t.ansi1, warn: t.blocked, todo: t.dim, dim: t.dim }[tone] ?? t.foreground);
+const PR_STATE_TONE = { open: "ok", draft: "dim", merged: "merged", closed: "bad" };
 
 function fileLine(path) {
   const parts = String(path).split("/"), name = parts.pop();
@@ -172,7 +165,7 @@ export default class PrFlow extends View {
   }
 
   signature() {
-    return JSON.stringify(this.tracker.cards(this.url).map((c) => [c.url, c.pr?.updatedAt, c.pr?.state, c.status?.name, c.status?.review, c.status?.comments, c.status?.ci?.kind, c.status?.ci?.checks?.map((x) => x.state), c.agent?.address, c.agent?.status, c.issues?.map((i) => i.state), c.flow?.active, c.flow?.runs?.map((r) => [r.id, r.status, r.conclusion]), Object.values(c.flow?.jobs ?? {}).map((j) => j.jobs.map((x) => x.steps.map((y) => y.status)))])) + this.tracker.lastError();
+    return JSON.stringify(this.tracker.cards(this.url).map((c) => [c.url, c.pr?.updatedAt, c.pr?.state, c.status?.name, c.status?.review, c.status?.comments, c.status?.ci?.kind, c.status?.ci?.checks?.map((x) => x.state), c.comments?.length, c.reviews?.length, c.threads?.length, c.agent?.address, c.agent?.status, c.issues?.map((i) => i.state), c.flow?.active, c.flow?.runs?.map((r) => [r.id, r.status, r.conclusion]), Object.values(c.flow?.jobs ?? {}).map((j) => j.jobs.map((x) => x.steps.map((y) => y.status)))])) + this.tracker.lastError();
   }
 
   tick(cx) {
@@ -338,8 +331,7 @@ export default class PrFlow extends View {
   }
 
   shown() {
-    return this.tracker.cards().filter(c => c.repo === this.repo)
-      .sort((a, b) => Number(b.branch === this.branch) - Number(a.branch === this.branch));
+    return orderCards(this.tracker.cards().filter(c => c.repo === this.repo), this.branch);
   }
 
   setOrg(org) {
@@ -393,9 +385,10 @@ export default class PrFlow extends View {
         .child(div().w_full().truncate().text_size(12).text_color(card.error ? t.ansi1 : t.dim).child(card.error ? sanitize(card.error) : tr("loading")));
     }
     return body
-      .child(div().w_full().truncate().font_medium().text_color(done ? t.muted : t.foreground).child(card.pr.title))
+      .child(div().w_full().truncate().font_medium().text_color(done || card.bot ? t.muted : t.foreground).child(card.pr.title))
       .child(h_flex().w_full().gap(6).items_center().text_size(11.5).text_color(t.dim)
         .child(div().min_w(0).truncate().child(`${short} #${card.number}`))
+        .when(!card.mine && Boolean(card.author), (e) => e.child(div().flex_none().child("·")).child(div().min_w(0).max_w(120).truncate().child(sanitize(card.author.replace(/^app\//, "")))))
         .child(div().flex_none().child("·"))
         .child(div().flex_none().child(issueLabel(card, tr)))
         .child(div().flex_1())
@@ -428,8 +421,20 @@ export default class PrFlow extends View {
     const bar = this.orgBar(all, t);
     return v_flex().size_full().child(this.header(cards.length, t))
       .when(Boolean(bar), (e) => e.child(bar))
-      .child(v_flex().id("pr-list").flex_1().min_h(0).overflow_y_scrollbar().p(6).gap(2).children(cards.map((c, i) => this.row(c, i, t))))
+      .child(v_flex().id("pr-list").flex_1().min_h(0).overflow_y_scrollbar().p(6).gap(2).children(this.grouped(cards, t)))
       .when(Boolean(error), (e) => e.child(div().flex_none().px(14).py(6).border_t(1).border_color(t.border).truncate().text_size(11).text_color(t.ansi1).child(sanitize(error))));
+  }
+
+  // Section labels only when the list holds both yours and others'.
+  grouped(cards, t) {
+    const rows = cards.map((c, i) => this.row(c, i, t));
+    const mine = cards.filter((c) => c.mine).length;
+    if (!mine || mine === cards.length) return rows;
+    const label = (id, text, count, top) => h_flex().id(id).flex_none().px(10).pt(top).pb(2).gap(6).items_center().text_size(11.5)
+      .child(div().font_medium().text_color(t.muted).child(text))
+      .child(div().text_color(t.dim).child(String(count)));
+    return [label("group-mine", this.t("group_mine"), mine, 4), ...rows.slice(0, mine),
+      label("group-others", this.t("group_others"), cards.length - mine, 12), ...rows.slice(mine)];
   }
 
   settingsScreen(t) {
@@ -479,15 +484,10 @@ export default class PrFlow extends View {
       return v_flex().size_full().child(top).child(div().p(14).text_color(card.error ? t.ansi1 : t.dim).child(card.error ? sanitize(card.error) : tr("loading")));
     }
     const { pr, agent } = card;
-    const refs = issueRefs(pr.body, shared("issues.refs"));
-    const all = [...steps(card, tr, now), ...flowRows(card, tr, now).map((r) => ({ ...r, run: true }))], threads = openThreads(card), files = pr.files ?? [], log = this.logBlock(card, t);
-    const logName = this.logFor(card)?.name;
+    const files = pr.files ?? [], log = this.logBlock(card, t), logName = this.logFor(card)?.name;
     return v_flex().size_full().child(top)
       .child(v_flex().id("detail").flex_1().min_h(0).overflow_y_scrollbar()
-        .child(v_flex().px(14).pt(14).gap(6)
-          .child(div().text_size(15).font_semibold().child(pr.title))
-          .child(div().text_size(11.5).text_color(t.dim).child(`${card.repo} #${card.number}`))
-          .child(h_flex().gap(5).items_center().text_size(11.5).text_color(t.muted).child(icon("branch", 12, t.dim)).child(div().min_w(0).truncate().child(`${pr.headRefName} → ${pr.baseRefName}`))))
+        .child(this.identity(card, t, now))
         .when(Boolean(agent), (e) => e.child(div().px(14).pt(12).child(
           h_flex().id("agent").w_full().px(10).h(38).gap(8).items_center().rounded(8).bg(t.raised).cursor_pointer().hover((s) => s.bg(t.hover)).on_click(() => this.goToAgent(card))
             .child(agentDot(agent.status, t))
@@ -495,31 +495,11 @@ export default class PrFlow extends View {
               .child(div().truncate().text_size(12.5).child(agent.name))
               .child(div().truncate().text_size(11).text_color(t.dim).child(`${agent.app} · ${tr(`a_${agent.status}`)}`)))
             .child(div().flex_none().text_size(11.5).text_color(t.muted).child(tr("agent_go"))).child(icon("arrow", 12, t.muted)))))
-        .when(refs.length > 0, e => e.child(h_flex().px(14).pt(12).gap(6).flex_wrap().children(refs.map(ref =>
-          div().id(`ref-${ref.provider}-${ref.key}`).px(8).py(4).rounded(6).bg(t.raised).text_size(12).text_color(t.muted).cursor_pointer().hover(s => s.bg(t.hover))
-            .on_click(() => {
-              setShared("issues.open", { provider: ref.provider, key: ref.key, at: Date.now() });
-              run("mod.open", { name: "issues" });
-            }).child(ref.key)))))
-        .child(this.section(tr("progress"), t))
-        .child(v_flex().px(14).children(all.map((row, i) => this.timelineRow(card, row, i === all.length - 1, t))))
+        .child(this.statusList(card, t, now))
         .when(Boolean(log), (e) => e.child(this.section(tr("failed_log", logName), t)).child(log))
-        .when(!(card.issues ?? []).length, (e) => e.child(this.section(tr("issues_none"), t)))
-        .when((card.issues ?? []).length > 0, (e) => e.child(this.section(tr("issues", card.issues.length), t)).child(v_flex().px(8).children(card.issues.map((issue, i) => {
-          const state = issueState(issue, tr);
-          return h_flex().id(`issue-${i}`).w_full().h(30).flex_none().px(6).gap(7).items_center().rounded(6).cursor_pointer().hover((s) => s.bg(t.hover)).on_click((_e, cx) => this.openIssue(issue.url, cx))
-            .child(div().size(8).flex_none().rounded(99).bg(toneColor(t, state.tone)))
-            .child(div().flex_none().text_size(12).text_color(t.dim).child(`#${issue.number}`))
-            .child(div().flex_1().min_w(0).truncate().child(issue.title))
-            .child(div().flex_none().text_size(11.5).text_color(t.muted).child(state.label));
-        }))))
-        .when(threads.length > 0, (e) => e.child(this.section(tr("comments_open", threads.length), t)).child(v_flex().px(14).gap(8).children(threads.map((x) =>
-          v_flex().w_full().p(10).gap(4).rounded(8).bg(t.raised)
-            .child(h_flex().w_full().gap(6).text_size(11).text_color(t.dim).child(div().min_w(0).truncate().child(sanitize(x.where))).child(div().flex_1()).child(div().flex_none().child(sanitize(x.who))))
-            .child(div().text_size(12.5).child(sanitize(x.body).slice(0, 400)))))))
-        .child(h_flex().px(14).pt(16).pb(8).gap(6).items_center().text_size(11.5).font_medium().text_color(t.dim)
-          .child(div().child(tr("files", pr.changedFiles ?? files.length))).child(div().flex_1())
-          .child(div().text_color(t.ansi2).child(`+${pr.additions ?? 0}`)).child(div().text_color(t.ansi1).child(`−${pr.deletions ?? 0}`)))
+        .child(this.conversationSection(card, t, now))
+        .child(this.heading(tr("files"), String(pr.changedFiles ?? files.length), t)
+          .child(div().flex_1()).child(div().text_size(11.5).text_color(t.ansi2).child(`+${pr.additions ?? 0}`)).child(div().text_size(11.5).text_color(t.ansi1).child(`−${pr.deletions ?? 0}`)))
         .child(v_flex().px(8).children(files.map((f, i) => {
           const { dir, name } = fileLine(f.path);
           return h_flex().id(`f-${i}`).w_full().h(28).flex_none().px(6).gap(6).items_center().rounded(6).cursor_pointer().hover((s) => s.bg(t.hover))
@@ -527,8 +507,149 @@ export default class PrFlow extends View {
             .child(h_flex().flex_1().min_w(0).child(div().min_w(0).truncate().text_color(t.dim).child(dir)).child(div().flex_none().max_w(220).truncate().child(name)))
             .child(div().flex_none().text_size(11).text_color(t.ansi2).child(`+${f.additions}`)).child(div().flex_none().text_size(11).text_color(t.ansi1).child(`−${f.deletions}`));
         })))
-        .when(Boolean(pr.body?.trim()), (e) => e.child(this.section(tr("description"), t)).child(div().px(14).pb(16).text_size(12.5).child(TextView.markdown(`body-${card.number}`, pr.body))))
-        .child(div().h(14).flex_none()));
+        .when(Boolean(pr.body?.trim()), (e) => e.child(this.description(card, t)))
+        .child(div().h(16).flex_none()));
+  }
+
+  // A zone's title. Zones are told apart by space and this, not by boxes.
+  heading(title, count, t) {
+    return h_flex().px(14).pt(24).pb(8).gap(6).items_center()
+      .child(div().text_size(12.5).font_semibold().child(title))
+      .when(Boolean(count), (e) => e.child(div().text_size(12).text_color(t.dim).child(count)));
+  }
+
+  // Title, then one line of what it is and one of where it goes.
+  identity(card, t, now) {
+    const tr = this.t, { pr } = card, name = card.status.name;
+    const state = name === "merged" || name === "closed" || name === "draft" ? name : "open";
+    const dot = () => div().flex_none().child("·");
+    return v_flex().px(14).pt(14).gap(6)
+      .child(div().text_size(16).font_semibold().child(pr.title))
+      .child(h_flex().w_full().gap(6).items_center().text_size(11.5).text_color(t.dim)
+        .child(div().size(7).flex_none().rounded(99).bg(toneColor(t, PR_STATE_TONE[state])))
+        .child(div().flex_none().text_color(t.muted).child(tr(state)))
+        .when(Boolean(card.author), (e) => e.child(dot()).child(div().flex_none().max_w(120).truncate().child(sanitize(card.author.replace(/^app\//, "")))))
+        .when(Boolean(pr.updatedAt), (e) => e.child(dot()).child(div().flex_none().child(relative(now - Date.parse(pr.updatedAt), tr))))
+        .child(div().flex_1())
+        .child(div().min_w(0).truncate().child(card.repo.split("/").at(-1)))
+        .child(div().flex_none().child(`#${card.number}`)))
+      .child(h_flex().gap(5).items_center().text_size(11.5).text_color(t.muted).child(icon("branch", 12, t.dim)).child(div().min_w(0).truncate().child(`${pr.headRefName} → ${pr.baseRefName}`)));
+  }
+
+  // Where the PR is, as aligned field/value lines: CI, review, merge, runs after merge, issues.
+  statusList(card, t, now) {
+    const tr = this.t;
+    const rows = statusRows(card, tr, now).map((row) => this.statusRow(card, row, t));
+    const runs = flowRows(card, tr, now).map((row, i) => this.statusRow(card, { ...row, key: `run-${row.id}`, field: i ? "" : tr("after_merge"), run: true }, t));
+    return v_flex().px(8).pt(14).children([...rows, ...runs, ...this.issueRows(card, t)]);
+  }
+
+  fieldLine(id, field, t) {
+    return h_flex().id(id).w_full().min_h(28).flex_none().px(6).gap(8).items_center().rounded(6)
+      .child(div().w(FIELD_W).flex_none().truncate().text_size(11.5).text_color(t.dim).child(field));
+  }
+
+  // One status fact; CI and runs open in place to their checks or steps.
+  statusRow(card, row, t) {
+    const tr = this.t, key = row.run ? row.key : "checks", openable = Boolean(row.run || row.checks), opened = openable && this.opened.has(key);
+    const toggle = (_e, cx) => { if (row.run) this.toggleRun(card, row.id, cx); else this.toggle(key); cx.notify(); };
+    const link = (id, label, onClick) => div().id(id).text_size(11.5).text_color(t.muted).cursor_pointer().hover((s) => s.text_color(t.foreground)).on_click(onClick).child(label);
+    const sub = opened ? this.subRows(card, row, t) : null, indent = 6 + FIELD_W + 8;
+    return v_flex().w_full().flex_none()
+      .child(this.fieldLine(`st-${row.key}`, row.field, t).when(openable, (e) => e.cursor_pointer().hover((s) => s.bg(t.hover)).on_click(toggle))
+        .child(row.key === "merge" && row.tone === "warn" ? icon("merge", 12, t.blocked) : factIcon(row.tone, t))
+        .child(div().min_w(0).truncate().text_size(12.5).font_medium().text_color(valueColor(t, row.tone)).child(sanitize(row.label)))
+        .child(div().flex_1().min_w(0).truncate().text_size(11.5).text_color(t.dim).child(sanitize(row.note ?? "")))
+        .when(openable, (e) => e.child(icon(opened ? "down" : "arrow", 11, t.dim))))
+      .when(Boolean(row.run) && (opened || row.failed), (e) => e.child(h_flex().pl(indent + 20).pb(6).gap(12)
+        .when(row.failed, (x) => x.child(link(`log-${row.id}`, tr("run_log"), () => this.openViewer({ kind: "log", repo: card.repo, runId: String(row.id), name: row.label, url: row.url, title: card.pr.title, number: card.number }))))
+        .child(link(`web-${row.id}`, "GitHub", () => openExternal(row.url)))))
+      .when(Boolean(sub), (e) => e.child(div().pl(indent).pr(6).pb(8).child(sub)));
+  }
+
+  // Closing issues open in the panel; Jira and Linear keys open the issues popup.
+  issueRows(card, t) {
+    const tr = this.t, issues = card.issues ?? [], refs = issueRefs(card.pr.body, shared("issues.refs"));
+    const rows = issues.map((issue, i) => {
+      const state = issueState(issue, tr);
+      return this.fieldLine(`issue-${i}`, i ? "" : tr("issues"), t).cursor_pointer().hover((s) => s.bg(t.hover)).on_click((_e, cx) => this.openIssue(issue.url, cx))
+        .child(h_flex().size(12).flex_none().items_center().justify_center().child(div().size(7).rounded(99).bg(toneColor(t, state.tone))))
+        .child(div().flex_none().text_size(11.5).text_color(t.dim).child(`#${issue.number}`))
+        .child(div().flex_1().min_w(0).truncate().text_size(12.5).child(sanitize(issue.title)))
+        .child(div().flex_none().text_size(11.5).text_color(t.muted).child(state.label));
+    });
+    if (refs.length) {
+      rows.push(this.fieldLine("refs", issues.length ? "" : tr("issues"), t).child(h_flex().flex_1().min_w(0).py(3).gap(4).flex_wrap().children(refs.map((ref) =>
+        h_flex().id(`ref-${ref.provider}-${ref.key}`).h(22).px(7).items_center().rounded(5).bg(t.raised).text_size(11.5).text_color(t.muted).cursor_pointer().hover((s) => s.bg(t.hover).text_color(t.foreground))
+          .on_click(() => {
+            setShared("issues.open", { provider: ref.provider, key: ref.key, at: Date.now() });
+            run("mod.open", { name: "issues" });
+          }).child(ref.key)))));
+    }
+    if (!rows.length) rows.push(this.fieldLine("issues", tr("issues"), t).child(icon("pending", 10, t.dim)).child(div().text_size(12.5).text_color(t.dim).child(tr("s_none"))));
+    return rows;
+  }
+
+  // Comments, reviews and open threads, oldest first. People in full; bots folded.
+  conversationSection(card, t, now) {
+    const tr = this.t, entries = conversation(card);
+    const count = entries.reduce((n, x) => n + (x.kind === "bots" ? x.items.length : 1), 0);
+    const ago = (at) => relative(now - Date.parse(at), tr);
+    return v_flex().w_full().flex_none()
+      .child(this.heading(tr("conversation"), count ? String(count) : "", t))
+      .when(!entries.length, (e) => e.child(div().px(14).text_size(12).text_color(t.dim).child(tr("no_comments"))))
+      .child(v_flex().px(8).gap(2).children(entries.map((x, i) =>
+        x.kind === "bots" ? this.botGroup(x, `${card.number}-${i}`, t, ago) : x.bot ? this.botPost(x, `${card.number}-${i}`, t, ago) : this.post(x, `${card.number}-${i}`, t, ago))));
+  }
+
+  post(x, id, t, ago) {
+    const tr = this.t, review = x.state === "APPROVED" || x.state === "CHANGES_REQUESTED";
+    const tag = x.kind === "thread" ? sanitize(x.where.split("/").at(-1)) : review ? tr(`rv_${x.state}`) : "";
+    return v_flex().w_full().flex_none().px(6).pt(6).pb(10).gap(4)
+      .child(h_flex().w_full().gap(6).items_center().text_size(11.5)
+        .child(div().flex_none().max_w(150).truncate().font_medium().child(x.who))
+        .when(Boolean(tag), (e) => e.child(div().min_w(0).truncate().text_color(x.state === "APPROVED" ? t.ansi2 : x.state === "CHANGES_REQUESTED" ? t.blocked : t.dim).child(tag)))
+        .child(div().flex_1())
+        .child(div().flex_none().text_size(11).text_color(t.dim).child(ago(x.at))))
+      .child(TextView.markdown(`cv-${id}`, x.body).text_size(12.5).text_color(t.foreground));
+  }
+
+  // A bot's post: one dim line until opened.
+  botPost(x, id, t, ago) {
+    const key = `c:${x.key}`, opened = this.opened.has(key);
+    return v_flex().w_full().flex_none()
+      .child(h_flex().id(`cv-${id}`).w_full().h(26).px(6).gap(6).items_center().rounded(6).cursor_pointer().hover((s) => s.bg(t.hover))
+        .on_click((_e, cx) => { this.toggle(key); cx.notify(); })
+        .child(icon(opened ? "down" : "arrow", 10, t.dim))
+        .child(div().flex_none().max_w(120).truncate().text_size(11.5).text_color(t.muted).child(x.who))
+        .child(div().flex_1().min_w(0).truncate().text_size(11.5).text_color(t.dim).child(x.line))
+        .child(div().flex_none().text_size(11).text_color(t.dim).child(ago(x.at))))
+      .when(opened, (e) => e.child(div().pl(22).pr(6).pt(2).pb(10).child(TextView.markdown(`cvb-${id}`, x.body).text_size(12).text_color(t.muted))));
+  }
+
+  // Back-to-back bot posts: one line that opens to their own folded lines.
+  botGroup(g, id, t, ago) {
+    const tr = this.t, key = `g:${g.key}`, opened = this.opened.has(key);
+    return v_flex().w_full().flex_none()
+      .child(h_flex().id(`cvg-${id}`).w_full().h(26).px(6).gap(6).items_center().rounded(6).cursor_pointer().hover((s) => s.bg(t.hover))
+        .on_click((_e, cx) => { this.toggle(key); cx.notify(); })
+        .child(icon(opened ? "down" : "arrow", 10, t.dim))
+        .child(div().flex_none().text_size(11.5).text_color(t.muted).child(tr("bot_comments", g.items.length)))
+        .child(div().flex_1().min_w(0).truncate().text_size(11.5).text_color(t.dim).child([...new Set(g.items.map((x) => x.who))].join(", ")))
+        .child(div().flex_none().text_size(11).text_color(t.dim).child(ago(g.items.at(-1).at))))
+      .when(opened, (e) => e.child(v_flex().pl(16).children(g.items.map((x, j) => this.botPost(x, `${id}-${j}`, t, ago)))));
+  }
+
+  // Long descriptions open on their first paragraph; the rest is a click away.
+  description(card, t) {
+    const tr = this.t, key = `desc:${card.url}`, { preview, more } = descPreview(card.pr.body), full = !more || this.opened.has(key);
+    return v_flex().w_full().flex_none()
+      .child(this.heading(tr("description"), "", t))
+      .when(full || Boolean(preview), (e) => e.child(div().px(14).text_size(12.5).child(TextView.markdown(`body-${card.number}-${full ? "full" : "head"}`, full ? card.pr.body : preview))))
+      .when(more, (e) => e.child(h_flex().px(8).pt(4).child(h_flex().id("desc-more").h(24).px(6).gap(4).items_center().rounded(6).cursor_pointer().hover((s) => s.bg(t.hover))
+        .on_click((_e, cx) => { this.toggle(key); cx.notify(); })
+        .child(div().text_size(12).text_color(t.muted).child(tr(full ? "show_less" : "show_more")))
+        .when(!full, (x) => x.child(icon("down", 11, t.dim))))));
   }
 
   miniIcon(tone, t) {
@@ -557,24 +678,6 @@ export default class PrFlow extends View {
         .child(this.miniIcon(x.tone, t))
         .child(div().flex_1().min_w(0).truncate().text_size(11.5).text_color(x.tone === "todo" ? t.dim : t.muted).child(sanitize(x.name)))),
     ]));
-  }
-
-  timelineRow(card, row, last, t) {
-    const tr = this.t, sub = this.subRows(card, row, t);
-    const key = row.run ? `run-${row.id}` : "checks", openable = row.run || row.checks;
-    const toggle = (_e, cx) => { if (row.run) this.toggleRun(card, row.id, cx); else this.toggle(key); cx.notify(); };
-    const link = (id, label, onClick) => div().id(id).text_size(11.5).text_color(t.muted).cursor_pointer().hover((s) => s.text_color(t.foreground)).on_click(onClick).child(label);
-    return h_flex().w_full().gap(10).items_start()
-      .child(v_flex().w(20).flex_none().items_center().h_full().child(stepMark(row.tone, t)).when(!last, (e) => e.child(div().w(1).flex_1().min_h(14).bg(t.border))))
-      .child(v_flex().flex_1().min_w(0).pb(last ? 0 : 12).gap(1)
-        .child(h_flex().id(`row-${row.run ? row.id : row.label}`).w_full().gap(4).items_center().when(openable, (e) => e.cursor_pointer().on_click(toggle))
-          .child(div().min_w(0).truncate().pt(1).font_medium().text_color(row.tone === "todo" ? t.dim : t.foreground).child(sanitize(row.label)))
-          .when(openable, (e) => e.child(icon(this.opened.has(key) ? "down" : "arrow", 11, t.dim))))
-        .when(Boolean(row.note), (e) => e.child(div().w_full().truncate().text_size(11.5).text_color(t.dim).child(sanitize(row.note))))
-        .when(row.run, (e) => e.child(h_flex().pt(2).gap(10)
-          .when(row.failed, (x) => x.child(link(`log-${row.id}`, tr("run_log"), () => this.openViewer({ kind: "log", repo: card.repo, runId: String(row.id), name: row.label, url: row.url, title: card.pr.title, number: card.number }))))
-          .child(link(`web-${row.id}`, "GitHub", () => openExternal(row.url)))))
-        .when(Boolean(sub), (e) => e.child(sub)));
   }
 
   issueScreen(url, t) {

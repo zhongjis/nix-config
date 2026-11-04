@@ -4,6 +4,7 @@ import { issueRefs } from '../issue-refs.js';
 import { createTracker } from '../tracker.js';
 import { checkState } from '../status.js';
 import { createGh, parseRemote, parsePrUrl } from '../gh.js';
+import { orderCards, conversation, descPreview } from '../present.js';
 import { checkouts, ciRollup, githubRepo } from '../../tui-spaces/tracking.js';
 
 test('CI reduction matches the detail check states; failure wins over pending', () => {
@@ -98,4 +99,49 @@ test('shared summaries need no requests; only the selected PR fetches detail wit
   assert.equal(calls.length, 2);
   tracker.sync({ 'owner/repo': [prs[0]] });
   assert.equal(tracker.cards().length, 1);
+});
+
+test('yours first, checked-out branch leads its group, bots trail people, newest first', () => {
+  const cards = [
+    { number: 1, bot: true, updatedAt: '2026-01-09' },
+    { number: 2, updatedAt: '2026-01-01' },
+    { number: 3, mine: true, updatedAt: '2026-01-02' },
+    { number: 4, updatedAt: '2026-01-05' },
+    { number: 5, mine: true, updatedAt: '2026-01-03' },
+    { number: 6, branch: 'topic', updatedAt: '2026-01-00' },
+    { number: 7, mine: true, branch: 'topic', updatedAt: '2026-01-00' },
+  ];
+  assert.deepEqual(orderCards(cards, 'topic').map(c => c.number), [7, 5, 3, 6, 4, 2, 1]);
+});
+
+test('conversation: people and bots oldest first, silent reviews dropped, back-to-back bots folded', () => {
+  const user = (login) => ({ login, __typename: 'User' });
+  const card = {
+    comments: [
+      { author: { login: 'coderabbitai', __typename: 'Bot' }, body: '<!-- x -->\n## ⚠️ **Walkthrough**\nlong', createdAt: '2026-01-02', url: 'c2' },
+      { author: user('alice'), body: 'Looks off', createdAt: '2026-01-05', url: 'c5' },
+      { author: { login: 'app/renovate' }, body: 'Rebased', createdAt: '2026-01-01', url: 'c1' },
+    ],
+    reviews: [
+      { author: user('bob'), body: '', state: 'APPROVED', submittedAt: '2026-01-04', url: 'r4' },
+      { author: user('bob'), body: 'LGTM', state: 'APPROVED', submittedAt: '2026-01-06', url: 'r6' },
+      { author: { login: 'chatgpt-codex-connector', __typename: 'Bot' }, body: 'Review', state: 'COMMENTED', submittedAt: '2026-01-03', url: 'r3' },
+    ],
+    threads: [
+      { isResolved: false, isOutdated: false, path: 'src/a.js', line: 7, comments: { nodes: [{ author: user('carol'), body: 'nit', createdAt: '2026-01-07', url: 't7' }] } },
+      { isResolved: true, isOutdated: false, path: 'src/b.js', line: 1, comments: { nodes: [{ author: user('carol'), body: 'done', createdAt: '2026-01-08', url: 't8' }] } },
+    ],
+  };
+  const out = conversation(card);
+  assert.deepEqual(out.map((x) => x.kind === 'bots' ? x.items.map((i) => i.key) : x.key), [['c1', 'c2', 'r3'], 'c5', 'r6', 't7']);
+  assert.deepEqual(out[0].items.map((i) => i.who), ['renovate', 'coderabbitai', 'chatgpt-codex-connector']);
+  assert.equal(out[0].items[1].line, 'Walkthrough');
+  assert.deepEqual(out.slice(1).map((x) => x.bot), [false, false, false]);
+  assert.equal(out[3].where, 'src/a.js:7');
+});
+
+test('description preview keeps the first section\'s prose and says when more is hidden', () => {
+  const body = '## Summary\nPromote the endpoint.\n\n```mermaid\nA\n\nB\n```\n\n## Changes\n- route';
+  assert.deepEqual(descPreview(body), { preview: 'Promote the endpoint.', more: true });
+  assert.deepEqual(descPreview('Fixes the thing.'), { preview: 'Fixes the thing.', more: false });
 });

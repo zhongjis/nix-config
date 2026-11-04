@@ -17,7 +17,7 @@ export function createTracker({ gh, now = Date.now }) {
     pending.add(url);
     try {
       const [pr, extra] = await Promise.all([gh.fetchPr(url), gh.fetchThreads(url)]);
-      const data = { pr: { ...pr, title: sanitize(pr.title), body: sanitize(pr.body) }, threads: extra.threads, issues: extra.issues ?? [], at: now(), flow: null };
+      const data = { pr: { ...pr, title: sanitize(pr.title), body: sanitize(pr.body) }, threads: extra.threads, issues: extra.issues ?? [], comments: extra.comments ?? [], reviews: extra.reviews ?? [], at: now(), flow: null };
       if (pr.state === 'MERGED' && pr.mergeCommit?.oid) {
         const runs = await gh.fetchRuns(entries.find(e => e.url === url).repo, pr.mergeCommit.oid);
         data.flow = { runs, jobs: live.get(url)?.flow?.jobs ?? {}, active: flowActive(runs, pr.mergedAt, now()) };
@@ -37,10 +37,10 @@ export function createTracker({ gh, now = Date.now }) {
   function cards(detailUrl) {
     return entries.map(e => {
       const data = e.url === detailUrl ? live.get(e.url) : null;
-      const pr = data?.pr ?? { title: sanitize(e.title), headRefName: e.branch, state: 'OPEN', reviewDecision: e.review };
+      const pr = data?.pr ?? { title: sanitize(e.title), headRefName: e.branch, state: 'OPEN', reviewDecision: e.review, updatedAt: e.updatedAt };
       const status = prState(pr, { now: now(), headSeenAt: 0, threads: data?.threads }, settings);
       if (!data?.pr) status.ci.kind = ({ pass: 'passed', fail: 'failed', pending: 'running' })[e.ci] ?? 'none';
-      return { ...e, key: e.url, pr, summary: !data?.pr, status, threads: data?.threads ?? [], issues: data?.issues ?? [], flow: data?.flow, error: data?.error };
+      return { ...e, key: e.url, pr, summary: !data?.pr, status, threads: data?.threads ?? [], issues: data?.issues ?? [], comments: data?.comments ?? [], reviews: data?.reviews ?? [], flow: data?.flow, error: data?.error };
     });
   }
 
