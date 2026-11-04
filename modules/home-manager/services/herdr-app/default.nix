@@ -87,6 +87,11 @@ in {
       tui-spaces = ./mods/tui-spaces;
       # herdr.dev/mods/herdrdev/tmux-prefix
       tmux-prefix = ./mods/tmux-prefix;
+      # Vendored and customized (not pinned); upstream LICENSE kept in each folder.
+      # github.com/cybertron288/herdr-mods filetree, without its Claude hook bridge.
+      filetree = ./mods/filetree;
+      # github.com/cybertron288/herdr-mods file-icons; filetree reads its icons/.
+      file-icons = ./mods/file-icons;
     };
   };
 }
