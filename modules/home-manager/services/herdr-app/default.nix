@@ -94,6 +94,8 @@ in {
       file-icons = ./mods/file-icons;
       # github.com/jjangsky/herdr-pr-flow, fed by tui-spaces' PR list.
       pr-flow = ./mods/pr-flow;
+      # github.com/DeevsDeevs/deevs-herdr-kit agent-browser.
+      agent-browser = ./mods/agent-browser;
     };
   };
 }
