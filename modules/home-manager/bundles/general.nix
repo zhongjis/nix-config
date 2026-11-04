@@ -14,7 +14,6 @@
 
   myHomeManager.neovim.enable = lib.mkDefault true;
   myHomeManager.stylix.enable = lib.mkDefault true;
-  myHomeManager.services.herdr.enable = lib.mkDefault true;
   myHomeManager.services.herdr-app.enable = lib.mkDefault true;
   myHomeManager.zellij.enable = lib.mkDefault false;
   myHomeManager.alacritty.enable = lib.mkDefault false;

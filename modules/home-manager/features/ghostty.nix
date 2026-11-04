@@ -21,7 +21,6 @@
       title = "Ghostty";
 
       # init
-      initial-command = "zsh -l -c 'cd ~/personal/nix-config && herdr'";
       confirm-close-surface = false;
       background-opacity = 1;
       keybind = [
