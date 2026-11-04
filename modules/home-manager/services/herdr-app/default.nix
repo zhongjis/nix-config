@@ -85,6 +85,8 @@ in {
       tui-subagents = ./mods/tui-subagents;
       # Herdr's `spaces` mod with the repo/branch on its own line.
       tui-spaces = ./mods/tui-spaces;
+      # Herdr's `tabs` mod with icon-only Files/Changes/PR panel buttons.
+      tui-tabs = ./mods/tui-tabs;
       # herdr.dev/mods/herdrdev/tmux-prefix
       tmux-prefix = ./mods/tmux-prefix;
       # Vendored and customized (not pinned); upstream LICENSE kept in each folder.
