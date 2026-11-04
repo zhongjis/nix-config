@@ -5,6 +5,7 @@
 
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
+import { Repositories } from "./repos.js";
 import { spaces, machines, panes, run, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout } from "herdr";
 
 function find(node, id) {
@@ -36,17 +37,12 @@ const FALLBACK = 60000;
 // that draws space avatars): one strong color per hue, light and dark alike.
 const MARK = { ansi6: "#22a99a", ansi3: "#e3814f", ansi4: "#5b8def", ansi5: "#8b7cf6", ansi2: "#3fae6a", ansi1: "#d9649a" };
 
-// A space speaks up only when something in it needs you.
-export function glyph(status) {
-  return status === "blocked" || status === "done" ? "●" : "·";
-}
-
-export function tone(t, status) {
-  return t[status] ?? t.unknown;
-}
-
 export default class Spaces extends View {
   init(_props, cx) {
+    const panels = shared("workspace.panels") ?? ["files", "changes"];
+    if (!panels.includes("pr")) setShared("workspace.panels", [...panels, "pr"]);
+    this.repos = new Repositories();
+    this.expanded = new Set(JSON.parse(localStorage.getItem("worktrees.expanded") ?? "[]"));
     this.git = {}; // where() -> { name, branch, ahead, behind, repo, linked }, null: not a repo
     this.checked = {}; // where() -> when it was last looked at
     this.unsure = new Set(); // where()s git couldn't answer for (a machine away)
@@ -74,10 +70,14 @@ export default class Spaces extends View {
 
   checkNew(cx) {
     const now = Date.now();
-    const sp = spaces();
+    const sp = spaces(), ps = panes();
     for (const s of sp) if (!this.shown.has(s.id)) this.born[s.id] ??= now;
-    const due = this.due(now, sp, panes());
+    const due = this.due(now, sp, ps);
     if (due.size) this.refreshGit(due, cx);
+    if (window().active) {
+      const known = new Set(sp.map(s => this.git[where(s, ps)]?.repo));
+      for (const g of Object.values(this.git)) if (g && known.has(g.repo)) this.repos.refresh(g, cx);
+    }
     if (sp.some((s) => !this.shown.has(s.id))) cx.notify();
   }
 
@@ -213,7 +213,7 @@ export default class Spaces extends View {
       const common = await exec("git", ["rev-parse", "--path-format=absolute", "--git-common-dir"], { cwd, on });
       const repo = common.stdout.trim();
       const name = repo.endsWith("/.git") ? base(repo.slice(0, -5)) : base(repo).replace(/\.git$/, "");
-      const info = { name, branch: null, ahead: 0, behind: 0, repo: JSON.stringify([on, repo]), linked: repo !== `${top.stdout.trim()}/.git` };
+      const info = { name, folder: top.stdout.trim(), branch: null, ahead: 0, behind: 0, repo: JSON.stringify([on, repo]), linked: repo !== `${top.stdout.trim()}/.git` };
       for (const line of r.stdout.split("\n")) {
         if (line.startsWith("# branch.head ")) info.branch = line.slice(14);
         else if (line.startsWith("# branch.ab ")) {
@@ -224,6 +224,7 @@ export default class Spaces extends View {
       }
       this.git[key] = info;
       if (!on) this.watch(repo, cx);
+      if (window().active || !this.repos.groups[info.repo]) this.repos.refresh(info, cx);
     } catch {
       // Couldn't ask (the machine is away): keep what it showed, look again later.
       this.git[key] ??= null;
@@ -256,17 +257,26 @@ export default class Spaces extends View {
     const ready = (w) => this.shown.has(w.id) || where(w, ps) in this.git || Date.now() - (this.born[w.id] ??= Date.now()) > 1500;
     for (const w of sp) if (!this.shown.has(w.id) && ready(w)) this.shown.add(w.id);
     const list = sp.map((w, i) => ({ w, i, g: this.git[where(w, ps)] ?? null })).filter((r) => this.shown.has(r.w.id));
-    const mains = new Set(list.filter((r) => r.g && !r.g.linked).map((r) => r.g.repo));
-    const nested = (r) => r.g?.linked && mains.has(r.g.repo);
-    const out = [];
-    const placed = new Set(); // repos whose worktrees are listed (under the first of its spaces)
+    const out = [], placed = new Set();
     for (const r of list) {
-      if (nested(r)) continue;
-      out.push({ ...r, tree: null });
-      if (!r.g || r.g.linked || placed.has(r.g.repo)) continue;
+      if (!r.g) { out.push(r); continue; }
+      if (placed.has(r.g.repo)) continue;
       placed.add(r.g.repo);
-      const kids = list.filter((k) => nested(k) && k.g.repo === r.g.repo);
-      kids.forEach((k, n) => out.push({ ...k, tree: n === kids.length - 1 ? "└─" : "├─" }));
+      const group = list.filter(k => k.g?.repo === r.g.repo);
+      // Without a main-checkout space, the first worktree space is the head.
+      const head = group.find(k => !k.g.linked) ?? group[0];
+      out.push({ ...head, tree: null });
+      group.filter(k => k !== head && !k.g.linked).forEach(k => out.push({ ...k, tree: null }));
+      const kids = group.filter(k => k !== head && k.g.linked).map(k => ({ ...k, tree: "└─" }));
+      const all = this.repos.groups[r.g.repo]?.worktrees ?? [];
+      for (const wt of all) {
+        if (group.some(k => k.g.folder === wt.folder)) continue;
+        kids.push({ w: { id: wt.folder, name: wt.branch ?? base(wt.folder), machine: r.w.machine }, g: { ...r.g, ...wt, ahead: 0, behind: 0 }, tree: "└─", vacant: true });
+      }
+      if (kids.length) {
+        out.push({ ...head, summary: true, count: new Set(kids.map(k => k.g.folder)).size, failed: kids.some(k => this.repos.pr(k.g)?.ci === "fail") });
+        out.push(...kids.filter(k => this.expanded.has(r.g.repo) || k.w.active));
+      }
     }
     return out;
   }
@@ -274,7 +284,7 @@ export default class Spaces extends View {
   // The rows, under a header per machine once one isn't this computer.
   grouped(t, collapsed) {
     const rows = this.ordered();
-    const draw = (r) => (collapsed ? this.compact(r, t) : this.row(r, t));
+    const draw = r => r.summary ? this.worktreeSummary(r, t) : r.vacant ? this.vacant(r, t) : collapsed ? this.compact(r, t) : this.row(r, t);
     const remote = [...new Set([...rows.map(r => r.w.machine).filter(Boolean), ...this.machines.map(m => m.name), ...Object.keys(this.reconnecting)])].sort();
     const loading = m => {
       const layout = machines().find(k => k.name === m)?.layout;
@@ -347,6 +357,37 @@ export default class Spaces extends View {
       .when(g.behind > 0, (el) => el.child(div().flex_none().text_color(t.ansi1).child(`\u2193${g.behind}`)));
   }
 
+  badge(g, t) {
+    const pr = this.repos.pr(g);
+    if (!pr) return div();
+    return h_flex().id(`pr-${g.repo}-${g.folder}-${pr.number}`).flex_none().gap(4).px(3).items_center().text_size(11).text_color(t.muted).cursor_pointer().hover(s => s.text_color(t.foreground))
+      .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
+      .on_mouse_up("left", (_e, cx) => {
+        cx.stop_propagation();
+        setShared("pr.select", { repo: pr.repo, number: pr.number, at: Date.now() });
+        run("layout.select", { stack: "panel-body", child: "pr" });
+        run("layout.show", { id: "panel" });
+      })
+      .child(`#${pr.number}`)
+      .child(div().size(6).rounded(3).bg(pr.ci === "fail" ? t.blocked : pr.ci === "pending" ? t.working : pr.ci === "pass" ? t.done : t.dim));
+  }
+
+  worktreeSummary(r, t) {
+    return h_flex().id(`worktrees-${r.g.repo}`).h(25).flex_none().pl(30).gap(5).items_center().text_size(12).text_color(t.dim).cursor_pointer().hover(s => s.bg(t.hover))
+      .on_click((_e, cx) => {
+        this.expanded.has(r.g.repo) ? this.expanded.delete(r.g.repo) : this.expanded.add(r.g.repo);
+        localStorage.setItem("worktrees.expanded", JSON.stringify([...this.expanded]));
+        cx.notify();
+      }).child(`⑂ ${r.count}`).when(r.failed, e => e.child(div().text_color(t.blocked).child("✗")));
+  }
+
+  vacant({ w, g }, t) {
+    return h_flex().id(`worktree-${g.repo}-${g.folder}`).h(28).flex_none().pl(30).gap(6).items_center().cursor_pointer().hover(s => s.bg(t.hover))
+      .on_click(() => run("space.new", { folder: g.folder, machine: w.machine ?? "" }))
+      .child(div().flex_1().min_w(0).truncate().text_size(12).text_color(t.dim).child(`⑂ ${w.name}`))
+      .child(this.badge(g, t));
+  }
+
   row({ w, i, g, tree }, t) {
     const on = w.active;
     const colors = shared("space.colors") ?? {};
@@ -398,14 +439,15 @@ export default class Spaces extends View {
           .when(Boolean(tree), el => el.pl(22).child(svg("mods/workspace-chrome/branch.svg").size(13).text_color(t.dim)))
           .when(!tree, el => el.child(h_flex().size(18).flex_none().rounded(5).bg(fill).items_center().justify_center().text_size(10.5).font_bold().text_color("#ffffff").child([...w.name][0]?.toUpperCase() ?? "?")))
           .child(div().flex_shrink(0).max_w(150).truncate().text_color(t.foreground).child(w.name))
-          .child(g ? this.gitTail(g, t) : div().flex_1()),
+          .child(g ? this.gitTail(g, t) : div().flex_1())
+          .child(this.badge(g, t)),
       )
       .when(Boolean(where), (el) => el.child(
         div().pl(tree ? 44 : 27).min_w(0).truncate().text_size(11.5).text_color(t.dim).child(where),
       ));
   }
 
-  compact({ w, i }, t) {
+  compact({ w, i, g }, t) {
     return h_flex()
       .id(`space-${w.id}`)
       .h(26)
@@ -416,7 +458,7 @@ export default class Spaces extends View {
       .hover((s) => s.bg(t.hover))
       .on_click(() => run("space.select", { id: w.id }))
       .child(div().text_color(w.active ? t.foreground : t.muted).child(String(i + 1)))
-      .child(div().text_color(tone(t, w.status)).child(glyph(w.status)));
+      .child(this.badge(g, t));
   }
 
   render() {

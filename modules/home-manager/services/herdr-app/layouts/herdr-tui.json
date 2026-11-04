@@ -140,6 +140,13 @@
                       "content": {
                         "mod": "changes"
                       }
+                    },
+                    {
+                      "id": "pr",
+                      "type": "block",
+                      "content": {
+                        "mod": "pr-flow"
+                      }
                     }
                   ],
                   "active": "files"

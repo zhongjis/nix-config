@@ -1,0 +1,101 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { issueRefs } from '../issue-refs.js';
+import { createTracker } from '../tracker.js';
+import { checkState } from '../status.js';
+import { createGh, parseRemote, parsePrUrl } from '../gh.js';
+import { checkouts, ciRollup, githubRepo } from '../../tui-spaces/tracking.js';
+
+test('CI reduction matches the detail check states; failure wins over pending', () => {
+  const checks = [
+    ...['FAILURE', 'TIMED_OUT', 'CANCELLED', 'ACTION_REQUIRED', 'STARTUP_FAILURE', 'SUCCESS', 'NEUTRAL', 'SKIPPED'].map(conclusion => ({ status: 'COMPLETED', conclusion })),
+    ...['FAILURE', 'ERROR', 'PENDING', 'SUCCESS'].map(state => ({ __typename: 'StatusContext', state })),
+    { status: 'IN_PROGRESS', conclusion: null },
+  ];
+  const expected = { failed: 'fail', passed: 'pass', running: 'pending' };
+  for (const check of checks) assert.equal(ciRollup([check]), expected[checkState(check)]);
+  assert.equal(ciRollup([{ status: 'QUEUED' }, { state: 'ERROR' }]), 'fail');
+  assert.equal(ciRollup([{ state: 'SUCCESS' }, { status: 'QUEUED' }]), 'pending');
+  assert.equal(ciRollup([]), null);
+});
+
+test('worktrees skip bare/prunable entries and retain detached checkouts and spaces in paths', () => {
+  const output = 'worktree /repo\nHEAD abc\nbranch refs/heads/main\n\nworktree /a branch\nHEAD def\nbranch refs/heads/topic\n\nworktree /detached\nHEAD abc\ndetached\n\nworktree /gone\nprunable gitdir missing\n\nworktree /bare\nbare\n';
+  assert.deepEqual(checkouts(output), [{ folder: '/repo', branch: 'main' }, { folder: '/a branch', branch: 'topic' }, { folder: '/detached', branch: null }]);
+  assert.equal(githubRepo('git@github.com:someone/project.git\n'), 'someone/project');
+  assert.equal(githubRepo('https://github.com/someone/project.git'), 'someone/project');
+  assert.equal(githubRepo('/local/repo'), null);
+});
+
+test('sidebar and panel share public, enterprise and SSH-alias identities', () => {
+  const cases = [
+    ['git@github.com:someone/project.git', 'someone/project'],
+    ['git@github.com-personal:someone/project.git', 'someone/project'],
+    ['git@github.com-work:someone/project.git', 'someone/project'],
+    ['https://ghe.example.com/someone/project', 'ghe.example.com/someone/project'],
+    ['git@ghe.example.com:someone/project.git', 'ghe.example.com/someone/project'],
+    ['ssh://git@ghe.example.com/someone/project.git', 'ghe.example.com/someone/project'],
+    ['https://gitlab.example.com/someone/project.git', 'gitlab.example.com/someone/project'],
+  ];
+  for (const [remote, expected] of cases) {
+    assert.equal(githubRepo(remote), expected);
+    assert.equal(parseRemote(remote), expected);
+  }
+  assert.deepEqual(parsePrUrl('https://ghe.example.com/someone/project/pull/42/files'), { host: 'ghe.example.com', owner: 'someone', name: 'project', repo: 'ghe.example.com/someone/project', number: 42, url: 'https://ghe.example.com/someone/project/pull/42' });
+  assert.equal(parsePrUrl('https://github.com/someone/project/pull/42').repo, 'someone/project');
+});
+
+test('enterprise detail commands keep host-qualified repos out of API paths', async () => {
+  const calls = [];
+  const gh = createGh(async (_command, args) => {
+    calls.push(args);
+    const response = args[1] === 'graphql' ? { data: { repository: { pullRequest: { reviewThreads: { nodes: [] }, commits: { nodes: [] } } } } }
+      : args[1].endsWith('/jobs?per_page=50') ? { jobs: [] } : { workflow_runs: [] };
+    return { code: 0, stdout: JSON.stringify(response) };
+  });
+  const repo = 'ghe.example.com/someone/project', url = 'https://ghe.example.com/someone/project/pull/42';
+  await gh.fetchPr(url);
+  await gh.fetchThreads(url);
+  await gh.fetchRuns(repo, 'abc');
+  await gh.fetchJobs(repo, 7);
+  await gh.failedLog(repo, 7);
+  assert.deepEqual(calls[0].slice(0, 5), ['pr', 'view', url, '-R', repo]);
+  for (const args of calls.filter(args => args[0] === 'api')) assert.equal(args[args.indexOf('--hostname') + 1], 'ghe.example.com');
+  assert.equal(calls[2][1], 'repos/someone/project/actions/runs?head_sha=abc&per_page=50');
+  assert.equal(calls[3][1], 'repos/someone/project/actions/runs/7/jobs?per_page=50');
+  assert.deepEqual(calls[4], ['run', 'view', 7, '-R', repo, '--log-failed']);
+});
+
+test('issue chips deduplicate providers, honor Jira host/projects, and detect Linear without settings', () => {
+  const body = 'Fix PROJ-12 and OTHER-8. https://jira.example.com/browse/PROJ-12 https://other.example.com/browse/OTHER-9 https://linear.app/team/issue/ENG-7/title';
+  assert.deepEqual(issueRefs(body, { jiraHost: 'https://jira.example.com', projectKeys: ['PROJ'] }), [{ provider: 'jira', key: 'PROJ-12' }, { provider: 'linear', key: 'ENG-7' }]);
+  assert.deepEqual(issueRefs(body), [{ provider: 'jira', key: 'PROJ-12' }, { provider: 'jira', key: 'OTHER-9' }, { provider: 'linear', key: 'ENG-7' }]);
+  assert.deepEqual(issueRefs('https://linear.app.evil/team/issue/ENG-7 XPROJ-12', { projectKeys: ['PROJ'] }), []);
+});
+
+test('shared summaries need no requests; only the selected PR fetches detail with backoff', async () => {
+  let now = 0;
+  const calls = [];
+  const tracker = createTracker({ now: () => now, gh: {
+    fetchPr: async url => { calls.push(url); return { title: 'detail', body: 'PROJ-1', state: 'OPEN', headRefName: 'topic', statusCheckRollup: [] }; },
+    fetchThreads: async () => ({ threads: [], issues: [] }),
+  } });
+  const prs = [1, 2].map(number => ({ number, title: `PR ${number}`, url: `https://github.com/owner/repo/pull/${number}`, branch: `topic${number}`, ci: 'fail', review: 'APPROVED' }));
+  tracker.sync({ 'owner/repo': prs });
+  assert.equal(tracker.cards().length, 2);
+  assert.equal(tracker.cards()[0].status.ci.kind, 'failed');
+  await tracker.tick(null);
+  assert.deepEqual(calls, []);
+  await tracker.tick(prs[1].url);
+  assert.deepEqual(calls, [prs[1].url]);
+  assert.equal(tracker.cards(prs[1].url)[1].summary, false);
+  tracker.sync({ 'owner/repo': [{ ...prs[0], ci: 'pass' }, prs[1]] });
+  assert.equal(tracker.cards()[0].status.ci.kind, 'passed');
+  await tracker.tick(prs[1].url);
+  assert.equal(calls.length, 1);
+  now += 30000;
+  await tracker.tick(prs[1].url);
+  assert.equal(calls.length, 2);
+  tracker.sync({ 'owner/repo': [prs[0]] });
+  assert.equal(tracker.cards().length, 1);
+});
