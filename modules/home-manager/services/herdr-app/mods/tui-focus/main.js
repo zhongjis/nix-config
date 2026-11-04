@@ -5,10 +5,14 @@
 // Settled Claude Code or Pi is also freed after DELAY (or at once by Clear): the agent is exited as a person
 // would, the resume command it prints is kept (shared "tui-focus.closed"), and its pane closes. Clicking that
 // closed row resumes it in a new tab.
+// Reboots: each local Claude Code or Pi terminal is kept by the core and labelled with the line that resumes its
+// session (`resume=`) and its shell's pid (`resume.pid=`). Claude Code's line comes from its own pid file; Pi's
+// from integrations/pi.ts, which this mod installs into Pi. A kept terminal comes back from a reboot as a shell
+// with a new pid in the same pane: the line is typed into it, or, for a settled one, kept as a closed row.
 
 import { View, div, image, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { agents, terminals, panes, spaces, focused, run, openOverlay, hc, exec, notify, theme, shared, setShared, setAgentOrder, props, nextCommand, settings, layout } from "herdr";
+import { agents, terminals, panes, spaces, focused, run, openOverlay, hc, exec, notify, theme, shared, setShared, setAgentOrder, props, nextCommand, settings, layout, home, appHome, readTextFile } from "herdr";
 import { namer } from "./name.js";
 import { kidStatus, descendants, treeStatus } from "./tree.js";
 
@@ -36,6 +40,10 @@ const DELAY = 15 * 60000;
 const OUT = 140, IN = 220, MOVE = Math.max(OUT, IN), GLOW = 1200;
 // Can be closed and resumed: a local agent that prints a resume line.
 const closable = (a) => Boolean(EXIT[a.app]) && !a.address.includes("/");
+// How often the resume labels are brought up to date (ms): a reboot loses at most this much of a session switch.
+const REMEMBER = 15000;
+// Where Pi loads integrations/pi.ts from.
+const PI_EXTENSION = ".pi/agent/extensions/herdr-app-session.ts";
 
 // As T3's sidebar times: no "ago", nothing past days.
 function ago(ms, now) {
@@ -78,6 +86,12 @@ export default class Focus extends View {
     // Settled past DELAY: closed, one try per settle (`${address}:${settled}`), so a failure doesn't repeat.
     this.tried = new Set();
     cx.timer.every(30000, (cx) => this.closeDue(cx));
+    // Reboots: install Pi's half, then label agents and resume recovered shells, now and every REMEMBER.
+    cx.spawn(async (cx) => {
+      await this.installPi();
+      await this.sessions(cx);
+    });
+    cx.timer.every(REMEMBER, (cx) => this.sessions(cx));
     // `t3-focus.settle` (cmd-shift-s in keys.json): see settleKey in render.
     cx.spawn(async (cx) => {
       for (;;) {
@@ -172,6 +186,95 @@ export default class Focus extends View {
       run("pane.close", { pane: a.pane });
       cx.notify();
     });
+  }
+
+  // Copies integrations/pi.ts into Pi's extensions when it differs (Pi installed only). Pi loads it at start,
+  // so a Pi already running reports its session after its next start.
+  async installPi() {
+    const pi = `${home()}/.pi/agent`, from = `${appHome()}/mods/tui-focus/integrations/pi.ts`, to = `${home()}/${PI_EXTENSION}`;
+    if ((await exec("test", ["-d", pi]).catch(() => null))?.code !== 0) return;
+    if ((await exec("cmp", ["-s", from, to]).catch(() => null))?.code === 0) return;
+    const r = await exec("install", ["-D", "-m", "644", from, to]).catch((e) => ({ code: 1, stderr: String(e) }));
+    if (r.code !== 0) notify({ title: "Couldn't install the Pi session hook", body: r.stderr.trim(), level: "error" });
+  }
+
+  // One pass at a time: labels each live agent's terminal, then resumes recovered shells.
+  sessions(cx) {
+    if (this.syncing) return;
+    this.syncing = true;
+    cx.spawn(async (cx) => {
+      try {
+        await this.remember();
+        await this.restore(cx);
+      } finally {
+        this.syncing = false;
+      }
+    });
+  }
+
+  // The core's full view of a terminal (pid, foreground, labels, keep), or null.
+  async inspect(address) {
+    const r = await hc(["get", address, "--json"]).catch(() => null);
+    try {
+      return r?.code === 0 ? JSON.parse(r.stdout) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  // While an agent runs: its terminal is kept, and labelled with its resume line and its shell's pid.
+  // Claude Code's session id is in ~/.claude/sessions/<its pid>.json, rewritten on /clear and /resume.
+  async remember() {
+    for (const a of agents()) {
+      if (!closable(a)) continue;
+      const k = await this.inspect(a.address);
+      if (!k || k.state !== "live" || !k.foreground || k.foreground.pid === k.pid) continue;
+      const labels = k.labels ?? {};
+      let line = labels.resume;
+      if (a.app === "claude-code") {
+        const text = await readTextFile(`${home()}/.claude/sessions/${k.foreground.pid}.json`).catch(() => null);
+        let id = null;
+        try {
+          id = text && JSON.parse(text).sessionId;
+        } catch {}
+        if (id) line = `claude --resume ${id}`;
+      }
+      if (!k.keep) await hc(["keep", a.address]).catch(() => null);
+      const set = [];
+      if (line && line !== labels.resume) set.push(`resume=${line}`);
+      if (line && String(k.pid) !== labels["resume.pid"]) set.push(`resume.pid=${k.pid}`);
+      if (set.length) await hc(["label", a.address, ...set]).catch(() => null);
+    }
+  }
+
+  // A labelled terminal whose shell is back at its prompt: the same pid means the agent was quit (forget it); a
+  // new pid means the core recovered it after a loss (a reboot). Recovered: the line is typed into its shell, or
+  // a settled one becomes a closed row and its pane closes. Labels go first, so no second window sends it again.
+  async restore(cx) {
+    for (const t of terminals()) {
+      const line = t.labels?.resume;
+      if (!line || t.state !== "live" || t.address.includes("/")) continue;
+      const k = await this.inspect(t.address);
+      if (!k?.labels?.resume || !k.foreground || k.foreground.pid !== k.pid) continue;
+      if ((await hc(["label", t.address, "resume=", "resume.pid="]).catch(() => null))?.code !== 0) continue;
+      // No pid yet (quit before the first pass labelled it) or the same pid: quit by hand, not lost.
+      const was = k.labels["resume.pid"];
+      if (!was || String(k.pid) === was) continue;
+      if (k.labels.settled) {
+        // The shell's program icon would be wrong here, so the row goes without one.
+        const p = panes().find((p) => p.terminal === t.address);
+        setShared(CLOSED, [{ key: `${t.address}-${Date.now()}`, title: k.labels["pi.session"] || k.labels.where || line.split(" ")[0],
+          space: k.labels["herdr.space"], cwd: k.cwd, program: null, argv: line.split(" "), at: Date.now() }, ...(shared(CLOSED) ?? [])]);
+        if (p) run("pane.close", { pane: p.pane });
+        else await hc(["kill", t.address]).catch(() => null);
+        continue;
+      }
+      // ponytail: the line is sent as soon as the shell owns the terminal; zsh keeps typed input until its prompt
+      // (direnv included). A shell that drops early input would need a prompt check (`hc read --lines 3`) first.
+      const r = await hc(["send", t.address, line]).catch((e) => ({ code: 1, stderr: String(e) }));
+      if (r.code !== 0) notify({ title: "Couldn't resume the agent", body: `${t.address}: ${line}\n${r.stderr.trim()}`, level: "error" });
+    }
+    cx.notify();
   }
 
   // Ends a drag or sweep, and hands the keyboard back to the pane that had it, unless the drop moved on to
@@ -491,6 +594,8 @@ export default class Focus extends View {
       const machine = a.address.includes("/") ? a.address.split("/")[0] : null;
       const branch = ps.find((p) => p.pane === a.pane)?.branch;
       const going = kids.get(a.address).filter((s) => s === "working").length;
+      // Live sub-agents, finished ones too: with none working, the line still opens the list.
+      const live = kids.get(a.address).length;
       const pic = icon(a.program, 16, t.muted);
       // Hovered, the corner offers Settle, but only for what's finished: a working or stuck tree stays in sight.
       const offer = !dragging && !this.sweep?.moved && this.hovered === a.address && !busy(a) && !pins.includes(a.address);
@@ -555,10 +660,10 @@ export default class Focus extends View {
           .child(div().flex_1().min_w(0).truncate().text_size(14).text_color(on ? t.foreground : t.muted).child(title(a)))
           .when(Boolean(pic), (el) => el.child(pic)))
         // The sub-agents part opens a list of them (tui-subagents); a click there peeks at one.
-        .when(Boolean(branch || going), (el) => el.child(h_flex().min_w(0).gap(4).text_size(12).text_color(t.dim)
+        .when(Boolean(branch || live), (el) => el.child(h_flex().min_w(0).gap(4).text_size(12).text_color(t.dim)
           .when(Boolean(branch), (el) => el.child(div().min_w(0).truncate().child(branch)))
-          .when(Boolean(branch && going), (el) => el.child(div().flex_none().child("·")))
-          .when(Boolean(going) && !ghost, (el) => el.child(div().id(`subs-${a.address}`).flex_none().rounded(4).px(2)
+          .when(Boolean(branch && live), (el) => el.child(div().flex_none().child("·")))
+          .when(Boolean(live) && !ghost, (el) => el.child(div().id(`subs-${a.address}`).flex_none().rounded(4).px(2)
             .role("button").accessibility_label("Show sub-agents")
             .hover((s) => s.text_color(t.foreground).bg(t.hover))
             .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
@@ -566,7 +671,7 @@ export default class Focus extends View {
               cx.stop_propagation();
               openOverlay({ mod: "tui-subagents", kind: "popup", width: 300, height: Math.min(360, 16 + 46 * kids.get(a.address).length), props: { parent: a.address } });
             })
-            .child(`${going} sub-agent${going > 1 ? "s" : ""} working`)))));
+            .child(going ? `${going} sub-agent${going > 1 ? "s" : ""} working` : "view sub-agents")))));
     };
 
     // A settled row: one dim line; viewing it leaves it settled. Hovered it brightens and its time
