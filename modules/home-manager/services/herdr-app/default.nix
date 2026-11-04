@@ -96,6 +96,8 @@ in {
       pr-flow = ./mods/pr-flow;
       # github.com/DeevsDeevs/deevs-herdr-kit agent-browser.
       agent-browser = ./mods/agent-browser;
+      # Jira + Linear issue popup; UI adapted from github.com/mrolafsson/herdr-linear.
+      issues = ./mods/issues;
     };
   };
 }
