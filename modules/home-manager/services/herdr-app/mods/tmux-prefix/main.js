@@ -1,6 +1,17 @@
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { closeOverlay, focused, hc, nextCommand, props, run, theme } from "herdr";
+import { closeOverlay, focused, hc, layout, nextCommand, props, run, theme } from "herdr";
+
+const find = (node, id) => node?.id === id ? node : (node?.children ?? []).reduce((hit, c) => hit ?? find(c, id), null);
+
+// The right panel stack (herdr-tui): show `child`, or hide the panel when it already shows.
+function togglePanel(child) {
+  const root = layout(), panel = find(root, "panel"), body = find(root, "panel-body");
+  if (!panel || !body) return;
+  if (!panel.hidden && body.active === child) return run("layout.hide", { id: "panel" });
+  run("layout.select", { stack: "panel-body", child });
+  run("layout.show", { id: "panel" });
+}
 
 // Edit these two things to make the example yours. Only repeatable actions
 // start a timer: the first key after Ctrl+B can take as long as you like.
@@ -24,6 +35,10 @@ const BINDINGS = [
   ["K", "Previous space", "space.prev", {}, true],
   ["z", "Zoom pane", "pane.zoom"],
   ["d", "Minimize window", "window.minimize"],
+  ["i", "Issues", "mod.open", { name: "issues" }],
+  ["b", "Browser sessions", "mod.open", { name: "agent-browser" }],
+  ["g", "Toggle PR panel", () => togglePanel("pr")],
+  ["f", "Toggle Files panel", () => togglePanel("files")],
   ...Array.from({ length: 10 }, (_, i) => [String(i), `Tab ${i === 0 ? 10 : i}`, "tab.select", { index: i === 0 ? 10 : i }]),
 ];
 
@@ -94,7 +109,8 @@ export default class TmuxPrefix extends View {
     }
     const [, , command, args = {}, repeatable = false] = binding;
     if (!repeatable) this.dismiss();
-    run(command, args);
+    if (typeof command === "function") command();
+    else run(command, args);
     if (repeatable) {
       this.repeat = true;
       const generation = ++this.generation;
