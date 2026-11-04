@@ -58,14 +58,20 @@ in {
       };
     };
     keys = {
-      global."ctrl-shift-f" = "mod.open:picker";
+      global = {
+        "ctrl-shift-f" = "mod.open:picker";
+        "ctrl-b" = "mod.open:tmux-prefix";
+      };
       # Herdr seeds its default keymap only into a new keys.json; one created by
       # activation first has none, so keep the terminal clipboard keys here.
       terminal = {
         "cmd-c" = "terminal.copy";
         "cmd-v" = "terminal.paste";
         "ctrl-v" = "terminal.paste_image";
+        # tmux-style prefix (tmux-prefix mod); Ctrl+B twice sends a literal Ctrl+B.
+        "ctrl-b" = "mod.open:tmux-prefix";
       };
+      "mod:tmux-prefix"."ctrl-b" = "tmux-prefix.send-prefix";
       # Settle the focused agent in the herdr-tui sidebar (tui-focus mod).
       "layout:herdr-tui" = {
         "cmd-shift-s" = "tui-focus.settle";
@@ -79,6 +85,8 @@ in {
       tui-subagents = ./mods/tui-subagents;
       # Herdr's `spaces` mod with the repo/branch on its own line.
       tui-spaces = ./mods/tui-spaces;
+      # herdr.dev/mods/herdrdev/tmux-prefix
+      tmux-prefix = ./mods/tmux-prefix;
     };
   };
 }
