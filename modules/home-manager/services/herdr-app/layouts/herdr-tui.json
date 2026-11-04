@@ -147,6 +147,16 @@
                       "content": {
                         "mod": "pr-flow"
                       }
+                    },
+                    {
+                      "id": "ci",
+                      "type": "block",
+                      "content": {
+                        "mod": "ci-dash",
+                        "props": {
+                          "panel": true
+                        }
+                      }
                     }
                   ],
                   "active": "files"

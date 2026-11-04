@@ -85,7 +85,7 @@ in {
       tui-subagents = ./mods/tui-subagents;
       # Herdr's `spaces` mod with the repo/branch on its own line.
       tui-spaces = ./mods/tui-spaces;
-      # Herdr's `tabs` mod with icon-only Files/Changes/PR panel buttons.
+      # Herdr's `tabs` mod with icon-only Files/Changes/PR/CI panel buttons.
       tui-tabs = ./mods/tui-tabs;
       # herdr.dev/mods/herdrdev/tmux-prefix
       tmux-prefix = ./mods/tmux-prefix;
@@ -96,6 +96,8 @@ in {
       file-icons = ./mods/file-icons;
       # github.com/jjangsky/herdr-pr-flow, fed by tui-spaces' PR list.
       pr-flow = ./mods/pr-flow;
+      # github.com/cybertron288/herdr-mods ci-dash (GitHub Actions runs, dispatch, artifacts).
+      ci-dash = ./mods/ci-dash;
       # github.com/DeevsDeevs/deevs-herdr-kit agent-browser.
       agent-browser = ./mods/agent-browser;
       # Jira + Linear issue popup; UI adapted from github.com/mrolafsson/herdr-linear.

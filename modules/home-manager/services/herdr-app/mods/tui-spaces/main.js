@@ -40,7 +40,8 @@ const MARK = { ansi6: "#22a99a", ansi3: "#e3814f", ansi4: "#5b8def", ansi5: "#8b
 export default class Spaces extends View {
   init(_props, cx) {
     const panels = shared("workspace.panels") ?? ["files", "changes"];
-    if (!panels.includes("pr")) setShared("workspace.panels", [...panels, "pr"]);
+    const missing = ["pr", "ci"].filter(id => !panels.includes(id));
+    if (missing.length) setShared("workspace.panels", [...panels, ...missing]);
     this.repos = new Repositories();
     this.expanded = new Set(JSON.parse(localStorage.getItem("worktrees.expanded") ?? "[]"));
     this.git = {}; // where() -> { name, branch, ahead, behind, repo, linked }, null: not a repo
