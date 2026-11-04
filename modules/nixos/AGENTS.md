@@ -16,7 +16,7 @@ nixos/
 ├── default.nix       # Imports features/, bundles/, services/ via extendModules
 ├── features/         # Individual capabilities
 ├── bundles/          # Feature compositions
-└── services/         # Hardware-specific layers (nvidia, amdgpu, amdcpu)
+└── services/         # Hardware layers (nvidia, amdgpu, amdcpu) and system services (postgresql, tailscale)
 ```
 
 ## BUNDLES → FEATURE MAPPINGS
@@ -25,7 +25,7 @@ Bundles compose features via `myNixOS.features.{name}.enable = true`:
 
 | Bundle | Enables | Extra |
 |--------|---------|-------|
-| general-desktop | nh, sops, power-management, stylix, plymouth, flatpak, xremap | firewall, printing, PipeWire, Bluetooth |
+| general-desktop | nh, sops, power-management, stylix, plymouth, flatpak, xremap | firewall, printing, PipeWire, Bluetooth, services: postgresql, tailscale |
 | developer | podman (default) | kubernetes, colmena, postgresql, mongodb-compass |
 | gaming | lact | Steam, GameMode, Gamescope, Proton, Heroic |
 | hyprland | hyprland, gdm | disables sddm |
