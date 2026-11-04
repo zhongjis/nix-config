@@ -77,6 +77,8 @@ in {
     mods = {
       tui-focus = ./mods/tui-focus;
       tui-subagents = ./mods/tui-subagents;
+      # Herdr's `spaces` mod with the repo/branch on its own line.
+      tui-spaces = ./mods/tui-spaces;
     };
   };
 }
