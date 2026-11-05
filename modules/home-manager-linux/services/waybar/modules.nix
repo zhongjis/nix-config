@@ -131,6 +131,15 @@ in {
             "on-click": "${hyprsunset-sh} --toggle",
             "tooltip": true
         },
+          "idle_inhibitor": {
+              "format": "{icon}",
+              "format-icons": {
+                  "activated": "",
+                  "deactivated": ""
+              },
+              "tooltip-format-activated": "Keep awake enabled (click to allow idle sleep)",
+              "tooltip-format-deactivated": "Idle sleep allowed (click to keep awake)"
+          },
           "battery#bat2": {
               "bat": "BAT2"
           },

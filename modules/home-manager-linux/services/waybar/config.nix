@@ -34,6 +34,7 @@
           "backlight",
           "pulseaudio",
           "custom/hyprsunset",
+          "idle_inhibitor",
           "battery",
         ],
       }

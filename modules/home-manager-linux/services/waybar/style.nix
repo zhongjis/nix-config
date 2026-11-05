@@ -61,6 +61,7 @@
       #custom-hyprsunset.inactive,
       #pulseaudio,
       #pulseaudio.muted,
+      #idle_inhibitor,
       #battery,
       #battery.critical,
       #battery.warning,
@@ -88,6 +89,7 @@
       #custom-hyprsunset.inactive,
       #pulseaudio,
       #pulseaudio.muted,
+      #idle_inhibitor,
       #battery,
       #battery.critical,
       #battery.warning,
@@ -223,6 +225,14 @@
 
       #custom-hyprsunset.inactive {
         color: #ea6962;
+      }
+
+      #idle_inhibitor {
+        color: #fff4d2;
+      }
+
+      #idle_inhibitor.activated {
+        color: #8ec07c;
       }
 
       /* ================================ */
