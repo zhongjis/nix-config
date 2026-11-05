@@ -238,6 +238,13 @@ export default class PrFlow extends View {
     return runId ? this.logs.get(runId) ?? null : { name: failed.name, url: failed.url, external: true };
   }
 
+  // Shared "ci.select" tells ci-dash which repo, branch and failed run to show; then its panel.
+  viewInCi(card) {
+    const runId = runIdFromUrl(card.status?.ci?.failed?.[0]?.url);
+    setShared("ci.select", { repo: card.repo, branch: card.pr?.headRefName ?? null, runId: runId ?? null, at: Date.now() });
+    run("layout.select", { stack: "panel-body", child: "ci" });
+  }
+
   goToAgent(card) {
     if (card?.agent) run("agent.focus", { terminal: card.agent.address });
   }
@@ -564,7 +571,10 @@ export default class PrFlow extends View {
       .when(Boolean(row.run) && (opened || row.failed), (e) => e.child(h_flex().pl(indent + 20).pb(6).gap(12)
         .when(row.failed, (x) => x.child(link(`log-${row.id}`, tr("run_log"), () => this.openViewer({ kind: "log", repo: card.repo, runId: String(row.id), name: row.label, url: row.url, title: card.pr.title, number: card.number }))))
         .child(link(`web-${row.id}`, "GitHub", () => openExternal(row.url)))))
-      .when(Boolean(sub), (e) => e.child(div().pl(indent).pr(6).pb(8).child(sub)));
+      .when(Boolean(sub), (e) => e.child(div().pl(indent).pr(6).pb(8).child(sub)))
+      // The CI panel (ci-dash) has the jobs, logs, artifacts and re-run: this PR's runs there.
+      .when(Boolean(row.checks), (e) => e.child(h_flex().pl(indent + 20).pb(6)
+        .child(link("ci-more", tr("view_ci"), () => this.viewInCi(card)))));
   }
 
   // Closing issues open in the panel; Jira and Linear keys open the issues popup.

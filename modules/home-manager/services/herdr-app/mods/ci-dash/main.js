@@ -2,7 +2,7 @@
 // focused repository. Port of the ci-dash TUI plugin.
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex, InputState } from "gpui-base";
-import { spaces, panes, focused, exec, home, theme, notify, props } from "herdr";
+import { spaces, panes, focused, exec, home, theme, notify, props, shared } from "herdr";
 import { Gh, resolveRepo, errorHint, safeName } from "./gh.js";
 import { relTime, duration, bytes, stateOf, mapLimit, fileType, GLYPH } from "./format.js";
 import { Dispatch } from "./dispatch.js";
@@ -122,6 +122,17 @@ export default class CiDash extends View {
     if (type) this.artType = String(type).toLowerCase().replace(/^\./, "");
   }
 
+  /** The PR's branch in the run filter, and its failed run opened when it has one; once per request. */
+  applySelection(cx) {
+    const sel = this.selected;
+    if (!sel || sel.applied) return;
+    sel.applied = true;
+    this.tab = "runs"; this.runStatus = "all";
+    this.runFilter.set_value(sel.branch ?? "");
+    if (sel.runId) this.openRun(Number(sel.runId), cx);
+    else this.detail = null;
+  }
+
   /** Loads what a tab needs the first time it is shown. */
   enterTab(cx) {
     if (this.tab === "dispatch") this.dsp.load(cx);
@@ -133,6 +144,16 @@ export default class CiDash extends View {
   ensureContext(cx) {
     const { cwd, on, branch } = location();
     const key = `${on ?? ""}|${cwd ?? ""}`;
+    // pr-flow's "View in CI" (shared "ci.select"): that PR's repo, its branch, its failed run. The
+    // repo holds until focus moves to another folder.
+    const sel = shared("ci.select");
+    if (sel?.at > (this.selAt ?? Date.now() - 1000) && sel.repo) {
+      this.selAt = sel.at;
+      this.selected = { ...sel, key };
+      if (this.override !== sel.repo) { this.override = sel.repo; this.key = null; }
+      else if (this.repo) this.applySelection(cx);
+    } else this.selAt ??= Date.now();
+    if (this.override && this.selected?.key !== key) { this.override = null; this.selected = null; this.key = null; }
     if (key === this.key) { if (branch) this.branch = branch; return; }
     this.key = key;
     this.branch = branch;
@@ -142,7 +163,7 @@ export default class CiDash extends View {
   resolve(cx, cwd, on) {
     if (this.resolving) { this.pending = { cwd, on }; return; }
     this.resolving = true;
-    const override = this.props.repo;
+    const override = this.override ?? this.props.repo;
     cx.spawn(async (cx) => {
       try {
         if (!cwd && !override) throw new Error("No folder to look for a repository in.");
@@ -158,6 +179,7 @@ export default class CiDash extends View {
         } else {
           this.gh.cwd = cwd; this.gh.on = on;
         }
+        this.applySelection(cx);
       } catch (e) {
         // The focused folder has no GitHub repository: say so for this folder rather than
         // keep showing the last repository's runs (which read as this tab's CI). A newer
