@@ -1,6 +1,6 @@
-import { View, div } from "gpui-kit";
+import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { closeOverlay, focused, hc, layout, nextCommand, props, run, theme } from "herdr";
+import { closeOverlay, focused, hc, layout, nextCommand, props, run, settings, theme } from "herdr";
 
 const find = (node, id) => node?.id === id ? node : (node?.children ?? []).reduce((hit, c) => hit ?? find(c, id), null);
 
@@ -15,34 +15,53 @@ function togglePanel(child) {
 
 // Edit these two things to make the example yours. Only repeatable actions
 // start a timer: the first key after Ctrl+B can take as long as you like.
+// Bindings are shown under their group's heading; one label's keys share a row.
 const REPEAT_MS = 500;
-const BINDINGS = [
-  ["c", "New tab", "tab.new"],
-  ["%", "Split right", "pane.split", { direction: "right" }],
-  ['"', "Split down", "pane.split", { direction: "down" }],
-  ["x", "Close pane", "pane.close"],
-  ["n", "Next tab", "tab.next"],
-  ["N", "Previous tab", "tab.prev"],
-  ["h", "Focus left", "pane.go", { direction: "left" }, true],
-  ["j", "Focus down", "pane.go", { direction: "down" }, true],
-  ["k", "Focus up", "pane.go", { direction: "up" }, true],
-  ["l", "Focus right", "pane.go", { direction: "right" }, true],
-  ["left", "Focus left", "pane.go", { direction: "left" }, true],
-  ["down", "Focus down", "pane.go", { direction: "down" }, true],
-  ["up", "Focus up", "pane.go", { direction: "up" }, true],
-  ["right", "Focus right", "pane.go", { direction: "right" }, true],
-  ["J", "Next space", "space.next", {}, true],
-  ["K", "Previous space", "space.prev", {}, true],
-  ["z", "Zoom pane", "pane.zoom"],
-  ["m", "Minimize window", "window.minimize"],
-  ["i", "Issues", "mod.open", { name: "issues" }],
-  ["b", "Browser sessions", "mod.open", { name: "agent-browser" }],
-  ["p", "Toggle PR panel", () => togglePanel("pr")],
-  ["f", "Toggle Files panel", () => togglePanel("files")],
-  ["d", "Toggle Changes panel", () => togglePanel("changes")],
-  ["a", "Toggle CI panel", () => togglePanel("ci")],
-  ...Array.from({ length: 10 }, (_, i) => [String(i), `Tab ${i === 0 ? 10 : i}`, "tab.select", { index: i === 0 ? 10 : i }]),
-];
+const GROUPS = {
+  Tabs: [
+    ["c", "New tab", "tab.new"],
+    ["n", "Next tab", "tab.next"],
+    ["N", "Previous tab", "tab.prev"],
+    ...Array.from({ length: 10 }, (_, i) => [String(i), `Tab ${i === 0 ? 10 : i}`, "tab.select", { index: i === 0 ? 10 : i }]),
+  ],
+  Panes: [
+    ["%", "Split right", "pane.split", { direction: "right" }],
+    ['"', "Split down", "pane.split", { direction: "down" }],
+    ["x", "Close pane", "pane.close"],
+    ["z", "Zoom pane", "pane.zoom"],
+    ["h", "Focus left", "pane.go", { direction: "left" }, true],
+    ["j", "Focus down", "pane.go", { direction: "down" }, true],
+    ["k", "Focus up", "pane.go", { direction: "up" }, true],
+    ["l", "Focus right", "pane.go", { direction: "right" }, true],
+    ["left", "Focus left", "pane.go", { direction: "left" }, true],
+    ["down", "Focus down", "pane.go", { direction: "down" }, true],
+    ["up", "Focus up", "pane.go", { direction: "up" }, true],
+    ["right", "Focus right", "pane.go", { direction: "right" }, true],
+  ],
+  Spaces: [
+    ["J", "Next space", "space.next", {}, true],
+    ["K", "Previous space", "space.prev", {}, true],
+  ],
+  Panels: [
+    ["p", "Toggle PR panel", () => togglePanel("pr")],
+    ["f", "Toggle Files panel", () => togglePanel("files")],
+    ["d", "Toggle Changes panel", () => togglePanel("changes")],
+    ["a", "Toggle CI panel", () => togglePanel("ci")],
+  ],
+  Mods: [
+    ["i", "Issues", "mod.open", { name: "issues" }],
+    ["b", "Browser sessions", "mod.open", { name: "agent-browser" }],
+  ],
+  Window: [
+    ["m", "Minimize window", "window.minimize"],
+  ],
+};
+const BINDINGS = Object.values(GROUPS).flat();
+// Arrow keys drawn as arrows on their keycaps (the issues mod's key icons).
+const ARROWS = { left: "key-left", right: "key-right", up: "key-up", down: "key-down" };
+// The repeat window's bar: drawn full, then emptied a frame or two later.
+const BAR_W = 96;
+const KICK_MS = 32;
 
 function forwardKey(e, key) {
   if (["enter", "tab", "backspace", "left", "right", "up", "down", "space"].includes(e.key)) return e.key;
@@ -57,6 +76,7 @@ export default class TmuxPrefix extends View {
     this.handle = cx.focus_handle();
     this.handle.focus();
     this.repeat = false;
+    this.draining = false;
     this.generation = 0;
     this.all = false;
     // The mod-specific key binding beats the global opener while we're open.
@@ -116,8 +136,15 @@ export default class TmuxPrefix extends View {
     if (repeatable) {
       this.repeat = true;
       const generation = ++this.generation;
+      this.draining = false;
       cx.timer.after(REPEAT_MS, () => {
         if (this.generation === generation) this.dismiss();
+      });
+      // The bar is drawn full first, then told to empty: its transition runs natively.
+      cx.timer.after(KICK_MS, (cx) => {
+        if (this.generation !== generation) return;
+        this.draining = true;
+        cx.notify();
       });
       cx.notify();
     }
@@ -125,15 +152,35 @@ export default class TmuxPrefix extends View {
 
   render() {
     const t = theme();
-    const rows = this.all ? BINDINGS : BINDINGS.filter(([key]) => !["left", "right", "up", "down"].includes(key) && !/^\d$/.test(key));
+    const shown = ([key]) => this.all || (!ARROWS[key] && !/^\d$/.test(key));
+    const cap = (key) => h_flex().flex_none().min_w(20).h(20).px(5).items_center().justify_center().rounded(5)
+      .border_1().border_b_2().border_color(t.border).bg(t.raised).font_family(String(settings().font_family ?? "JetBrains Mono")).text_size(11).text_color(t.foreground)
+      .child(ARROWS[key] ? svg(`mods/issues/icons/${ARROWS[key]}.svg`).size(11) : key);
+    // One row per label: h and ← are the same "Focus left".
+    const rows = (bindings) => bindings.filter(shown).reduce((out, b) => {
+      const row = out.find((r) => r[0][1] === b[1]);
+      if (row) row.push(b);
+      else out.push([b]);
+      return out;
+    }, []).map((keys) =>
+      h_flex().h(22).flex_none().items_center().gap(10).child(h_flex().w(48).flex_none().gap(4).children(keys.map(([key]) => cap(key))))
+        .child(div().flex_1().min_w(0).truncate().child(keys[0][1])).child(div().text_size(11).text_color(t.dim).child(keys[0][4] ? "repeat" : "")));
+    const group = ([title, bindings]) => v_flex().flex_none().gap(2)
+      .child(div().h(18).text_size(11).text_color(t.dim).child(title)).children(rows(bindings));
+    // Two columns: tabs and panes, then the rest.
+    const column = (groups) => v_flex().flex_1().min_w(0).gap(6).children(groups.filter(([, b]) => b.some(shown)).map(group));
+    const groups = Object.entries(GROUPS);
     return v_flex().id("tmux-prefix").track_focus(this.handle)
       .on_key_down((e, cx) => this.key(e, cx))
-      .p(14).gap(8).bg(t.popover).text_color(t.foreground).text_size(12)
-      .child(h_flex().justify_between().child(div().font_semibold().child(this.repeat ? `Repeat · ${REPEAT_MS} ms` : "Ctrl+B · waiting for a key"))
+      .p(14).gap(10).bg(t.popover).text_color(t.foreground).text_size(12)
+      .child(h_flex().h(20).flex_none().items_center().justify_between()
+        .child(h_flex().gap(10).items_center().child(div().font_semibold().child(this.repeat ? "Repeat" : "Ctrl+B · waiting for a key"))
+          .when(this.repeat, (el) => el.child(div().w(BAR_W).h(3).rounded(2).bg(t.border)
+            .child(div().id(`repeat-${this.generation}`).h_full().rounded(2).bg(t.accent).w(this.draining ? 0 : BAR_W)
+              .transition("width", { duration: REPEAT_MS - KICK_MS, easing: "linear" })))))
         .child(div().text_color(t.muted).child("Esc cancel · ^B send prefix")))
-      .child(v_flex().h(280).min_h(0).overflow_y_scrollbar().children(rows.map(([key, label, , , repeatable]) =>
-        h_flex().h(20).flex_none().items_center().gap(12).child(div().w(40).text_color(t.accent).child(key))
-          .child(div().flex_1().child(label)).child(div().text_color(t.dim).child(repeatable ? "repeat" : "")))))
-      .child(div().text_color(t.muted).child("0–9 tabs (0 = 10) · arrows focus · ? all bindings"));
+      .child(v_flex().id("tmux-prefix-list").flex_none().max_h(316).overflow_y_scrollbar()
+        .child(h_flex().items_start().gap(24).child(column(groups.slice(0, 2))).child(column(groups.slice(2)))))
+      .child(div().flex_none().text_color(t.muted).child("0–9 tabs (0 = 10) · arrows focus · ? all bindings"));
   }
 }
