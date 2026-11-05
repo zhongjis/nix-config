@@ -14,7 +14,7 @@
 // then run the line); shared "tui-focus.hibernated" lists them for the cards and the sub-agents popup.
 
 import { View, div, image, svg } from "gpui-kit";
-import { v_flex, h_flex } from "gpui-base";
+import { v_flex, h_flex, Scrollbar } from "gpui-base";
 import { agents, terminals, panes, spaces, focused, run, openOverlay, hc, exec, notify, theme, shared, setShared, setAgentOrder, props, nextCommand, settings, layout, home, appHome, readTextFile } from "herdr";
 import { namer } from "./name.js";
 import { kidStatus, descendants, treeStatus } from "./tree.js";
@@ -24,6 +24,8 @@ const BUSY = new Set(["working", "blocked"]);
 const MARK = { ansi6: "#22a99a", ansi3: "#e3814f", ansi4: "#5b8def", ansi5: "#8b7cf6", ansi2: "#3fae6a", ansi1: "#d9649a" };
 // The settled tail opens on this many, then grows by MORE.
 const FIRST = 10, MORE = 25;
+// The Settled shelf shows this many rows at most; the rest scroll.
+const SETTLED_ROWS = 5;
 // A run that stops stays on the Working shelf this long (ms), as in T3: a quick continuation doesn't move it twice.
 const GRACE = 2000;
 // The last word when times tie, so the order doesn't follow the order the data came in.
@@ -902,6 +904,9 @@ export default class Focus extends View {
         .when(dragging, (el) => el.text_color(hot("settled") ? t.accent : t.foreground)))
       .when(dragging && others(rows).length === 0 && !(rows.length > 0 && !plan), (el) => el
         .child(plan?.gap === "head-settled" ? gap("head-settled") : placeholder("settled", "Settled")))
+      // At most SETTLED_ROWS 30px rows show; the rest scroll, with a bar paired by name (as the shipped worktree list).
+      .child(v_flex().relative().flex_none()
+      .child(v_flex().id("settled-rows").flex_none().max_h(SETTLED_ROWS * 30).min_h(0).overflow_y_scroll()
       .children(lane("settled", rows, (a) => slim(a), 0))
       .when(this.open, (el) => el.children(closed.map(closedRow)))
       .when(this.open && put.length > this.limit, (el) => el.child(h_flex().id("settled-more").h(30).px(10).gap(8).flex_none().items_center().rounded(8)
@@ -912,7 +917,8 @@ export default class Focus extends View {
           cx.notify();
         })
         .child(svg("mods/workspace-chrome/chevron-down.svg").size(12).flex_none())
-        .child(`Show ${Math.min(MORE, put.length - this.limit)} more`)));
+        .child(`Show ${Math.min(MORE, put.length - this.limit)} more`))))
+      .child(Scrollbar.vertical("settled-rows").absolute().inset_0()));
 
     // The shipped agents list's header in place of T3's search, filter, new space and new agent row.
     const top = h_flex().id("focus-top").px(16).h(41).pt(14).pb(5).flex_none().items_center()
