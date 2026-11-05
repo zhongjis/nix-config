@@ -99,11 +99,26 @@ function frameLook() {
   const radius = Number(pane?.radius ?? 6);
   return { radius: Math.max(0, Math.min(6, Number.isFinite(radius) ? radius : 6)), header: Math.max(26, Math.min(40, Number(pane?.header?.height) || 30)) };
 }
+// On screen: the window is active, no block above the tree is hidden, and every stack above it
+// shows it. A copy outside the layout (a pane, an overlay) counts as shown.
+function onScreen() {
+  if (window()?.active === false) return false;
+  const path = [];
+  const find = (n) => {
+    if (!n) return false;
+    path.push(n);
+    if (n.content?.mod === NAME || (n.children ?? []).some(find)) return true;
+    path.pop();
+    return false;
+  };
+  try { if (!find(layout())) return true; } catch { return true; }
+  return path.every((n, i) => !n.hidden && (n.type !== "stack" || !path[i + 1] || (n.active ?? n.children?.[0]?.id) === path[i + 1].id));
+}
 // A theme color at some opacity, for tinted backgrounds. Themes may give #rgb, #rrggbb or
-// #rrggbbaa; anything else is returned as is.
-function alpha(color, a) {
+// #rrggbbaa; anything else gets the solid hover color.
+function alpha(t, color, a) {
   const hex = /^#([0-9a-f]{3})$/i.test(color ?? "") ? "#" + [...color.slice(1)].map((c) => c + c).join("") : color;
-  if (!/^#[0-9a-f]{6}([0-9a-f]{2})?$/i.test(hex ?? "")) return color;
+  if (!/^#[0-9a-f]{6}([0-9a-f]{2})?$/i.test(hex ?? "")) return t.hover;
   return hex.slice(0, 7) + Math.round(a * 255).toString(16).padStart(2, "0");
 }
 // Writes are orange (ansi 3), modified is yellow (ansi 11), so the two never read alike.
@@ -273,6 +288,18 @@ function sendToAgent(cx, abs) {
   run("terminal.paste");
   cx.timer.after(600, (cx) => { if (before !== undefined) cx.write_to_clipboard(before); });
 }
+// The right-click menu's entries, also counted to size its popup: a file on another machine
+// has no app here to open it and no folder to show.
+function menuItems(m) {
+  const items = [];
+  if (!m.dir) items.push({ id: "m-preview", label: "Preview", act: () => setShared(`${NAME}.preview`, { root: m.root, rel: m.rel, n: Date.now() }) });
+  if (!m.dir && m.local) items.push({ id: "m-open", label: "Open in default app", act: () => openExternal(m.abs).catch((e) => notify({ title: "Could not open the file", body: String(e?.message ?? e), level: "error" })) });
+  if (m.local) items.push({ id: "m-reveal", label: window()?.platform === "macos" ? "Reveal in Finder" : "Show in folder", act: () => revealExternal(m.abs).catch(() => {}) });
+  items.push({ id: "m-rel", label: "Copy relative path", act: (cx) => copy(cx, m.rel) });
+  items.push({ id: "m-abs", label: "Copy absolute path", act: (cx) => copy(cx, m.abs) });
+  items.push({ id: "m-send", label: "Send to agent", act: (cx) => sendToAgent(cx, m.abs) });
+  return items;
+}
 
 export default class FileTree extends View {
   init(_props, cx) {
@@ -338,7 +365,7 @@ export default class FileTree extends View {
     const key = JSON.stringify([root, on]), s = this.saved.get(key);
     this.ctx = { key, root, on }; this.root = root; this.on = on;
     this.entries = new Map(); this.folders = new Set(s?.folders); this.pending = new Set();
-    this.cursor = s?.cursor ?? ""; this.git = emptyGit(); this.index = null; this.hits = null;
+    this.cursor = s?.cursor ?? ""; this.git = emptyGit(); this.index = null; this.hits = null; this.searchError = null;
     this.sizes = new Map(); this.sizing = new Set(); this.error = null; this.limited = false;
     this.loading = false; this.again = false; this.watched = null; this.scrollTo = this.cursor || null;
     if (this.query) { this.query = ""; this.input?.set_value(""); }
@@ -356,6 +383,8 @@ export default class FileTree extends View {
 
   refresh(cx) {
     if (!this.root) return;
+    // Only while on screen; render catches up when the tree shows again.
+    if (!onScreen()) { this.stale = true; return; }
     if (this.loading) { this.again = true; return; }
     const ctx = this.ctx;
     this.loading = true; this.limited = false;
@@ -465,7 +494,7 @@ export default class FileTree extends View {
 
   // ── search ───────────────────────────────────────────────────────────────────────────
   search(query, cx) {
-    this.query = query;
+    this.query = query; this.searchError = null;
     const q = query.trim().toLowerCase();
     // Recent filters its own short list in rows(); only the tree searches disk.
     if (!q || this.view !== "tree") { this.hits = null; cx.notify(); return; }
@@ -484,13 +513,13 @@ export default class FileTree extends View {
         this.hits = [...new Set([...named, ...matches])].slice(0, FIND_LIMIT);
         this.cursor = this.hits[0] ?? "";
         this.scrollTo = this.cursor;
-      } catch (e) { if (seq === this.searchSeq) this.hits = []; this.error = String(e?.message ?? e); }
+      } catch (e) { if (seq === this.searchSeq) { this.hits = []; this.searchError = String(e?.message ?? e); } }
       finally { if (seq === this.searchSeq) this.searching = false; cx.notify(); }
     });
   }
 
   clearSearch(cx) {
-    this.query = ""; this.hits = null; this.searchSeq++;
+    this.query = ""; this.hits = null; this.searchError = null; this.searchSeq++;
     this.input.set_value("");
     cx.notify();
   }
@@ -674,7 +703,7 @@ export default class FileTree extends View {
     }
     if (this.chip && now - this.chip.at > (this.chip.state === "running" ? RUNNING_MS : CHIP_MS)) { this.chip = null; dirty = true; }
     if (this.branchFlash && now - this.branchFlash.at > FLASH_MS) { this.branchFlash = null; dirty = true; }
-    if (this.showSize && this.view === "tree") this.pumpSizes(cx);
+    if (this.showSize && this.view === "tree" && onScreen()) this.pumpSizes(cx);
     // Recent shows "4m ago"-style times; refresh them twice a minute, only while shown.
     if (this.view === "recent" && now - this.agoAt > 30000) { this.agoAt = now; dirty = true; }
     if (dirty) cx.notify();
@@ -749,8 +778,8 @@ export default class FileTree extends View {
   }
 
   openMenu(rel, dir) {
-    const abs = join(this.root, rel);
-    openOverlay({ mod: NAME, kind: "popup", width: 210, height: dir ? 5 * 28 + 10 : 7 * 28 + 10, props: { menu: { root: this.root, rel, abs, dir, local: !this.on } } });
+    const menu = { root: this.root, rel, abs: join(this.root, rel), dir, local: !this.on };
+    openOverlay({ mod: NAME, kind: "popup", width: 210, height: menuItems(menu).length * 28 + 10, props: { menu } });
   }
 
   // A virtual list's rows can't hold handlers, so the list reports the row and
@@ -825,16 +854,19 @@ export default class FileTree extends View {
   }
 
   // ── drawing ──────────────────────────────────────────────────────────────────────────
-  button(id, label, tip, on, onClick, t, R) {
-    return div().id(id).h(20).min_w(20).px(4).flex_none().flex().items_center().justify_center().rounded(R).cursor_pointer()
-      .text_size(12).text_color(on ? t.foreground : t.dim).hover((s) => s.bg(t.hover).text_color(t.foreground)).tooltip(tip)
+  // A 26 px icon button from [id, svg, tooltip, action, on]; a toggle that is on keeps its
+  // fill under the pointer. The tooltip's text before its shortcut names it for screen readers.
+  iconButton([id, icon, tip, act, on], t) {
+    return div().id(id).size(26).flex_none().flex().items_center().justify_center().rounded(6).cursor_pointer()
+      .text_color(on ? t.foreground : t.muted).when(Boolean(on), (el) => el.bg(t.selected))
+      .hover((s) => s.bg(on ? t.selected : t.hover).text_color(t.foreground)).tooltip(tip).accessibility_label(tip.split("  ")[0])
       .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
-      .on_click((_e, cx) => { onClick(cx); cx.notify(); })
-      .child(label);
+      .on_click((_e, cx) => { act(cx); cx.notify(); })
+      .child(svg(ICON(icon)).size(14));
   }
 
-  pill(letter, color, R) {
-    return div().size(16).flex_none().flex().items_center().justify_center().rounded(Math.min(R, 3)).bg(alpha(color, 0.15)).text_color(color).text_size(10).font_semibold().child(letter);
+  pill(letter, color, t, R) {
+    return div().size(16).flex_none().flex().items_center().justify_center().rounded(Math.min(R, 3)).bg(alpha(t, color, 0.15)).text_color(color).text_size(11).font_semibold().child(letter);
   }
 
   // A row of Recent: a status pill, the name, then what happened to it.
@@ -845,9 +877,9 @@ export default class FileTree extends View {
     const h = r.recent, color = h.kind === "read" ? tone.purple : h.kind === "commit" ? tone.green : tone.orange;
     return h_flex().id(`ft-${rel}`).h(ROW).flex_none().pl(8).pr(10).gap(7).items_center().rounded(R).cursor_pointer()
       .when(selected, (el) => el.bg(t.selected)).when(!selected, (el) => el.hover((s) => s.bg(t.hover)))
-      .when(Boolean(fl?.bright), (el) => el.bg(alpha(lit, 0.13)))
-      .child(this.pill(h.kind === "read" ? "R" : h.kind === "commit" ? "C" : "W", color, R))
-      .child(div().flex_none().max_w(Math.max(80, this.width * 0.5)).truncate().text_color(lit ?? t.foreground).when(Boolean(fl?.bright), pulse).child(e.name))
+      .when(Boolean(fl?.bright) && !selected, (el) => el.bg(alpha(t, lit, 0.13)))
+      .child(this.pill(h.kind === "read" ? "R" : h.kind === "commit" ? "C" : "W", color, t, R).when(Boolean(fl?.bright), pulse))
+      .child(div().flex_none().max_w(Math.max(80, this.width * 0.5)).truncate().text_color(lit ?? t.foreground).child(e.name))
       .child(div().flex_1().min_w(0).truncate().text_size(11).text_color(t.dim).child(dirOf(rel)))
       .child(div().flex_none().text_size(11).text_color(color).child(h.kind === "read" ? "read" : h.kind === "commit" ? "committed" : "wrote"))
       .child(div().flex_none().w(26).text_size(11).text_color(t.dim).text_right().child(ago(h.at)));
@@ -867,13 +899,15 @@ export default class FileTree extends View {
       : (!e.dir && !loc && this.width > 250 ? stamp(e.mtime) : "");
     const selected = rel === this.cursor;
     const pulse = (el) => el.loop("opacity", { from: 0.35, to: 1, period: 900 });
+    // While a read, write or commit lights the row, a pill says which, not only its color.
     return h_flex().id(`ft-${rel}`).h(ROW).flex_none().pl(6 + depth * 14).pr(10).gap(6).items_center().rounded(R).cursor_pointer()
       .when(selected, (el) => el.bg(t.selected)).when(!selected, (el) => el.hover((s) => s.bg(t.hover)))
-      .when(Boolean(fl?.bright), (el) => el.bg(alpha(lit, 0.13)))
+      .when(Boolean(fl?.bright) && !selected, (el) => el.bg(alpha(t, lit, 0.13)))
       .child(e.dir ? svg(ICON(`chevron-${open ? "down" : "right"}`)).size(12).flex_none().text_color(t.dim) : div().w(12).flex_none())
       .child(image(fileIcon(rel, e.dir, open, settings().dark !== false)).size(16).flex_none().when(Boolean(fl?.bright), pulse))
       .child(div().flex_1().min_w(0).truncate().text_color(nameColor).when(selected, (el) => el.font_medium())
-        .when(status === "D" && !e.dir, (el) => el.line_through()).when(Boolean(fl?.bright), pulse).child(e.name + (e.link ? " ↪" : "")))
+        .when(status === "D" && !e.dir, (el) => el.line_through()).child(e.name + (e.link ? " ↪" : "")))
+      .when(Boolean(fl), (el) => el.child(this.pill((KIND[fl.tone] ?? "write")[0].toUpperCase(), lit, t, R)))
       .when(Boolean(meta), (el) => el.child(div().flex_none().text_size(11).text_color(t.dim).child(meta)))
       .when(Boolean(loc?.[0]), (el) => el.child(div().flex_none().text_size(11).text_color(t.ansi2).child(`+${loc[0]}`)))
       .when(Boolean(loc?.[1]), (el) => el.child(div().flex_none().text_size(11).text_color(t.ansi1).child(`−${loc[1]}`)))
@@ -893,8 +927,8 @@ export default class FileTree extends View {
   // Branch, totals, a bar of modified / new / deleted, and its legend.
   summary(t) {
     const g = this.git, b = g.branch, tone = tones(t);
-    if (!g.top) return h_flex().h(28).flex_none().px(10).gap(6).items_center().text_size(11.5).text_color(t.dim).border_b(1).border_color(t.border)
-      .child(div().truncate().child(this.root ? "± no git repo · git status starts after git init" : ""));
+    if (!g.top) return h_flex().h(28).flex_none().px(10).gap(6).items_center().text_size(12).text_color(t.dim).border_b(1).border_color(t.border)
+      .child(div().truncate().child(this.root ? "Not a git repo" : ""));
     const lit = this.branchFlash ? tone[this.branchFlash.tone] : null, totals = g.diff.get("") ?? [0, 0];
     const c = g.counts.get("") ?? [0, 0, 0], total = c[0] + c[1] + c[2];
     const parts = [[c[1], tone.yellow, "modified"], [c[0], tone.green, "new"], [c[2], tone.red, "deleted"]].filter(([n]) => n > 0);
@@ -906,8 +940,8 @@ export default class FileTree extends View {
         .when(Boolean(b?.ahead), (el) => el.child(div().flex_none().text_color(tone.teal).child(`↑${b.ahead}`)))
         .when(Boolean(b?.behind), (el) => el.child(div().flex_none().text_color(tone.blue).child(`↓${b.behind}`)))
         .child(div().flex_1())
-        .when(Boolean(totals[0]), (el) => el.child(div().flex_none().text_size(11.5).text_color(t.ansi2).child(`+${totals[0]}`)))
-        .when(Boolean(totals[1]), (el) => el.child(div().flex_none().text_size(11.5).text_color(t.ansi1).child(`−${totals[1]}`))))
+        .when(Boolean(totals[0]), (el) => el.child(div().flex_none().text_color(t.ansi2).child(`+${totals[0]}`)))
+        .when(Boolean(totals[1]), (el) => el.child(div().flex_none().text_color(t.ansi1).child(`−${totals[1]}`))))
       .child(total
         ? h_flex().h(4).gap(2).children(parts.map(([n, color]) => div().h_full().w(Math.max(3, (room * n) / total)).bg(color)))
         : div().h(4).w_full().bg(t.raised))
@@ -932,16 +966,9 @@ export default class FileTree extends View {
   renderMenu(cx) {
     const t = theme(), m = this.menu, R = frameLook().radius;
     const close = () => closeOverlay(props().overlay);
-    const item = (id, label, act) => div().id(id).h(28).px(10).flex().items_center().rounded(R).cursor_pointer().text_size(12.5)
+    const item = ({ id, label, act }) => div().id(id).h(28).px(10).flex().items_center().rounded(R).cursor_pointer().text_size(13)
       .hover((s) => s.bg(t.hover)).on_click((_e, cx) => { close(); act(cx); }).child(label);
-    const items = [];
-    if (!m.dir) items.push(item("m-preview", "Preview", () => setShared(`${NAME}.preview`, { root: m.root, rel: m.rel, n: Date.now() })));
-    if (!m.dir && m.local) items.push(item("m-open", "Open in default app", () => openExternal(m.abs).catch((e) => notify({ title: "Could not open the file", body: String(e?.message ?? e), level: "error" }))));
-    if (m.local) items.push(item("m-reveal", window()?.platform === "macos" ? "Reveal in Finder" : "Show in folder", () => revealExternal(m.abs).catch(() => {})));
-    items.push(item("m-rel", "Copy relative path", (cx) => copy(cx, m.rel)));
-    items.push(item("m-abs", "Copy absolute path", (cx) => copy(cx, m.abs)));
-    items.push(item("m-send", "Send to agent", (cx) => sendToAgent(cx, m.abs)));
-    return v_flex().id("ft-menu").size_full().p(5).gap(0).bg(t.popover ?? t.surface).text_color(t.foreground).children(items);
+    return v_flex().id("ft-menu").size_full().p(5).gap(0).bg(t.popover ?? t.surface).text_color(t.foreground).children(menuItems(m).map(item));
   }
 
   render(cx) {
@@ -955,44 +982,54 @@ export default class FileTree extends View {
       this.seenView = want.n;
       if (VIEWS.some(([v]) => v === want.view) && want.view !== this.view) { this.view = want.view; this.hits = null; this.closePreview(); this.savePrefs(); }
     }
-    const t = theme(), look = frameLook(), R = look.radius, now = Date.now();
+    if (this.stale && onScreen()) { this.stale = false; this.refresh(cx); }
+    const t = theme(), look = frameLook(), R = look.radius, now = Date.now(), panel = Boolean(props()?.panel);
     const rows = this.file ? [] : this.rows();
     if (this.scrollTo !== null && this.scrollTo !== undefined) {
       const at = rows.findIndex((r) => r.rel === this.scrollTo);
       if (at >= 0) { this.scroll.scroll_to_item(at, "center"); this.scrollTo = null; }
       else if (!this.pending.size && !this.loading) this.scrollTo = null;
     }
-    const title = this.file ?? (this.root ? baseOf(this.root) : "Files");
-    const btn = (id, label, tip, on, fn) => this.button(id, label, tip, on, fn, t, R);
-    const header = h_flex().h(look.header).flex_none().px(8).gap(4).items_center().bg(t.chrome).border_b(1).border_color(t.border).text_size(12)
-      .when(Boolean(this.file), (el) => el.child(btn("ft-back", svg(ICON("chevron-left")).size(12), "Back to the tree (Esc)", false, () => this.closePreview())))
-      .when(Boolean(this.file), (el) => el.child(image(fileIcon(this.file, false, false, settings().dark !== false)).size(14).flex_none()))
-      .child(div().flex_1().min_w(0).truncate().font_medium().text_color(this.file ? t.foreground : t.muted).child(title))
+    // In the right panel stack ({panel: true}) a flush 42 px header like its neighbours';
+    // elsewhere the shown layout's pane header height, on chrome.
+    const title = this.file ? baseOf(this.file) : "Files", subtitle = this.file ? dirOf(this.file) : this.root ? baseOf(this.root) : "";
+    const btn = (b) => this.iconButton(b, t);
+    const header = h_flex().h(panel ? 42 : look.header).flex_none().px(panel ? 12 : 8).gap(6).items_center().border_b(1).border_color(t.border).when(!panel, (el) => el.bg(t.chrome))
       .when(Boolean(this.file), (el) => el
-        .when(!this.on, (el) => el.child(btn("ft-ext", "↗", "Open in default app (o)", false, () => openExternal(join(this.root, this.file)).catch(() => {}))))
-        .child(btn("ft-copy", "⧉", "Copy path", false, (cx) => copy(cx, this.file)))
-        .child(btn("ft-send", "@", "Send to agent", false, (cx) => sendToAgent(cx, join(this.root, this.file)))))
+        .child(h_flex().id("ft-back").h(22).px(6).gap(2).flex_none().items_center().rounded(5).cursor_pointer().text_size(12).text_color(t.muted)
+          .hover((s) => s.bg(t.hover).text_color(t.foreground)).tooltip("Back to the tree  Esc")
+          .on_mouse_down("left", (_e, cx) => cx.stop_propagation()).on_click((_e, cx) => { this.closePreview(); cx.notify(); })
+          .child(svg(ICON("chevron-left")).size(14).flex_none()).child("Files"))
+        .child(image(fileIcon(this.file, false, false, settings().dark !== false)).size(14).flex_none()))
+      .child(div().min_w(0).truncate().text_size(13).font_semibold().text_color(t.foreground).child(title))
+      .child(div().flex_1().min_w(0).truncate().text_size(12).text_color(t.dim).child(subtitle))
+      .when(Boolean(this.file), (el) => el.children([
+        ...(this.on ? [] : [["ft-ext", "external-link", "Open in default app  o", () => openExternal(join(this.root, this.file)).catch(() => {})]]),
+        ["ft-copy", "copy", "Copy path", (cx) => copy(cx, this.file)],
+        ["ft-send", "at-sign", "Send to agent", (cx) => sendToAgent(cx, join(this.root, this.file))],
+      ].map(btn)))
       .when(!this.file, (el) => el.child(h_flex().flex_none().gap(2).items_center().children(VIEWS.map(([id, label, icon], i) => {
         const on = this.view === id;
-        return h_flex().id(`ft-tab-${id}`).h(22).px(7).gap(5).flex_none().items_center().rounded(R).cursor_pointer().text_size(11.5)
-          .text_color(on ? t.foreground : t.dim).when(on, (el) => el.bg(t.selected)).when(!on, (el) => el.hover((s) => s.bg(t.hover).text_color(t.foreground)))
-          .tooltip(`${label} (${i + 1})`).on_mouse_down("left", (_e, cx) => cx.stop_propagation()).on_click((_e, cx) => this.setView(id, cx))
+        return h_flex().id(`ft-tab-${id}`).h(22).px(6).gap(5).flex_none().items_center().rounded(5).cursor_pointer().text_size(12)
+          .text_color(on ? t.foreground : t.muted).when(on, (el) => el.bg(t.selected)).when(!on, (el) => el.hover((s) => s.bg(t.hover).text_color(t.foreground)))
+          .tooltip(`${label}  ${i + 1}`).on_mouse_down("left", (_e, cx) => cx.stop_propagation()).on_click((_e, cx) => this.setView(id, cx))
           .child(svg(ICON(icon)).size(12).flex_none())
           .when(on || this.width >= 300, (el) => el.child(label));
       }))));
 
     // Tools sit beside the filter box and change with the view.
     const tools = this.view === "tree" ? [
-      btn("ft-up", "↑", "Up a folder", false, () => { if (!this.root) return; this.follow = false; this.pinned = this.root.replace(/[\\/][^\\/]+[\\/]?$/, "") || "/"; this.pinnedOn = this.on; }),
-      btn("ft-home", "⌂", this.follow ? "Following the focused pane" : "Back to the focused pane's folder", this.follow, () => { this.follow = true; this.pinned = null; }),
-      btn("ft-hidden", this.showHidden ? "◉" : "○", this.showHidden ? "Hide dotfiles (.)" : "Show dotfiles (.)", this.showHidden, () => { this.showHidden = !this.showHidden; this.savePrefs(); }),
-      btn("ft-size", "Σ", this.showSize ? "Show dates" : "Show sizes", Boolean(this.showSize), () => { this.showSize = !this.showSize; this.savePrefs(); }),
-      btn("ft-collapse", "⊟", "Collapse all", false, (cx) => this.collapseAll(cx)),
+      ["ft-up", "arrow-up", "Up a folder", () => { if (!this.root) return; this.follow = false; this.pinned = this.root.replace(/[\\/][^\\/]+[\\/]?$/, "") || "/"; this.pinnedOn = this.on; }],
+      ["ft-home", "house", this.follow ? "Following the focused pane" : "Back to the focused pane's folder", () => { this.follow = true; this.pinned = null; }, this.follow],
+      ["ft-hidden", this.showHidden ? "eye" : "eye-off", this.showHidden ? "Hide dotfiles  ." : "Show dotfiles  .", () => { this.showHidden = !this.showHidden; this.savePrefs(); }, this.showHidden],
+      ["ft-size", "sigma", this.showSize ? "Show dates" : "Show sizes", () => { this.showSize = !this.showSize; this.savePrefs(); }, Boolean(this.showSize)],
+      ["ft-collapse", "chevrons-down-up", "Collapse all", (cx) => this.collapseAll(cx)],
     ] : [
-      btn("ft-forget", "⊘", "Clear the list", false, () => { this.history = []; try { localStorage.setItem("history", "[]"); } catch {} }),
+      ["ft-forget", "eraser", "Clear the list", () => { this.history = []; try { localStorage.setItem("history", "[]"); } catch {} }],
     ];
 
     const root = v_flex().id(NAME).size_full().min_h(0).overflow_hidden().bg(t.background).text_color(t.foreground).text_size(13)
+      .when(panel, (el) => el.border_t(1).border_b(1).border_color(t.border))
       .track_focus(this.handle).on_key_down((e, cx) => this.key(e, cx))
       .on_size_change((size, cx) => { if (Math.abs(size.width - this.width) > 4) { this.width = size.width; cx.notify(); } })
       .child(header);
@@ -1003,19 +1040,24 @@ export default class FileTree extends View {
         : div().p(12).text_color(t.dim).child(this.fileError || "Loading file…"));
     }
 
+    // A note only fills an empty list. A search error stays under the filter box; a failed
+    // refresh over rows already shown sits below them.
     const q = this.query.trim();
-    const note = this.error || (!this.root ? "No folder"
-      : this.view === "recent" ? (rows.length ? null : q ? "No matches" : "Files Claude reads and writes here show up in this list")
-      : this.searching && !rows.length ? "Searching…" : this.hits ? (rows.length ? null : "No matches") : this.loading && !rows.length ? "Loading files…" : !rows.length ? "Empty folder" : null);
+    const note = rows.length ? null : this.error || (!this.root ? "No folder"
+      : this.view === "recent" ? (q ? "No matches" : "Files your agent reads and writes appear here.")
+      : this.searching ? "Searching…" : this.searchError ? null : this.hits ? "No matches" : this.loading ? "Loading files…" : "Empty folder");
     return root
       .child(this.summary(t))
       .child(h_flex().flex_none().mx(6).mt(6).mb(4).gap(2).items_center()
-        .child(h_flex().flex_1().min_w(0).h(26).px(8).gap(6).items_center().rounded(R).bg(t.canvas ?? t.background).border_1().border_color(this.typing ? t.accent : t.input ?? t.border).cursor_text()
+        .child(h_flex().flex_1().min_w(0).h(26).pl(8).pr(this.query ? 1 : 8).gap(6).items_center().rounded(R).bg(t.canvas ?? t.background).border_1().border_color(this.typing ? t.accent : t.input ?? t.border).cursor_text()
           .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
           .child(svg(ICON("search")).size(12).flex_none().text_color(t.dim))
           .child(Input.new(this.input).flex_1().h_full().text_size(12).text_color(t.foreground))
-          .when(Boolean(this.query), (el) => el.child(div().id("ft-clear").flex_none().text_size(12).text_color(t.dim).cursor_pointer().hover((s) => s.text_color(t.foreground)).on_click((_e, cx) => this.clearSearch(cx)).child("×"))))
-        .children(tools))
+          .when(Boolean(this.query), (el) => el.child(div().id("ft-clear").size(24).flex_none().flex().items_center().justify_center().rounded(5).cursor_pointer().text_color(t.dim)
+            .hover((s) => s.bg(t.hover).text_color(t.foreground)).tooltip("Clear filter  Esc").accessibility_label("Clear filter")
+            .on_click((_e, cx) => this.clearSearch(cx)).child(svg(ICON("x")).size(14)))))
+        .children(tools.map(btn)))
+      .when(Boolean(this.searchError), (el) => el.child(div().flex_none().mx(6).mb(4).px(2).truncate().text_size(11).text_color(t.ansi1).child(`Search failed · ${this.searchError}`)))
       .child(div().flex_1().min_h(0).relative().px(4)
         .child(v_virtual_list("ft-rows", rows.length, ROW, (i) => rows[i]?.rel ?? String(i), (range) => {
           const shown = rows.slice(range.start, range.end);
@@ -1026,6 +1068,7 @@ export default class FileTree extends View {
           .on_item_secondary_click((rel, _e, cx) => { const r = this.rows().find((x) => x.rel === rel); if (!r) return; this.cursor = rel; this.openMenu(rel, r.e.dir); cx.notify(); }))
         .child(Scrollbar.vertical("ft-rows").viewport_from_layout().absolute().inset_0())
         .when(Boolean(note), (el) => el.child(div().absolute().top(4).left(0).right(0).px(10).text_size(12).text_color(t.dim).child(note))))
+      .when(Boolean(this.error) && rows.length > 0, (el) => el.child(div().px(10).py(3).truncate().text_size(11).text_color(t.ansi1).child(this.error)))
       .when(this.limited, (el) => el.child(div().px(10).py(3).text_size(11).text_color(t.dim).child(`Folders show their first ${PER_FOLDER} entries`)))
       .when(Boolean(this.hits?.length >= FIND_LIMIT), (el) => el.child(div().px(10).py(3).text_size(11).text_color(t.dim).child(`First ${FIND_LIMIT} matches · Enter jumps to the selected one`)))
       .when(Boolean(this.cursor || this.chip), (el) => el.child(this.footer(t)));

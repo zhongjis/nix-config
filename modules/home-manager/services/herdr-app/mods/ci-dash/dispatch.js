@@ -6,7 +6,7 @@ import { settings } from "herdr";
 import { GhError } from "./gh.js";
 import { parseWorkflowInputs } from "./workflow-inputs.js";
 import { mapLimit, relTime, stateOf } from "./format.js";
-import { icon, tint, pill, section, searchBox, busy, iconTile, segmented, stepper } from "./ui.js";
+import { icon, tint, pill, section, searchBox, busy, iconTile, segmented, stepper, backLink } from "./ui.js";
 
 const mono = () => settings().font_family ?? "JetBrains Mono";
 
@@ -264,12 +264,10 @@ export class Dispatch {
   /** A choice chip; the picked one is tinted with the accent color. */
   chip(id, label, active, onClick, t) {
     return div().id(id).h(26).px(10).flex_none().flex().items_center().rounded(7).text_size(12).border_1()
-      .border_color(active ? t.accent : t.border).bg(active ? tint(t.accent, "33") : t.background)
-      .text_color(active ? t.accent : t.muted).cursor_pointer().hover((s) => s.bg(active ? tint(t.accent, "33") : t.hover))
+      .border_color(active ? t.accent : t.border).bg(active ? tint(t, t.accent, "33") : t.background)
+      .text_color(active ? t.accent : t.muted).cursor_pointer().hover((s) => s.bg(active ? tint(t, t.accent, "33") : t.hover))
       .on_click((_e, cx) => onClick(cx)).child(label);
   }
-
-  button(id, label, onClick, t) { return this.app.button(id, label, onClick, t); }
 
   /** The strong call to action: `▶ Dispatch`, `Review →`. */
   primary(id, label, onClick, t, symbol) {
@@ -285,7 +283,7 @@ export class Dispatch {
   }
 
   banner(t, text, color, symbol = "info") {
-    return h_flex().flex_none().px(12).py(8).gap(8).items_center().rounded(10).bg(tint(color, "1c")).border_1().border_color(tint(color, "44"))
+    return h_flex().flex_none().px(12).py(8).gap(8).items_center().rounded(10).bg(tint(t, color, "1c")).border_1().border_color(tint(t, color, "44"))
       .child(svg(icon(symbol)).size(14).flex_none().text_color(color))
       .child(div().flex_1().min_w(0).text_size(12).text_color(color).child(text));
   }
@@ -296,7 +294,7 @@ export class Dispatch {
     return h_flex().flex_none().px(14).py(8).gap(10).items_center().border_t(1).border_b(1).border_color(t.border)
       .child(iconTile(t, "play", t.accent))
       .child(v_flex().flex_1().min_w(0).gap(1)
-        .child(div().truncate().text_size(14).font_semibold().child(w.name))
+        .child(div().truncate().font_semibold().child(w.name))
         .child(div().truncate().text_size(11).text_color(t.dim).font_family(mono()).child(w.path)))
       .when(withRef && Boolean(this.ref), (e) => e.child(pill(t, { label: this.ref, symbol: "branch", code: true })));
   }
@@ -320,7 +318,7 @@ export class Dispatch {
   noticeView(t) {
     return v_flex().flex_1().min_h(0).p(16).gap(12)
       .child(this.banner(t, this.notice, t.blocked, "info"))
-      .child(h_flex().child(this.button("dsp-notice-back", "‹ Back", (cx) => { this.step = this.workflow ? "refs" : "workflows"; cx.notify(); }, t)));
+      .child(h_flex().child(backLink(t, "dsp-notice-back", "Back", (cx) => { this.step = this.workflow ? "refs" : "workflows"; cx.notify(); })));
   }
 
   workflowsView(t) {
@@ -345,9 +343,9 @@ export class Dispatch {
             .child(h_flex().gap(10).items_center()
               .child(iconTile(t, "play", t.accent))
               .child(v_flex().flex_1().min_w(0).gap(1)
-                .child(div().truncate().text_size(14).child(w.name))
+                .child(div().truncate().child(w.name))
                 .child(div().truncate().text_size(11).text_color(t.dim).font_family(mono()).child(w.path)))
-              .child(div().flex_none().text_size(16).text_color(t.dim).child("›")))
+              .child(svg(icon("chevron")).size(14).flex_none().text_color(t.dim)))
             .child(h_flex().pl(38).flex_wrap().gap(6).items_center()
               .child(pill(t, { label: w.inputCount ? `${w.inputCount} input${w.inputCount === 1 ? "" : "s"}` : "no inputs", color: w.inputCount ? t.accent : undefined }))
               .when(Boolean(last), (e) => e.child(app.statePill(stateOf(last), t)).child(div().text_size(11).text_color(t.dim).child(`last run ${relTime(last.created_at, now)}`)))
@@ -366,16 +364,16 @@ export class Dispatch {
         .child(searchBox(t, "dsp-ref-filter", this.refFilter, { right: query ? `${list.length}/${this.refs.length}` : `${this.refs.length}`, onClear: (cx) => { this.refFilter.set_value(""); cx.notify(); } }))
         .when(Boolean(this.problem), (e) => e.child(this.banner(t, this.problem, t.ansi1, "info"))))
       .child(v_flex().id("dsp-ref-scroll").flex_1().min_h(0).overflow_y_scrollbar().pb(8)
-        .child(section(t, "BRANCHES", list.length, t.muted, "Choose where the run starts"))
+        .child(section(t, "Branches", list.length, t.muted, "Choose where the run starts"))
         .children(list.map((b) => h_flex().id(`ref-${b.name}`).w_full().flex_none().h(38).px(14).gap(10).items_center().cursor_pointer().hover((s) => s.bg(t.hover))
           .on_click((_e, cx) => this.chooseRef(b.name, cx))
           .child(svg(icon("branch")).size(14).flex_none().text_color(b.name === def ? t.accent : t.dim))
           .child(div().flex_1().min_w(0).truncate().font_family(mono()).text_size(12).child(b.name))
           .when(b.name === def, (e) => e.child(pill(t, { label: "default", color: t.accent })))
           .when(b.name === cur && b.name !== def, (e) => e.child(pill(t, { label: "current" })))
-          .child(div().flex_none().text_size(16).text_color(t.dim).child("›"))))
+          .child(svg(icon("chevron")).size(14).flex_none().text_color(t.dim))))
         .when(!list.length, (e) => e.child(div().p(16).text_size(12).text_color(t.dim).child("No branch matches."))))
-      .child(this.footer(t, this.button("dsp-back", "‹ Workflows", (cx) => this.goStep(1, cx), t)));
+      .child(this.footer(t, backLink(t, "dsp-back", "Workflows", (cx) => this.goStep(1, cx))));
   }
 
   fieldCard(f, t) {
@@ -401,7 +399,7 @@ export class Dispatch {
         .children(this.warnings.map((w) => this.banner(t, w, t.blocked, "info")))
         .children(this.inputs.map((f) => this.fieldCard(f, t))))
       .when(Boolean(this.problem), (e) => e.child(v_flex().flex_none().px(12).pb(8).child(this.banner(t, this.problem, t.ansi1, "info"))))
-      .child(this.footer(t, this.button("dsp-back", "‹ Branches", (cx) => this.goStep(2, cx), t), this.primary("dsp-review", "Review →", (cx) => this.review(cx), t)));
+      .child(this.footer(t, backLink(t, "dsp-back", "Branches", (cx) => this.goStep(2, cx)), this.primary("dsp-review", "Review →", (cx) => this.review(cx), t)));
   }
 
   confirmView(t) {
@@ -410,7 +408,7 @@ export class Dispatch {
       .child(this.summary(t, true))
       .child(v_flex().id("dsp-confirm-scroll").flex_1().min_h(0).overflow_y_scrollbar().px(12).py(12).gap(10)
         .child(this.banner(t, "Nothing starts until you press Dispatch.", t.accent, "info"))
-        .when(rows.length > 0, (e) => e.child(section(t, "INPUTS", rows.length, t.muted)))
+        .when(rows.length > 0, (e) => e.child(section(t, "Inputs", rows.length, t.muted)))
         .when(rows.length > 0, (e) => e.child(v_flex().flex_none().rounded(10).bg(t.raised).border_1().border_color(t.border).overflow_hidden()
           .children(rows.map(([k, v], i) => h_flex().w_full().px(12).py(8).gap(12).items_start()
             .when(i > 0, (x) => x.border_t(1).border_color(t.border))
@@ -422,7 +420,7 @@ export class Dispatch {
             .child(div().text_size(13).child("No inputs to fill"))
             .child(div().text_size(11).text_color(t.dim).child(`The run starts on ${this.ref} with the workflow's own defaults.`)))))
         .when(Boolean(this.problem), (e) => e.child(this.banner(t, this.problem, t.ansi1, "info"))))
-      .child(this.footer(t, this.button("dsp-back", "‹ Back", (cx) => { this.step = this.inputs.length ? "inputs" : "refs"; this.problem = ""; cx.notify(); }, t),
+      .child(this.footer(t, backLink(t, "dsp-back", "Back", (cx) => { this.step = this.inputs.length ? "inputs" : "refs"; this.problem = ""; cx.notify(); }),
         this.primary("dsp-go", "Dispatch", (cx) => this.dispatch(cx), t, "play")));
   }
 }

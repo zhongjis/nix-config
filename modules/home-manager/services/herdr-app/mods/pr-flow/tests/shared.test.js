@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { issueRefs } from '../issue-refs.js';
 import { createTracker } from '../tracker.js';
-import { checkState } from '../status.js';
+import { checkState, ciSummary } from '../status.js';
 import { createGh, parseRemote, parsePrUrl } from '../gh.js';
 import { orderCards, conversation, descPreview } from '../present.js';
 import { checkouts, ciRollup, githubRepo } from '../../tui-spaces/tracking.js';
@@ -18,6 +18,27 @@ test('CI reduction matches the detail check states; failure wins over pending', 
   assert.equal(ciRollup([{ status: 'QUEUED' }, { state: 'ERROR' }]), 'fail');
   assert.equal(ciRollup([{ state: 'SUCCESS' }, { status: 'QUEUED' }]), 'pending');
   assert.equal(ciRollup([]), null);
+});
+
+test('checks are classified by where their details live; only Actions runs count for the CI panel', () => {
+  const settings = { aiChecks: [], ciWaitMs: 0 };
+  const summary = (rollup) => ciSummary({ statusCheckRollup: rollup }, { now: 0, headSeenAt: 0 }, settings);
+  const app = { __typename: 'CheckRun', name: 'Kodiak', workflowName: '', status: 'COMPLETED', conclusion: 'SUCCESS', detailsUrl: 'https://wiki.example.com/Kodiak' };
+  const job = { __typename: 'CheckRun', name: 'build', workflowName: 'CI', status: 'COMPLETED', conclusion: 'FAILURE', detailsUrl: 'https://github.com/o/r/actions/runs/42/job/7' };
+  const sibling = { ...job, name: 'test', detailsUrl: 'https://github.com/o/r/actions/runs/42/job/8' };
+  const ghe = { __typename: 'CheckRun', name: 'lint', workflowName: 'Lint', status: 'COMPLETED', conclusion: 'SUCCESS', detailsUrl: 'https://ghe.example.com/o/r/runs/99' };
+  const status = { __typename: 'StatusContext', context: 'jenkins', state: 'SUCCESS', targetUrl: 'https://ci.example.com/1' };
+
+  const external = summary([app, status]);
+  assert.deepEqual(external.checks.map((c) => c.source), ['app', 'status']);
+  assert.equal(external.actions, false);
+  assert.equal(external.runs, 0);
+
+  const mixed = summary([app, job, sibling, ghe]);
+  assert.deepEqual(mixed.checks.map((c) => [c.source, c.runId]), [['app', null], ['actions', '42'], ['actions', '42'], ['actions', null]]);
+  assert.equal(mixed.actions, true);
+  assert.equal(mixed.runs, 1);
+  assert.equal(mixed.failed[0].runId, '42');
 });
 
 test('worktrees skip bare/prunable entries and retain detached checkouts and spaces in paths', () => {

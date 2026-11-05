@@ -157,7 +157,7 @@ export class Gh {
   }
 
   async getLogin() { return (await this.json("user")).login; }
-  async listRuns(perPage = 30) { return (await this.json(this.rp(`/actions/runs?per_page=${perPage}`))).workflow_runs || []; }
+  async listRuns(perPage = 30, sha = null) { return (await this.json(this.rp(`/actions/runs?per_page=${perPage}${sha ? `&head_sha=${sha}` : ""}`))).workflow_runs || []; }
   async getRun(id) { return this.json(this.rp(`/actions/runs/${id}`)); }
   async listJobs(id) { return this.pages(this.rp(`/actions/runs/${id}/jobs?per_page=100`), "jobs"); }
   async listArtifacts(id) { return this.pages(this.rp(`/actions/runs/${id}/artifacts?per_page=100`), "artifacts"); }

@@ -131,7 +131,10 @@
                       "id": "files",
                       "type": "block",
                       "content": {
-                        "mod": "filetree"
+                        "mod": "filetree",
+                        "props": {
+                          "panel": true
+                        }
                       }
                     },
                     {
@@ -145,7 +148,10 @@
                       "id": "pr",
                       "type": "block",
                       "content": {
-                        "mod": "pr-flow"
+                        "mod": "pr-flow",
+                        "props": {
+                          "panel": true
+                        }
                       }
                     },
                     {

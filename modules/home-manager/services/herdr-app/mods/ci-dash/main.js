@@ -1,21 +1,23 @@
 // CI Dash for the Herdr app: GitHub Actions runs, dispatch and artifacts of the
 // focused repository. Port of the ci-dash TUI plugin.
 import { View, div, svg } from "gpui-kit";
-import { v_flex, h_flex, InputState } from "gpui-base";
-import { spaces, panes, focused, exec, home, theme, notify, props, shared } from "herdr";
+import { v_flex, h_flex, InputState, v_virtual_list, VirtualListScrollHandle, Scrollbar } from "gpui-base";
+import { spaces, panes, focused, exec, home, theme, notify, props, shared, layout, window as appWindow } from "herdr";
 import { Gh, resolveRepo, errorHint, safeName } from "./gh.js";
 import { relTime, duration, bytes, stateOf, mapLimit, fileType, GLYPH } from "./format.js";
 import { Dispatch } from "./dispatch.js";
-import { icon, pill, section, searchBox, filterChip, busy } from "./ui.js";
+import { MOD, icon, pill, section, SECTION_H, searchBox, filterChip, busy, backLink } from "./ui.js";
 
 const POLL_MS = 5000;
+const RUN_ROW_H = 62;
+const TABS = ["runs", "dispatch", "artifacts"];
 
 // Runs are grouped by what the person has to do about them.
 const RUN_GROUPS = [
-  { id: "live", label: "IN PROGRESS", filter: "Running", color: (t) => t.working },
-  { id: "attention", label: "NEEDS ATTENTION", filter: "Failed", color: (t) => t.ansi1 },
-  { id: "passed", label: "PASSED", filter: "Passed", color: (t) => t.ansi2 },
-  { id: "other", label: "OTHER", filter: "Other", color: (t) => t.dim },
+  { id: "live", label: "In progress", filter: "Running", color: (t) => t.working },
+  { id: "attention", label: "Needs attention", filter: "Failed", color: (t) => t.ansi1 },
+  { id: "passed", label: "Passed", filter: "Passed", color: (t) => t.ansi2 },
+  { id: "other", label: "Other", filter: "Other", color: (t) => t.dim },
 ];
 const groupOf = (run) => {
   const kind = stateOf(run).kind;
@@ -35,6 +37,17 @@ const sep = (root) => (root.includes("\\") ? "\\" : "/");
 const join = (root, ...parts) => [root.replace(/[\\/]+$/, ""), ...parts].join(sep(root));
 
 let lastCwd = null;
+
+// The panel copy (props.panel) sits in a stack that can show another child, in a column that
+// can be hidden. A layout without such a block counts as shown.
+function onScreen() {
+  const root = layout();
+  const mine = (n) => n?.content?.mod === MOD && Boolean(n.content.props?.panel);
+  const has = (n) => mine(n) || (n?.children ?? []).some(has);
+  const shown = (n) => !n.hidden && (mine(n)
+    || (n.children ?? []).some((c) => (n.type !== "stack" || (n.active ?? n.children[0]?.id) === c.id) && shown(c)));
+  return !has(root) || shown(root);
+}
 
 // A mod pane has no folder of its own, so look at the terminals around it:
 // the focused pane, then its tab, then the rest of its space. The last folder
@@ -59,8 +72,8 @@ function location() {
 function friendlyError(text) {
   if (/not a git repository/i.test(text)) return { title: "This folder is not a git repository.", hint: "Focus a terminal inside a repository that has a GitHub remote, and CI runs follows it." };
   if (/no git remotes|none of the git remotes|could not determine.*repo/i.test(text)) return { title: "This repository has no GitHub remote.", hint: "Add one with git remote add origin <url>, or focus a terminal in another repository." };
-  if (/Could not resolve to a Repository/i.test(text)) return { title: "None of your GitHub logins can see this repository.", hint: "Log in with an account that has access: gh auth login, then press ⟳." };
-  if (/not logged in|gh auth login/i.test(text) && !/Could not start gh/.test(text)) return { title: "GitHub CLI is not logged in.", hint: "Run gh auth login in a terminal, then press ⟳." };
+  if (/Could not resolve to a Repository/i.test(text)) return { title: "None of your GitHub logins can see this repository.", hint: "Log in with an account that has access: gh auth login, then press r or Refresh." };
+  if (/not logged in|gh auth login/i.test(text) && !/Could not start gh/.test(text)) return { title: "GitHub CLI is not logged in.", hint: "Run gh auth login in a terminal, then press r or Refresh." };
   return null;
 }
 
@@ -84,7 +97,9 @@ export default class CiDash extends View {
     // answer for another copy. Fall back to props() when the argument is empty.
     this.props = (given && Object.keys(given).length ? given : props()) || {};
     const first = this.props.tab;
-    this.tab = ["runs", "dispatch", "artifacts"].includes(first) ? first : "runs";
+    this.tab = TABS.includes(first) ? first : "runs";
+    this.handle = cx.focus_handle();
+    this.scroll = VirtualListScrollHandle.new();
     this.key = null; this.branch = null;
     this.resolving = false;
     this.repo = null; this.gh = null; this.root = null; this.error = null;
@@ -103,9 +118,10 @@ export default class CiDash extends View {
 
   reset() {
     this.runs = []; this.runsLoading = false; this.runsError = null; this.runsLoaded = false;
-    this.detail = null;
+    this.runKeys = []; // the runs list's entries as drawn: `g-<group>` headings and `r-<run id>` rows
+    this.detail = null; this.sel = null;
     this.art = { groups: [], failed: 0, loaded: false, loading: false, error: null };
-    this.dl = {}; this.lastDir = ""; this.note = "";
+    this.dl = {}; this.lastDir = ""; this.note = null; // { text, error }
     this.runStatus = "all"; this.artStatus = "all"; this.artType = "all";
     this.runFilter.set_value(""); this.artFilter.set_value("");
     this.dsp.reset();
@@ -122,15 +138,29 @@ export default class CiDash extends View {
     if (type) this.artType = String(type).toLowerCase().replace(/^\./, "");
   }
 
-  /** The PR's branch in the run filter, and its failed run opened when it has one; once per request. */
+  /** The PR's commit as the runs list's scope, and its run opened when it has one; once per request. */
   applySelection(cx) {
     const sel = this.selected;
     if (!sel || sel.applied) return;
     sel.applied = true;
     this.tab = "runs"; this.runStatus = "all";
-    this.runFilter.set_value(sel.branch ?? "");
+    this.runFilter.set_value("");
+    this.rescope(cx);
     if (sel.runId) this.openRun(Number(sel.runId), cx);
-    else this.detail = null;
+  }
+
+  /** The runs list scoped to a PR's commit (pr-flow's "View in CI"), or null for the repo's latest runs. */
+  scope() { return this.selected?.sha ? this.selected : null; }
+
+  /** Reloads the runs list for a new scope, dropping what the old one showed. */
+  rescope(cx) {
+    this.runs = []; this.runsLoaded = false; this.runsError = null; this.detail = null; this.sel = null;
+    this.loadRuns(cx);
+  }
+
+  clearScope(cx) {
+    if (this.selected) this.selected.sha = null;
+    this.rescope(cx);
   }
 
   /** Loads what a tab needs the first time it is shown. */
@@ -144,8 +174,8 @@ export default class CiDash extends View {
   ensureContext(cx) {
     const { cwd, on, branch } = location();
     const key = `${on ?? ""}|${cwd ?? ""}`;
-    // pr-flow's "View in CI" (shared "ci.select"): that PR's repo, its branch, its failed run. The
-    // repo holds until focus moves to another folder.
+    // pr-flow's "View in CI" (shared "ci.select"): that PR's repo, its commit's runs, a run to open.
+    // The repo and scope hold until focus moves to another folder.
     const sel = shared("ci.select");
     if (sel?.at > (this.selAt ?? Date.now() - 1000) && sel.repo) {
       this.selAt = sel.at;
@@ -153,7 +183,11 @@ export default class CiDash extends View {
       if (this.override !== sel.repo) { this.override = sel.repo; this.key = null; }
       else if (this.repo) this.applySelection(cx);
     } else this.selAt ??= Date.now();
-    if (this.override && this.selected?.key !== key) { this.override = null; this.selected = null; this.key = null; }
+    if (this.override && this.selected?.key !== key) {
+      const scoped = this.scope();
+      this.override = null; this.selected = null; this.key = null;
+      if (scoped) this.rescope(cx);
+    }
     if (key === this.key) { if (branch) this.branch = branch; return; }
     this.key = key;
     this.branch = branch;
@@ -201,7 +235,8 @@ export default class CiDash extends View {
   // ---- polling -----------------------------------------------------------
 
   tick(cx) {
-    if (!this.gh) return;
+    // Nothing to keep fresh while the panel shows another child or the window is in the background.
+    if (!this.gh || !appWindow().active || (this.props.panel && !onScreen())) return;
     if (this.dsp.locate) this.dsp.tryLocate(cx);
     const d = this.detail;
     if (d) {
@@ -219,14 +254,17 @@ export default class CiDash extends View {
   // ---- runs --------------------------------------------------------------
 
   loadRuns(cx, silent = false) {
-    const gh = this.gh;
-    if (!gh || this.runsLoading) return;
-    this.runsLoading = true;
+    const gh = this.gh, sha = this.scope()?.sha ?? null;
+    if (!gh) return;
+    // A load for another scope is in flight: load again for this one when it lands.
+    if (this.runsLoading) { if (sha !== this.runsSha) this.runsStale = true; return; }
+    this.runsLoading = true; this.runsSha = sha;
     if (!silent) this.runsError = null;
     cx.spawn(async (cx) => {
       try {
-        const runs = await gh.listRuns(30);
+        const runs = await gh.listRuns(30, sha);
         if (this.gh !== gh) return;
+        if ((this.scope()?.sha ?? null) !== sha) { this.runsStale = true; return; }
         if (this.runsLoaded) {
           const before = new Map(this.runs.map((r) => [r.id, stateOf(r).done]));
           for (const r of runs) if (before.get(r.id) === false && stateOf(r).done) this.announce(r);
@@ -236,6 +274,7 @@ export default class CiDash extends View {
         if (this.gh === gh && (!silent || !this.runs.length)) this.runsError = e;
       } finally {
         this.runsLoading = false;
+        if (this.runsStale) { this.runsStale = false; this.loadRuns(cx); }
         cx.notify();
       }
     });
@@ -253,8 +292,8 @@ export default class CiDash extends View {
 
   openRun(id, cx) {
     this.detail = { id, run: this.runs.find((r) => r.id === id) || null, jobs: [], artifacts: [], artLoaded: false, artError: null, error: null, tick: 0, inFlight: false, live: false, hold: 0, attempt: 0 };
-    this.tab = "runs";
-    this.note = "";
+    this.tab = "runs"; this.sel = id;
+    this.note = null;
     this.pollDetail(cx);
     cx.notify();
   }
@@ -291,10 +330,10 @@ export default class CiDash extends View {
   }
 
   act(label, fn, cx) {
-    this.note = `${label}…`;
+    this.note = { text: `${label}…`, error: false };
     cx.notify();
     cx.spawn(async (cx) => {
-      try { await fn(); this.note = ""; } catch (e) { this.note = `${label} failed: ${e.message || e}`; }
+      try { await fn(); this.note = null; } catch (e) { this.note = { text: `${label} failed: ${e.message || e}`, error: true }; }
       cx.notify();
     });
   }
@@ -358,7 +397,7 @@ export default class CiDash extends View {
   download(runId, artifact, cx) {
     const key = `${runId}:${artifact.id}`;
     if (!this.gh || !this.root || this.dl[key]?.state === "busy") return;
-    if (artifact.expired) { this.note = `Artifact "${artifact.name}" has expired.`; cx.notify(); return; }
+    if (artifact.expired) { this.note = { text: `Artifact "${artifact.name}" has expired.`, error: true }; cx.notify(); return; }
     const dir = join(this.root, ".ci-dash", "artifacts", String(runId), safeName(artifact.name));
     const gh = this.gh;
     this.dl[key] = { state: "busy" };
@@ -381,20 +420,81 @@ export default class CiDash extends View {
     cx.spawn(async (cx) => {
       for (const dir of candidates) {
         if (await dirExists(dir)) {
-          try { await openFolder(dir); this.note = `Opened ${dir}`; } catch (e) { this.note = `Could not open ${dir}: ${e}`; }
+          try { await openFolder(dir); this.note = { text: `Opened ${dir}`, error: false }; } catch (e) { this.note = { text: `Could not open ${dir}: ${e}`, error: true }; }
           cx.notify();
           return;
         }
       }
-      this.note = `No artifacts downloaded yet. They go to ${candidates[candidates.length - 1]}`;
+      this.note = { text: `No artifacts downloaded yet. They go to ${candidates[candidates.length - 1]}`, error: false };
       cx.notify();
     });
+  }
+
+  // ---- keyboard ----------------------------------------------------------
+
+  /** Reloads what the shown view holds. */
+  refresh(cx) {
+    if (!this.gh) return;
+    if (this.tab === "artifacts") this.loadArtifactTab(cx);
+    else if (this.tab === "dispatch") { this.dsp.loaded = false; this.dsp.reset(); this.dsp.load(cx); }
+    else if (this.detail) { this.detail.artLoaded = false; this.pollDetail(cx); }
+    else this.loadRuns(cx);
+  }
+
+  showTab(id, cx) {
+    this.tab = id; this.note = null;
+    if (id === "runs") this.detail = null;
+    this.enterTab(cx);
+    cx.notify();
+  }
+
+  back(cx) {
+    this.detail = null;
+    this.reveal(0);
+    cx.notify();
+  }
+
+  /** Moves the chosen run by `step` rows of the list as drawn. */
+  move(step) {
+    const rows = this.runKeys.filter((k) => k.startsWith("r-"));
+    if (!rows.length) return;
+    const at = rows.indexOf(`r-${this.sel}`);
+    this.sel = Number(rows[at < 0 ? 0 : Math.max(0, Math.min(rows.length - 1, at + step))].slice(2));
+    this.reveal(step);
+  }
+
+  /** Scrolls the chosen run into sight; going up onto a group's first run shows its heading too. */
+  reveal(step) {
+    const at = this.runKeys.indexOf(`r-${this.sel}`);
+    if (at >= 0) this.scroll.scroll_to_item(step <= 0 && this.runKeys[at - 1]?.startsWith("g-") ? at - 1 : at);
+  }
+
+  onKey(e, cx) {
+    // A filter or an input keeps its own keys; Esc hands the keyboard back to the panel.
+    if (!this.handle.is_focused()) {
+      if (e.key !== "escape") return;
+      this.handle.focus();
+    } else if (e.keystroke !== e.key) return; // chords belong to the app
+    else if (e.key === "escape" || e.key === "backspace") {
+      if (this.tab === "runs" && this.detail) this.back(cx);
+      else if (this.tab === "dispatch" && this.dsp.step !== "workflows" && !this.dsp.busy) this.dsp.back(cx);
+      else if (this.tab !== "runs") this.showTab("runs", cx);
+      else return;
+    } else if (e.key === "r") this.refresh(cx);
+    else if (e.key === "1" || e.key === "2" || e.key === "3") this.showTab(TABS[Number(e.key) - 1], cx);
+    else if (this.tab !== "runs" || this.detail) return;
+    else if (e.key === "j" || e.key === "down") this.move(1);
+    else if (e.key === "k" || e.key === "up") this.move(-1);
+    else if (e.key === "enter" && this.runKeys.includes(`r-${this.sel}`)) this.openRun(this.sel, cx);
+    else return;
+    cx.stop_propagation();
+    cx.notify();
   }
 
   // ---- UI pieces ---------------------------------------------------------
 
   color(kind, t) {
-    return { success: t.ansi2, failure: t.ansi1, warning: t.ansi3, running: t.working, queued: t.blocked, neutral: t.dim }[kind] ?? t.dim;
+    return { success: t.ansi2, failure: t.ansi1, warning: t.ansi3, running: t.working, queued: t.idle, neutral: t.dim }[kind] ?? t.dim;
   }
 
   icon(state, t) {
@@ -402,10 +502,10 @@ export default class CiDash extends View {
     return div().w(14).flex_none().text_center().text_size(13).text_color(this.color(state.kind, t)).child(GLYPH[state.kind] ?? "•");
   }
 
-  /** The tinted status pill: `passed`, `failed`, `running`… */
+  /** The tinted status word: `passed`, `failed`, `running`… Rows put the status mark beside the title. */
   statePill(state, t) {
     const label = state.label === "success" ? "passed" : state.label;
-    return pill(t, { label, color: this.color(state.kind, t), glyph: state.kind === "running" ? undefined : GLYPH[state.kind], spin: state.kind === "running" });
+    return pill(t, { label, color: this.color(state.kind, t) });
   }
 
   button(id, label, onClick, t, { primary = false, active = false, disabled = false } = {}) {
@@ -416,39 +516,37 @@ export default class CiDash extends View {
       .child(label);
   }
 
-  header(t, cx) {
-    const onArtifacts = this.tab === "artifacts";
+  header(t) {
+    // An icon button; without `onClick` it shows dimmed and does nothing.
+    const tool = (id, name, tip, onClick) => div().id(id).size(26).flex_none().flex().items_center().justify_center().rounded(6).tooltip(tip)
+      .when(Boolean(onClick), (e) => e.cursor_pointer().hover((s) => s.bg(t.hover)).on_click((_e, cx) => onClick(cx)))
+      .child(svg(icon(name)).size(14).text_color(onClick ? t.muted : t.dim));
     const tab = (id, label, count) => {
       const active = this.tab === id;
-      return h_flex().id(`tab-${id}`).h(28).px(10).gap(6).flex_none().items_center().rounded(8).text_size(12)
-        .bg(active ? t.raised : t.background).border_1().border_color(active ? t.border : t.background)
-        .text_color(active ? t.foreground : t.muted).cursor_pointer().hover((s) => s.bg(active ? t.raised : t.hover))
-        .on_click((_e, cx) => {
-          this.tab = id; this.note = "";
-          if (id === "runs") this.detail = null;
-          this.enterTab(cx);
-          cx.notify();
-        })
+      return h_flex().id(`tab-${id}`).h(24).px(8).gap(6).flex_none().items_center().rounded(6).text_size(12)
+        .when(active, (e) => e.bg(t.selected)).text_color(active ? t.foreground : t.muted)
+        .cursor_pointer().hover((s) => s.bg(active ? t.selected : t.hover)).tooltip(`${label}  ${TABS.indexOf(id) + 1}`)
+        .on_click((_e, cx) => this.showTab(id, cx))
         .child(label)
-        .when(count != null, (e) => e.child(div().h(16).px(6).rounded(8).flex().items_center().text_size(10)
-          .bg(active ? t.hover : t.raised).text_color(t.dim).child(String(count))));
+        .when(count != null, (e) => e.child(div().text_size(11).text_color(t.dim).child(String(count))));
     };
     const artifactCount = this.art.groups.reduce((sum, g) => sum + g.artifacts.length, 0);
     return v_flex().flex_none()
-      .child(h_flex().h(38).flex_none().px(12).gap(8).items_center()
-        .child(div().font_semibold().flex_none().child("CI runs"))
-        .child(div().flex_1().min_w(0).truncate().text_size(11).text_color(t.dim).child(this.repo ? this.repo.slug : ""))
-        .when(onArtifacts, (e) => e.child(this.button("folder", "↗", (cx) => this.openArtifactsFolder(cx), t, { disabled: !this.root })))
-        .child(this.button("refresh", "⟳", (cx) => {
-          if (this.tab === "artifacts") this.loadArtifactTab(cx);
-          else if (this.tab === "dispatch") { this.dsp.loaded = false; this.dsp.reset(); this.dsp.load(cx); }
-          else if (this.detail) { this.detail.artLoaded = false; this.pollDetail(cx); }
-          else this.loadRuns(cx);
-        }, t, { disabled: !this.gh })))
-      .child(h_flex().h(40).flex_none().px(10).gap(4).items_center().border_b(1).border_color(t.border)
+      .child(h_flex().h(42).flex_none().px(12).gap(8).items_center()
+        .child(div().flex_none().font_semibold().text_color(t.foreground).child("CI runs"))
+        .child(div().flex_1().min_w(0).truncate().text_size(12).text_color(t.dim).child(this.repo ? this.repo.slug : ""))
+        .when(this.tab === "artifacts", (e) => e.child(tool("folder", "folder", "Open artifacts folder", this.root ? (cx) => this.openArtifactsFolder(cx) : null)))
+        .child(tool("refresh", "refresh", "Refresh  r", this.gh ? (cx) => this.refresh(cx) : null)))
+      .child(h_flex().h(32).flex_none().px(10).gap(2).items_center().border_b(1).border_color(t.border)
         .child(tab("runs", "Runs", this.runsLoaded ? this.runs.length : null))
         .child(tab("dispatch", "Dispatch", this.dsp.loaded ? this.dsp.workflows.length : null))
-        .child(tab("artifacts", "Artifacts", this.art.loaded ? artifactCount : null)));
+        .child(tab("artifacts", "Artifacts", this.art.loaded ? artifactCount : null))
+        .when(this.tab === "runs" && Boolean(this.scope()), (e) => e.child(div().flex_1())
+          .child(h_flex().id("scope").h(22).px(8).gap(6).flex_none().items_center().rounded(5).bg(t.selected).text_size(11).text_color(t.muted)
+            .cursor_pointer().hover((s) => s.text_color(t.foreground)).tooltip("Show all of the repository's runs")
+            .on_click((_e, cx) => this.clearScope(cx))
+            .child(`${this.scope().number ? `PR #${this.scope().number} · ` : ""}${this.scope().sha.slice(0, 7)}`)
+            .child(svg(icon("close")).size(10).text_color(t.dim)))));
   }
 
   message(t, title, detail) {
@@ -461,20 +559,20 @@ export default class CiDash extends View {
     return friendly ? this.message(t, friendly.title, friendly.hint) : this.message(t, text, errorHint(error));
   }
 
-  /** Title and #number on top, then pills: branch, status, duration, trigger. */
+  /** Title and #number on top, then pills: branch, status, duration, trigger. One line each, RUN_ROW_H tall. */
   runRow(r, t) {
-    const st = stateOf(r), now = Date.now();
+    const st = stateOf(r), now = Date.now(), selected = r.id === this.sel;
     const dur = duration(r.run_started_at || r.created_at, st.done ? r.updated_at : now);
     const by = [r.name, r.actor?.login].filter(Boolean).join(" · ");
-    return v_flex().id(`run-${r.id}`).w_full().flex_none().px(14).py(8).gap(6).cursor_pointer().hover((s) => s.bg(t.hover))
-      .on_click((_e, cx) => this.openRun(r.id, cx))
-      .child(h_flex().gap(10).items_center()
+    return v_flex().id(`run-${r.id}`).w_full().h(RUN_ROW_H).flex_none().px(14).gap(6).justify_center().cursor_pointer()
+      .when(selected, (e) => e.bg(t.selected)).hover((s) => s.bg(selected ? t.selected : t.hover))
+      .child(h_flex().h(20).gap(10).items_center()
         .child(this.icon(st, t))
-        .child(div().flex_1().min_w(0).truncate().text_size(14).child(r.display_title || r.name || `Run ${r.id}`))
+        .child(div().flex_1().min_w(0).truncate().child(r.display_title || r.name || `Run ${r.id}`))
         .child(div().flex_none().text_size(11).text_color(t.dim).child(`#${r.run_number}`))
         .child(div().flex_none().text_size(11).text_color(t.dim).child(relTime(r.created_at, now))))
-      .child(h_flex().pl(24).flex_wrap().gap(6).items_center()
-        .when(Boolean(r.head_branch), (e) => e.child(pill(t, { label: r.head_branch, symbol: "branch", code: true })))
+      .child(h_flex().h(20).pl(24).gap(6).items_center().overflow_hidden()
+        .when(Boolean(r.head_branch), (e) => e.child(pill(t, { label: r.head_branch, symbol: "branch", code: true }).flex_shrink(1).min_w(0)))
         .child(this.statePill(st, t))
         .when(Boolean(dur), (e) => e.child(pill(t, { label: dur })))
         .when(Boolean(r.event) && r.event !== "push", (e) => e.child(pill(t, { label: r.event.replace(/_/g, " "), color: t.accent })))
@@ -487,7 +585,11 @@ export default class CiDash extends View {
   runsView(t) {
     if (this.runsError && !this.runs.length) return this.errorView(t, this.runsError);
     if (!this.runsLoaded) return busy(t, "Loading runs…");
-    if (!this.runs.length) return this.message(t, "No workflow runs yet.", "Runs appear here after a workflow executes.");
+    if (!this.runs.length) {
+      if (!this.scope()) return this.message(t, "No workflow runs yet.", "Runs appear here after a workflow executes.");
+      return this.message(t, "No GitHub Actions runs for this commit.", "Its checks may come from other systems; the PR panel links to them.")
+        .child(h_flex().pt(4).child(this.button("all-runs", "Show all runs", (cx) => this.clearScope(cx), t)));
+    }
 
     const q = this.runFilter.value().trim().toLowerCase();
     const matches = this.runs.filter((r) => !q || [r.display_title, r.name, r.head_branch, r.actor?.login, r.event, `#${r.run_number}`]
@@ -502,18 +604,30 @@ export default class CiDash extends View {
       }
     }
 
-    // One list, newest first (the filter chips above narrow it by state).
+    // Grouped by what to do about them, newest first in each group (the chips above narrow it by state).
     const when = (r) => Date.parse(r.run_started_at || r.created_at) || 0;
-    const rows = [...shown].sort((x, y) => when(y) - when(x) || (y.id ?? 0) - (x.id ?? 0)).map((r) => this.runRow(r, t));
+    const sorted = [...shown].sort((x, y) => when(y) - when(x) || (y.id ?? 0) - (x.id ?? 0));
+    const entries = [];
+    for (const g of RUN_GROUPS) {
+      const runs = sorted.filter((r) => groupOf(r) === g.id);
+      if (!runs.length) continue;
+      entries.push({ key: `g-${g.id}`, h: SECTION_H, el: () => section(t, g.label, runs.length, t.muted) });
+      for (const r of runs) entries.push({ key: `r-${r.id}`, h: RUN_ROW_H, el: () => this.runRow(r, t) });
+    }
+    this.runKeys = entries.map((e) => e.key);
 
     return v_flex().flex_1().min_h(0)
       .child(v_flex().flex_none().px(12).pt(10).pb(2).gap(8)
         .child(searchBox(t, "run-filter", this.runFilter, { right: q || this.runStatus !== "all" ? `${shown.length}/${this.runs.length}` : `${this.runs.length}`, onClear: (cx) => { this.runFilter.set_value(""); cx.notify(); } }))
         .child(h_flex().flex_wrap().gap(4).children(chips)))
-      .child(v_flex().id("runs-scroll").flex_1().min_h(0).overflow_y_scrollbar().pb(8).children(rows)
-        .when(!shown.length, (e) => e.child(v_flex().p(16).gap(8).items_start()
+      .child(shown.length ? div().flex_1().min_h(0).relative()
+        .child(v_virtual_list("runs-rows", entries.length, entries.map((e) => e.h), (i) => entries[i].key,
+          (range) => entries.slice(range.start, range.end).map((e) => e.el())).track_scroll(this.scroll).size_full()
+          .on_item_click((key, cx) => { if (key.startsWith("r-")) this.openRun(Number(key.slice(2)), cx); }))
+        .child(Scrollbar.vertical("runs-rows").viewport_from_layout().absolute().inset_0())
+        : v_flex().p(16).gap(8).items_start()
           .child(div().text_size(12).text_color(t.dim).child("No run matches the filters."))
-          .child(this.button("clear-run-filters", "Clear filters", (cx) => this.clearRunFilters(cx), t)))));
+          .child(this.button("clear-run-filters", "Clear filters", (cx) => this.clearRunFilters(cx), t)));
   }
 
   stepRow(s, t) {
@@ -539,18 +653,19 @@ export default class CiDash extends View {
     return this.dl[`${runId}:${a.id}`]?.state === "done" ? "downloaded" : "available";
   }
 
-  /** Name and action on top, then pills: size, age, and what happened to it. */
+  /** Name and its download action on top, then pills: size, age, and what happened to it. */
   artifactRow(runId, a, t) {
     const key = `${runId}:${a.id}`, dl = this.dl[key];
     const busy = dl?.state === "busy";
-    const action = a.expired ? "" : busy ? "Downloading…" : dl?.state === "error" ? "Retry" : dl?.state === "done" ? "Again" : "Download";
+    const action = a.expired || busy ? "" : dl?.state === "error" ? "Retry" : dl?.state === "done" ? "Download again" : "Download";
     return v_flex().id(`art-${key}`).w_full().flex_none().px(14).py(8).gap(6)
-      .when(!a.expired, (e) => e.cursor_pointer().hover((s) => s.bg(t.hover)).on_click((_e, cx) => this.download(runId, a, cx)))
       .child(h_flex().gap(10).items_center()
-        .child(svg(icon("package")).size(15).flex_none().text_color(a.expired ? t.dim : t.accent))
-        .child(div().flex_1().min_w(0).truncate().text_size(14).text_color(a.expired ? t.dim : t.foreground).child(a.name))
-        .child(div().flex_none().text_size(11).text_color(t.accent).child(action)))
-      .child(h_flex().pl(25).flex_wrap().gap(6).items_center()
+        .child(svg(icon("package")).size(14).flex_none().text_color(a.expired ? t.dim : t.accent))
+        .child(div().flex_1().min_w(0).truncate().text_color(a.expired ? t.dim : t.foreground).child(a.name))
+        .when(Boolean(action), (e) => e.child(div().id(`art-dl-${key}`).h(22).px(6).flex_none().flex().items_center().rounded(5)
+          .text_size(12).text_color(t.accent).cursor_pointer().hover((s) => s.bg(t.hover))
+          .on_click((_e, cx) => this.download(runId, a, cx)).child(action))))
+      .child(h_flex().pl(24).flex_wrap().gap(6).items_center()
         .when(Boolean(fileType(a.name)), (e) => e.child(pill(t, { label: `.${fileType(a.name)}`, color: t.accent, code: true })))
         .when(Number.isFinite(a.size_in_bytes), (e) => e.child(pill(t, { label: bytes(a.size_in_bytes) })))
         .when(Boolean(a.created_at), (e) => e.child(pill(t, { label: relTime(a.created_at) })))
@@ -569,7 +684,7 @@ export default class CiDash extends View {
     const dur = duration(run.run_started_at || run.created_at, st.done ? run.updated_at : now);
     return v_flex().flex_1().min_h(0)
       .child(h_flex().flex_none().px(12).py(8).gap(8).items_center().border_b(1).border_color(t.border)
-        .child(this.button("back", "‹ Runs", (cx) => { this.detail = null; cx.notify(); }, t))
+        .child(backLink(t, "back", "Runs", (cx) => this.back(cx)))
         .child(div().flex_1())
         .child(this.button("web", "Open", (cx) => this.openWeb(cx), t))
         .when(!st.done, (e) => e.child(this.button("cancel", "Cancel", (cx) => this.cancel(cx), t)))
@@ -577,7 +692,7 @@ export default class CiDash extends View {
       .child(v_flex().id("detail-scroll").flex_1().min_h(0).overflow_y_scrollbar()
         .child(v_flex().flex_none().px(14).py(12).gap(8)
           .child(h_flex().gap(10).items_center().child(this.icon(st, t))
-            .child(div().flex_1().min_w(0).truncate().text_size(15).font_semibold().child(run.display_title || run.name))
+            .child(div().flex_1().min_w(0).truncate().text_size(16).font_semibold().child(run.display_title || run.name))
             .child(div().flex_none().text_size(11).text_color(t.dim).child(`#${run.run_number}`)))
           .child(h_flex().pl(24).flex_wrap().gap(6).items_center()
             .child(this.statePill(st, t))
@@ -590,7 +705,7 @@ export default class CiDash extends View {
         .children(d.jobs.map((j) => this.jobBlock(j, t)))
         .when(!d.jobs.length && !d.error, (e) => e.child(div().px(12).py(6).text_size(12).text_color(t.dim).child("Waiting for jobs…")))
         .when(st.done && (d.artifacts.length > 0 || d.artError), (e) => e
-          .child(section(t, "ARTIFACTS", d.artifacts.length, t.muted))
+          .child(section(t, "Artifacts", d.artifacts.length, t.muted))
           .when(Boolean(d.artError), (x) => x.child(div().px(14).text_size(11).text_color(t.ansi1).child(`Could not list artifacts: ${d.artError.message}`)))
           .children(d.artifacts.map((a) => this.artifactRow(run.id, a, t)))));
   }
@@ -637,7 +752,7 @@ export default class CiDash extends View {
     for (const g of art.groups) {
       const inGroup = shown.filter((m) => m.g === g);
       if (!inGroup.length) continue;
-      rows.push(section(t, g.workflow.name.toUpperCase(), inGroup.length, t.muted, `#${g.run.run_number} · ${g.run.head_branch || ""}`));
+      rows.push(section(t, g.workflow.name, inGroup.length, t.muted, `#${g.run.run_number} · ${g.run.head_branch || ""}`));
       for (const m of inGroup) rows.push(this.artifactRow(g.run.id, m.a, t));
     }
 
@@ -666,8 +781,9 @@ export default class CiDash extends View {
     else body = this.detail ? this.detailView(t) : this.runsView(t);
 
     return v_flex().id("ci-dash").size_full().min_h(0).rounded(this.props.panel ? 0 : 10).overflow_hidden().bg(t.background).when(!this.props.panel, (el) => el.border_1().border_color(t.border)).when(Boolean(this.props.panel), (el) => el.border_t(1).border_b(1).border_color(t.border)).text_color(t.foreground).text_size(13)
-      .child(this.header(t, cx))
+      .track_focus(this.handle).on_key_down((e, cx) => this.onKey(e, cx)).on_mouse_down("left", () => this.handle.focus())
+      .child(this.header(t))
       .child(body)
-      .when(Boolean(this.note), (e) => e.child(div().flex_none().px(12).py(6).border_t(1).border_color(t.border).text_size(11).text_color(t.blocked).truncate().child(this.note)));
+      .when(Boolean(this.note), (e) => e.child(div().flex_none().px(12).py(6).border_t(1).border_color(t.border).text_size(11).text_color(this.note.error ? t.blocked : t.muted).truncate().child(this.note.text)));
   }
 }

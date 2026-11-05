@@ -20,13 +20,25 @@ export function isAiCheck(check, settings) {
   return AI_CHECK.test(name) || settings.aiChecks.includes(name);
 }
 
+// Where a check's details live: a GitHub Actions run (the CI panel shows it), a GitHub App's
+// own page (Kodiak, scanners), or a commit status from outside CI (Jenkins).
+function checkSource(check, runId) {
+  if (check.__typename === 'StatusContext' || check.context) return 'status';
+  return check.workflowName || runId ? 'actions' : 'app';
+}
+
 function describeCheck(check, settings) {
+  const url = check.detailsUrl ?? check.targetUrl ?? '';
+  const m = /\/actions\/runs\/(\d+)/.exec(url);
+  const runId = m ? m[1] : null;
   return {
     name: check.name ?? check.context ?? 'check',
     state: checkState(check),
     at: check.completedAt ?? check.startedAt ?? null,
     ai: isAiCheck(check, settings),
-    url: check.detailsUrl ?? check.targetUrl ?? '',
+    url,
+    source: checkSource(check, runId),
+    runId,
   };
 }
 
@@ -39,7 +51,9 @@ export function ciSummary(pr, ctx, settings) {
   if (!ci.length) kind = ctx.now - ctx.headSeenAt < settings.ciWaitMs ? 'running' : 'none';
   else if (failed.length) kind = 'failed';
   else kind = ci.some((c) => c.state === 'running') ? 'running' : 'passed';
-  return { kind, checks: ci, ai: checks.filter((c) => c.ai), failed, passed, total: ci.length };
+  const runIds = new Set(checks.filter((c) => c.source === 'actions').map((c) => c.runId));
+  return { kind, checks: ci, ai: checks.filter((c) => c.ai), failed, passed, total: ci.length,
+    actions: checks.some((c) => c.source === 'actions'), runs: [...runIds].filter(Boolean).length };
 }
 
 export function reviewSummary(pr, ci) {

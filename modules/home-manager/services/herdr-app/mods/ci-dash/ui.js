@@ -7,8 +7,8 @@ import { settings } from "herdr";
 export const MOD = "ci-dash"; // folder name under ~/.config/herdr-app/mods
 export const icon = (name) => `mods/${MOD}/${name}.svg`;
 
-/** A translucent version of a theme color, for tinted pills. Non-hex colors pass through. */
-export const tint = (color, alpha = "24") => (/^#[0-9a-f]{6}$/i.test(color || "") ? color + alpha : color);
+/** A translucent version of a theme color, for tinted pills. A color that is not #rrggbb gets the theme's hover wash. */
+export const tint = (t, color, alpha = "24") => (/^#[0-9a-f]{6}$/i.test(color || "") ? color + alpha : t.hover);
 
 const mono = () => settings().font_family ?? "JetBrains Mono";
 
@@ -20,7 +20,7 @@ export function pill(t, { label, color, glyph, symbol, spin = false, code = fals
   const fg = color || t.muted;
   return h_flex().h(20).px(7).gap(4).flex_none().items_center().rounded(6).text_size(11)
     // A neutral pill is a faint wash of the text color, so it shows on both the page and the cards.
-    .bg(color ? tint(color) : tint(t.foreground, "1a")).text_color(fg)
+    .bg(color ? tint(t, color) : tint(t, t.foreground, "1a")).text_color(fg)
     .when(code, (e) => e.font_family(mono()))
     .when(Boolean(glyph), (e) => e.child(div().flex_none().child(glyph)))
     .when(Boolean(symbol) && !spin, (e) => e.child(svg(icon(symbol)).size(11).flex_none()))
@@ -28,10 +28,11 @@ export function pill(t, { label, color, glyph, symbol, spin = false, code = fals
     .child(div().truncate().child(label));
 }
 
-/** `NEEDS ATTENTION  2  ─────────`. `meta` is a dim note that shrinks first. */
+/** `Needs attention  2  ─────────`, SECTION_H tall. `meta` is a dim note that shrinks first. */
+export const SECTION_H = 34;
 export function section(t, label, count, color, meta = "") {
-  return h_flex().flex_none().w_full().px(14).pt(14).pb(4).gap(8).items_center()
-    .child(div().flex_none().text_size(11).font_semibold().text_color(color || t.muted).child(label))
+  return h_flex().flex_none().w_full().h(SECTION_H).px(14).pt(12).gap(8).items_center()
+    .child(div().flex_none().text_size(12).font_semibold().text_color(color || t.muted).child(label))
     .child(div().flex_none().text_size(11).text_color(t.dim).child(String(count)))
     .when(Boolean(meta), (e) => e.child(div().min_w(0).truncate().text_size(11).text_color(t.dim).child(meta)))
     .child(div().flex_1().min_w(8).h(1).bg(t.border));
@@ -46,9 +47,17 @@ export function searchBox(t, id, state, { right = "", onClear } = {}) {
     .child(svg(icon("search")).size(14).flex_none().text_color(t.dim))
     .child(Input.new(state).h_full().flex_1().min_w(0).text_size(12).text_color(t.foreground))
     .when(Boolean(right), (e) => e.child(div().flex_none().text_size(11).text_color(t.dim).child(right)))
-    .when(typed && Boolean(onClear), (e) => e.child(div().id(`${id}-clear`).size(18).flex_none().flex().items_center().justify_center()
-      .rounded(5).cursor_pointer().hover((s) => s.bg(t.hover)).on_click((_e, cx) => onClear(cx))
-      .child(svg(icon("close")).size(11).text_color(t.muted))));
+    .when(typed && Boolean(onClear), (e) => e.child(div().id(`${id}-clear`).size(22).flex_none().flex().items_center().justify_center()
+      .rounded(5).cursor_pointer().hover((s) => s.bg(t.hover)).tooltip("Clear filter").on_click((_e, cx) => onClear(cx))
+      .child(svg(icon("close")).size(12).text_color(t.muted))));
+}
+
+/** The back icon and `label` (`Runs`, `Branches`): the way out of a detail or a step, 22 px tall. */
+export function backLink(t, id, label, onClick) {
+  return h_flex().id(id).h(22).px(6).gap(2).flex_none().items_center().rounded(5).cursor_pointer()
+    .hover((s) => s.bg(t.hover)).tooltip("Back  Esc").on_click((_e, cx) => onClick(cx))
+    .child(svg(icon("back")).size(14).flex_none().text_color(t.muted))
+    .child(div().text_size(12).text_color(t.muted).child(label));
 }
 
 /** A centered spinner with a title and an optional hint, for loading states. */
@@ -61,7 +70,7 @@ export function busy(t, title, detail = "") {
 
 /** A rounded square holding an icon, tinted with `color`. */
 export function iconTile(t, name, color, size = 28) {
-  return div().size(size).flex_none().flex().items_center().justify_center().rounded(8).bg(tint(color, "26"))
+  return div().size(size).flex_none().flex().items_center().justify_center().rounded(8).bg(tint(t, color, "26"))
     .child(svg(icon(name)).size(Math.round(size / 2)).text_color(color));
 }
 
@@ -72,8 +81,8 @@ export function segmented(t, id, options, value, onPick) {
       const on = option === value;
       return div().id(`${id}-${option}`).h_full().px(16).flex().items_center().text_size(12).cursor_pointer()
         .when(i > 0, (e) => e.border_l(1).border_color(t.border))
-        .bg(on ? tint(t.accent, "33") : t.background).text_color(on ? t.accent : t.muted).when(on, (e) => e.font_semibold())
-        .hover((s) => s.bg(on ? tint(t.accent, "33") : t.hover))
+        .bg(on ? tint(t, t.accent, "33") : t.background).text_color(on ? t.accent : t.muted).when(on, (e) => e.font_semibold())
+        .hover((s) => s.bg(on ? tint(t, t.accent, "33") : t.hover))
         .on_click((_e, cx) => onPick(option, cx)).child(option);
     }));
 }
@@ -86,10 +95,11 @@ export function stepper(t, id, steps, current, wide, onGo) {
   const items = [];
   steps.forEach((label, i) => {
     const n = i + 1, done = n < current, active = n === current;
-    if (i > 0) items.push(div().flex_1().min_w(6).h(1).bg(n <= current ? tint(t.ansi2, "88") : t.border));
-    items.push(h_flex().id(`${id}-${n}`).flex_none().gap(6).items_center().when(done, (e) => e.cursor_pointer().on_click((_e, cx) => onGo(n, cx)))
+    if (i > 0) items.push(div().flex_1().min_w(6).h(1).bg(n <= current ? tint(t, t.ansi2, "88") : t.border));
+    items.push(h_flex().id(`${id}-${n}`).flex_none().gap(6).items_center().rounded(10)
+      .when(done, (e) => e.cursor_pointer().hover((s) => s.bg(t.hover)).on_click((_e, cx) => onGo(n, cx)))
       .child(div().size(20).rounded(10).flex_none().flex().items_center().justify_center().text_size(11).font_semibold()
-        .bg(active ? t.accent : done ? tint(t.ansi2, "33") : t.raised)
+        .bg(active ? t.accent : done ? tint(t, t.ansi2, "33") : t.raised)
         .text_color(active ? t.accent_foreground : done ? t.ansi2 : t.dim)
         .child(done ? "✓" : String(n)))
       .when(wide || active, (e) => e.child(div().text_size(12).text_color(active ? t.foreground : done ? t.muted : t.dim)
@@ -101,10 +111,9 @@ export function stepper(t, id, steps, current, wide, onGo) {
 /** A selectable filter such as `Failed 2`. */
 export function filterChip(t, id, label, count, active, onClick, color) {
   return h_flex().id(id).h(26).px(10).gap(6).flex_none().items_center().rounded(8).text_size(12).cursor_pointer()
-    .bg(active ? t.raised : t.background).border_1().border_color(active ? t.border : t.background)
-    .text_color(active ? t.foreground : t.muted).hover((s) => s.bg(t.hover))
+    .bg(active ? t.selected : t.background).text_color(active ? t.foreground : t.muted).hover((s) => s.bg(active ? t.selected : t.hover))
     .on_click((_e, cx) => onClick(cx))
     .when(Boolean(color), (e) => e.child(div().size(6).rounded(3).flex_none().bg(color)))
     .child(label)
-    .child(div().h(16).px(6).rounded(8).flex().items_center().text_size(10).bg(active ? t.hover : t.raised).text_color(t.dim).child(String(count)));
+    .child(div().text_size(11).text_color(t.dim).child(String(count)));
 }
