@@ -1,7 +1,8 @@
 // Workspace spaces: stable colored avatars, worktrees under their checkout,
 // grouped by machine when more than one is known. After a space's name, the repo
 // its first terminal is in now, only where unusual: branch, ahead/behind. Agent state lives in the agents list, not here. Click to
-// switch, right-click for its menu, drag to reorder.
+// switch, right-click for its menu, drag to reorder. A repo's worktrees go by their branch, folded behind a count
+// on its row; the open ones bright, the rest dim (a click opens one as a space).
 
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
@@ -266,7 +267,8 @@ export default class Spaces extends View {
       const group = list.filter(k => k.g?.repo === r.g.repo);
       // Without a main-checkout space, the first worktree space is the head.
       const head = group.find(k => !k.g.linked) ?? group[0];
-      out.push({ ...head, tree: null });
+      const top = { ...head, tree: null };
+      out.push(top);
       group.filter(k => k !== head && !k.g.linked).forEach(k => out.push({ ...k, tree: null }));
       const kids = group.filter(k => k !== head && k.g.linked).map(k => ({ ...k, tree: "└─" }));
       const all = this.repos.groups[r.g.repo]?.worktrees ?? [];
@@ -275,8 +277,8 @@ export default class Spaces extends View {
         kids.push({ w: { id: wt.folder, name: wt.branch ?? base(wt.folder), machine: r.w.machine }, g: { ...r.g, ...wt, ahead: 0, behind: 0 }, tree: "└─", vacant: true });
       }
       if (kids.length) {
-        out.push({ ...head, summary: true, count: new Set(kids.map(k => k.g.folder)).size, failed: kids.some(k => this.repos.pr(k.g)?.ci === "fail") });
-        out.push(...kids.filter(k => this.expanded.has(r.g.repo) || k.w.active));
+        Object.assign(top, { count: new Set(kids.map(k => k.g.folder)).size, failed: kids.some(k => this.repos.pr(k.g)?.ci === "fail"), open: this.expanded.has(r.g.repo) });
+        out.push(...kids.filter(k => top.open || k.w.active));
       }
     }
     return out;
@@ -284,8 +286,9 @@ export default class Spaces extends View {
 
   // The rows, under a header per machine once one isn't this computer.
   grouped(t, collapsed) {
-    const rows = this.ordered();
-    const draw = r => r.summary ? this.worktreeSummary(r, t) : r.vacant ? this.vacant(r, t) : collapsed ? this.compact(r, t) : this.row(r, t);
+    // The rail has no room for worktrees without a space.
+    const rows = this.ordered().filter(r => !(collapsed && r.vacant));
+    const draw = r => r.vacant ? this.vacant(r, t) : collapsed ? this.compact(r, t) : this.row(r, t);
     const remote = [...new Set([...rows.map(r => r.w.machine).filter(Boolean), ...this.machines.map(m => m.name), ...Object.keys(this.reconnecting)])].sort();
     const loading = m => {
       const layout = machines().find(k => k.name === m)?.layout;
@@ -361,7 +364,10 @@ export default class Spaces extends View {
   badge(g, t) {
     const pr = this.repos.pr(g);
     if (!pr) return div();
-    return h_flex().id(`pr-${g.repo}-${g.folder}-${pr.number}`).flex_none().gap(4).px(3).items_center().text_size(11).text_color(t.muted).cursor_pointer().hover(s => s.text_color(t.foreground))
+    // CI as a mark that reads without its color: passed, failed, running.
+    const ci = { pass: ["check", t.done], fail: ["cross", t.blocked], pending: ["pending", t.working] }[pr.ci];
+    return h_flex().id(`pr-${g.repo}-${g.folder}-${pr.number}`).flex_none().gap(3).px(3).items_center().text_size(11.5).text_color(t.muted).cursor_pointer().hover(s => s.text_color(t.foreground))
+      .tooltip(pr.title)
       .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
       .on_mouse_up("left", (_e, cx) => {
         cx.stop_propagation();
@@ -370,31 +376,58 @@ export default class Spaces extends View {
         run("layout.show", { id: "panel" });
       })
       .child(`#${pr.number}`)
-      .child(div().size(6).rounded(3).bg(pr.ci === "fail" ? t.blocked : pr.ci === "pending" ? t.working : pr.ci === "pass" ? t.done : t.dim));
+      .when(Boolean(ci), el => el.child(svg(`mods/pr-flow/${ci?.[0]}.svg`).size(11).flex_none().text_color(ci?.[1])));
   }
 
-  worktreeSummary(r, t) {
-    return h_flex().id(`worktrees-${r.g.repo}`).h(25).flex_none().pl(30).gap(5).items_center().text_size(12).text_color(t.dim).cursor_pointer().hover(s => s.bg(t.hover))
-      .on_click((_e, cx) => {
-        this.expanded.has(r.g.repo) ? this.expanded.delete(r.g.repo) : this.expanded.add(r.g.repo);
+  // A branch with its prefix ("feat/") dimmed, so the part that names the work reads first.
+  branchLabel(branch, color, t) {
+    const cut = branch.lastIndexOf("/") + 1;
+    return h_flex().min_w(0).flex_shrink(1).text_color(color)
+      .when(cut > 0, el => el.child(div().flex_none().text_color(t.dim).child(branch.slice(0, cut))))
+      .child(div().min_w(0).truncate().child(branch.slice(cut)));
+  }
+
+  // On a repo's row: how many worktrees it has; a click folds or unfolds them. Folded, a failing
+  // PR among them shows here, since its own row is hidden.
+  worktreeChip(r, t) {
+    const alarm = r.failed && !r.open;
+    return h_flex().id(`worktrees-${r.g.repo}`).flex_none().h(20).gap(3).px(3).items_center().text_size(11.5)
+      .text_color(alarm ? t.blocked : t.dim).cursor_pointer().hover(s => s.text_color(alarm ? t.blocked : t.foreground))
+      .tooltip(`${r.count} worktree${r.count > 1 ? "s" : ""}${alarm ? ", CI failing on one" : ""}`)
+      .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
+      .on_mouse_up("left", (_e, cx) => {
+        cx.stop_propagation();
+        r.open ? this.expanded.delete(r.g.repo) : this.expanded.add(r.g.repo);
         localStorage.setItem("worktrees.expanded", JSON.stringify([...this.expanded]));
         cx.notify();
-      }).child(`⑂ ${r.count}`).when(r.failed, e => e.child(div().text_color(t.blocked).child("✗")));
+      })
+      .child(svg("mods/workspace-chrome/branch.svg").size(12).flex_none())
+      .child(String(r.count))
+      .when(alarm, el => el.child(svg("mods/pr-flow/cross.svg").size(11).flex_none()))
+      .child(svg(`mods/workspace-chrome/chevron-${r.open ? "down" : "right"}.svg`).size(10).flex_none());
   }
 
+  // A worktree without a space: the same line as an open one, dimmed; a click opens it.
   vacant({ w, g }, t) {
-    return h_flex().id(`worktree-${g.repo}-${g.folder}`).h(28).flex_none().pl(30).gap(6).items_center().cursor_pointer().hover(s => s.bg(t.hover))
+    return h_flex().id(`worktree-${g.repo}-${g.folder}`).h(28).flex_none().px(8).gap(9).items_center().rounded(8).cursor_pointer().hover(s => s.bg(t.hover))
+      .tooltip(`Open ${base(g.folder)} as a space`)
       .on_click(() => run("space.new", { folder: g.folder, machine: w.machine ?? "" }))
-      .child(div().flex_1().min_w(0).truncate().text_size(12).text_color(t.dim).child(`⑂ ${w.name}`))
+      .child(h_flex().pl(22).flex_none().child(svg("mods/workspace-chrome/branch.svg").size(13).text_color(t.dim)))
+      .child(this.branchLabel(g.branch ?? w.name, t.muted, t))
+      .child(div().flex_1())
       .child(this.badge(g, t));
   }
 
-  row({ w, i, g, tree }, t) {
+  row(r, t) {
+    const { w, i, g, tree } = r;
     const on = w.active;
     const colors = shared("space.colors") ?? {};
     const color = colors[w.id] ?? "ansi6";
     const fill = color.startsWith("#") ? color : (MARK[color] ?? t[color]);
-    const where = this.gitWhere(g, tree, w.name);
+    // A worktree goes by its branch; a name the person gave its space comes first, the branch under it.
+    const branch = tree ? g?.branch ?? null : null;
+    const own = Boolean(branch) && w.named && w.name !== branch;
+    const where = tree ? (own ? branch : "") : this.gitWhere(g, tree, w.name);
     return v_flex()
       .relative()
       .id(`space-${w.id}`)
@@ -439,9 +472,10 @@ export default class Spaces extends View {
           .items_center()
           .when(Boolean(tree), el => el.pl(22).child(svg("mods/workspace-chrome/branch.svg").size(13).text_color(t.dim)))
           .when(!tree, el => el.child(h_flex().size(18).flex_none().rounded(5).bg(fill).items_center().justify_center().text_size(10.5).font_bold().text_color("#ffffff").child([...w.name][0]?.toUpperCase() ?? "?")))
-          .child(div().flex_shrink(0).max_w(150).truncate().text_color(t.foreground).child(w.name))
+          .child(branch && !own ? this.branchLabel(branch, t.foreground, t) : div().flex_shrink(0).max_w(150).truncate().text_color(t.foreground).child(w.name))
           .child(g ? this.gitTail(g, t) : div().flex_1())
-          .child(this.badge(g, t)),
+          .child(this.badge(g, t))
+          .when(Boolean(r.count), el => el.child(this.worktreeChip(r, t))),
       )
       .when(Boolean(where), (el) => el.child(
         div().pl(tree ? 44 : 27).min_w(0).truncate().text_size(11.5).text_color(t.dim).child(where),

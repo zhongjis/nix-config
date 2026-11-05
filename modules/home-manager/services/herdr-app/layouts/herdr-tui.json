@@ -32,7 +32,7 @@
                 "mod": "tui-spaces"
               },
               "size": {
-                "weight": 1
+                "weight": 2
               },
               "min": 90
             },

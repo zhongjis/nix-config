@@ -6,11 +6,15 @@ export function githubRepo(remote) {
   return `${host === "github.com" ? "" : host + "/"}${match[4]}/${match[5]}`;
 }
 
+// Checkouts in the system's temp folders are scratch copies (an agent's), not work to list.
+const TEMP = /^(\/tmp|\/var\/tmp|\/var\/folders|\/private\/var\/folders)\//;
+
 export function checkouts(porcelain) {
   return porcelain.split(/\n\n+/).flatMap(block => {
     const lines = block.split("\n");
     const folder = lines.find(l => l.startsWith("worktree "))?.slice(9);
-    if (!folder || lines.some(l => l === "bare" || l.startsWith("prunable"))) return [];
+    // Detached checkouts have no branch to go by or PR to show.
+    if (!folder || TEMP.test(folder) || lines.some(l => l === "bare" || l === "detached" || l.startsWith("prunable"))) return [];
     const branch = lines.find(l => l.startsWith("branch "))?.slice(7).replace(/^refs\/heads\//, "") ?? null;
     return [{ folder, branch }];
   });
