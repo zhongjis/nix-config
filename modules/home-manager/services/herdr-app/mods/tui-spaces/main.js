@@ -1,14 +1,15 @@
 // Workspace spaces: stable colored avatars, worktrees under their checkout,
 // grouped by machine when more than one is known. After a space's name, the repo
 // its first terminal is in now, only where unusual: branch, ahead/behind. Agent state lives in the agents list, not here,
-// except a chip counting the space's sub-agents (live and hibernated, space.js) that opens tui-subagents. Click to
+// except a chip counting sub-agents (live and hibernated, space.js) that opens tui-subagents: on a shown worktree's
+// row those working in it, on a space's row the rest working for that space. Click to
 // switch, right-click for its menu, drag to reorder. A repo's worktrees go by their branch, folded behind a count
 // on its row; the open ones bright, the rest dim (a click opens one as a space).
 
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { Repositories } from "./repos.js";
-import { inSpace, spaceOf } from "./space.js";
+import { inSpace, spaceOf, matches } from "./space.js";
 import { spaces, machines, panes, terminals, run, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout } from "herdr";
 
 function find(node, id) {
@@ -290,6 +291,7 @@ export default class Spaces extends View {
   grouped(t, collapsed) {
     // The rail has no room for worktrees without a space.
     const rows = this.ordered().filter(r => !(collapsed && r.vacant));
+    this.subs = this.subFilters(rows);
     const draw = r => r.vacant ? this.vacant(r, t) : collapsed ? this.compact(r, t) : this.row(r, t);
     const remote = [...new Set([...rows.map(r => r.w.machine).filter(Boolean), ...this.machines.map(m => m.name), ...Object.keys(this.reconnecting)])].sort();
     const loading = m => {
@@ -389,8 +391,8 @@ export default class Spaces extends View {
       .child(div().min_w(0).truncate().child(branch.slice(cut)));
   }
 
-  // On a repo's row: how many worktrees it has; a click folds or unfolds them. Folded, a failing
-  // PR among them shows here, since its own row is hidden.
+  // On a repo's row: a chevron that folds or unfolds its worktrees. Folded, a failing PR among them shows
+  // here, since its own row is hidden.
   worktreeChip(r, t) {
     const alarm = r.failed && !r.open;
     return h_flex().id(`worktrees-${r.g.repo}`).flex_none().h(20).gap(3).px(3).items_center().text_size(11.5)
@@ -403,43 +405,51 @@ export default class Spaces extends View {
         localStorage.setItem("worktrees.expanded", JSON.stringify([...this.expanded]));
         cx.notify();
       })
-      .child(svg("mods/workspace-chrome/branch.svg").size(12).flex_none())
-      .child(String(r.count))
       .when(alarm, el => el.child(svg("mods/pr-flow/cross.svg").size(11).flex_none()))
       .child(svg(`mods/workspace-chrome/chevron-${r.open ? "down" : "right"}.svg`).size(10).flex_none());
   }
 
-  // Per space, its sub-agents: live ones (space.js) and hibernated ones (tui-focus), read once per render.
-  subAgents() {
+  // Each row's sub-agent filter (space.js), read once per render: a shown worktree row takes those working in its
+  // folder; a space row the rest of that space's. `rows` are the drawn rows.
+  subFilters(rows) {
     const all = terminals(), byAddress = new Map(all.map((k) => [k.address, k]));
     const sleeping = shared("tui-focus.hibernated") ?? [];
-    return (id) => inSpace(all, id).length
-      + sleeping.filter((r) => (r.space ?? spaceOf({ parent: r.parent }, byAddress)) === id).length;
+    const count = (f) => inSpace(all, f).length + sleeping.filter((r) => matches(r.space ?? spaceOf({ parent: r.parent }, byAddress), r.cwd, f)).length;
+    const trees = rows.filter((r) => r.tree && r.g?.folder).map((r) => r.g.folder);
+    const out = new Map();
+    for (const r of rows) {
+      const f = r.tree && r.g?.folder ? { folder: r.g.folder } : r.vacant ? null : { space: r.w.id, except: trees };
+      const n = f ? count(f) : 0;
+      if (n) out.set(r, { filter: f, n });
+    }
+    return out;
   }
 
-  // On a space's row: how many sub-agents work for it; a click lists them (tui-subagents), to peek at or revive.
-  subChip(w, n, t) {
+  // How many sub-agents a row counts; a click lists them (tui-subagents), to peek at or revive.
+  subChip(w, { filter, n }, t) {
     return h_flex().id(`subs-${w.id}`).flex_none().h(20).gap(3).px(3).items_center().text_size(11.5).text_color(t.dim)
       .cursor_pointer().hover(s => s.text_color(t.foreground))
-      .role("button").accessibility_label("Show sub-agents")
-      .tooltip(`${n} sub-agent${n > 1 ? "s" : ""}`)
+      .role("button").accessibility_label("Show workers")
+      .tooltip(`${n} worker${n > 1 ? "s" : ""}`)
       .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
       .on_mouse_up("left", (_e, cx) => {
         cx.stop_propagation();
-        openOverlay({ mod: "tui-subagents", kind: "popup", width: 300, height: Math.min(360, 16 + 46 * n), props: { space: w.id } });
+        openOverlay({ mod: "tui-subagents", kind: "popup", width: 300, height: Math.min(360, 16 + 46 * n), props: { filter } });
       })
-      .child(svg("mods/workspace-chrome/terminal.svg").size(12).flex_none())
+      .child(svg("icons/agent.svg").size(12).flex_none())
       .child(String(n));
   }
 
   // A worktree without a space: the same line as an open one, dimmed; a click opens it.
-  vacant({ w, g }, t) {
+  vacant(r, t) {
+    const { w, g } = r;
     return h_flex().id(`worktree-${g.repo}-${g.folder}`).h(28).flex_none().px(8).gap(9).items_center().rounded(8).cursor_pointer().hover(s => s.bg(t.hover))
       .tooltip(`Open ${base(g.folder)} as a space`)
       .on_click(() => run("space.new", { folder: g.folder, machine: w.machine ?? "" }))
       .child(h_flex().pl(22).flex_none().child(svg("mods/workspace-chrome/branch.svg").size(13).text_color(t.dim)))
       .child(this.branchLabel(g.branch ?? w.name, t.muted, t))
       .child(div().flex_1())
+      .when(Boolean(this.subs?.get(r)), el => el.child(this.subChip(w, this.subs.get(r), t)))
       .child(this.badge(g, t));
   }
 
@@ -453,7 +463,7 @@ export default class Spaces extends View {
     const branch = tree ? g?.branch ?? null : null;
     const own = Boolean(branch) && w.named && w.name !== branch;
     const where = tree ? (own ? branch : "") : this.gitWhere(g, tree, w.name);
-    const subs = this.subs?.(w.id) ?? 0;
+    const subs = this.subs?.get(r);
     return v_flex()
       .relative()
       .id(`space-${w.id}`)
@@ -501,7 +511,7 @@ export default class Spaces extends View {
           .child(branch && !own ? this.branchLabel(branch, t.foreground, t) : div().flex_shrink(0).max_w(150).truncate().text_color(t.foreground).child(w.name))
           .child(g ? this.gitTail(g, t) : div().flex_1())
           .child(this.badge(g, t))
-          .when(subs > 0, el => el.child(this.subChip(w, subs, t)))
+          .when(Boolean(subs), el => el.child(this.subChip(w, subs, t)))
           .when(Boolean(r.count), el => el.child(this.worktreeChip(r, t))),
       )
       .when(Boolean(where), (el) => el.child(
@@ -538,7 +548,6 @@ export default class Spaces extends View {
       changed = true;
     }
     if (changed) setShared("space.colors", kept);
-    this.subs = this.subAgents();
     return v_flex().size_full().min_h(0).bg(t.chrome).text_size(13)
       .child(h_flex().h(31).pl(16).pr(10).items_center().justify_between().text_size(11.5).text_color(t.dim)
         .when(!collapsed, el => el.child("Spaces"))

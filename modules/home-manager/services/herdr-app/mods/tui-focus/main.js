@@ -725,14 +725,14 @@ export default class Focus extends View {
           .when(Boolean(branch), (el) => el.child(div().min_w(0).truncate().child(branch)))
           .when(Boolean(branch && live), (el) => el.child(div().flex_none().child("·")))
           .when(Boolean(live) && !ghost, (el) => el.child(div().id(`subs-${a.address}`).flex_none().rounded(4).px(2)
-            .role("button").accessibility_label("Show sub-agents")
+            .role("button").accessibility_label("Show workers")
             .hover((s) => s.text_color(t.foreground).bg(t.hover))
             .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
             .on_click((_e, cx) => {
               cx.stop_propagation();
               openOverlay({ mod: "tui-subagents", kind: "popup", width: 300, height: Math.min(360, 16 + 46 * live), props: { parent: a.address } });
             })
-            .child(going ? `${going} worker${going > 1 ? "s" : ""} working` : "view sub-agents")))));
+            .child(going ? `${going} worker${going > 1 ? "s" : ""} working` : "view finished workers")))));
     };
 
     // A settled row: one dim line; viewing it leaves it settled. Hovered it brightens and its time
