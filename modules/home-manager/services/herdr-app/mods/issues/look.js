@@ -1,11 +1,12 @@
 // Adapted from mrolafsson/herdr-linear (MIT; see LICENSE).
 // How the issues mod draws a ticket: its colours, its icons and
 // the pieces of its card, in the app's theme. The same look as Recap's and
-// GitHub's: colour is spent only on state, surfaces stay neutral; a status is
-// drawn in Linear's own colour for it.
+// GitHub's: colour is spent only on state, surfaces stay neutral; a status's
+// icon is drawn in Linear's own colour for it, its words in the theme's.
 
 import { div, svg } from "gpui-kit";
 import { h_flex } from "gpui-base";
+import { theme } from "herdr";
 
 // The mod's own icons, from the app's home folder, tinted with the text colour.
 const ICONS = "mods/issues/icons";
@@ -14,8 +15,9 @@ const ICONS = "mods/issues/icons";
 // machines, keys). JetBrains Mono ships with Herdr.
 export const MONO = "JetBrains Mono";
 
-// A colour at an alpha: the theme's colours are #rrggbb.
-export const tint = (color, alpha) => (/^#[0-9a-f]{6}$/i.test(color ?? "") ? color + Math.round(alpha * 255).toString(16).padStart(2, "0") : color);
+// A colour at an alpha: the theme's colours are #rrggbb; any other gets the
+// theme's hover wash.
+export const tint = (color, alpha) => (/^#[0-9a-f]{6}$/i.test(color ?? "") ? color + Math.round(alpha * 255).toString(16).padStart(2, "0") : theme().hover);
 
 // Colour roles, from the theme's own names for them, so every theme reads:
 // ready (green), waiting (yellow), a draft, merged, something broken, and the
@@ -62,11 +64,10 @@ export function stateIcon(state) {
   return "lin-todo";
 }
 
-// A status's colour: Linear's own when it has one; else (Jira) by how far
-// along it is, as Linear's defaults: review cyan, started yellow, to do the
-// text's, backlog and canceled dim, done green.
+// A status's colour in the theme, by how far along it is, as Linear's
+// defaults: review cyan, started yellow, to do the text's, backlog and
+// canceled dim, done green. Words and tints take this one, so every theme reads.
 export function stateColor(o, state) {
-  if (/^#[0-9a-f]{6}$/i.test(state?.color ?? "")) return state.color;
   switch (state?.type) {
     case "started":
       return /review/i.test(state.name ?? "") ? o.info : o.work;
@@ -80,10 +81,14 @@ export function stateColor(o, state) {
   return o.dim;
 }
 
-// A group's heading: its name in capitals and its colour, how many, a rule.
+// A status's icon colour: Linear's own when it has one (only ever the icon),
+// else the theme's.
+export const stateHue = (o, state) => (/^#[0-9a-f]{6}$/i.test(state?.color ?? "") ? state.color : stateColor(o, state));
+
+// A group's heading: its name as written and its colour, how many, a rule.
 export function heading(o, label, color, n) {
-  return h_flex().flex_none().h(30).px(10).pt(8).gap(8).items_center().text_size(10.5)
-    .child(div().font_semibold().text_color(color ?? o.dim).child(label.toUpperCase()))
+  return h_flex().flex_none().h(30).px(10).pt(8).gap(8).items_center().text_size(11)
+    .child(div().font_semibold().text_color(color ?? o.dim).child(label))
     .when(n != null, (el) => el.child(div().font_medium().text_color(o.dim).child(String(n))))
     .child(div().flex_1().h(1).bg(o.line));
 }
@@ -92,13 +97,13 @@ export function heading(o, label, color, n) {
 export function primary(o, id, label, click) {
   return h_flex().id(id).flex_none().h(30).px(14).items_center().justify_center().rounded(7).bg(o.accent)
     .cursor_pointer().hover((s) => s.opacity(0.85)).on_click((_e, cx) => click(cx))
-    .child(div().text_size(12.5).font_semibold().text_color(o.ink).child(label));
+    .child(div().text_size(12).font_semibold().text_color(o.ink).child(label));
 }
 export function ghost(o, id, label, click, ic = null) {
   return h_flex().id(id).flex_none().h(30).px(12).gap(6).items_center().justify_center().rounded(7).border_1().border_color(o.line)
     .cursor_pointer().hover((s) => s.bg(o.raised)).on_click((_e, cx) => click(cx))
     .when(Boolean(ic), (el) => el.child(icon(ic, o.muted, 13)))
-    .when(Boolean(label), (el) => el.child(div().text_size(12.5).font_medium().text_color(o.fg).child(label)));
+    .when(Boolean(label), (el) => el.child(div().text_size(12).font_medium().text_color(o.fg).child(label)));
 }
 
 // A project's icon, by its status's type.
@@ -111,10 +116,6 @@ export const PRIORITIES = ["No priority", "Urgent", "High", "Medium", "Low"];
 export function priorityIcon(p) {
   return { 1: "prio-urgent", 2: "prio-3", 3: "prio-2", 4: "prio-1" }[p] ?? null;
 }
-
-// Linear's colour for a status, readable on the theme: its own when it has
-// one, else the theme's dim.
-export const hue = (o, c) => (/^#[0-9a-f]{6}$/i.test(c ?? "") ? c : o.dim);
 
 // How long ago, in a word or two.
 export function ago(ms, now = Date.now()) {
@@ -154,7 +155,7 @@ export function chip(o, id, parts, { color = null, mono = false, click = null } 
     .items_center()
     .rounded(6)
     .bg(color ? tint(color, 0.12) : o.sunk)
-    .text_size(mono ? 11 : 11.5)
+    .text_size(mono ? 11 : 12)
     .text_color(color ?? o.muted)
     .when(!mono, (el) => el.font_medium())
     .when(mono, (el) => el.font_family(MONO))
@@ -178,13 +179,17 @@ export function words(o, groups, idBase) {
       const w = div().text_color(color).child(text);
       if (!click) return out.push(w);
       out.push(
-        div()
+        h_flex()
           .id(`${idBase}-${i}-${j}`)
+          .h(22)
+          .px(6)
+          .items_center()
+          .rounded(5)
           .text_color(color)
           .font_medium()
           .when(Boolean(under), (el) => el.underline())
           .cursor_pointer()
-          .hover((s) => s.underline())
+          .hover((s) => s.bg(o.hover))
           .on_click((_e, cx) => {
             cx.stop_propagation();
             click(cx);
@@ -234,18 +239,20 @@ export function cap(o, k) {
     .children(keyParts(k).map((p) => (KEY_ICONS[p] ? icon(KEY_ICONS[p], o.muted, 11) : div().child(p))));
 }
 
-// A key in the footer: its keycaps and what it does. Clickable.
+// A key in the footer: its keycaps and what it does. A click does it too;
+// one with nothing to click (`click` null) is only a hint.
 export function key(o, keys, label, click, id) {
   return h_flex()
     .id(id)
     .flex_none()
+    .h(22)
+    .px(6)
     .gap(6)
     .items_center()
-    .cursor_pointer()
+    .rounded(5)
     .text_size(12)
     .text_color(o.dim)
-    .hover((s) => s.text_color(o.fg))
-    .on_click((_e, cx) => click(cx))
+    .when(Boolean(click), (el) => el.cursor_pointer().hover((s) => s.bg(o.hover).text_color(o.fg)).on_click((_e, cx) => click(cx)))
     .children(keys.map((k) => cap(o, k)))
     .child(div().child(label));
 }

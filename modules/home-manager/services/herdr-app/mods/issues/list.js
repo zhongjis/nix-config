@@ -2,12 +2,13 @@
 // issues by status, as herdr-linear draws them.
 import { div } from "gpui-kit";
 import { h_flex, v_flex, Input, v_virtual_list, Scrollbar } from "gpui-base";
-import { icon, stateIcon, stateColor, priorityIcon, countPill, heading, primary, ghost, tint, MONO } from "./look.js";
+import { icon, stateIcon, stateColor, stateHue, priorityIcon, countPill, heading, primary, ghost, tint, MONO } from "./look.js";
 import { byStatus, matches, KEY } from "./logic.js";
 import { openSettings } from "./setup.js";
 
 const HEADING_H = 30;
 const ROW_H = 36;
+// The list's height cap (px): the popup sizes to its content, so rows need a height of their own.
 const LIST_H = 560;
 const TABS = [
   { id: "mine", label: "My issues", short: "Mine", icon: "person" },
@@ -38,7 +39,7 @@ export function tabs(app, o) {
     .children(TABS.map((tb) => {
       const on = tb.id === app.tab;
       const n = tb.id === "mine" ? (app.loaded ? app.items.length : null) : (app.recent[app.provider] ?? []).length;
-      return h_flex().id(`tab-${tb.id}`).flex_none().h(28).px(10).gap(7).items_center().rounded(7).cursor_pointer().text_size(12.5)
+      return h_flex().id(`tab-${tb.id}`).flex_none().h(28).px(10).gap(7).items_center().rounded(7).cursor_pointer().text_size(12)
         .when(on, (el) => el.bg(o.raised).shadow_sm())
         .when(!on, (el) => el.hover((s) => s.bg(o.hover)))
         .on_click((_e, cx) => { if (!on) app.step(cx); })
@@ -49,13 +50,14 @@ export function tabs(app, o) {
         .child(countPill(o, n, on));
     }))
     .child(div().flex_1())
-    // The provider, as herdr-linear's workspace: with both, a click (or ⌃T) goes to the other.
-    .child(h_flex().id("provider").flex_none().h(26).px(8).gap(6).items_center().rounded(6).border_1().border_color(o.line)
-      .when(many, (el) => el.cursor_pointer().hover((s) => s.bg(o.hover)).on_click((_e, cx) => app.switchProvider(app.provider === "jira" ? "linear" : "jira", cx)))
+    // The provider, as herdr-linear's workspace: with both, a click (or ⌃T) goes
+    // to the other; with one, just its name.
+    .child(h_flex().id("provider").flex_none().h(26).px(8).gap(6).items_center().rounded(6)
+      .when(many, (el) => el.border_1().border_color(o.line).cursor_pointer().hover((s) => s.bg(o.hover)).on_click((_e, cx) => app.switchProvider(app.provider === "jira" ? "linear" : "jira", cx)))
       .child(div().text_size(12).text_color(o.muted).child(app.api.label))
       .when(many, (el) => el.child(div().font_family(MONO).text_size(11).text_color(o.dim).child(`${app.configured().indexOf(app.provider) + 1}/2`))))
-    .child(h_flex().id("settings").flex_none().w(26).h(26).items_center().justify_center().rounded(6).border_1().border_color(o.line)
-      .cursor_pointer().hover((s) => s.bg(o.hover)).on_click((_e, cx) => openSettings(app, cx))
+    .child(h_flex().id("settings").flex_none().w(26).h(26).items_center().justify_center().rounded(6)
+      .cursor_pointer().hover((s) => s.bg(o.hover)).tooltip("Settings  ⌃,").on_click((_e, cx) => openSettings(app, cx))
       .child(icon("settings", o.muted, 14)));
 }
 
@@ -70,22 +72,22 @@ function row(app, o, issue, on, keyW) {
     .when(on, (el) => el.bg(o.raised).shadow_sm())
     .when(!on, (el) => el.hover((s) => s.bg(o.raised)))
     .child(div().flex_none().w(3).h(16).rounded(2).when(on, (el) => el.bg(color)))
-    .child(icon(stateIcon(issue.state), color, 14))
-    .child(div().flex_none().w(keyW).font_family(MONO).text_size(11.5).text_color(o.muted).truncate().child(issue.identifier))
-    .child(div().flex_1().min_w(0).truncate().text_size(13.5).when(on, (el) => el.font_medium()).text_color(o.fg).child(issue.title))
+    .child(icon(stateIcon(issue.state), stateHue(o, issue.state), 14))
+    .child(div().flex_none().w(keyW).font_family(MONO).text_size(11).text_color(o.muted).truncate().child(issue.identifier))
+    .child(div().flex_1().min_w(0).truncate().text_size(13).when(on, (el) => el.font_medium()).text_color(o.fg).child(issue.title))
     .when(wide, (el) => el.child(div().flex_none().w(170).truncate().text_size(12).text_color(o.dim).child(issue.project)))
     .when(wide && app.provider === "jira", (el) => el.child(div().flex_none().w(84).truncate().text_size(12).text_color(o.dim).child(issue.type)))
     .child(div().flex_none().w(14).child(prio ? icon(prio, issue.level === 1 ? o.fix : o.muted, 13) : div()));
 }
 
-const note = (o, text) => div().px(14).py(10).text_size(12.8).text_color(o.muted).child(text);
+const note = (o, text) => div().px(14).py(10).text_size(13).text_color(o.muted).child(text);
 
 function failure(app, o) {
   return v_flex().flex_none().gap(8).px(14).py(12).rounded(8).bg(tint(o.fix, 0.1))
     .child(h_flex().gap(8).items_center()
       .child(icon("need", o.fix, 14))
       .child(div().text_size(13).font_semibold().text_color(o.fg).child(`Couldn't load your ${app.api.label} issues`)))
-    .child(div().text_size(12.5).text_color(o.fg).child(app.listError))
+    .child(div().text_size(12).text_color(o.fg).child(app.listError))
     .child(h_flex().gap(8).pt(2)
       .child(primary(o, "retry", "Retry", (cx) => app.load(cx)))
       .child(ghost(o, "fix-settings", "Settings", (cx) => openSettings(app, cx), "settings")));

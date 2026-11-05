@@ -3,7 +3,7 @@
 import { div } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import { theme } from "herdr";
-import { tones, tint, icon, stateIcon, stateColor, key, MONO } from "./look.js";
+import { tones, tint, icon, stateIcon, stateHue, key, MONO } from "./look.js";
 import { search, tabs, list, follow } from "./list.js";
 import { detail } from "./detail.js";
 import { connect, settings, openSettings, save } from "./setup.js";
@@ -80,8 +80,8 @@ function menu(app, o) {
         .when(on, (el) => el.bg(tint(o.accent, 0.18)))
         .when(!on, (el) => el.hover((s) => s.bg(o.sunk)))
         .on_click((_e, cx) => move(app, it, cx))
-        .child(div().flex_none().w(14).font_family(MONO).text_size(11.5).text_color(o.dim).child(i < 9 ? String(i + 1) : ""))
-        .child(icon(stateIcon(it.state), stateColor(o, it.state), 13))
+        .child(div().flex_none().w(14).font_family(MONO).text_size(11).text_color(o.dim).child(i < 9 ? String(i + 1) : ""))
+        .child(icon(stateIcon(it.state), stateHue(o, it.state), 13))
         .child(div().text_size(13).when(on, (el) => el.font_medium()).text_color(on ? o.fg : o.muted).child(it.name))
         .when(it.state.name !== it.name, (el) => el.child(div().text_size(12).text_color(o.dim).child(`→ ${it.state.name}`)));
     }));
@@ -92,7 +92,7 @@ function footer(app, o) {
   const esc = (label) => k(["esc"], label, (cx) => app.escape(cx), "f-esc");
   const is = app.detail;
   const row = app.shown[app.at];
-  if (app.menu) return [k(["↑", "↓"], "choose", () => {}, "f-choose"), k(["enter"], "move", (cx) => app.menu.items.length && move(app, app.menu.items[app.menu.at], cx), "f-move"), esc("cancel")];
+  if (app.menu) return [k(["↑", "↓"], "choose", null, "f-choose"), k(["enter"], "move", (cx) => app.menu.items.length && move(app, app.menu.items[app.menu.at], cx), "f-move"), esc("cancel")];
   if (app.page === "detail" && app.composing) return [k(["cmd-enter"], "comment", (cx) => comment(app, cx), "f-send"), esc("cancel")];
   if (app.page === "detail") {
     return is ? [
@@ -104,7 +104,7 @@ function footer(app, o) {
   if (app.page === "connect") return [k(["enter"], "connect", (cx) => save(app, cx), "f-go"), esc("close")];
   if (app.page === "settings") return [k(["enter"], "save", (cx) => save(app, cx), "f-go"), esc(app.configured().length ? "back" : "close")];
   return [
-    k(["↑", "↓"], "choose", () => {}, "f-choose"),
+    k(["↑", "↓"], "choose", null, "f-choose"),
     k(["enter"], "open", (cx) => app.enter(cx), "f-open"),
     k(["^o"], app.api.label, (cx) => row && cx.open_url(row.issue.url), "f-o"),
     k(["^r"], "refresh", (cx) => app.load(cx), "f-r"),
@@ -146,5 +146,8 @@ export function screen(app, _cx) {
     .when(p === "settings", (el) => el.child(settings(app, o)))
     .when(Boolean(app.menu), (el) => el.child(menu(app, o)))
     .when(Boolean(status), (el) => el.child(status))
-    .child(h_flex().flex_none().gap(14).flex_wrap().items_center().pt(8).border_t_1().border_color(o.line).children(footer(app, o)));
+    // The keys along the bottom, however tall the screen; each one's padding
+    // hangs into the margin, so the first keycap lines up with the content.
+    .child(div().flex_none().mt_auto().pt(8).border_t_1().border_color(o.line)
+      .child(h_flex().ml(-6).gap(2).flex_wrap().items_center().children(footer(app, o))));
 }

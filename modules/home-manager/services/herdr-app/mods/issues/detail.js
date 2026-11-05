@@ -2,7 +2,7 @@
 // then its description and comments, and a comment box when asked for.
 import { div } from "gpui-kit";
 import { h_flex, v_flex, Textarea, TextView } from "gpui-base";
-import { icon, stateIcon, stateColor, priorityIcon, chip, heading, primary, ghost, ago, tint, MONO } from "./look.js";
+import { icon, stateIcon, stateColor, stateHue, priorityIcon, chip, heading, primary, ghost, ago, tint, MONO } from "./look.js";
 import { jiraMarkdown } from "./logic.js";
 import { statuses, comment } from "./actions.js";
 
@@ -32,11 +32,11 @@ function comments(app, o) {
   const list = app.comments;
   return v_flex().flex_none().gap(12).pt(6)
     .child(heading(o, "Comments", null, list ? list.length : "…").px(0))
-    .when(Boolean(list) && !list.length, (el) => el.child(div().text_size(12.8).text_color(o.dim).child("No comments yet. A adds one.")))
+    .when(Boolean(list) && !list.length, (el) => el.child(div().text_size(12).text_color(o.dim).child("No comments yet · press A to add one")))
     .children((list ?? []).map((c) => v_flex().gap(4)
       .child(h_flex().gap(8).items_center()
         .child(icon("person", o.dim, 12))
-        .child(div().text_size(12.5).font_medium().text_color(o.fg).child(c.author))
+        .child(div().text_size(12).font_medium().text_color(o.fg).child(c.author))
         .child(div().text_size(12).text_color(o.dim).child(ago(Date.parse(c.created)))))
       .child(div().pl(20).child(text(app, o, `comment-${c.id}`, c.body)))));
 }
@@ -56,24 +56,24 @@ export function detail(app, o) {
   const failed = !d && Boolean(app.error);
   return v_flex().flex_1().min_h(0).gap(10)
     .child(h_flex().flex_none().gap(10).items_center()
-      .child(h_flex().id("back").flex_none().h(24).px(8).gap(4).items_center().rounded(6).cursor_pointer().hover((s) => s.bg(o.raised))
+      .child(h_flex().id("back").flex_none().h(22).px(6).gap(2).items_center().rounded(5).cursor_pointer().hover((s) => s.bg(o.hover))
         .on_click((_e, cx) => app.back(cx))
-        .child(icon("back", o.muted, 13))
+        .child(icon("back", o.muted, 14))
         .child(div().text_size(12).text_color(o.muted).child(app.tab === "recent" ? "Recent" : "My issues")))
-      .when(Boolean(is?.state), (el) => el.child(chip(o, "status", [icon(stateIcon(is.state), stateColor(o, is.state), 12), is.state.name, d ? icon("chevron", stateColor(o, is.state), 11) : null],
+      .when(Boolean(is?.state), (el) => el.child(chip(o, "status", [icon(stateIcon(is.state), stateHue(o, is.state), 12), is.state.name, d ? icon("chevron", stateColor(o, is.state), 11) : null],
         { color: stateColor(o, is.state), click: (cx) => statuses(app, cx) })))
-      .child(div().font_family(MONO).text_size(12.5).text_color(o.muted).child(is?.identifier ?? app.key))
-      .child(div().text_size(12.5).text_color(o.dim).child(app.api.where)))
+      .child(div().font_family(MONO).text_size(12).text_color(o.muted).child(is?.identifier ?? app.key))
+      .child(div().text_size(12).text_color(o.dim).child(app.api.where)))
     .when(Boolean(is), (el) => el.child(div().flex_none().text_size(17).font_semibold().text_color(o.fg).line_height(1.35).child(is.title)))
     .when(Boolean(d), (el) => el.child(facts(o, d)))
     .when(failed, (el) => el.child(v_flex().flex_none().gap(8).px(14).py(12).rounded(8).bg(tint(o.fix, 0.1))
       .child(div().text_size(13).font_semibold().text_color(o.fg).child(`Couldn't load ${app.key}`))
-      .child(div().text_size(12.5).text_color(o.fg).child(app.error))
+      .child(div().text_size(12).text_color(o.fg).child(app.error))
       .child(h_flex().gap(8).pt(2).child(primary(o, "retry-issue", "Retry", (cx) => app.open(app.key, cx))))))
     .child(div().flex_none().h(1).bg(o.line))
     .child(v_flex().id("issue-body").h(app.composing ? 250 : 360).min_h(0).flex_shrink(1).overflow_y_scrollbar().pr(6).gap(10)
       .child(d ? text(app, o, `desc-${d.id}`, d.description || "_No description._")
-        : div().text_size(12.8).text_color(o.dim).child(failed ? "" : "Loading…"))
+        : div().text_size(12).text_color(o.dim).child(failed ? "" : "Loading…"))
       .when(Boolean(d), (el) => el.child(comments(app, o))))
     .when(app.composing, (el) => el.child(composer(app, o)));
 }
