@@ -2,13 +2,20 @@
 // counts (props().filter: {space, folder, except}, space.js); a click peeks at one. Opened from tui-focus cards' sub-agents line and
 // tui-spaces' sub-agents chip. Hibernated workers (shared "tui-focus.hibernated") show a moon and
 // how long ago; a click revives one where it was (same name, folder, parent, session), then peeks at it.
+// The keyboard works it too: j/k or the arrows pick a row, Enter peeks or revives, Esc closes.
+// Rows keep one height each (LIVE, ASLEEP): openers size the popup from them (tui-focus, tui-spaces).
 
 import { View, div, image, svg } from "gpui-kit";
-import { v_flex, h_flex } from "gpui-base";
-import { agents, terminals, theme, run, props, closeOverlay, exec, hc, shared, setShared, notify } from "herdr";
+import { v_flex, h_flex, v_virtual_list, Scrollbar, VirtualListScrollHandle } from "gpui-base";
+import { agents, terminals, theme, run, props, closeOverlay, exec, hc, shared, setShared, notify, window } from "herdr";
 import { inSpace, spaceOf, matches } from "./space.js";
 
 const HIBERNATED = "tui-focus.hibernated";
+// A row's height with the 2px under it: a live one has two lines (the second kept even empty, so a git answer
+// arriving doesn't move the rows), a hibernated one a single line.
+const LIVE = 50, ASLEEP = 32;
+// Indents stop here, so a deep tree keeps room for its names.
+const DEPTH = 3;
 
 // As tui-focus times: no "ago", nothing past days.
 function ago(ms, now) {
@@ -64,8 +71,14 @@ export default class SubAgents extends View {
   init(_props, cx) {
     // address → {project, branch}, for the parent and each sub-agent; re-read gently, as branches change.
     this.places = {};
+    // The picked row, and the hibernated ones being revived (address): a second click on one does nothing.
+    this.at = 0;
+    this.reviving = new Set();
+    this.scroll = VirtualListScrollHandle.new();
+    this.keys = cx.focus_handle();
+    this.keys.focus();
     this.refresh(cx);
-    cx.timer.every(5000, (cx) => this.refresh(cx));
+    cx.timer.every(5000, (cx) => { if (window()?.active) this.refresh(cx); });
   }
 
   refresh(cx) {
@@ -90,35 +103,86 @@ export default class SubAgents extends View {
     // A row from before workers carried `space` goes by its parent's.
     const sleeping = (shared(HIBERNATED) ?? []).filter((r) => filter
       ? matches(r.space ?? spaceOf({ parent: r.parent }, byAddress), r.cwd, filter) : under.has(r.parent));
-    return v_flex().id("subagents-root").size_full().p(6).gap(2).text_size(13).bg(t.popover).overflow_y_scrollbar()
-      .when(rows.length === 0 && sleeping.length === 0, (el) => el.child(div().p(8).text_color(t.dim).child("No workers.")))
-      .children(rows.map(({ k, depth }) => {
-        const st = word(k);
-        // Second line: project and branch, each only when it differs from the parent's.
-        const at = this.places[k.address] ?? {};
-        const info = [at.project !== mine.project ? at.project : null, at.branch !== mine.branch ? at.branch : null].filter(Boolean);
-        const pic = icon(k.program, 14, t.muted);
-        // First line: name and status. Second: project/branch, and the agent icon on the right.
-        return v_flex().id(`sub-${k.address}`).flex_none().py(5).pl(8 + depth * 16).pr(8).rounded(6)
-          .cursor_pointer().hover((s) => s.bg(t.hover))
-          .on_click(() => { closeOverlay(overlay); run("terminal.peek", { terminal: k.address }); })
-          .child(h_flex().h(20).gap(8).items_center().min_w(0)
-            .child(div().flex_1().min_w(0).truncate().text_color(t.foreground).child(k.name || k.template || k.program?.name || k.address))
-            .child(div().flex_none().text_size(11).text_color(color[st] ?? t.dim).child(st ?? "")))
-          .when(info.length > 0 || Boolean(pic), (el) => el.child(h_flex().h(18).gap(8).items_center().min_w(0)
-            .child(div().flex_1().min_w(0).truncate().text_size(11).text_color(t.dim).child(info.join(" · ")))
-            .when(Boolean(pic), (el) => el.child(pic))));
-      }))
-      .children(sleeping.map((r) => {
-        const pic = icon(r.program, 14, t.muted);
-        return h_flex().id(`hib-${r.address}`).flex_none().h(30).px(8).gap(8).items_center().rounded(6)
-          .cursor_pointer().hover((s) => s.bg(t.hover)).role("button").accessibility_label(`Revive ${r.title}`)
-          // Closed after: closing first could cancel the popup's own task.
-          .on_click((_e, cx) => cx.spawn(async () => { await revive(r); closeOverlay(overlay); }))
-          .child(div().flex_1().min_w(0).truncate().text_color(t.muted).child(r.title))
-          .child(h_flex().flex_none().gap(4).items_center().text_size(11).text_color(t.dim)
+    // One list for the pointer and the keyboard: live rows, then hibernated ones.
+    const items = [...rows.map((r) => ({ key: `sub:${r.k.address}`, h: LIVE, live: r })),
+      ...sleeping.map((r) => ({ key: `hib:${r.address}`, h: ASLEEP, asleep: r }))];
+    this.at = Math.max(0, Math.min(this.at, items.length - 1));
+    // Peeks at a live one; revives a hibernated one, then peeks. Closed after: closing first could cancel the
+    // popup's own task.
+    const choose = (x, cx) => {
+      if (x.live) {
+        closeOverlay(overlay);
+        run("terminal.peek", { terminal: x.live.k.address });
+        return;
+      }
+      const r = x.asleep;
+      if (this.reviving.has(r.address)) return;
+      this.reviving.add(r.address);
+      cx.notify();
+      cx.spawn(async () => {
+        try { await revive(r); } finally { this.reviving.delete(r.address); closeOverlay(overlay); }
+      });
+    };
+    const step = (by) => {
+      if (!items.length) return;
+      this.at = (this.at + by + items.length) % items.length;
+      this.scroll.scroll_to_item(this.at);
+    };
+    const liveRow = ({ k, depth }, on) => {
+      const st = word(k);
+      // Second line: project and branch, each only when it differs from the parent's.
+      const at = this.places[k.address] ?? {};
+      const info = [at.project !== mine.project ? at.project : null, at.branch !== mine.branch ? at.branch : null].filter(Boolean);
+      const pic = icon(k.program, 14, t.muted), name = k.name || k.template || k.program?.name || k.address;
+      // First line: name and status. Second: project/branch, and the agent icon on the right.
+      return v_flex().id(`sub-${k.address}`).h(LIVE - 2).py(5).pl(8 + Math.min(depth, DEPTH) * 16).pr(8).rounded(6)
+        .cursor_pointer().when(on, (el) => el.bg(t.selected)).hover((s) => s.bg(on ? t.selected : t.hover))
+        .role("button").accessibility_label(`Peek at ${name}`)
+        .child(h_flex().h(20).gap(8).items_center().min_w(0)
+          .child(div().flex_1().min_w(0).truncate().text_color(t.foreground).child(name))
+          .child(div().flex_none().text_size(11).text_color(color[st] ?? t.unknown).child(st ?? "")))
+        .child(h_flex().h(18).gap(8).items_center().min_w(0)
+          .child(div().flex_1().min_w(0).truncate().text_size(11).text_color(t.dim).child(info.join(" · ")))
+          .when(Boolean(pic), (el) => el.child(pic)));
+    };
+    const asleepRow = (r, on) => {
+      const pic = icon(r.program, 14, t.muted), waking = this.reviving.has(r.address);
+      return h_flex().id(`hib-${r.address}`).h(ASLEEP - 2).px(8).gap(8).items_center().rounded(6)
+        .when(!waking, (el) => el.cursor_pointer()).when(on, (el) => el.bg(t.selected)).hover((s) => s.bg(on ? t.selected : t.hover))
+        .role("button").accessibility_label(waking ? `Reviving ${r.title}` : `Revive ${r.title}`)
+        .child(div().flex_1().min_w(0).truncate().text_color(t.muted).child(r.title))
+        .child(waking
+          ? h_flex().flex_none().gap(4).items_center().text_size(11).text_color(t.muted)
+            .child(svg("mods/workspace-chrome/spinner.svg").size(11).flex_none().text_color(t.muted).spin(900)).child("Reviving…")
+          : h_flex().flex_none().gap(4).items_center().text_size(11).text_color(t.dim)
             .child(svg("mods/tui-focus/moon.svg").size(11).flex_none().text_color(t.dim)).child(ago(r.at, now)))
-          .when(Boolean(pic), (el) => el.child(pic));
-      }));
+        .when(Boolean(pic), (el) => el.child(pic));
+    };
+    return v_flex().id("subagents-root").track_focus(this.keys).size_full().p(6).text_size(13).bg(t.popover)
+      .on_key_down((e, cx) => {
+        const plain = !e.modifiers.control && !e.modifiers.alt && !e.modifiers.platform;
+        if (e.key === "escape") closeOverlay(overlay);
+        else if (e.key === "down" || (plain && e.key === "j")) step(1);
+        else if (e.key === "up" || (plain && e.key === "k")) step(-1);
+        else if (e.key === "enter" && items[this.at]) choose(items[this.at], cx);
+        else return;
+        cx.stop_propagation();
+        cx.notify();
+      })
+      .when(items.length === 0, (el) => el.child(div().p(8).text_color(t.dim).child("No workers.")))
+      .when(items.length > 0, (el) => el.child(div().relative().flex_1().min_h(0)
+        .child(v_virtual_list("subagents-rows", items.length, items.map((x) => x.h), (i) => items[i].key,
+          (range) => items.slice(range.start, range.end).map((x, j) => {
+            const on = range.start + j === this.at;
+            return div().h(x.h).pb(2).child(x.live ? liveRow(x.live, on) : asleepRow(x.asleep, on));
+          })).track_scroll(this.scroll).size_full()
+          .on_item_click((key, cx) => {
+            const i = items.findIndex((x) => x.key === key);
+            if (i < 0) return;
+            this.at = i;
+            choose(items[i], cx);
+            cx.notify();
+          }))
+        .child(Scrollbar.vertical("subagents-rows").absolute().inset_0())));
   }
 }

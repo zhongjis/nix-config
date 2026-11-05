@@ -15,13 +15,35 @@
 
 import { View, div, image, svg } from "gpui-kit";
 import { v_flex, h_flex, Scrollbar } from "gpui-base";
-import { agents, terminals, panes, spaces, focused, run, openOverlay, hc, exec, notify, theme, shared, setShared, setAgentOrder, props, nextCommand, settings, layout, home, appHome, readTextFile } from "herdr";
+import { agents, terminals, panes, spaces, focused, run, openOverlay, hc, exec, notify, theme, shared, setShared, setAgentOrder, props, nextCommand, settings, layout, home, appHome, readTextFile, window } from "herdr";
 import { namer } from "./name.js";
 import { kidStatus, descendants, treeStatus } from "./tree.js";
 
 const BUSY = new Set(["working", "blocked"]);
-// Space avatar colors, as the Herdr T3 layout's t3-spaces draws them (shared "space.colors").
-const MARK = { ansi6: "#22a99a", ansi3: "#e3814f", ansi4: "#5b8def", ansi5: "#8b7cf6", ansi2: "#3fae6a", ansi1: "#d9649a" };
+// A theme color at some opacity (#rgb or #rrggbb); any other color gives `solid` instead.
+function tint(color, alpha, solid) {
+  const hex = /^#[0-9a-f]{3}$/i.test(color ?? "") ? "#" + [...color.slice(1)].map((x) => x + x).join("") : color;
+  return /^#[0-9a-f]{6}$/i.test(hex ?? "") ? hex + Math.round(alpha * 255).toString(16).padStart(2, "0") : solid;
+}
+// Relative luminance of #rgb or #rrggbb, or null for anything else.
+function luminance(c) {
+  const hex = /^#[0-9a-f]{3}$/i.test(c ?? "") ? [...c.slice(1)].map((x) => x + x).join("") : /^#[0-9a-f]{6}/i.test(c ?? "") ? c.slice(1, 7) : null;
+  if (!hex) return null;
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+// The theme's text color that reads best on a fill: its background or its foreground, whichever contrasts more.
+function ink(t, color) {
+  const l = luminance(color), contrast = (c) => {
+    const m = luminance(c);
+    return l == null || m == null ? 0 : (Math.max(l, m) + 0.05) / (Math.min(l, m) + 0.05);
+  };
+  return contrast(t.background) > contrast(t.foreground) ? t.background : t.foreground;
+}
+// tui-subagents' rows (live 50px, hibernated 32px) and padding: its popup's height for what it will list.
+const subsHeight = (live, asleep) => Math.min(360, Math.max(46, 12 + 50 * live + 32 * asleep));
+// The list's header row (px): the lifted row's copy stays below it and the Pinned label.
+const HEAD = 41;
 // The settled tail opens on this many, then grows by MORE.
 const FIRST = 10, MORE = 25;
 // The Settled shelf shows this many rows at most; the rest scroll.
@@ -41,10 +63,9 @@ const RESUME = /claude --resume [0-9a-f-]{36}|pi --session [0-9a-zA-Z-]+/g;
 const pause = () => exec("sleep", ["0.3"]).catch(() => null);
 // How long an orchestrator worker sits idle before it's hibernated (ms).
 const HIBERNATE = 5 * 60000;
-// A card changing section folds away where it was and unfolds where it goes (ms): leaving is quicker, so the
-// list never waits on what's gone. Arriving in Active needing the person (blocked, done) it also glows in its
-// status color, fading over GLOW: a cue for the corner of the eye, beside Herdr's own sound and toast.
-const OUT = 140, IN = 220, MOVE = Math.max(OUT, IN), GLOW = 1200;
+// Arriving in Active needing the person (blocked, done), a card glows in its status color, fading natively over
+// GLOW (ms): a cue for the corner of the eye, beside Herdr's own sound and toast. A section change reorders at once.
+const GLOW = 1200;
 // Can be closed and resumed: a local agent that prints a resume line.
 const closable = (a) => Boolean(EXIT[a.app]) && !a.address.includes("/");
 // How often the resume labels are brought up to date (ms): a reboot loses at most this much of a session switch.
@@ -88,8 +109,9 @@ export default class Focus extends View {
     this.hovered = null;
     // Takes the keyboard while a row is lifted, so Esc can put it back.
     this.keys = cx.focus_handle();
-    // "Working 9s" counts up only while such a card shows.
-    cx.timer.every(1000, (cx) => { if (this.ticking) cx.notify(); });
+    // "Working 9s" counts by the second only while such a card shows under a minute, the window in front; past
+    // that it reads in minutes, and the minute tick below moves it on.
+    cx.timer.every(1000, (cx) => { if (this.ticking && window()?.active) cx.notify(); });
     // The cards' times (5m, 2h) move on by the minute, as T3's do.
     cx.timer.every(60000, (cx) => cx.notify());
     // One retire per settle (`${address}:${settled}`), so a failure doesn't repeat.
@@ -425,54 +447,21 @@ export default class Focus extends View {
     const put = rest.filter(settledAt).sort((x, y) => settledAt(y)[0] - settledAt(x)[0] || byAddress(x, y));
     // Shelves fold by default on this screen; the one in view stays out even folded or past the page, so it's never lost.
     const busyRows = this.workOpen ? work : work.filter((a) => a.focused);
-    // Section changes (a status change, a settle; not a drag, which animates itself). Each gets two renders ~40ms
-    // apart, so `transition` has a start and an end: full then folded where it was, folded then full where it goes.
+    // Section changes reorder at once. A card arriving in Active needing the person glows: drawn full on the render
+    // that sees it arrive, then one render ~50ms later sets its fade's target, and the fade runs natively (shine).
     const sectionNow = new Map([...pinned.map((a) => [a.address, "pinned"]), ...out.map((a) => [a.address, "active"]),
       ...work.map((a) => [a.address, "working"]), ...put.map((a) => [a.address, "settled"])]);
-    this.moves ??= {};
     for (const [k, s] of sectionNow) {
       const was = this.sections?.get(k);
-      if (!was || was === s || this.drag?.moved) continue;
-      this.moves[k] = { from: was, to: s, at: now, index: this.orders?.[was]?.indexOf(k) ?? -1 };
-      // The fold is computed per redraw (see folding): native transitions stalled partway here, and the card then
-      // vanished at once. A redraw every ~16ms for the move only (no standing timer), then one to clear.
-      for (let ms = 16; ms <= MOVE + 40; ms += 16) cx.timer.after(ms, (cx) => cx.notify());
-      cx.timer.after(MOVE + 80, (cx) => cx.notify());
+      if (!was || was === s || s !== "active" || this.drag?.moved) continue;
       // Not for the one in view: the person is already looking at it.
       const a = every.find((x) => x.address === k), st = a && state(a);
-      if (s === "active" && !a.focused && (st === "blocked" || st === "done")) {
-        (this.glows ??= {})[k] = { at: now, color: st === "blocked" ? t.blocked : t.ansi2 };
-        // As for moves, the fade is computed per redraw; a slow fade needs fewer (~15 fps).
-        for (let ms = 66; ms <= GLOW + 80; ms += 66) cx.timer.after(ms, (cx) => cx.notify());
-      }
+      if (a.focused || (st !== "blocked" && st !== "done")) continue;
+      (this.glows ??= {})[k] = { at: now, color: st === "blocked" ? t.blocked : t.done };
+      cx.timer.after(50, (cx) => cx.notify());
     }
-    for (const [k, m] of Object.entries(this.moves)) if (now - m.at > MOVE + 60 || !sectionNow.has(k)) delete this.moves[k];
     for (const [k, g] of Object.entries(this.glows ?? {})) if (now - g.at > GLOW + 60 || !sectionNow.has(k)) delete this.glows[k];
     this.sections = sectionNow;
-    this.orders = { pinned: pinned.map((a) => a.address), active: out.map((a) => a.address),
-      working: work.map((a) => a.address), settled: put.map((a) => a.address) };
-    // A shown list with the cards just leaving it put back where they were, to fold away there.
-    const withLeaving = (section, xs) => {
-      if ((section === "working" && !this.workOpen) || (section === "settled" && !this.open)) return xs;
-      const ys = [...xs];
-      for (const [k, m] of Object.entries(this.moves)) {
-        const a = m.from === section && every.find((x) => x.address === k);
-        if (a && !ys.includes(a)) ys.splice(m.index < 0 ? ys.length : Math.min(m.index, ys.length), 0, a);
-      }
-      return ys;
-    };
-    // Its fold in this section now: null (none), or the height and opacity to show.
-    const folding = (section, a, natural) => {
-      const m = this.moves[a.address];
-      if (!m || (m.from !== section && m.to !== section)) return null;
-      // Settled rows are slim (30px) whatever the card measured: a card's height there leaves a gap.
-      const h = section === "settled" ? natural : this.heights?.[a.address] ?? natural;
-      // Computed per redraw (every ~16ms during a move): native transitions stalled partway here.
-      const leaving = m.from === section, p = Math.min(1, (now - m.at) / (leaving ? OUT : IN));
-      const k = 1 - (1 - p) ** 3; // ease-out
-      const shown = leaving ? 1 - k : k;
-      return { h: Math.round(h * shown), o: shown };
-    };
     // agent.next goes as the list reads. Only while this list shows: the agents list (t3-agents) sets its own.
     const find = (n) => n?.id === "sidebar-lists" ? n : (n?.children ?? []).map(find).find(Boolean);
     if (find(layout())?.active !== "lists") setAgentOrder([...pinned, ...out, ...work, ...put].map((a) => a.address));
@@ -490,11 +479,12 @@ export default class Focus extends View {
       cx.notify();
     };
     const lit = (id, color) => (this.hot === id ? t.foreground : color);
-    // A space's avatar, as t3-spaces draws it.
+    // A space's avatar, as tui-spaces draws it: the theme's color of that name, the letter in whichever theme
+    // text color reads best on it.
     const avatar = (id, name, size) => {
-      const color = (shared("space.colors") ?? {})[id] ?? "ansi6";
-      return h_flex().size(size).flex_none().rounded(4).bg(color.startsWith("#") ? color : MARK[color] ?? t[color])
-        .items_center().justify_center().text_size(size * 0.64).font_bold().text_color("#ffffff")
+      const color = (shared("space.colors") ?? {})[id] ?? "ansi6", fill = color.startsWith("#") ? color : t[color] ?? t.accent;
+      return h_flex().size(size).flex_none().rounded(4).bg(fill)
+        .items_center().justify_center().text_size(size * 0.64).font_bold().text_color(ink(t, fill))
         .child([...(name ?? "")][0]?.toUpperCase() ?? "?");
     };
     // Brought back, it's news again: the top of the list. Brought back by the person (`look`), it's also what
@@ -565,9 +555,9 @@ export default class Focus extends View {
     const verb = !plan ? null : plan.section === "pinned" ? (from === "pinned" ? null : "pin")
       : plan.section === "settled" ? "settle" : from === "pinned" ? "unpin" : from === "settled" ? "unsettle" : null;
     const BADGE = { pin: ["mods/workspace-chrome/pin.svg", "Pin"], unpin: ["mods/workspace-chrome/pin-off.svg", "Unpin"],
-      settle: ["mods/workspace-chrome/circle-check.svg", "Settle"], unsettle: ["mods/tui-focus/undo.svg", "Un-settle"] };
+      settle: ["mods/workspace-chrome/circle-check.svg", "Settle"], unsettle: ["mods/tui-focus/undo.svg", "Unsettle"] };
     const badge = (v) => h_flex().id(`badge-${v}`).h(20).px(6).gap(4).flex_none().items_center().rounded(4)
-      .border(1).border_color(t.accent + "66").bg(t.accent + "1a").text_size(11).font_medium().text_color(t.accent)
+      .border(1).border_color(tint(t.accent, 0.4, t.accent)).bg(tint(t.accent, 0.1, t.selected)).text_size(11).font_medium().text_color(t.accent)
       .child(svg(BADGE[v][0]).size(12).flex_none().text_color(t.accent)).child(BADGE[v][1]);
 
     // Settled shows one page; while a drag moves a row out of it the next row fills in, and one settled into
@@ -594,27 +584,23 @@ export default class Focus extends View {
       .when(dragging, (el) => el.transition("height", MOTION));
     // Each droppable row sits in a lane: the gap that opens above it, the row (folding away once the lifted one is
     // headed elsewhere, holding its place until then) with the list's spacing, and after the last, the end gap.
-    const lane = (section, xs, draw, spacing) => withLeaving(section, xs).map((a, i, ys) => {
-      const f = !dragging && folding(section, a, section === "settled" ? 30 : this.cardH ?? 82);
-      return v_flex().id(`lane-${a.address}`).flex_none()
-        .child(gap(a.address))
-        .child(v_flex().id(`hold-${a.address}`).flex_none()
-          .when(dragging && d.from === a.address, (el) => el.overflow_hidden().opacity(0).h(plan ? 0 : d.height + spacing).transition("height", MOTION))
-          .when(Boolean(f), (el) => el.overflow_hidden().h(f.h ? f.h + spacing : 0).opacity(f.o))
-          .child(draw(a)).when(spacing > 0, (el) => el.child(div().h(spacing).flex_none())))
-        .when(i === ys.length - 1, (el) => el.child(gap(`end-${section}`)));
-    });
+    const lane = (section, xs, draw, spacing) => xs.map((a, i, ys) => v_flex().id(`lane-${a.address}`).flex_none()
+      .child(gap(a.address))
+      .child(v_flex().id(`hold-${a.address}`).flex_none()
+        .when(dragging && d.from === a.address, (el) => el.overflow_hidden().opacity(0).h(plan ? 0 : d.height + spacing).transition("height", MOTION))
+        .child(draw(a)).when(spacing > 0, (el) => el.child(div().h(spacing).flex_none())))
+      .when(i === ys.length - 1, (el) => el.child(gap(`end-${section}`))));
     // T3's boundaries: Pinned and Active labels, shown only while dragging; the list opens room for them.
     const boundary = (id, text, section, to) => h_flex().id(id).flex_none().overflow_hidden().h(dragging ? 24 : 0)
       .transition("height", MOTION).px(10).gap(8).items_center().text_size(12).font_medium()
       .on_mouse_move((_e, cx) => aim(to, cx))
       .when(dragging, (el) => el.child(div().text_color(hot(section) ? t.accent : t.muted).child(text))
-        .child(div().flex_1().h(1).bg(hot(section) ? t.accent + "80" : t.border)));
+        .child(div().flex_1().h(1).bg(hot(section) ? tint(t.accent, 0.5, t.accent) : t.border)));
     // An empty section still takes a drop: T3's dashed placeholder, accent while it's the target.
     const placeholder = (section, text) => div().id(`${section}-placeholder`).h(36).mb(2).flex_none().flex().items_center().justify_center()
       .rounded(6).border(1).border_dashed().text_size(12)
-      .border_color(hot(section) ? t.accent + "66" : t.border).text_color(hot(section) ? t.accent : t.muted)
-      .when(hot(section), (el) => el.bg(t.accent + "0d"))
+      .border_color(hot(section) ? tint(t.accent, 0.4, t.accent) : t.border).text_color(hot(section) ? t.accent : t.muted)
+      .when(hot(section), (el) => el.bg(tint(t.accent, 0.05, t.hover)))
       .on_mouse_move((_e, cx) => aim({ section }, cx))
       .child(text);
     // Picked up anywhere on a row that can move (not Working, not one whose Settle is still on its way).
@@ -698,9 +684,9 @@ export default class Focus extends View {
       const corner = ghost ? (verb ? badge(verb) : div())
         : swept(a) ? badge("settle")
         : offer
-        ? h_flex().id(id).h(20).px(6).gap(4).flex_none().items_center().rounded(6)
-          .text_size(12).text_color(lit(id, t.muted)).on_hover(glow(id))
-          .role("button").accessibility_label("Settle")
+        ? h_flex().id(id).h(22).px(6).gap(4).flex_none().items_center().rounded(5)
+          .text_size(12).text_color(lit(id, t.muted)).on_hover(glow(id)).cursor_pointer().hover((s) => s.bg(t.hover))
+          .role("button").accessibility_label("Settle").tooltip(`Settle  ${window()?.platform === "macos" ? "⌘⇧S" : "Ctrl+Shift+S"}`)
           .on_mouse_down("left", sweepFrom("settle", a))
           .on_click((_e, cx) => {
             cx.stop_propagation();
@@ -718,22 +704,22 @@ export default class Focus extends View {
           ? pill(t.working, svg("mods/workspace-chrome/spinner.svg").size(16).flex_none().text_color(t.working).spin(900),
             "Working", started(a) > 0 && started(a) < Infinity ? took(started(a), now) : null)
             // Waiting on sub-agents with a reply not yet seen: a dot, so the reply isn't lost while it stays here.
-            .when(a.status === "done", (el) => el.child(div().size(6).flex_none().rounded_full().bg(t.ansi2)))
+            .when(a.status === "done", (el) => el.child(div().id(`reply-${a.address}`).size(6).flex_none().rounded_full().bg(t.done).tooltip("Reply not yet seen")))
           : st === "blocked"
-            ? pill(t.blocked, div().size(14).flex_none().rounded(4).bg(t.blocked + "26").text_size(11).font_bold().flex().items_center().justify_center().child("!"), "Needs you")
+            ? pill(t.blocked, div().size(14).flex_none().rounded(4).bg(tint(t.blocked, 0.15, t.hover)).text_size(11).font_bold().flex().items_center().justify_center().child("!"), "Needs you")
             : st === "done"
-              ? pill(t.ansi2, svg("mods/workspace-chrome/circle-check.svg").size(16).flex_none().text_color(t.ansi2), "Done")
+              ? pill(t.done, svg("mods/workspace-chrome/circle-check.svg").size(16).flex_none().text_color(t.done), "Done")
               : div().id(`state-${a.address}`).flex_none().child(since(a) > 0 ? ago(since(a), now) : "");
-      // Relative only while it glows: a relative card escapes its lane's clip and fade, so a folding card would
-      // stay drawn whole over the rows below until its move ends.
+      // Relative only while it glows: its glow is laid over the card's box.
       const base = v_flex().id(`${ghost ? "ghost-" : ""}card-${a.address}`).px(10).py(8).gap(2).flex_none().rounded(10);
-      // The arrival glow: drawn under the content, fading out over GLOW (computed per redraw, as the fold is).
+      // The arrival glow, drawn under the content: full on the render that sees it arrive, then faded out over GLOW
+      // natively once a render sets its target (see sectionNow).
       const g = !ghost && this.glows?.[a.address];
       const shine = g && div().id(`glow-${a.address}`).absolute().top(0).left(0).right(0).bottom(0).rounded(10)
-        .bg(g.color + "3d").opacity((1 - Math.min(1, (now - g.at) / GLOW)) ** 2);
-      return (ghost ? base : row(base, a).role("button").accessibility_label(title(a)).on_hover(hover(a))
+        .bg(tint(g.color, 0.24, t.hover)).opacity(now - g.at < 40 ? 1 : 0).transition("opacity", { duration: GLOW, easing: "ease-out" });
+      return (ghost ? base : row(base, a).role("button").accessibility_label(title(a)).on_hover(hover(a)).cursor_pointer()
         // agent.focus, not pane.focus: in tabs it focuses the pane, and it picks what the agent view shows.
-        .on_click(open(a)).on_size_change((size) => { this.cardH = size.height; (this.heights ??= {})[a.address] = size.height; }))
+        .on_click(open(a)).on_size_change((size) => { this.cardH = size.height; }))
         .when(on, (el) => el.bg(t.selected))
         .when(!on && !ghost && !dragging && !this.sweep?.moved, (el) => el.hover((s) => s.bg(t.hover)))
         .when(Boolean(shine), (el) => el.relative().child(shine))
@@ -745,21 +731,24 @@ export default class Focus extends View {
           .child(corner))
         .child(h_flex().gap(8).items_center()
           // Only the one in view is bright, as in T3.
-          .child(div().flex_1().min_w(0).truncate().text_size(14).text_color(on ? t.foreground : t.muted).child(title(a)))
+          .child(div().flex_1().min_w(0).truncate().text_size(13).text_color(on ? t.foreground : t.muted).child(title(a)))
           .when(Boolean(pic), (el) => el.child(pic)))
         // The sub-agents part opens a list of them (tui-subagents); a click there peeks at one.
-        .when(Boolean(branch || live), (el) => el.child(h_flex().min_w(0).gap(4).text_size(12).text_color(t.dim)
+        .when(Boolean(branch || live), (el) => el.child(h_flex().min_w(0).gap(4).items_center().text_size(12).text_color(t.dim)
           .when(Boolean(branch), (el) => el.child(div().min_w(0).truncate().child(branch)))
           .when(Boolean(branch && live), (el) => el.child(div().flex_none().child("·")))
-          .when(Boolean(live) && !ghost, (el) => el.child(div().id(`subs-${a.address}`).flex_none().rounded(4).px(2)
-            .role("button").accessibility_label("Show workers")
+          .when(Boolean(live) && !ghost, (el) => el.child(div().id(`subs-${a.address}`).flex_none().h(22).px(6).flex().items_center().rounded(5)
+            .cursor_pointer().role("button").accessibility_label("Show workers").tooltip(`${live} worker${live > 1 ? "s" : ""}`)
             .hover((s) => s.text_color(t.foreground).bg(t.hover))
             .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
             .on_click((_e, cx) => {
               cx.stop_propagation();
-              openOverlay({ mod: "tui-subagents", kind: "popup", width: 300, height: Math.min(360, 16 + 46 * live), props: { parent: a.address } });
+              // Sized for what it will list: the live ones under it and the hibernated ones they or it left.
+              const subs = descendants(terminals(), a.address), under = new Set([a.address, ...subs.map((k) => k.address)]);
+              const asleep = (shared(HIBERNATED) ?? []).filter((r) => under.has(r.parent)).length;
+              openOverlay({ mod: "tui-subagents", kind: "popup", width: 300, height: subsHeight(subs.length, asleep), props: { parent: a.address } });
             })
-            .child(going ? `${going} worker${going > 1 ? "s" : ""} working` : "view finished workers")))));
+            .child(going ? `${going} worker${going > 1 ? "s" : ""} working` : "View finished workers")))));
     };
 
     // A settled row: one dim line; viewing it leaves it settled. Hovered it brightens and its time
@@ -767,9 +756,9 @@ export default class Focus extends View {
     const slim = (a, ghost) => {
       const on = a.focused, over = !dragging && !this.sweep?.moved && this.hovered === a.address, bright = on || over || ghost || swept(a);
       const pic = icon(a.program, 14, t.dim);
-      const undo = h_flex().id(`unsettle-${a.address}`).size(20).flex_none().items_center().justify_center().rounded(4)
-        .on_hover(glow(`unsettle-${a.address}`))
-        .role("button").accessibility_label("Unsettle")
+      const undo = h_flex().id(`unsettle-${a.address}`).size(24).flex_none().items_center().justify_center().rounded(6)
+        .on_hover(glow(`unsettle-${a.address}`)).cursor_pointer().hover((s) => s.bg(t.hover))
+        .role("button").accessibility_label("Unsettle").tooltip("Unsettle")
         .on_mouse_down("left", sweepFrom("unsettle", a))
         .on_click((_e, cx) => {
           cx.stop_propagation();
@@ -781,13 +770,13 @@ export default class Focus extends View {
         })
         .child(svg("mods/tui-focus/undo.svg").size(14).flex_none().text_color(lit(`unsettle-${a.address}`, t.muted)));
       const base = h_flex().id(`${ghost ? "ghost-" : ""}slim-${a.address}`).h(30).px(10).gap(8).flex_none().items_center().rounded(8);
-      return (ghost ? base : row(base, a).role("button").accessibility_label(title(a)).on_hover(hover(a)).on_click(open(a)))
+      return (ghost ? base : row(base, a).role("button").accessibility_label(title(a)).on_hover(hover(a)).on_click(open(a)).cursor_pointer())
         .when(on, (el) => el.bg(t.selected))
         .when(!on && !ghost && !dragging && !this.sweep?.moved, (el) => el.hover((s) => s.bg(t.hover)))
         .child(h_flex().size(16).flex_none().items_center().justify_center().opacity(bright ? 1 : 0.5).when(Boolean(pic), (el) => el.child(pic)))
         .child(div().flex_1().min_w(0).truncate().text_color(bright ? t.foreground : t.muted).child(title(a)))
         .child(ghost ? (verb ? badge(verb) : div()) : swept(a) ? badge("unsettle")
-          // A row folding away after the agent came back has no settle time any more: no time on it.
+          // No settle time (its label is on its way back from the core): no time on it.
           : over ? undo : div().flex_none().text_size(12).text_color(t.dim).child(!settledAt(a) ? "" : closable(a)
             ? "closing" : ago(settledAt(a)[0], now)));
     };
@@ -809,7 +798,7 @@ export default class Focus extends View {
     const closedRow = (r) => {
       const over = !dragging && this.hovered === r.key, id = `forget-${r.key}`;
       return h_flex().id(`closed-${r.key}`).h(30).px(10).gap(8).flex_none().items_center().rounded(8)
-        .role("button").accessibility_label(`Resume ${r.title}`)
+        .role("button").accessibility_label(`Resume ${r.title}`).cursor_pointer()
         .when(!dragging, (el) => el.hover((s) => s.bg(t.hover)))
         .on_hover(hover({ address: r.key }))
         .on_click((_e, cx) => { if (!justDropped()) resume(r, cx); })
@@ -817,17 +806,17 @@ export default class Focus extends View {
           .when(Boolean(r.program?.icon), (el) => el.child(icon(r.program, 14, t.dim))))
         .child(div().flex_1().min_w(0).truncate().text_color(over ? t.foreground : t.muted).child(r.title))
         .child(over
-          ? h_flex().id(id).size(20).flex_none().items_center().justify_center().rounded(4).text_color(lit(id, t.muted))
-            .on_hover(glow(id)).role("button").accessibility_label("Forget")
+          ? h_flex().id(id).size(24).flex_none().items_center().justify_center().rounded(6).cursor_pointer().hover((s) => s.bg(t.hover))
+            .on_hover(glow(id)).role("button").accessibility_label("Forget").tooltip("Forget")
             .on_click((_e, cx) => { cx.stop_propagation(); this.hovered = null; forget(r); cx.notify(); })
-            .child("×")
+            .child(svg("mods/workspace-chrome/x.svg").size(14).flex_none().text_color(lit(id, t.muted)))
           : h_flex().flex_none().gap(4).items_center().text_size(12).text_color(t.dim)
             .child(svg("mods/tui-focus/moon.svg").size(12).flex_none().text_color(t.dim)).child(ago(r.at, now)));
     };
 
     // A shelf's header, folding it: label, then count and chevron at the far edge.
-    const shelf = (id, label, count, open, toggle, extra) => h_flex().id(id).h(30).px(10).gap(6).flex_none().items_center()
-      .text_size(12).font_medium().text_color(t.dim)
+    const shelf = (id, label, count, open, toggle, extra) => h_flex().id(id).h(30).px(10).gap(6).flex_none().items_center().rounded(8)
+      .text_size(12).font_medium().text_color(t.dim).cursor_pointer().when(!dragging, (el) => el.hover((s) => s.bg(t.hover)))
       .role("button").accessibility_label(`${open ? "Hide" : "Show"} ${label.toLowerCase()} agents`)
       .on_click((_e, cx) => {
         toggle();
@@ -838,7 +827,11 @@ export default class Focus extends View {
       .child(div().child(String(count)))
       .child(svg(`mods/workspace-chrome/chevron-${open ? "down" : "right"}.svg`).size(12).flex_none());
 
-    this.ticking = busyRows.length > 0 || pinned.some(working);
+    // Ticks by the second only while a shown working time is still in seconds (took).
+    this.ticking = [...pinned, ...busyRows].some((a) => {
+      const s = started(a);
+      return running(a) && s > 0 && s < Infinity && now - s < 60000;
+    });
     // The first shelf takes the free space above it, so both sit at the bottom.
     const shelves = v_flex().id("shelves").pt(12).flex_none()
       .when(work.length > 0, (el) => el
@@ -880,7 +873,8 @@ export default class Focus extends View {
         else close(cx);
       }
     };
-    const clearButton = doomed.length > 0 && h_flex().id("settled-clear").h(20).px(6).flex_none().items_center().rounded(4)
+    const clearButton = doomed.length > 0 && h_flex().id("settled-clear").h(22).px(6).flex_none().items_center().rounded(5)
+      .cursor_pointer().hover((s) => s.bg(t.hover))
       .text_color(this.clearing ? t.blocked : lit("settled-clear", t.dim)).on_hover((on, cx) => {
         if (this.clearing) unask(on ? 0 : 400, cx);
         glow("settled-clear")(on, cx);
@@ -910,7 +904,7 @@ export default class Focus extends View {
       .children(lane("settled", rows, (a) => slim(a), 0))
       .when(this.open, (el) => el.children(closed.map(closedRow)))
       .when(this.open && put.length > this.limit, (el) => el.child(h_flex().id("settled-more").h(30).px(10).gap(8).flex_none().items_center().rounded(8)
-        .text_color(t.dim).hover((s) => s.bg(t.hover).text_color(t.foreground))
+        .text_color(t.dim).cursor_pointer().hover((s) => s.bg(t.hover).text_color(t.foreground))
         .role("button").accessibility_label("Show more settled agents")
         .on_click((_e, cx) => {
           this.limit += MORE;
@@ -921,8 +915,8 @@ export default class Focus extends View {
       .child(Scrollbar.vertical("settled-rows").absolute().inset_0()));
 
     // The shipped agents list's header in place of T3's search, filter, new space and new agent row.
-    const top = h_flex().id("focus-top").px(16).h(41).pt(14).pb(5).flex_none().items_center()
-      .child(div().text_size(11.5).font_medium().text_color(t.dim).child("Agents"));
+    const top = h_flex().id("focus-top").px(16).h(HEAD).pt(14).pb(5).flex_none().items_center()
+      .child(div().text_size(12).font_medium().text_color(t.dim).child("Agents"));
 
     return v_flex().id("t3-focus-root").relative().size_full().min_h(0).bg(t.chrome).text_size(13)
       .on_size_change((size) => { this.height = size.height; this.width = size.width; })
@@ -969,9 +963,10 @@ export default class Focus extends View {
         // nearest-row drop does.
         .child(div().id("active-rest").flex_1().min_h(0).on_mouse_move((_e, cx) => aim({ section: "active" }, cx)))
         .child(shelves.when(put.length > 0 || closed.length > 0 || (dragging && !busy(lifted)), (el) => el.child(tail))))
-      // The lifted row moves only up and down, inside the list and below the Pinned label (T3's clamps).
+      // The lifted row moves only up and down, inside the list and below the Pinned label (T3's clamps): the
+      // header, the list's 8px top padding, the label's 24px.
       .when(Boolean(lifted) && d.y != null, (el) => el.child(div().id("drag-ghost").absolute().left(8).right(8)
-        .top(Math.max(32 + 8 + 24, Math.min(d.y - d.grab, (this.height ?? Infinity) - d.height - 8)))
+        .top(Math.max(HEAD + 8 + 24, Math.min(d.y - d.grab, (this.height ?? Infinity) - d.height - 8)))
         .rounded(10).bg(t.selected).border(1).border_color(t.accent).shadow_lg()
         .child(from === "settled" ? slim(lifted, true) : card(lifted, true))));
   }
