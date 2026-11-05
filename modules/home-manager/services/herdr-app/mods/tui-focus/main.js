@@ -730,7 +730,7 @@ export default class Focus extends View {
               cx.stop_propagation();
               openOverlay({ mod: "tui-subagents", kind: "popup", width: 300, height: Math.min(360, 16 + 46 * live), props: { parent: a.address } });
             })
-            .child(going ? `${going} sub-agent${going > 1 ? "s" : ""} working` : "view sub-agents")))));
+            .child(going ? `${going} worker${going > 1 ? "s" : ""} working` : "view sub-agents")))));
     };
 
     // A settled row: one dim line; viewing it leaves it settled. Hovered it brightens and its time
