@@ -38,7 +38,7 @@ const EXIT = { "claude-code": ["ctrl+c", "ctrl+c"], pi: ["ctrl+d"] };
 const RESUME = /claude --resume [0-9a-f-]{36}|pi --session [0-9a-zA-Z-]+/g;
 const pause = () => exec("sleep", ["0.3"]).catch(() => null);
 // How long a settled agent keeps running before it's closed (ms); undo before then is instant.
-const DELAY = 15 * 60000;
+const DELAY = 45000;
 // How long an orchestrator worker sits idle before it's hibernated (ms).
 const HIBERNATE = 5 * 60000;
 // A card changing section folds away where it was and unfolds where it goes (ms): leaving is quicker, so the
@@ -94,7 +94,7 @@ export default class Focus extends View {
     cx.timer.every(60000, (cx) => cx.notify());
     // Settled past DELAY: closed, one try per settle (`${address}:${settled}`), so a failure doesn't repeat.
     this.tried = new Set();
-    cx.timer.every(30000, (cx) => this.closeDue(cx));
+    cx.timer.every(1000, (cx) => this.closeDue(cx));
     // Reboots: install Pi's half, then label agents and resume recovered shells, now and every REMEMBER.
     cx.spawn(async (cx) => {
       await this.installPi();
@@ -192,9 +192,28 @@ export default class Focus extends View {
         return;
       }
       setShared(CLOSED, [{ ...rec, argv: line.split(" "), at: Date.now() }, ...(shared(CLOSED) ?? [])]);
-      run("pane.close", { pane: a.pane });
+      await this.closePane(a.pane);
       cx.notify();
     });
+  }
+
+  // Check at closure, not before the agent exits: other tabs may have gone meanwhile.
+  /** @param {string} pane */
+  async closePane(pane) {
+    const p = panes().find((p) => p.pane === pane);
+    if (!p) return;
+    const s = spaces().find((s) => s.tabs.some((t) => t.id === p.tab));
+    if (!s) return;
+    if (s.tabs.length === 1 && s.tabs[0].panes === 1) {
+      // run() cannot acknowledge failure; leave the pane open unless its replacement was created.
+      const r = await exec("herdr-app", ["do", "tab.new", JSON.stringify({ space: s.id, folder: p.cwd || s.folder })])
+        .catch((e) => ({ code: 1, stderr: String(e) }));
+      if (r.code !== 0) {
+        notify({ title: "Couldn't preserve the space", body: r.stderr.trim(), level: "error" });
+        return;
+      }
+    }
+    run("pane.close", { pane });
   }
 
   // Copies integrations/pi.ts into Pi's extensions when it differs (Pi installed only). Pi loads it at start,
@@ -328,7 +347,7 @@ export default class Focus extends View {
       setShared(CLOSED, [{ key: `${k.address}-${Date.now()}`, title: k.labels["pi.session"] || k.labels.where || line.split(" ")[0],
         space: k.labels["herdr.space"], cwd: k.cwd, program: null, argv: line.split(" "), at: Date.now() }, ...(shared(CLOSED) ?? [])]);
       const p = panes().find((p) => p.terminal === k.address);
-      if (p) run("pane.close", { pane: p.pane });
+      if (p) await this.closePane(p.pane);
       else await hc(["kill", k.address]).catch(() => null);
       return;
     }
