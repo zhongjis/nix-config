@@ -5,7 +5,7 @@ import vm from "node:vm";
 
 let now = 1000000, liveAgents = [], liveTerminals = [], livePanes = [], liveSpaces = [];
 let events = [], failCreation = false, onKeys = () => {}, reads = 0;
-const saved = new Map(), tasks = [], timers = [];
+const saved = new Map(), tasks = [];
 const result = { code: 0, stdout: "", stderr: "" };
 const api = {
   agents: () => liveAgents, terminals: () => liveTerminals,
@@ -68,41 +68,29 @@ const Focus = mod.namespace.default;
 const cx = {
   notify() {}, focus_handle() {},
   spawn: (fn) => tasks.push(Promise.resolve().then(() => fn(cx))),
-  timer: { every: (ms, fn) => timers.push({ ms, fn }) },
 };
 async function drain() { while (tasks.length) await Promise.all(tasks.splice(0)); }
 function fixture(extra = {}) {
   events = []; reads = 0; saved.clear(); failCreation = false; onKeys = () => {};
   liveAgents = [{ address: "t1", pane: "p1", tab: "tab1", space: "s1", app: "pi", status: "idle", focused: false, ...extra }];
-  liveTerminals = [{ address: liveAgents[0].address, cwd: "/live", labels: { settled: `${now - 45000}:0` } }];
+  liveTerminals = [{ address: liveAgents[0].address, cwd: "/live", labels: { settled: `${now}:0` } }];
   livePanes = [{ pane: "p1", terminal: liveAgents[0].address, tab: "tab1", cwd: "/live" }];
   liveSpaces = [{ id: "s1", folder: "/old", tabs: [{ id: "tab1", panes: 1 }] }];
   const focus = new Focus(); focus.tried = new Set(); return focus;
 }
 const actions = () => events.filter(([name]) => name !== "notify").map(([name]) => name);
 
-// Drive the registered scheduler, not just the delay constant.
+// A settle retires at once: no countdown, no polling pass.
 const focus = fixture();
-focus.installPi = async () => {};
-focus.sessions = () => {};
-// Do not start the permanent command reader in this isolated scheduler check.
-const initCx = { ...cx, spawn() {} };
-focus.init({}, initCx);
-const settledAt = now - 45000;
-now = settledAt + 44999;
-for (const timer of timers.filter((t) => 44999 % t.ms === 0)) timer.fn(cx);
-focus.closeDue(cx); await drain();
-assert.deepEqual(actions(), []);
-now = settledAt + 45000;
-for (const timer of timers.filter((t) => 45000 % t.ms === 0)) timer.fn(cx);
+focus.retire(liveAgents[0], cx);
 await drain();
 assert.deepEqual(actions(), ["hc.run", "pane.close"]);
 assert.equal(liveSpaces.length, 1);
 assert.ok(liveSpaces[0].tabs[0].blank);
 assert.equal(saved.get("tui-focus.closed")[0].argv.join(" "), "pi --session abc123");
 
-for (const extra of [{ focused: true }, { status: "working" }, { status: "blocked" }, { address: "remote/t1" }, { app: "codex" }]) {
-  fixture(extra).closeDue(cx); await drain(); assert.deepEqual(actions(), []);
+for (const extra of [{ address: "remote/t1" }, { app: "codex" }]) {
+  fixture(extra).retire(liveAgents[0], cx); await drain(); assert.deepEqual(actions(), []);
 }
 for (const kind of ["split", "tabs", "late-close", "failure", "reject", "unlisted", "missing-resume"]) {
   const f = fixture();
@@ -111,7 +99,7 @@ for (const kind of ["split", "tabs", "late-close", "failure", "reject", "unliste
   if (kind === "late-close") onKeys = () => { liveSpaces[0].tabs.pop(); };
   if (kind === "failure" || kind === "reject" || kind === "unlisted") failCreation = kind === "failure" ? true : kind;
   if (kind === "missing-resume") reads = -100;
-  f.closeDue(cx); await drain();
+  f.retire(liveAgents[0], cx); await drain();
   const expected = kind === "split" || kind === "tabs" ? ["pane.close"]
     : kind === "failure" || kind === "reject" || kind === "unlisted" ? ["hc.run"]
     : kind === "missing-resume" ? [] : ["hc.run", "pane.close"];

@@ -2,7 +2,7 @@
 // Below, as in T3: Working (busy agents, folded) and Settled (put away by hand until new work brings them back).
 // Settled lives on the agent's own terminal as `settled=<ms>:<turn>`: it ends with the terminal, every mod
 // sees it, and a turn ended since says there was new work even while no window watched. Looking doesn't count.
-// Settled Claude Code or Pi is also freed after DELAY (or at once by Clear): the agent is exited as a person
+// Settled Claude Code or Pi is also freed at once (by its Settle or by Clear): the agent is exited as a person
 // would, the resume command it prints is kept (shared "tui-focus.closed"), and its pane closes. Clicking that
 // closed row resumes it in a new tab.
 // Reboots: each local Claude Code or Pi terminal is kept by the core and labelled with the line that resumes its
@@ -37,8 +37,6 @@ const HIBERNATED = "tui-focus.hibernated";
 const EXIT = { "claude-code": ["ctrl+c", "ctrl+c"], pi: ["ctrl+d"] };
 const RESUME = /claude --resume [0-9a-f-]{36}|pi --session [0-9a-zA-Z-]+/g;
 const pause = () => exec("sleep", ["0.3"]).catch(() => null);
-// How long a settled agent keeps running before it's closed (ms); undo before then is instant.
-const DELAY = 45000;
 // How long an orchestrator worker sits idle before it's hibernated (ms).
 const HIBERNATE = 5 * 60000;
 // A card changing section folds away where it was and unfolds where it goes (ms): leaving is quicker, so the
@@ -92,9 +90,8 @@ export default class Focus extends View {
     cx.timer.every(1000, (cx) => { if (this.ticking) cx.notify(); });
     // The cards' times (5m, 2h) move on by the minute, as T3's do.
     cx.timer.every(60000, (cx) => cx.notify());
-    // Settled past DELAY: closed, one try per settle (`${address}:${settled}`), so a failure doesn't repeat.
+    // One retire per settle (`${address}:${settled}`), so a failure doesn't repeat.
     this.tried = new Set();
-    cx.timer.every(1000, (cx) => this.closeDue(cx));
     // Reboots: install Pi's half, then label agents and resume recovered shells, now and every REMEMBER.
     cx.spawn(async (cx) => {
       await this.installPi();
@@ -158,14 +155,6 @@ export default class Focus extends View {
 
   // Frees a settled agent: exits it, keeps the resume line that appears, closes its pane. Local Claude Code and
   // Pi only. When no new resume line shows (a draft in the prompt, a slow exit), it stays settled by label only.
-  // Settled agents past DELAY, read live (not from the last render). The one in view waits until it isn't.
-  closeDue(cx) {
-    const term = new Map(terminals().map((k) => [k.address, k]));
-    for (const a of agents()) {
-      const v = term.get(a.address)?.labels?.settled;
-      if (v && !a.focused && !BUSY.has(a.status) && Date.now() - Number(v.split(":")[0]) >= DELAY) this.retire(a, cx);
-    }
-  }
 
   retire(a, cx) {
     const k = terminals().find((k) => k.address === a.address), once = `${a.address}:${k?.labels?.settled ?? ""}`;
@@ -514,7 +503,8 @@ export default class Focus extends View {
     // Settling the agent in view moves on to the next card down the list, from the top past the end, as T3 does;
     // one in the background moves nothing.
     const settle = (xs, cx) => {
-      for (const a of xs) this.setSettled(a.address, `${Date.now()}:${term.get(a.address)?.turn ?? 0}`, cx);
+      // Settling is the person's call: Claude Code and Pi are freed at once, no countdown.
+      for (const a of xs) { this.setSettled(a.address, `${Date.now()}:${term.get(a.address)?.turn ?? 0}`, cx); this.retire(a, cx); }
       const cards = [...pinned, ...out, ...busyRows], i = cards.findIndex((a) => a.focused);
       if (i < 0 || !xs.includes(cards[i])) return false;
       const next = [...cards.slice(i + 1), ...cards.slice(0, i)].find((a) => !xs.includes(a));
@@ -794,7 +784,7 @@ export default class Focus extends View {
         .child(ghost ? (verb ? badge(verb) : div()) : swept(a) ? badge("unsettle")
           // A row folding away after the agent came back has no settle time any more: no time on it.
           : over ? undo : div().flex_none().text_size(12).text_color(t.dim).child(!settledAt(a) ? "" : closable(a)
-            ? `closes ${Math.max(1, Math.ceil((settledAt(a)[0] + DELAY - now) / 60000))}m` : ago(settledAt(a)[0], now)));
+            ? "closing" : ago(settledAt(a)[0], now)));
     };
 
     // A closed settled agent: the slim row's look; a click resumes it where it was, hovered its time becomes forget.
