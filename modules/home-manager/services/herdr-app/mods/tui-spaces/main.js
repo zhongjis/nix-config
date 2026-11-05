@@ -1,13 +1,15 @@
 // Workspace spaces: stable colored avatars, worktrees under their checkout,
 // grouped by machine when more than one is known. After a space's name, the repo
-// its first terminal is in now, only where unusual: branch, ahead/behind. Agent state lives in the agents list, not here. Click to
+// its first terminal is in now, only where unusual: branch, ahead/behind. Agent state lives in the agents list, not here,
+// except a chip counting the space's sub-agents (live and hibernated, space.js) that opens tui-subagents. Click to
 // switch, right-click for its menu, drag to reorder. A repo's worktrees go by their branch, folded behind a count
 // on its row; the open ones bright, the rest dim (a click opens one as a space).
 
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { Repositories } from "./repos.js";
-import { spaces, machines, panes, run, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout } from "herdr";
+import { inSpace, spaceOf } from "./space.js";
+import { spaces, machines, panes, terminals, run, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout } from "herdr";
 
 function find(node, id) {
   if (node?.id === id) return node;
@@ -407,6 +409,29 @@ export default class Spaces extends View {
       .child(svg(`mods/workspace-chrome/chevron-${r.open ? "down" : "right"}.svg`).size(10).flex_none());
   }
 
+  // Per space, its sub-agents: live ones (space.js) and hibernated ones (tui-focus), read once per render.
+  subAgents() {
+    const all = terminals(), byAddress = new Map(all.map((k) => [k.address, k]));
+    const sleeping = shared("tui-focus.hibernated") ?? [];
+    return (id) => inSpace(all, id).length
+      + sleeping.filter((r) => (r.space ?? spaceOf({ parent: r.parent }, byAddress)) === id).length;
+  }
+
+  // On a space's row: how many sub-agents work for it; a click lists them (tui-subagents), to peek at or revive.
+  subChip(w, n, t) {
+    return h_flex().id(`subs-${w.id}`).flex_none().h(20).gap(3).px(3).items_center().text_size(11.5).text_color(t.dim)
+      .cursor_pointer().hover(s => s.text_color(t.foreground))
+      .role("button").accessibility_label("Show sub-agents")
+      .tooltip(`${n} sub-agent${n > 1 ? "s" : ""}`)
+      .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
+      .on_mouse_up("left", (_e, cx) => {
+        cx.stop_propagation();
+        openOverlay({ mod: "tui-subagents", kind: "popup", width: 300, height: Math.min(360, 16 + 46 * n), props: { space: w.id } });
+      })
+      .child(svg("mods/workspace-chrome/terminal.svg").size(12).flex_none())
+      .child(String(n));
+  }
+
   // A worktree without a space: the same line as an open one, dimmed; a click opens it.
   vacant({ w, g }, t) {
     return h_flex().id(`worktree-${g.repo}-${g.folder}`).h(28).flex_none().px(8).gap(9).items_center().rounded(8).cursor_pointer().hover(s => s.bg(t.hover))
@@ -428,6 +453,7 @@ export default class Spaces extends View {
     const branch = tree ? g?.branch ?? null : null;
     const own = Boolean(branch) && w.named && w.name !== branch;
     const where = tree ? (own ? branch : "") : this.gitWhere(g, tree, w.name);
+    const subs = this.subs?.(w.id) ?? 0;
     return v_flex()
       .relative()
       .id(`space-${w.id}`)
@@ -475,6 +501,7 @@ export default class Spaces extends View {
           .child(branch && !own ? this.branchLabel(branch, t.foreground, t) : div().flex_shrink(0).max_w(150).truncate().text_color(t.foreground).child(w.name))
           .child(g ? this.gitTail(g, t) : div().flex_1())
           .child(this.badge(g, t))
+          .when(subs > 0, el => el.child(this.subChip(w, subs, t)))
           .when(Boolean(r.count), el => el.child(this.worktreeChip(r, t))),
       )
       .when(Boolean(where), (el) => el.child(
@@ -511,6 +538,7 @@ export default class Spaces extends View {
       changed = true;
     }
     if (changed) setShared("space.colors", kept);
+    this.subs = this.subAgents();
     return v_flex().size_full().min_h(0).bg(t.chrome).text_size(13)
       .child(h_flex().h(31).pl(16).pr(10).items_center().justify_between().text_size(11.5).text_color(t.dim)
         .when(!collapsed, el => el.child("Spaces"))

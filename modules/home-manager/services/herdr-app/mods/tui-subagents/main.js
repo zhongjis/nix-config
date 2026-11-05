@@ -1,10 +1,12 @@
-// A popup listing an agent's live sub-agents (props().parent), all the way down; a click peeks at one.
-// Opened from tui-focus cards' sub-agents line. Hibernated workers (shared "tui-focus.hibernated") show a moon and
+// A popup listing an agent's live sub-agents (props().parent), all the way down, or every sub-agent working for a
+// space (props().space, space.js); a click peeks at one. Opened from tui-focus cards' sub-agents line and
+// tui-spaces' sub-agents chip. Hibernated workers (shared "tui-focus.hibernated") show a moon and
 // how long ago; a click revives one where it was (same name, folder, parent, session), then peeks at it.
 
 import { View, div, image, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { agents, terminals, theme, run, props, closeOverlay, exec, hc, shared, setShared, notify } from "herdr";
+import { inSpace, spaceOf } from "./space.js";
 
 const HIBERNATED = "tui-focus.hibernated";
 
@@ -23,6 +25,7 @@ async function revive(r) {
   const args = ["run", "--bg", "--json", "--cwd", r.cwd, "--outlive-parent"];
   if (r.name) args.push("--name", r.name);
   if (terminals().some((k) => k.address === r.parent && k.state === "live")) args.push("--parent", r.parent);
+  if (r.space) args.push("--label", `space=${r.space}`);
   const res = await hc([...args, ...r.line.split(" ")]).catch((e) => ({ code: 1, stderr: String(e) }));
   if (res.code !== 0) {
     notify({ title: "Couldn't revive the agent", body: `${r.title}: ${res.stderr.trim()}`, level: "error" });
@@ -40,6 +43,8 @@ const icon = (p, size, color) => !p?.icon ? null
 // Live sub-agents of `addr`, depth first, with their depth.
 const tree = (all, addr, depth = 0) => all.filter((k) => k.parent === addr && k.state === "live")
   .flatMap((k) => [{ k, depth }, ...tree(all, k.address, depth + 1)]);
+// What the popup lists: a space's sub-agents, else the parent's.
+const listOf = (all, p) => p?.space ? inSpace(all, p.space) : tree(all, p?.parent);
 
 const base = (path) => path.replace(/[\\/]+$/, "").split(/[\\/]/).pop() || path;
 
@@ -66,22 +71,25 @@ export default class SubAgents extends View {
   refresh(cx) {
     cx.spawn(async (cx) => {
       const parent = props()?.parent, all = terminals();
-      const ks = [all.find((k) => k.address === parent), ...tree(all, parent).map((r) => r.k)].filter((k) => k?.cwd);
+      const ks = [all.find((k) => k.address === parent), ...listOf(all, props()).map((r) => r.k)].filter((k) => k?.cwd);
       for (const k of ks) this.places[k.address] = await place(k);
       cx.notify();
     });
   }
 
   render() {
-    const t = theme(), { parent, overlay } = props() ?? {};
+    const t = theme(), { parent, space, overlay } = props() ?? {};
     // A sub-agent with a pane is in agents(); else its raw word, error counting as blocked.
     const listed = new Map(agents().map((a) => [a.address, a.status]));
     const word = (k) => { const s = listed.get(k.address) ?? k.status; return s === "error" ? "blocked" : s; };
     const color = { working: t.working, blocked: t.blocked, done: t.done, idle: t.idle };
-    const rows = tree(terminals(), parent);
+    const rows = listOf(terminals(), props());
     const mine = this.places[parent] ?? {};
     const under = new Set([parent, ...rows.map((r) => r.k.address)]), now = Date.now();
-    const sleeping = (shared(HIBERNATED) ?? []).filter((r) => under.has(r.parent));
+    const byAddress = new Map(terminals().map((k) => [k.address, k]));
+    // A row from before workers carried `space` goes by its parent's.
+    const sleeping = (shared(HIBERNATED) ?? []).filter((r) => space
+      ? (r.space ?? spaceOf({ parent: r.parent }, byAddress)) === space : under.has(r.parent));
     return v_flex().id("subagents-root").size_full().p(6).gap(2).text_size(13).bg(t.popover).overflow_y_scrollbar()
       .when(rows.length === 0 && sleeping.length === 0, (el) => el.child(div().p(8).text_color(t.dim).child("No live sub-agents.")))
       .children(rows.map(({ k, depth }) => {

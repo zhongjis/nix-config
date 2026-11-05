@@ -9,7 +9,7 @@
 // session (`resume=`) and its terminal's pid (`resume.pid=`). Claude Code's line comes from its own pid file; Pi's
 // from integrations/pi.ts, which this mod installs into Pi. A kept terminal comes back from a reboot as a shell
 // with a new pid in the same pane: the line is typed into it, or, for a settled one, kept as a closed row.
-// Hibernating: an orchestrator worker (a sub-agent labelled `hibernate=ok`) idle past DELAY is exited the same
+// Hibernating: an orchestrator worker (a sub-agent labelled `hibernate=ok`) idle past HIBERNATE is exited the same
 // way. Its terminal finishes with `hibernated=<ms>` and `resume=<line>` on it, so its parent can revive it (rm,
 // then run the line); shared "tui-focus.hibernated" lists them for the cards and the sub-agents popup.
 
@@ -30,7 +30,7 @@ const GRACE = 2000;
 const byAddress = (x, y) => x.address.localeCompare(y.address);
 // Closed settled agents: [{key, title, space, cwd, program, argv, at}], newest first.
 const CLOSED = "tui-focus.closed";
-// Hibernated workers: [{address, name, parent, cwd, line, at, title, program}], newest first.
+// Hibernated workers: [{address, name, parent, space, cwd, line, at, title, program}], newest first.
 const HIBERNATED = "tui-focus.hibernated";
 // How each agent exits from its prompt, and the resume line it prints then (both checked by hand: Claude Code
 // "Resume this session with: claude --resume <uuid>", Pi "To resume this session: pi --session <id>").
@@ -39,6 +39,8 @@ const RESUME = /claude --resume [0-9a-f-]{36}|pi --session [0-9a-zA-Z-]+/g;
 const pause = () => exec("sleep", ["0.3"]).catch(() => null);
 // How long a settled agent keeps running before it's closed (ms); undo before then is instant.
 const DELAY = 15 * 60000;
+// How long an orchestrator worker sits idle before it's hibernated (ms).
+const HIBERNATE = 5 * 60000;
 // A card changing section folds away where it was and unfolds where it goes (ms): leaving is quicker, so the
 // list never waits on what's gone. Arriving in Active needing the person (blocked, done) it also glows in its
 // status color, fading over GLOW: a cue for the corner of the eye, beside Herdr's own sound and toast.
@@ -234,11 +236,11 @@ export default class Focus extends View {
     });
   }
 
-  // An orchestrator worker idle (not stuck) past DELAY, once per idle spell. Only its parent works with it, so
+  // An orchestrator worker idle (not stuck) past HIBERNATE, once per idle spell. Only its parent works with it, so
   // focus doesn't hold it back as it does a settled agent.
   sleepy(k) {
     return Boolean(k.parent) && k.labels?.hibernate === "ok" && !k.labels?.hibernated && ["idle", "done"].includes(k.status?.state)
-      && k.status_ms > 0 && Date.now() - k.status_ms >= DELAY && !this.tried.has(`hibernate:${k.address}:${k.status_ms}`);
+      && k.status_ms > 0 && Date.now() - k.status_ms >= HIBERNATE && !this.tried.has(`hibernate:${k.address}:${k.status_ms}`);
   }
 
   // Exits it as retire() does and keeps its resume line on the finished terminal. Labelled first, so neither
@@ -274,7 +276,7 @@ export default class Focus extends View {
     const resume = ns ? `env ${ns} ${line}` : line;
     await hc(["label", k.address, `resume=${resume}`, "resume.pid="]).catch(() => null);
     const program = t.program && { name: t.program.name, icon: t.program.icon, tint: t.program.tint };
-    setShared(HIBERNATED, [{ address: k.address, name: k.name, parent: k.parent, cwd: k.cwd, line: resume, at, title, program },
+    setShared(HIBERNATED, [{ address: k.address, name: k.name, parent: k.parent, space: k.labels?.space, cwd: k.cwd, line: resume, at, title, program },
       ...(shared(HIBERNATED) ?? []).filter((r) => r.address !== k.address)]);
   }
 
