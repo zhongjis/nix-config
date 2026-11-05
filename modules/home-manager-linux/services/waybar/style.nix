@@ -227,14 +227,6 @@
         color: #ea6962;
       }
 
-      #idle_inhibitor {
-        color: #fff4d2;
-      }
-
-      #idle_inhibitor.activated {
-        color: #8ec07c;
-      }
-
       /* ================================ */
       /*            battery               */
       /* ================================ */

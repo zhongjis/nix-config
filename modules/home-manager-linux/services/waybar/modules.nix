@@ -134,8 +134,8 @@ in {
           "idle_inhibitor": {
               "format": "{icon}",
               "format-icons": {
-                  "activated": "",
-                  "deactivated": ""
+                  "activated": "<span color='#202020' bgcolor='#8ec07c' > 󰈈 </span>",
+                  "deactivated": "<span color='#202020' bgcolor='#fff4d2' > 󰈉 </span>"
               },
               "tooltip-format-activated": "Keep awake enabled (click to allow idle sleep)",
               "tooltip-format-deactivated": "Idle sleep allowed (click to keep awake)"
