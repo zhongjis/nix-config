@@ -25,19 +25,20 @@ const api = {
     }
     return null;
   },
-  exec: async (command, args) => {
-    if (command !== "herdr-app") return result;
-    assert.equal(args[0], "do");
-    assert.equal(args[1], "tab.new");
-    const target = JSON.parse(args[2]);
-    events.push(["tab.new", target]);
-    if (failCreation === "reject") throw new Error("launch failed");
-    if (failCreation) return { ...result, code: 1, stderr: "creation failed" };
-    assert.equal(target.folder, "/live");
-    liveSpaces.find((s) => s.id === target.space).tabs.push({ id: "blank", panes: 1 });
-    return result;
-  },
+  exec: async () => result,
   hc: async (args) => {
+    if (args[0] === "run") {
+      // The replacement tab comes from the core, never tab.new (which would select it).
+      events.push(["hc.run", args]);
+      if (failCreation === "reject") throw new Error("launch failed");
+      if (failCreation === "unlisted") return result;
+      if (failCreation) return { ...result, code: 1, stderr: "creation failed" };
+      const label = (k) => args.find((a) => a.startsWith(`${k}=`)).slice(k.length + 1);
+      assert.ok(args.includes("--no-parent") && args.includes("--bg"));
+      assert.equal(args[args.indexOf("--cwd") + 1], "/live");
+      liveSpaces.find((s) => s.id === label("herdr.space")).tabs.push({ id: label("herdr.tab"), panes: 1, blank: true });
+      return result;
+    }
     if (args[0] === "keys") onKeys();
     return { ...result, stdout: args[0] === "read" && reads++ > 0 ? "pi --session abc123" : "" };
   },
@@ -95,25 +96,25 @@ assert.deepEqual(actions(), []);
 now = settledAt + 45000;
 for (const timer of timers.filter((t) => 45000 % t.ms === 0)) timer.fn(cx);
 await drain();
-assert.deepEqual(actions(), ["tab.new", "pane.close"]);
+assert.deepEqual(actions(), ["hc.run", "pane.close"]);
 assert.equal(liveSpaces.length, 1);
-assert.equal(liveSpaces[0].tabs[0].id, "blank");
+assert.ok(liveSpaces[0].tabs[0].blank);
 assert.equal(saved.get("tui-focus.closed")[0].argv.join(" "), "pi --session abc123");
 
 for (const extra of [{ focused: true }, { status: "working" }, { status: "blocked" }, { address: "remote/t1" }, { app: "codex" }]) {
   fixture(extra).closeDue(cx); await drain(); assert.deepEqual(actions(), []);
 }
-for (const kind of ["split", "tabs", "late-close", "failure", "reject", "missing-resume"]) {
+for (const kind of ["split", "tabs", "late-close", "failure", "reject", "unlisted", "missing-resume"]) {
   const f = fixture();
   if (kind === "split") liveSpaces[0].tabs[0].panes = 2;
   if (kind === "tabs" || kind === "late-close") liveSpaces[0].tabs.push({ id: "other", panes: 1 });
   if (kind === "late-close") onKeys = () => { liveSpaces[0].tabs.pop(); };
-  if (kind === "failure" || kind === "reject") failCreation = kind === "reject" ? "reject" : true;
+  if (kind === "failure" || kind === "reject" || kind === "unlisted") failCreation = kind === "failure" ? true : kind;
   if (kind === "missing-resume") reads = -100;
   f.closeDue(cx); await drain();
   const expected = kind === "split" || kind === "tabs" ? ["pane.close"]
-    : kind === "failure" || kind === "reject" ? ["tab.new"]
-    : kind === "missing-resume" ? [] : ["tab.new", "pane.close"];
+    : kind === "failure" || kind === "reject" || kind === "unlisted" ? ["hc.run"]
+    : kind === "missing-resume" ? [] : ["hc.run", "pane.close"];
   assert.deepEqual(actions(), expected, kind);
   assert.equal(liveSpaces.length, 1, kind);
 }
@@ -123,7 +124,7 @@ for (const failed of [false, true]) {
   await f.restore({ address: "t1", pid: 2, cwd: "/live", labels: {
     resume: "pi --session abc123", "resume.pid": "1", settled: "1:0", "herdr.space": "s1",
   } });
-  assert.deepEqual(actions(), failed ? ["tab.new"] : ["tab.new", "pane.close"]);
+  assert.deepEqual(actions(), failed ? ["hc.run"] : ["hc.run", "pane.close"]);
 }
 // The separate orchestrator-worker threshold remains five minutes.
 const f = fixture(), worker = { parent: "parent", address: "worker", labels: { hibernate: "ok" }, status: { state: "idle" } };

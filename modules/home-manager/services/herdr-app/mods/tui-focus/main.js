@@ -204,16 +204,29 @@ export default class Focus extends View {
     if (!p) return;
     const s = spaces().find((s) => s.tabs.some((t) => t.id === p.tab));
     if (!s) return;
-    if (s.tabs.length === 1 && s.tabs[0].panes === 1) {
-      // run() cannot acknowledge failure; leave the pane open unless its replacement was created.
-      const r = await exec("herdr-app", ["do", "tab.new", JSON.stringify({ space: s.id, folder: p.cwd || s.folder })])
-        .catch((e) => ({ code: 1, stderr: String(e) }));
-      if (r.code !== 0) {
-        notify({ title: "Couldn't preserve the space", body: r.stderr.trim(), level: "error" });
-        return;
+    // Leave the pane open unless its replacement was created.
+    if (s.tabs.length === 1 && s.tabs[0].panes === 1 && !(await this.keepSpace(s, p.cwd || s.folder))) return;
+    run("pane.close", { pane });
+  }
+
+  // A fresh shell tab for a space about to lose its last pane, out of sight: tab.new would select it. A core
+  // terminal labelled with a tab id Herdr doesn't know becomes that tab, unselected; no argv runs that machine's
+  // shell. True once Herdr lists the tab, so the pane close after it can't take the space.
+  async keepSpace(s, folder) {
+    const on = s.machine ?? null, local = (id) => id.split("/").pop();
+    const tab = `tb${Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
+    const args = ["run", "--bg", "--keep", "--no-parent", "--json", "--label", `herdr.space=${local(s.id)}`, "--label", `herdr.tab=${tab}`];
+    if (folder) args.push("--cwd", folder);
+    if (on) args.push("--on", on);
+    const r = await hc(args).catch((e) => ({ code: 1, stderr: String(e) }));
+    if (r.code === 0) {
+      for (let i = 0; i < 20; i++) {
+        if (spaces().find((x) => x.id === s.id)?.tabs.some((t) => local(t.id) === tab)) return true;
+        await pause();
       }
     }
-    run("pane.close", { pane });
+    notify({ title: "Couldn't preserve the space", body: r.code === 0 ? "Its new tab didn't appear, so the pane was left open." : r.stderr.trim(), level: "error" });
+    return false;
   }
 
   // Copies integrations/pi.ts into Pi's extensions when it differs (Pi installed only). Pi loads it at start,
@@ -864,14 +877,13 @@ export default class Focus extends View {
       for (const id of new Set(doomed.map((a) => a.space))) {
         const s = sp.find((s) => s.id === id), tabs = s?.tabs.map((c) => c.id) ?? [];
         const mine = ps.filter((p) => tabs.includes(p.tab));
+        // Claude Code and Pi skip the countdown but keep their resume command; anything else just closes.
+        const close = (cx) => { for (const a of doomed.filter((a) => a.space === id)) closable(a) ? this.retire(a, cx) : run("pane.close", { pane: a.pane }); };
         // The space stays: pane.close refuses its last pane, so a space left empty gets a fresh shell tab first,
         // where its terminals are now: an unnamed space is named after that, and s.folder is only where it began.
-        if (mine.every((p) => gone.has(p.pane))) run("tab.new", { space: id, folder: mine.find((p) => p.cwd)?.cwd || s.folder });
-        // Claude Code and Pi skip the countdown but keep their resume command; anything else just closes.
-        for (const a of doomed.filter((a) => a.space === id)) closable(a) ? this.retire(a, cx) : run("pane.close", { pane: a.pane });
+        if (mine.every((p) => gone.has(p.pane))) cx.spawn(async (cx) => { if (await this.keepSpace(s, mine.find((p) => p.cwd)?.cwd || s.folder)) close(cx); });
+        else close(cx);
       }
-      // tab.new shows the new tab; go back to where the person was.
-      if (tabNow) { run("space.select", { id: spaceNow.id }); run("tab.select", { id: tabNow }); }
     };
     const clearButton = doomed.length > 0 && h_flex().id("settled-clear").h(20).px(6).flex_none().items_center().rounded(4)
       .text_color(this.clearing ? t.blocked : lit("settled-clear", t.dim)).on_hover((on, cx) => {
