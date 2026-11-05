@@ -4,7 +4,7 @@
 
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
-import { exec, run, theme, settings, props, openOverlay, closeOverlay, updates, readTextFile, appHome } from "herdr";
+import { exec, run, theme, settings, props, openOverlay, closeOverlay, updates, readTextFile, appHome, window } from "herdr";
 import { DISCOVER, parseDiscovery, sessionKey, slug, host, brief, ago, normalizeUrl, loopback, toPage, cdpModifiers, keyMessages, textMessages } from "./lib.js";
 import { SETTINGS } from "./settings.js";
 import { remoteMachines, connector, pageTunnel } from "./connect.js";
@@ -36,7 +36,7 @@ async function livePictures() {
   return Boolean(doc?.includes(FREES_PICTURES));
 }
 
-const STILLS = "Stills, not live: Herdr 0.1.11 keeps every picture it shows in memory, and the fix is not released yet. Pictures update after you click or type.";
+const STILLS = "Showing still frames: live streaming isn't available on this Herdr version.";
 
 async function discover(name) {
   const r = await exec("sh", ["-c", DISCOVER], name ? { on: name } : {});
@@ -62,7 +62,7 @@ function iconButton(t, id, name, onClick, tip) {
   return control(
     h_flex()
       .id(id)
-      .size(28)
+      .size(26)
       .flex_none()
       .items_center()
       .justify_center()
@@ -70,9 +70,27 @@ function iconButton(t, id, name, onClick, tip) {
       .text_color(t.muted)
       .hover((s) => s.bg(t.hover).text_color(t.foreground))
       .tooltip(tip)
-      .child(icon(name).size(15)),
+      .child(icon(name).size(14)),
     onClick,
   );
+}
+
+// The ink that reads on a fill: whichever of the theme's background and
+// foreground contrasts more with it.
+function ink(t, fill) {
+  const lum = (c) => {
+    const m = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i.exec(c ?? "");
+    if (!m) return null;
+    const [r, g, b] = m.slice(1).map((h) => {
+      const v = parseInt(h, 16) / 255;
+      return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const [f, bg, fg] = [fill, t.background, t.foreground].map(lum);
+  if (f === null || bg === null || fg === null) return t.foreground;
+  const ratio = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+  return ratio(f, bg) > ratio(f, fg) ? t.background : t.foreground;
 }
 
 function textButton(t, id, label, onClick, { solid = false, danger = false } = {}) {
@@ -86,7 +104,7 @@ function textButton(t, id, label, onClick, { solid = false, danger = false } = {
       .rounded(6)
       .text_size(12)
       .bg(danger ? t.blocked : solid ? t.solid : t.raised)
-      .text_color(danger ? "#ffffff" : solid ? t.solid_foreground : t.foreground)
+      .text_color(danger ? ink(t, t.blocked) : solid ? t.solid_foreground : t.foreground)
       .hover((s) => (danger || solid ? s.opacity(0.9) : s.bg(t.hover)))
       .child(label),
     onClick,
@@ -121,6 +139,8 @@ class Overview {
     this.copy = newId();
     this.machines = [];
     this.hover = null;
+    this.sel = null;
+    this.rows = [];
     this.results = new Map();
     this.asking = new Map();
     this.feeds = new Map();
@@ -138,8 +158,11 @@ class Overview {
 
   scan(cx) {
     if (this.scanning) return;
-    this.scanning = true;
     const started = Date.now();
+    // Hidden, or Herdr in the background: no machine is asked; shown cards keep
+    // streaming and keep their pictures.
+    if (this.scanned && (started - this.lastRender > SETTINGS.scanEveryMs * 2.5 || window()?.active === false)) return this.sync(cx, started);
+    this.scanning = true;
     cx.spawn(async (cx) => {
       try {
         if (this.live === null) this.live = await livePictures();
@@ -193,8 +216,10 @@ class Overview {
 
   publish(cx, started) {
     this.machines = (this.list ?? []).map((m) => this.results.get(m.name) ?? { ...m, sessions: [], waiting: true, error: null });
-    // A card that vanished under the pointer never hears it leave.
-    if (this.hover && !this.machines.some((m) => m.sessions.some((s) => slug(sessionKey(m.name, s)) === this.hover))) this.hover = null;
+    // A card that vanished under the pointer never hears it leave; one that vanished under the ring drops it.
+    const shown = (id) => this.machines.some((m) => m.sessions.some((s) => slug(sessionKey(m.name, s)) === id));
+    if (this.hover && !shown(this.hover)) this.hover = null;
+    if (this.sel && !shown(this.sel)) this.sel = null;
     this.sync(cx, started);
     cx.notify();
   }
@@ -241,6 +266,31 @@ class Overview {
     this.feeds.clear();
   }
 
+  // Arrows move the ring across the cards as drawn (up and down to the same
+  // column of the next row, or its last card); Enter opens the ringed card,
+  // Shift+Enter as a tab. The first arrow rings the card under the pointer, or
+  // the first one.
+  key(e, cx) {
+    const rows = this.rows, flat = rows.flat();
+    const cur = this.sel ?? this.hover, r = rows.findIndex((row) => row.some((x) => x.id === cur));
+    const c = r < 0 ? -1 : rows[r].findIndex((x) => x.id === cur), i = flat.findIndex((x) => x.id === cur);
+    let next;
+    if (e.key === "enter") {
+      if (i < 0) return;
+      this.open(flat[i].m, flat[i].s, e.modifiers.shift);
+    } else if (e.key === "left" || e.key === "right") {
+      next = flat[i < 0 ? 0 : Math.min(flat.length - 1, Math.max(0, i + (e.key === "left" ? -1 : 1)))];
+    } else if (e.key === "up" || e.key === "down") {
+      const row = rows[i < 0 ? 0 : Math.min(rows.length - 1, Math.max(0, r + (e.key === "up" ? -1 : 1)))];
+      next = row?.[i < 0 ? 0 : Math.min(row.length - 1, c)];
+    } else return;
+    cx.stop_propagation();
+    if (next) {
+      this.sel = next.id;
+      cx.notify();
+    }
+  }
+
   card(t, m, s, w) {
     const feed = this.feedFor(m, s);
     const st = statusOf(t, feed, s);
@@ -248,6 +298,7 @@ class Overview {
     const url = feed?.url ?? feed?.activeTab?.url ?? s.url;
     const id = slug(sessionKey(m.name, s));
     const hovered = this.hover === id;
+    const ringed = this.sel === id;
     const healthy = st.color === t.working;
     const title = feed?.title || host(url) || brief(url) || "—";
     // The host only when the title doesn't already say it.
@@ -272,19 +323,21 @@ class Overview {
             .rounded(8)
             .overflow_hidden()
             .border_1()
-            .border_color(hovered ? t.accent : t.border)
+            .border_color(hovered || ringed ? t.accent : t.border)
             .bg(t.canvas)
             .children(feed ? feed.frames.view() : [])
             .when(!feed || feed.frames.empty, (el) =>
-              el.child(h_flex().absolute().inset_0().items_center().justify_center().px(16).text_size(11.5).text_color(t.dim).child(st.text)))
-            .when(hovered, (el) => el.child(
+              el.child(h_flex().absolute().inset_0().items_center().justify_center().px(16).text_size(12).text_color(t.dim).child(st.text)))
+            // The keyboard's ring: a second pixel inside the accent border.
+            .when(ringed, (el) => el.child(div().absolute().inset_0().rounded(7).border_1().border_color(t.accent)))
+            .when(hovered || ringed, (el) => el.child(
               control(
                 h_flex()
                   .id(`ab-tab-${id}`)
                   .absolute()
                   .top(6)
                   .right(6)
-                  .size(28)
+                  .size(26)
                   .items_center()
                   .justify_center()
                   .rounded(6)
@@ -294,7 +347,7 @@ class Overview {
                   .shadow_sm()
                   .text_color(t.foreground)
                   .hover((x) => x.bg(t.hover))
-                  .tooltip("Open as a tab")
+                  .tooltip("Open as a tab  Shift+Enter")
                   .child(icon("app-window").size(14)),
                 () => this.open(m, s, true),
               ))),
@@ -308,10 +361,10 @@ class Overview {
                 .gap(7)
                 .items_center()
                 .when(!healthy, (el) => el.child(dot(st.color)))
-                .child(div().flex_none().font_semibold().text_size(12.5).text_color(t.foreground).child(s.session))
+                .child(div().flex_none().font_semibold().text_size(13).text_color(t.foreground).child(s.session))
                 .when(Boolean(s.namespace), (el) => el.child(div().flex_none().text_size(11).text_color(t.dim).child(s.namespace)))
                 .child(div().flex_1().min_w(0).truncate().text_size(12).text_color(t.muted).child(where ? `${title} · ${where}` : title)))
-            .child(div().min_h(16).truncate().text_size(11.5).text_color(st.color === t.blocked && feed && !feed.frames.empty ? t.blocked : t.dim).child(
+            .child(div().min_h(16).truncate().text_size(11).text_color(st.color === t.blocked && feed && !feed.frames.empty ? t.blocked : t.dim).child(
               !healthy && feed && !feed.frames.empty ? st.text : last ? `${last.text} · ${ago(Date.now() - last.at)}` : "")),
         ),
       () => this.open(m, s, false),
@@ -346,6 +399,9 @@ class Overview {
           el.child(h_flex().flex_wrap().gap(GAP).children(m.sessions.map((s) => this.card(t, m, s, cardW)))));
     const shown = this.machines.filter((m) => m.sessions.length || m.waiting || m.slow || m.error);
     const idle = this.machines.filter((m) => !shown.includes(m));
+    // The cards as drawn, row by row, for the arrow keys.
+    this.rows = shown.flatMap((m) => Array.from({ length: Math.ceil(m.sessions.length / cols) }, (_, r) =>
+      m.sessions.slice(r * cols, (r + 1) * cols).map((s) => ({ id: slug(sessionKey(m.name, s)), m, s }))));
 
     return v_flex()
       .id("ab-root")
@@ -363,7 +419,7 @@ class Overview {
         if (e.key === "escape" && props()?.overlay) {
           cx.stop_propagation();
           closeOverlay(props().overlay);
-        }
+        } else this.key(e, cx);
       })
       .child(
         h_flex()
@@ -380,13 +436,13 @@ class Overview {
           .child(div().flex_none().font_semibold().text_size(13).child("Agent browsers"))
           .child(div().flex_none().text_size(12).text_color(t.muted).child(this.scanned ? `${total} ${total === 1 ? "session" : "sessions"}` : "looking…"))
           .child(div().flex_1())
-          .when(Boolean(this.othersError), (el) => el.child(div().min_w(0).text_size(11.5).text_color(t.blocked).truncate().child(this.othersError)))
+          .when(Boolean(this.othersError), (el) => el.child(div().id("ab-others-error").min_w(0).text_size(12).text_color(t.blocked).truncate().tooltip(this.othersError).child(this.othersError)))
           .child(closeButton(t, "Close  Esc") ?? div()),
       )
       .when(this.live === false, (el) =>
-        el.child(h_flex().flex_none().px(16).py(8).gap(8).items_start().text_size(11.5).text_color(t.muted).bg(t.raised)
+        el.child(h_flex().flex_none().px(16).py(8).gap(8).items_start().text_size(12).text_color(t.muted).bg(t.raised)
           .child(icon("camera").size(13).text_color(t.dim))
-          .child(div().flex_1().min_w(0).child(`${STILLS} Each card shows its first frame.`))))
+          .child(div().flex_1().min_w(0).child(`${STILLS} Each card shows its first frame; an open session updates after you click or type.`))))
       .child(
         v_flex()
           .id("ab-list")
@@ -432,6 +488,9 @@ class Viewer {
     this.lastPoint = null;
     this.lastMove = 0;
     this.h = cx.focus_handle();
+    // The viewer's own keys (Esc) work before anything in it is clicked.
+    this.root = cx.focus_handle();
+    this.root.focus();
     this.url = InputState.new({ placeholder: "Go to…" });
     this.shownUrl = "";
     this.url.on("submit", (_e, cx) => {
@@ -456,6 +515,11 @@ class Viewer {
           this.feed?.stop();
           this.feed = null;
           this.found = null;
+          return;
+        }
+        // Herdr in the background: a found session keeps streaming, and no one is asked about it.
+        if ((this.found || this.ended) && window()?.active === false) {
+          if (this.feed) await this.feed.frames.keepAlive(cx, KEEP_MS);
           return;
         }
         const d = await discover(this.machine);
@@ -573,7 +637,7 @@ class Viewer {
       .when(this.control, (el) => el.cursor_pointer())
       .children(feed ? feed.frames.view() : [])
       .when(Boolean(message), (el) =>
-        el.child(h_flex().absolute().inset_0().items_center().justify_center().px(20).text_size(12.5).text_color(t.dim).child(message)))
+        el.child(h_flex().absolute().inset_0().items_center().justify_center().px(20).text_size(13).text_color(t.dim).child(message)))
       .when(this.control, (el) => el.child(div().absolute().inset_0().border_2().border_color(t.accent)))
       .on_mouse_down("left", (e, cx) => {
         cx.stop_propagation();
@@ -617,7 +681,8 @@ class Viewer {
         this.poke(cx);
       })
       .on_key_down((e, cx) => {
-        if (!this.control || !this.feed) return;
+        // A bare Esc and Cmd+Esc are the viewer's (leave Control, close); Shift+Esc reaches the page as Esc.
+        if (!this.control || !this.feed || (e.key === "escape" && !e.modifiers.shift)) return;
         cx.stop_propagation();
         if (e.keystroke === "cmd-v" || e.keystroke === "ctrl-v") {
           for (const m of textMessages(cx.read_from_clipboard())) this.feed.send(m);
@@ -700,14 +765,14 @@ class Viewer {
       )
       .child(h_flex().flex_none().mx(4).p(2).gap(2).rounded(7).bg(t.raised)
         .child(segment("ab-watch", "eye", "Watch", !this.control, "Only watch the page"))
-        .child(segment("ab-control", "mouse-pointer", "Control", this.control, "Clicks and keys go to the page")))
+        .child(segment("ab-control", "mouse-pointer", "Control", this.control, "Clicks and keys go to the page · Esc stops, Shift+Esc sends Esc")))
       .when(feed?.live === false, (el) => el.child(iconButton(t, "ab-still", "camera", (cx) => feed.refresh(cx), "Show the page as it is now")))
       .child(iconButton(t, "ab-open", "external-link", (cx) => this.openHere(current, cx), "Open in your browser"))
       .when(!this.ended, (el) => el.child(iconButton(t, "ab-end", "power", (cx) => {
         this.confirmEnd = !this.confirmEnd;
         cx.notify();
       }, "End this session")))
-      .child(closeButton(t) ?? div());
+      .child(closeButton(t, "Close  Esc") ?? div());
 
     // Asked in place, not through Herdr's confirm: that runs a global command every open viewer would hear.
     const confirmBar = this.confirmEnd && !this.ended
@@ -764,7 +829,8 @@ class Viewer {
       : null;
 
     const log = feed?.activity ?? [];
-    const status = live ? (!feed.live ? "still" : feed.rate ? `live · ${feed.rate} fps` : "live") : st.text;
+    // The stream's state in words at the right; its detail on hover. An error's own words are at the left.
+    const status = live ? (!feed.live ? "still" : feed.rate ? `live · ${feed.rate} fps` : "live") : feed?.phase === "error" ? "disconnected" : st.text;
     const problem = this.note ?? (feed?.phase === "error" ? { text: st.text, error: true } : null);
     const footer = v_flex()
       .flex_none()
@@ -800,14 +866,16 @@ class Viewer {
           .items_center()
           .text_size(12)
           .hover((x) => x.bg(t.hover))
-          .child(h_flex().id("ab-state").size(16).flex_none().items_center().justify_center().tooltip(status).child(dot(st.color)))
           .child(div().flex_1().min_w(0).truncate()
             .text_color(problem?.error ? t.blocked : problem ? t.muted : t.dim)
             .child(problem ? problem.text : log[0] ? `${log[0].text} · ${ago(Date.now() - log[0].at)}` : ""))
           .when(log.length > 0, (el) => el.child(h_flex().flex_none().gap(6).items_center().text_color(this.showLog ? t.foreground : t.muted)
             .child("Activity")
             .child(div().text_color(t.dim).child(String(Math.min(log.length, 30))))
-            .child(icon(this.showLog ? "chevron-down" : "chevron-up").size(13)))),
+            .child(icon(this.showLog ? "chevron-down" : "chevron-up").size(13))))
+          .child(h_flex().id("ab-state").flex_none().max_w(240).ml(4).gap(6).items_center().text_color(st.color === t.blocked ? t.blocked : t.dim).tooltip(st.text)
+            .child(dot(st.color))
+            .child(div().min_w(0).truncate().child(status))),
         (cx) => {
           this.showLog = !this.showLog;
           cx.notify();
@@ -819,6 +887,19 @@ class Viewer {
       .size_full()
       .bg(t.surface)
       .text_color(t.foreground)
+      .track_focus(this.root)
+      .on_key_down((e, cx) => {
+        if (e.key !== "escape") return;
+        // In Control a bare Esc only leaves it; Cmd+Esc closes from either.
+        if (this.control && !e.modifiers.platform) {
+          cx.stop_propagation();
+          this.control = false;
+          cx.notify();
+        } else if (props()?.overlay) {
+          cx.stop_propagation();
+          closeOverlay(props().overlay);
+        }
+      })
       .child(header)
       .child(confirmBar ?? div())
       .child(tabStrip ?? div())
