@@ -219,12 +219,15 @@ export default class Focus extends View {
   }
 
   // Copies integrations/pi.ts into Pi's extensions when it differs (Pi installed only). Pi loads it at start,
-  // so a Pi already running reports its session after its next start.
+  // so a Pi already running reports its session after its next start. mkdir + cp, not `install -D`: BSD install
+  // (macOS) reads -D as a destdir.
   async installPi() {
     const pi = `${home()}/.pi/agent`, from = `${appHome()}/mods/tui-focus/integrations/pi.ts`, to = `${home()}/${PI_EXTENSION}`;
     if ((await exec("test", ["-d", pi]).catch(() => null))?.code !== 0) return;
     if ((await exec("cmp", ["-s", from, to]).catch(() => null))?.code === 0) return;
-    const r = await exec("install", ["-D", "-m", "644", from, to]).catch((e) => ({ code: 1, stderr: String(e) }));
+    const fail = (e) => ({ code: 1, stderr: String(e) });
+    let r = await exec("mkdir", ["-p", to.slice(0, to.lastIndexOf("/"))]).catch(fail);
+    if (r.code === 0) r = await exec("cp", ["-f", from, to]).catch(fail);
     if (r.code !== 0) notify({ title: "Couldn't install the Pi session hook", body: r.stderr.trim(), level: "error" });
   }
 
