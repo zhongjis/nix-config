@@ -1,12 +1,20 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }: let
   stylixEnabled = config.stylix.enable or false;
 in {
   imports = [
     ../../../../custom-home-manager-options/herdr-app
+  ];
+
+  home.packages = [
+    (pkgs.writeShellScriptBin "sessionizer" ''
+      export PATH=${lib.makeBinPath [pkgs.jq pkgs.fzf pkgs.findutils pkgs.coreutils pkgs.gnused config.programs.herdr-app.package]}:"$PATH"
+      ${builtins.readFile ./scripts/herdr-sessionizer.sh}
+    '')
   ];
 
   programs.herdr-app = {
