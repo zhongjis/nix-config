@@ -97,6 +97,8 @@ in {
       tui-tabs = ./mods/tui-tabs;
       # Herdr's `workspace-chrome` footer (Settings, Add machine) with centered icons on the collapsed rail.
       herdr-tui-chrome = ./mods/herdr-tui-chrome;
+      # Replaces Herdr's shipped `changes` panel (reuses its git listing): inline diffs, opens hunk, sends hunk notes to the tab's agent.
+      hunk-review = ./mods/hunk-review;
       # herdr.dev/mods/herdrdev/tmux-prefix
       tmux-prefix = ./mods/tmux-prefix;
       # Vendored and customized (not pinned); upstream LICENSE kept in each folder.

@@ -141,7 +141,7 @@
                       "id": "changes",
                       "type": "block",
                       "content": {
-                        "mod": "changes"
+                        "mod": "hunk-review"
                       }
                     },
                     {
