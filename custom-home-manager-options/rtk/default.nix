@@ -153,7 +153,15 @@ in {
           then "Library/Application Support/rtk/config.toml"
           else "${config.xdg.configHome}/rtk/config.toml";
         source = (pkgs.formats.toml {}).generate "rtk-config.toml" {
-          hooks.exclude_commands = ["pnpm lint" "pnpm run lint" "biome"];
+          # Diffs are the work product reviewers and implementers read; rtk's
+          # compaction truncates large diffs, so pass them through unfiltered.
+          hooks.exclude_commands = [
+            "pnpm lint"
+            "pnpm run lint"
+            "biome"
+            "^git (-C [^ ]+ )?(diff|show)( |$)"
+            "^gh pr diff"
+          ];
           telemetry.enabled = false;
           retriever.mode = "tee";
         };
