@@ -25,6 +25,32 @@
       value = path;
     })
     commonInstructions);
+
+  # Claude Code's Bash tool never runs a shell's direnv hook, so load the
+  # allowed .envrc environment into CLAUDE_ENV_FILE on session start, on cd,
+  # and when .envrc changes. direnv keeps refusing unallowed .envrc files.
+  direnvHook = pkgs.writeShellScript "claude-direnv-hook" ''
+    [ -n "''${CLAUDE_ENV_FILE:-}" ] || exit 0
+    dir=$(${lib.getExe pkgs.jq} -r '.new_cwd // .cwd // empty')
+    [ -n "$dir" ] && cd "$dir" || exit 0
+    direnv export bash >> "$CLAUDE_ENV_FILE" 2>/dev/null || true
+  '';
+  direnvHookEntry = matcher:
+    {
+      hooks = [
+        {
+          type = "command";
+          command = "${direnvHook}";
+          timeout = 120;
+        }
+      ];
+    }
+    // lib.optionalAttrs (matcher != null) {inherit matcher;};
+  direnvHooks = {
+    SessionStart = direnvHookEntry null;
+    CwdChanged = direnvHookEntry null;
+    FileChanged = direnvHookEntry ".envrc";
+  };
 in {
   imports = [
     ../common/mcp
@@ -47,6 +73,24 @@ in {
         printf '%s\n' '{"permissions":{"defaultMode":"bypassPermissions"}}' > "$temporary"
       fi
       mv "$temporary" "$settings"
+    ''}
+  '';
+
+  # Merge the direnv hooks into the writable settings.json, replacing earlier
+  # generations of this hook and leaving every other hook untouched.
+  home.activation.claudeCodeDirenvHooks = lib.hm.dag.entryAfter ["claudeCodePermissions"] ''
+    run ${pkgs.bash}/bin/bash -eu -c ${lib.escapeShellArg ''
+      settings=${lib.escapeShellArg "${config.programs.claude-code.configDir}/settings.json"}
+      temporary=$(mktemp "$settings.XXXXXX")
+      trap 'rm -f "$temporary"' EXIT
+      ${lib.getExe pkgs.jq} --argjson add ${lib.escapeShellArg (builtins.toJSON direnvHooks)} '
+        def isDirenv: any((.hooks // [])[]; (.command? // "") | type == "string" and endswith("-claude-direnv-hook"));
+        reduce ($add | to_entries[]) as $e (.;
+          .hooks[$e.key] = (((.hooks[$e.key] // []) | map(select(isDirenv | not))) + [$e.value]))
+      ' "$settings" > "$temporary"
+      if ! ${lib.getExe pkgs.jq} -e -n --slurpfile a "$settings" --slurpfile b "$temporary" '$a == $b' > /dev/null; then
+        cat "$temporary" > "$settings"
+      fi
     ''}
   '';
 
