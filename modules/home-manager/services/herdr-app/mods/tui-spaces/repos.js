@@ -15,7 +15,7 @@ export class Repositories {
     if (group.busy || Date.now() < group.at) return;
     group.busy = true;
     cx.spawn(async cx => {
-      const [on] = JSON.parse(g.repo);
+      const [on, common] = JSON.parse(g.repo);
       group.at = Date.now() + 60000;
       try {
         const result = await exec("git", ["-c", "core.quotePath=false", "worktree", "list", "--porcelain"], { cwd: g.folder, on });
@@ -42,7 +42,8 @@ export class Repositories {
           const me = this.logins[host];
           const r = await exec("gh", ["pr", "list", "-R", group.github, "--state", "open", "--limit", "200", "--json", "number,headRefName,title,url,statusCheckRollup,reviewDecision,author,updatedAt"], { cwd });
           if (r.code !== 0) throw new Error("PRs unavailable");
-          cache.list = JSON.parse(r.stdout).map(p => ({ number: p.number, branch: p.headRefName, title: p.title, url: p.url, ci: ciRollup(p.statusCheckRollup), review: p.reviewDecision, author: p.author?.login ?? null, mine: Boolean(me) && p.author?.login === me, bot: Boolean(p.author?.is_bot), updatedAt: p.updatedAt, folder: group.worktrees.find(w => w.branch === p.headRefName)?.folder ?? cwd }));
+          // `common`: the checkout group's git common dir, which tui-subagents matches a worker's checkout against.
+          cache.list = JSON.parse(r.stdout).map(p => ({ number: p.number, branch: p.headRefName, title: p.title, url: p.url, ci: ciRollup(p.statusCheckRollup), review: p.reviewDecision, author: p.author?.login ?? null, mine: Boolean(me) && p.author?.login === me, bot: Boolean(p.author?.is_bot), updatedAt: p.updatedAt, folder: group.worktrees.find(w => w.branch === p.headRefName)?.folder ?? cwd, common }));
           const value = Object.fromEntries(Object.entries(this.prs).map(([repo, data]) => [repo, data.list]));
           if (JSON.stringify(value) !== JSON.stringify(shared("tui-spaces.prs"))) setShared("tui-spaces.prs", value);
         } catch { cache.at = Date.now() + 300000; }

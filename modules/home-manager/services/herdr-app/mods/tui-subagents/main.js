@@ -2,8 +2,10 @@
 // counts (props().filter: {space, folder, except}, space.js); a click peeks at one. Opened from tui-focus cards' sub-agents line and
 // tui-spaces' sub-agents chip. Hibernated workers (shared "tui-focus.hibernated") show a moon and
 // how long ago; a click revives one where it was (same name, folder, parent, session), then peeks at it.
-// The keyboard works it too: j/k or the arrows pick a row, Enter peeks or revives, Esc closes.
-// Rows keep one height each (LIVE, ASLEEP): openers size the popup from them (tui-focus, tui-spaces).
+// A live worker on a branch of its own shows that branch's PR (tui-spaces' shared "tui-spaces.prs"), as a space row does.
+// The keyboard works it too: j/k or the arrows pick a row, Enter peeks or revives, p opens the picked worker's PR
+// in the PR panel, Esc closes; a footer under the rows says so.
+// Rows keep one height each (LIVE, ASLEEP), the footer FOOT: openers size the popup from them (tui-focus, tui-spaces).
 
 import { View, div, image, svg } from "gpui-kit";
 import { v_flex, h_flex, v_virtual_list, Scrollbar, VirtualListScrollHandle } from "gpui-base";
@@ -14,6 +16,8 @@ const HIBERNATED = "tui-focus.hibernated";
 // A row's height with the 2px under it: a live one has two lines (the second kept even empty, so a git answer
 // arriving doesn't move the rows), a hibernated one a single line.
 const LIVE = 50, ASLEEP = 32;
+// The key footer, its hairline and the 2px above it; drawn, and counted by openers, only under rows.
+const FOOT = 24;
 // Indents stop here, so a deep tree keeps room for its names.
 const DEPTH = 3;
 
@@ -57,19 +61,20 @@ const base = (path) => path.replace(/[\\/]+$/, "").split(/[\\/]/).pop() || path;
 
 // Where a terminal works: its project (the main checkout's folder, so a worktree reads as its repo) and
 // branch. Outside git: the folder's name, no branch. A terminal on another machine (`vps/t7`) runs git there.
+// `common`, the repo's git folder, finds its PRs in tui-spaces' feed, which has only this machine's.
 async function place(k) {
   const on = k.address.includes("/") ? k.address.split("/")[0] : undefined;
   try {
     const r = await exec("git", ["rev-parse", "--path-format=absolute", "--git-common-dir", "--abbrev-ref", "HEAD"], { cwd: k.cwd, on });
     const [common, branch] = r.stdout.trim().split("\n");
-    if (r.code === 0 && common) return { project: base(common.replace(/[\\/]\.git$/, "")), branch: branch && branch !== "HEAD" ? branch : null };
+    if (r.code === 0 && common) return { project: base(common.replace(/[\\/]\.git$/, "")), branch: branch && branch !== "HEAD" ? branch : null, common: on ? null : common };
   } catch {}
   return { project: base(k.cwd), branch: null };
 }
 
 export default class SubAgents extends View {
   init(_props, cx) {
-    // address → {project, branch}, for the parent and each sub-agent; re-read gently, as branches change.
+    // address → {project, branch, common}, for the parent and each sub-agent; re-read gently, as branches change.
     this.places = {};
     // The picked row, and the hibernated ones being revived (address): a second click on one does nothing.
     this.at = 0;
@@ -98,13 +103,21 @@ export default class SubAgents extends View {
     const color = { working: t.working, blocked: t.blocked, done: t.done, idle: t.idle };
     const rows = listOf(terminals(), props());
     const mine = this.places[parent] ?? {};
+    // A worker's PR: the open one on its branch in its repo, its author's first, as a space row's badge picks.
+    // None on the parent's branch: that PR is the parent's.
+    const prs = Object.entries(shared("tui-spaces.prs") ?? {}).flatMap(([repo, list]) => list.map((p) => ({ ...p, repo })));
+    const prOf = (at) => {
+      if (!at?.common || !at.branch || at.branch === mine.branch) return null;
+      const on = prs.filter((p) => p.common === at.common && p.branch === at.branch);
+      return on.find((p) => p.mine) ?? on[0] ?? null;
+    };
     const under = new Set([parent, ...rows.map((r) => r.k.address)]), now = Date.now();
     const byAddress = new Map(terminals().map((k) => [k.address, k]));
     // A row from before workers carried `space` goes by its parent's.
     const sleeping = (shared(HIBERNATED) ?? []).filter((r) => filter
       ? matches(r.space ?? spaceOf({ parent: r.parent }, byAddress), r.cwd, filter) : under.has(r.parent));
     // One list for the pointer and the keyboard: live rows, then hibernated ones.
-    const items = [...rows.map((r) => ({ key: `sub:${r.k.address}`, h: LIVE, live: r })),
+    const items = [...rows.map((r) => ({ key: `sub:${r.k.address}`, h: LIVE, live: r, pr: prOf(this.places[r.k.address]) })),
       ...sleeping.map((r) => ({ key: `hib:${r.address}`, h: ASLEEP, asleep: r }))];
     this.at = Math.max(0, Math.min(this.at, items.length - 1));
     // Peeks at a live one; revives a hibernated one, then peeks. Closed after: closing first could cancel the
@@ -123,18 +136,35 @@ export default class SubAgents extends View {
         try { await revive(r); } finally { this.reviving.delete(r.address); closeOverlay(overlay); }
       });
     };
+    // p: the picked worker's PR in the PR panel, as a space row's badge opens one. Closed last, after the commands.
+    const openPr = (pr) => {
+      if (!pr) return;
+      setShared("pr.select", { repo: pr.repo, number: pr.number, at: Date.now() });
+      run("layout.select", { stack: "panel-body", child: "pr" });
+      run("layout.show", { id: "panel" });
+      closeOverlay(overlay);
+    };
     const step = (by) => {
       if (!items.length) return;
       this.at = (this.at + by + items.length) % items.length;
       this.scroll.scroll_to_item(this.at);
     };
-    const liveRow = ({ k, depth }, on) => {
+    // CI as a mark that reads without its color (pr-flow's): passed, failed, running.
+    const marks = { pass: ["check", t.done, "CI passing"], fail: ["cross", t.blocked, "CI failing"], pending: ["pending", t.working, "CI running"] };
+    const liveRow = ({ k, depth }, on, pr) => {
       const st = word(k);
       // Second line: project and branch, each only when it differs from the parent's.
       const at = this.places[k.address] ?? {};
       const info = [at.project !== mine.project ? at.project : null, at.branch !== mine.branch ? at.branch : null].filter(Boolean);
       const pic = icon(k.program, 14, t.muted), name = k.name || k.template || k.program?.name || k.address;
-      // First line: name and status. Second: project/branch, and the agent icon on the right.
+      // Its PR, as a space row's badge draws it: display only (the row's click peeks; p opens it), never cut.
+      const ci = marks[pr?.ci];
+      const chip = pr ? h_flex().id(`pr-${k.address}`).flex_none().gap(3).items_center().text_size(11).text_color(t.muted)
+        .tooltip([`PR #${pr.number}`, ci?.[2], pr.title].filter(Boolean).join(" · "))
+        .accessibility_label([`PR #${pr.number}`, ci?.[2]].filter(Boolean).join(", "))
+        .child(`#${pr.number}`)
+        .when(Boolean(ci), (el) => el.child(svg(`mods/pr-flow/${ci?.[0]}.svg`).size(11).flex_none().text_color(ci?.[1]))) : null;
+      // First line: name and status. Second: project/branch, its PR, and the agent icon on the right.
       return v_flex().id(`sub-${k.address}`).h(LIVE - 2).py(5).pl(8 + Math.min(depth, DEPTH) * 16).pr(8).rounded(6)
         .cursor_pointer().when(on, (el) => el.bg(t.selected)).hover((s) => s.bg(on ? t.selected : t.hover))
         .role("button").accessibility_label(`Peek at ${name}`)
@@ -143,6 +173,7 @@ export default class SubAgents extends View {
           .child(div().flex_none().text_size(11).text_color(color[st] ?? t.unknown).child(st ?? "")))
         .child(h_flex().h(18).gap(8).items_center().min_w(0)
           .child(div().flex_1().min_w(0).truncate().text_size(11).text_color(t.dim).child(info.join(" · ")))
+          .when(Boolean(chip), (el) => el.child(chip))
           .when(Boolean(pic), (el) => el.child(pic)));
     };
     const asleepRow = (r, on) => {
@@ -158,6 +189,13 @@ export default class SubAgents extends View {
             .child(svg("mods/tui-focus/moon.svg").size(11).flex_none().text_color(t.dim)).child(ago(r.at, now)))
         .when(Boolean(pic), (el) => el.child(pic));
     };
+    // The keys, under the rows: a cap per key, p's lit while the picked row has a PR to open.
+    const cap = (key, lit) => div().px(4).rounded(3).text_size(10).bg(lit ? t.accent : t.raised).text_color(lit ? t.background : t.muted).child(key);
+    const hint = (keys, label, lit = false) => h_flex().flex_none().gap(3).items_center().text_color(lit ? t.foreground : t.dim)
+      .children(keys.map((x) => cap(x, lit))).child(label);
+    const footer = h_flex().flex_none().h(FOOT - 2).mt(2).pt(3).px(8).gap(10).items_center().border_t(1).border_color(t.border).text_size(11)
+      .child(hint(["j", "k"], "move")).child(hint(["↵"], "peek")).child(hint(["p"], "open PR", Boolean(items[this.at]?.pr)))
+      .child(hint(["esc"], "close"));
     return v_flex().id("subagents-root").track_focus(this.keys).size_full().p(6).text_size(13).bg(t.popover)
       .on_key_down((e, cx) => {
         const plain = !e.modifiers.control && !e.modifiers.alt && !e.modifiers.platform;
@@ -165,18 +203,19 @@ export default class SubAgents extends View {
         else if (e.key === "down" || (plain && e.key === "j")) step(1);
         else if (e.key === "up" || (plain && e.key === "k")) step(-1);
         else if (e.key === "enter" && items[this.at]) choose(items[this.at], cx);
+        else if (plain && e.key === "p") openPr(items[this.at]?.pr);
         else return;
         cx.stop_propagation();
         cx.notify();
       })
       .when(items.length === 0, (el) => el.child(div().p(8).text_color(t.dim).child("No workers.")))
       // A popup takes its content's height and a virtual list has none of its own: state it, capped as openers
-      // cap the popup (360 less the 12px padding).
-      .when(items.length > 0, (el) => el.child(div().relative().flex_none().h(Math.min(348, items.reduce((s, x) => s + x.h, 0)))
+      // cap the popup (360 less the 12px padding and the footer).
+      .when(items.length > 0, (el) => el.child(div().relative().flex_none().h(Math.min(348 - FOOT, items.reduce((s, x) => s + x.h, 0)))
         .child(v_virtual_list("subagents-rows", items.length, items.map((x) => x.h), (i) => items[i].key,
           (range) => items.slice(range.start, range.end).map((x, j) => {
             const on = range.start + j === this.at;
-            return div().h(x.h).pb(2).child(x.live ? liveRow(x.live, on) : asleepRow(x.asleep, on));
+            return div().h(x.h).pb(2).child(x.live ? liveRow(x.live, on, x.pr) : asleepRow(x.asleep, on));
           })).track_scroll(this.scroll).size_full()
           .on_item_click((key, cx) => {
             const i = items.findIndex((x) => x.key === key);
@@ -185,6 +224,7 @@ export default class SubAgents extends View {
             choose(items[i], cx);
             cx.notify();
           }))
-        .child(Scrollbar.vertical("subagents-rows").absolute().inset_0())));
+        .child(Scrollbar.vertical("subagents-rows").absolute().inset_0()))
+        .child(footer));
   }
 }

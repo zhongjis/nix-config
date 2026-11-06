@@ -62,8 +62,9 @@ function ink(t, color) {
   };
   return contrast(t.background) > contrast(t.foreground) ? t.background : t.foreground;
 }
-// tui-subagents' rows (live 50px, hibernated 32px) and padding: its popup's height for what it will list.
-const subsHeight = (live, asleep) => Math.min(360, Math.max(46, 12 + 50 * live + 32 * asleep));
+// tui-subagents' rows (live 50px, hibernated 32px), padding and, under any rows, its key footer (24px): its popup's
+// height for what it will list.
+const subsHeight = (live, asleep) => Math.min(360, Math.max(46, 12 + 50 * live + 32 * asleep + (live + asleep ? 24 : 0)));
 
 export default class Spaces extends View {
   init(_props, cx) {
