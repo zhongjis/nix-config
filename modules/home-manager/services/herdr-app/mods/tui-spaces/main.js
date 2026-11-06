@@ -24,6 +24,13 @@ function find(node, id) {
 // The sidebar's rail goes by its width, not a flag: dragging its edge narrows it too.
 const narrow = () => (find(layout(), "sidebar")?.size?.px ?? Infinity) < 160;
 
+// Out of the rail, back to the width it had: workspace-chrome's toggle, whose brand row has no room for it on the
+// macOS rail. Mods edited before the rail went by width still read the flag.
+function expandSidebar() {
+  setShared("sidebar.collapsed", false);
+  run("layout.resize", { id: "sidebar", px: shared("sidebar.width") ?? 268 });
+}
+
 // Where a space is now: its first terminal's live folder, else where it was made.
 // `ps`: panes(), read once by the caller (each read copies every pane).
 function place(s, ps) {
@@ -333,7 +340,8 @@ export default class Spaces extends View {
       return layout === "loading" || (!layout && this.machines.some(k => k.name === m && k.state === "connected"))
         || spaces().some(s => (s.machine ?? null) === m && !this.shown.has(s.id));
     };
-    const loadingRow = m => div().id(`machine-loading-${m ?? "local"}`).h(28).flex_none().px(8).text_size(12).text_color(t.dim).child(collapsed ? "…" : "Loading…");
+    const loadingRow = m => div().id(`machine-loading-${m ?? "local"}`).h(28).flex_none().px(8).text_size(12).text_color(t.dim)
+      .when(collapsed, el => el.flex().justify_center()).child(collapsed ? "…" : "Loading…");
     if (!remote.length) return loading(null) && !rows.length ? [loadingRow(null)] : rows.map(draw);
     const machineNames = [null, ...remote];
     return machineNames.flatMap((m) => {
@@ -346,7 +354,7 @@ export default class Spaces extends View {
       // The state in words, for the dot's tooltip.
       const said = connected ? "connected" : (machine?.state ?? "asleep").replace(/_/g, " "), state = said[0].toUpperCase() + said.slice(1);
       const head = h_flex().id(`machine-${m ?? "local"}`).h(26).flex_none().px(collapsed ? 2 : 8).gap(7).items_center().text_size(11).text_color(t.dim)
-        .cursor_pointer().hover(s => s.bg(t.hover))
+        .when(collapsed, el => el.justify_center()).cursor_pointer().hover(s => s.bg(t.hover))
         .on_click((_e, cx) => {
           folded ? this.folded.delete(m) : this.folded.add(m);
           localStorage.setItem("machines.folded", JSON.stringify([...this.folded]));
@@ -369,7 +377,7 @@ export default class Spaces extends View {
           .child(div().id(`machine-state-${m ?? "local"}`).size(6).rounded(3).flex_none().bg(connected ? t.done : t.dim).tooltip(state))
           .child(svg(`mods/workspace-chrome/chevron-${folded ? "right" : "down"}.svg`).size(11).flex_none()));
       const empty = h_flex().id(`machine-new-${m ?? "local"}`).h(28).flex_none().px(8).gap(7).items_center().rounded(7)
-        .text_size(12).text_color(t.dim).cursor_pointer().hover(s => s.bg(t.hover).text_color(t.foreground))
+        .when(collapsed, el => el.justify_center()).text_size(12).text_color(t.dim).cursor_pointer().hover(s => s.bg(t.hover).text_color(t.foreground))
         .on_click(() => run("space.new", { machine: m ?? "" }))
         .child(svg("mods/workspace-chrome/plus.svg").size(12)).when(!collapsed, el => el.child("New space there"));
       if (!collapsed && rebuilt) return [head];
@@ -571,22 +579,40 @@ export default class Spaces extends View {
       ));
   }
 
-  // The rail: each space's avatar color, with its number on it; its name on hover.
-  compact({ w, i, g }, t) {
+  // The rail: each space's avatar color, with the same letter as its wide row; its name on hover. The active one is the raised
+  // band with the accent bar at its edge (the rail's only bar). Its PR chip has no room here: only a failing check
+  // shows, as a mark on the avatar's corner. Agent state stays in the agents list, so no ring.
+  compact({ w, g }, t) {
+    const failing = this.repos.pr(g)?.ci === "fail";
     return h_flex()
       .id(`space-${w.id}`)
-      .h(26)
+      .relative()
+      .h(28)
       .flex_none()
       .justify_center()
       .items_center()
-      .gap(4)
       .cursor_pointer()
-      .when(w.active, (el) => el.bg(t.raised))
+      .when(w.active, (el) => el.bg(t.raised).child(div().absolute().left(0).top(6).bottom(6).w(2).rounded(1).bg(t.accent)))
       .hover((s) => s.bg(w.active ? t.raised : t.hover))
-      .tooltip(w.name)
+      .tooltip(failing ? `${w.name} · CI failing` : w.name)
       .on_click(() => run("space.select", { id: w.id }))
-      .child(this.avatar(w, t, String(i + 1)))
-      .child(this.badge(g, t));
+      .child(this.avatar(w, t, [...w.name][0]?.toUpperCase() ?? "?").relative()
+        // 8px of red in a 1px ring of the rail's color, so it stands off the avatar.
+        .when(failing, (el) => el.child(h_flex().absolute().right(-4).bottom(-4).size(10).rounded(3).border(1).border_color(t.chrome).bg(t.blocked)
+          .items_center().justify_center().child(svg("mods/tui-spaces/ci-fail.svg").size(6).text_color(t.chrome)))));
+  }
+
+  // The rail's top: the macOS traffic lights fill the brand row there, so expanding gets its own row under it (the
+  // wide toggle's icon), then a new space. Each an icon centered in a 28px target.
+  railHead(t, newKey) {
+    const button = (id, icon, label, action) => div().id(id).size(28).flex_none().flex().items_center().justify_center().rounded(6)
+      .text_color(t.dim).cursor_pointer().hover(s => s.bg(t.raised).text_color(t.foreground))
+      .role("button").accessibility_label(label).tooltip(label).on_click(action).child(svg(icon).size(16));
+    return v_flex().flex_none().items_center()
+      .when(window()?.platform === "macos", el => el
+        .child(button("sidebar-expand", "mods/workspace-chrome/sidebar.svg", "Expand sidebar", expandSidebar))
+        .child(div().h(6).flex_none()))
+      .child(button("space-new", "mods/workspace-chrome/plus.svg", newKey ? `New space  ${newKey}` : "New space", () => run("space.new")));
   }
 
   render(cx) {
@@ -613,12 +639,12 @@ export default class Spaces extends View {
         this.endDrag();
         cx.notify();
       })
-      .child(h_flex().h(31).pl(16).pr(10).items_center().justify_between().text_size(12).text_color(t.dim)
-        .when(!collapsed, el => el.child("Spaces"))
+      .child(collapsed ? this.railHead(t, newKey) : h_flex().h(31).pl(16).pr(10).items_center().justify_between().text_size(12).text_color(t.dim)
+        .child("Spaces")
         .child(div().id("space-new").size(26).flex_none().flex().items_center().justify_center().rounded(6)
           .cursor_pointer().hover(s => s.bg(t.hover).text_color(t.foreground)).tooltip(newKey ? `New space  ${newKey}` : "New space")
           .on_click(() => run("space.new")).child(svg("mods/workspace-chrome/plus.svg").size(14))))
-      .child(v_flex().id("spaces-list").flex_1().min_h(0).px(8).pb(14).overflow_y_scrollbar().mode("always")
+      .child(v_flex().id("spaces-list").flex_1().min_h(0).px(collapsed ? 0 : 8).pb(14).overflow_y_scrollbar().mode("always")
         // Released anywhere in the list, or the pointer leaving it (Herdr reports no release outside), ends a drag.
         .on_mouse_up("left", (_e, cx) => { if (this.pressed === null) return; this.endDrag(); cx.notify(); })
         .on_hover((on, cx) => { if (on || this.pressed === null) return; this.endDrag(); cx.notify(); })

@@ -75,6 +75,16 @@ const PI_EXTENSION = ".pi/agent/extensions/herdr-app-session.ts";
 // A shell at its prompt, by the foreground process's name (a login shell's starts with "-").
 const SHELL = /^-?(zsh|bash|fish|sh|dash|nu)$/;
 
+// The sidebar's rail goes by its width, not a flag (as workspace-chrome reads it): dragging its edge narrows it too.
+const sidebar = (n) => (n?.id === "sidebar" ? n : (n?.children ?? []).map(sidebar).find(Boolean));
+const narrow = () => (sidebar(layout())?.size?.px ?? Infinity) < 160;
+// Out of the rail, back to the width it had: workspace-chrome's toggle. Mods edited before the rail went by width
+// still read the flag.
+function expandSidebar() {
+  setShared("sidebar.collapsed", false);
+  run("layout.resize", { id: "sidebar", px: shared("sidebar.width") ?? 268 });
+}
+
 // As T3's sidebar times: no "ago", nothing past days.
 function ago(ms, now) {
   const m = Math.floor((now - ms) / 60000);
@@ -513,6 +523,63 @@ export default class Focus extends View {
       if (settledAt(a)) unsettle(a, cx);
       else if (!busy(a) && !pins.includes(a.address)) settle([a], cx);
     };
+
+    // The rail (the sidebar under 160px): one 28px row per agent in the list's order, its groups (Pinned, Active,
+    // Working as its shelf folds, Settled) told apart by 12px of space alone, Working and Settled at the bottom as
+    // the wide list's shelves are. An agent is its space's avatar as a
+    // circle, and the ring around it is its state: working turns over a faint track, needing the person pulses and
+    // keeps a steady dot (so it doesn't hang on color), done holds still, idle has none. Settled is one outlined
+    // check that unfolds the sidebar with its shelf open. No drag, hover buttons, glows or sub-agents here.
+    if (narrow()) {
+      this.ticking = false;
+      const ring = (a) => {
+        const st = state(a), round = (el) => el.absolute().top(0).left(0).size(24).rounded_full();
+        return st === "working" ? [svg("mods/tui-focus/ring-working.svg").absolute().top(0).left(0).size(24).text_color(t.working).spin(1400)]
+          : st === "blocked" ? [round(div()).border(2).border_color(t.blocked).loop("opacity", { from: 1, to: 0.5, period: 1600 }),
+            // At 45° on the ring, 6px of red in a 1px ring of the rail's color.
+            div().absolute().top(0).left(16).size(8).rounded_full().border(1).border_color(t.chrome).bg(t.blocked)]
+          : st === "done" ? [round(div()).border(1.5).border_color(t.done)]
+          : [];
+      };
+      // Its name, space and state with how long, as the card's corner says it.
+      const said = (a) => {
+        const st = state(a), age = since(a) > 0 ? ago(since(a), now) : "", s = started(a);
+        const machine = a.address.includes("/") ? a.address.split("/")[0] : null;
+        const word = running(a) ? `Working ${s > 0 && s < Infinity ? took(s, now) : ""}`
+          : `${st === "blocked" ? "Needs you" : st === "done" ? "Done" : "Idle"} ${age}`;
+        return [title(a), machine ? `${a.space_name} · ${machine}` : a.space_name, word.trim()].filter(Boolean).join(" · ");
+      };
+      const tile = (a) => h_flex().id(`rail-${a.address}`).h(28).flex_none().items_center().justify_center().cursor_pointer()
+        .when(a.focused, (el) => el.bg(t.raised)).when(!a.focused, (el) => el.hover((s) => s.bg(t.hover)))
+        .role("button").accessibility_label(title(a)).tooltip(said(a))
+        // agent.focus, as a card's click.
+        .on_click(() => run("agent.focus", { terminal: a.address }))
+        .child(h_flex().relative().size(24).flex_none().items_center().justify_center()
+          .child(avatar(a.space, a.space_name, 18).rounded_full()).children(ring(a)));
+      const shelved = put.length + (shared(CLOSED) ?? []).length, inView = put.some((a) => a.focused);
+      const shelfTile = h_flex().id("rail-settled").h(28).flex_none().items_center().justify_center().cursor_pointer()
+        // The one in view settled: its row is folded in here, so the band marks this.
+        .when(inView, (el) => el.bg(t.raised)).when(!inView, (el) => el.hover((s) => s.bg(t.hover)))
+        .role("button").accessibility_label("Show settled agents").tooltip(`${shelved} settled`)
+        .on_click(() => {
+          this.open = true;
+          this.limit = FIRST;
+          localStorage.setItem("open", "true");
+          expandSidebar();
+        })
+        .child(h_flex().size(18).flex_none().items_center().justify_center().rounded(5).border(1).border_color(t.dim)
+          .child(svg("mods/workspace-chrome/check.svg").size(10).text_color(t.dim)));
+      const spaced = (groups) => groups.filter(Boolean).flatMap((xs, i) => (i ? [div().h(12).flex_none(), ...xs] : xs));
+      const top = spaced([
+        pinned.length > 0 && [div().h(10).pt(2).flex_none().flex().justify_center().child(svg("mods/workspace-chrome/pin.svg").size(8).text_color(t.dim)), ...pinned.map(tile)],
+        out.length > 0 && out.map(tile),
+      ]);
+      const bottom = spaced([busyRows.length > 0 && busyRows.map(tile), shelved > 0 && [shelfTile]]);
+      // As the wide list: the top groups scroll, the shelves below them keep to the bottom.
+      return v_flex().id("focus-rail").size_full().min_h(0).py(8).bg(t.chrome)
+        .child(v_flex().id("focus-rail-list").flex_1().min_h(0).overflow_y_scroll().children(top))
+        .when(bottom.length > 0, (el) => el.child(v_flex().flex_none().pt(12).children(bottom)));
+    }
 
     // Dragging, as T3's sidebar does it (Sidebar.drag.ts, Sidebar.pointer.ts). Press a row and move 6px to lift it;
     // it follows the pointer up and down inside the list and says what letting go will do. While it's lifted, the

@@ -95,6 +95,8 @@ in {
       tui-spaces = ./mods/tui-spaces;
       # Herdr's `tabs` mod with icon-only Files/Changes/PR/CI panel buttons.
       tui-tabs = ./mods/tui-tabs;
+      # Herdr's `workspace-chrome` footer (Settings, Add machine) with centered icons on the collapsed rail.
+      herdr-tui-chrome = ./mods/herdr-tui-chrome;
       # herdr.dev/mods/herdrdev/tmux-prefix
       tmux-prefix = ./mods/tmux-prefix;
       # Vendored and customized (not pinned); upstream LICENSE kept in each folder.
