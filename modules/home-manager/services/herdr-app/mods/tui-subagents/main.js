@@ -170,7 +170,9 @@ export default class SubAgents extends View {
         cx.notify();
       })
       .when(items.length === 0, (el) => el.child(div().p(8).text_color(t.dim).child("No workers.")))
-      .when(items.length > 0, (el) => el.child(div().relative().flex_1().min_h(0)
+      // A popup takes its content's height and a virtual list has none of its own: state it, capped as openers
+      // cap the popup (360 less the 12px padding).
+      .when(items.length > 0, (el) => el.child(div().relative().flex_none().h(Math.min(348, items.reduce((s, x) => s + x.h, 0)))
         .child(v_virtual_list("subagents-rows", items.length, items.map((x) => x.h), (i) => items[i].key,
           (range) => items.slice(range.start, range.end).map((x, j) => {
             const on = range.start + j === this.at;
