@@ -571,7 +571,7 @@ export default class Focus extends View {
           .child(svg("mods/workspace-chrome/check.svg").size(10).text_color(t.dim)));
       const spaced = (groups) => groups.filter(Boolean).flatMap((xs, i) => (i ? [div().h(12).flex_none(), ...xs] : xs));
       const top = spaced([
-        pinned.length > 0 && [div().h(10).pt(2).flex_none().flex().justify_center().child(svg("mods/workspace-chrome/pin.svg").size(8).text_color(t.dim)), ...pinned.map(tile)],
+        pinned.length > 0 && [div().h(28).flex_none().flex().items_center().justify_center().child(svg("mods/workspace-chrome/pin.svg").size(16).text_color(t.dim)), ...pinned.map(tile)],
         out.length > 0 && out.map(tile),
       ]);
       const bottom = spaced([busyRows.length > 0 && busyRows.map(tile), shelved > 0 && [shelfTile]]);
