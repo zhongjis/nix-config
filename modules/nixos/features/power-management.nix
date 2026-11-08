@@ -29,4 +29,10 @@
   services.thermald.enable = false;
   # TLP conflicts with PPD; nixos-hardware enables it by mkDefault when PPD is off.
   services.tlp.enable = false;
+
+  # Disable CPU boost at boot. Measured on the Framework 16 under agent load:
+  # boost cost +24°C, +15W and a 100% fan for 0-2% faster tsc/vitest runs,
+  # because the chip is thermal-limited around 4.3 GHz anyway.
+  # Re-enable at runtime: echo 1 | sudo tee /sys/devices/system/cpu/cpufreq/boost
+  systemd.tmpfiles.rules = ["w /sys/devices/system/cpu/cpufreq/boost - - - - 0"];
 }
