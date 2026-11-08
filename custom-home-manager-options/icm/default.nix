@@ -249,6 +249,10 @@ in {
         store_raw = false;
         summarizer.provider = "auto";
       };
+      # ~4x less CPU than the multilingual-e5-large default, Chinese kept. A
+      # database keeps its recorded model until `icm embed --migrate` runs; see
+      # the icm-migrate skill.
+      programs.icm.settings.embeddings.model = lib.mkDefault "intfloat/multilingual-e5-base";
     })
     (lib.mkIf cfg.daemon.enable {
       assertions = [

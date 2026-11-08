@@ -14,9 +14,6 @@ in {
     ../../modules/home-manager-linux
   ];
   programs.icm.daemon.enable = true;
-  # Lighter than the multilingual-e5-large default and keeps Chinese support.
-  # The database's recorded model wins until `icm embed --migrate` runs.
-  programs.icm.settings.embeddings.model = "intfloat/multilingual-e5-base";
   # Capture one tool output per 12 calls (default 3). Read by the Claude Code
   # post hook and the Pi extension's native mode. icm 0.11.5 ignores
   # min_score/max_facts and [memory] prune_threshold, so they are not set.

@@ -101,6 +101,7 @@ in
     store_raw = false;
     summarizer.provider = "auto";
   };
+  assert integrated.programs.icm.settings.embeddings.model == "intfloat/multilingual-e5-base";
   assert standaloneIntegration.programs.icm.settings == integrated.programs.icm.settings;
   assert hasPackage standaloneIntegration expectedPackage;
   assert standaloneIntegration.home.file."icm/config.toml".source != null;

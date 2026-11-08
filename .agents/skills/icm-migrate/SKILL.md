@@ -6,13 +6,13 @@ disable-model-invocation: true
 
 # icm migrate
 
-Move one host's icm database from its recorded embedding model (the `Qdrant/multilingual-e5-large-onnx` default) to `intfloat/multilingual-e5-base`, the model framework-16 now runs.
+Move one host's icm database, such as the Mac's, from its recorded embedding model (the `Qdrant/multilingual-e5-large-onnx` default) to `intfloat/multilingual-e5-base`. The shared icm module (`custom-home-manager-options/icm/default.nix`) already requests e5-base on every host; framework-16 is migrated.
 
 Outcome: the database records `intfloat/multilingual-e5-base` at 768 dimensions, every memory has an embedding, the file is compacted, and recall answers.
 
 ## Decision boundary
 
-- **Inside**: read-only inspection (`icm stats`, read-only SQLite queries), editing `hosts/<host>/home.nix`, `nh home switch .`, `icm --no-embeddings backup`, stopping and restarting icm, `icm embed --migrate`, and `VACUUM`. The backup in step 4 makes the migration recoverable.
+- **Inside**: read-only inspection (`icm stats`, read-only SQLite queries), `nh home switch .`, `icm --no-embeddings backup`, stopping and restarting icm, `icm embed --migrate`, and `VACUUM`. The backup in step 4 makes the migration recoverable.
 - **Outside**: the stale-memory delete. Show the user the rule and the exact row count, and run it only after they confirm that count. Restoring a backup also waits for the user.
 - Agents must be paused while icm is stopped. Ask the user to pause them before step 3, and tell the user when they can start them again.
 
@@ -20,7 +20,7 @@ Outcome: the database records `intfloat/multilingual-e5-base` at 768 dimensions,
 
 1. **Preflight.** On the target host, record: icm version (`icm --version`), database path, recorded model (`icm_metadata.embedding_model`), memory count, how many have `access_count = 0`, and free disk (the backup is roughly the database size). Done when every value is written down.
    - This procedure was verified against icm **0.11.5**. On another version, re-check each gotcha in [Reference](#reference) against that tag's source before relying on it.
-2. **Request the model.** Set `programs.icm.settings.embeddings.model = "intfloat/multilingual-e5-base";` in `hosts/<host>/home.nix` (framework-16 has the same line) and run `nh home switch .`. Done when `icm stats` prints the warning that the database's recorded model differs from the configuration.
+2. **Apply the config.** Run `nh home switch .` so the host's `config.toml` carries the shared module's model. Done when `icm stats` prints the warning that the database's recorded model differs from the configuration.
 3. **Stop icm.** With agents paused, stop every icm process on the database: `systemctl --user stop icm.service` on a Linux daemon host, plus any MCP or `icm serve` process `pgrep -a icm` still shows. Done when `pgrep -a icm` is empty.
 4. **Back up.** `icm --no-embeddings backup`. Done when it prints the backup path and that file exists.
 5. **Clean up stale memories** (optional; needs the user's confirmation of the count). Every memory deleted here is one the migration no longer embeds. On framework-16 this removed 17,221 of 37,848 memories and cut about 40 minutes from the migration. Count first, read-only:
