@@ -21,6 +21,21 @@
         ++ final.lib.optionals final.stdenv.hostPlatform.isDarwin [final.cctools];
     });
 
+    # btop 1.4.8 segfaults in Cpu::draw when a GPU is runtime-suspended: its
+    # power history deque stays empty and draw reads .back() unguarded.
+    # Drop once upstream PR #1939 ships in a release.
+    # https://github.com/aristocratos/btop/issues/1949
+    btop = prev.btop.overrideAttrs (old: {
+      patches =
+        (old.patches or [])
+        ++ [
+          (prev.fetchpatch {
+            url = "https://github.com/aristocratos/btop/commit/b5cc4d6e3d7b1e67798bfe59ab94bd3c1a1781de.patch";
+            hash = "sha256-byZDqOGzeoUTX8urI0LZ/1fhNBVt3sH6XrDJKTh9jxI=";
+          })
+        ];
+    });
+
     # jdk = prev."jdk${toString 17}";
     # maven = prev.maven.override {inherit jdk;};
     # xwayland = prev.xwayland.overrideAttrs (oldAttrs: {
