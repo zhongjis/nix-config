@@ -102,6 +102,11 @@
             match.class = ''^(steam_app_.*|steam_proton|gamescope)$'';
             content = "game";
           }
+          # vrr = 3 also fires on video content; keep fullscreen browser video at fixed refresh
+          {
+            match.class = ''^(helium|zen-beta)$'';
+            no_vrr = true;
+          }
           # Pavucontrol floating - combine effects
           {
             match.class = ''org\.pulseaudio\.pavucontrol'';
