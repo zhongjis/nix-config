@@ -7,7 +7,11 @@
   #   cpuFreqGovernor = "powersave";
   # };
 
-  services.power-profiles-daemon.enable = false;
+  # Framework recommends power-profiles-daemon over TLP on Ryzen 7040: PPD drives
+  # amd-pmf platform_profile and amd-pstate EPP together (balanced = balance_performance
+  # on AC). It persists the chosen profile in /var/lib/power-profiles-daemon/state.ini.
+  # https://wiki.nixos.org/wiki/Hardware/Framework/Laptop_16
+  services.power-profiles-daemon.enable = true;
 
   # services.auto-cpufreq.enable = true;
   # services.auto-cpufreq.settings = {
@@ -21,24 +25,8 @@
   #   };
   # };
 
-  services.thermald.enable = true;
-  services.tlp = {
-    enable = true;
-    settings = {
-      CPU_SCALING_GOVERNOR_ON_AC = "performance";
-      CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
-
-      CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
-      CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
-
-      CPU_MIN_PERF_ON_AC = 0;
-      CPU_MAX_PERF_ON_AC = 100;
-      CPU_MIN_PERF_ON_BAT = 10;
-      CPU_MAX_PERF_ON_BAT = 30;
-
-      #Optional helps save long term battery health
-      START_CHARGE_THRESH_BAT0 = 40; # 40 and bellow it starts to charge
-      STOP_CHARGE_THRESH_BAT0 = 80; # 80 and above it stops charging
-    };
-  };
+  # thermald supports Intel CPUs only.
+  services.thermald.enable = false;
+  # TLP conflicts with PPD; nixos-hardware enables it by mkDefault when PPD is off.
+  services.tlp.enable = false;
 }
