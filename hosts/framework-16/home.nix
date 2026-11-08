@@ -1,4 +1,6 @@
 {
+  config,
+  lib,
   pkgs,
   inputs,
   ...
@@ -15,6 +17,28 @@ in {
   # Lighter than the multilingual-e5-large default and keeps Chinese support.
   # The database's recorded model wins until `icm embed --migrate` runs.
   programs.icm.settings.embeddings.model = "intfloat/multilingual-e5-base";
+  # Capture one tool output per 12 calls (default 3). Read by the Claude Code
+  # post hook and the Pi extension's native mode. icm 0.11.5 ignores
+  # min_score/max_facts and [memory] prune_threshold, so they are not set.
+  programs.icm.settings.extraction.extract_every = 12;
+
+  # icm decays weights on recall but never prunes on its own. Unused medium
+  # memories fall below 0.3 after ~23 days; high and critical are never pruned.
+  systemd.user.services.icm-prune = {
+    Unit.Description = "Prune decayed icm memories";
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${lib.getExe config.programs.icm.package} --no-embeddings prune --threshold 0.3";
+    };
+  };
+  systemd.user.timers.icm-prune = {
+    Timer = {
+      OnCalendar = "daily";
+      Persistent = true;
+      RandomizedDelaySec = "1h";
+    };
+    Install.WantedBy = ["timers.target"];
+  };
   myHomeManager.aiProfile = "personal";
   myHomeManager.bundles.general.enable = true;
   myHomeManager.obsidian.enable = true;
