@@ -27,8 +27,8 @@
 
         "modules-right": [
           "disk",
-          "cpu",
-          "temperature",
+          "custom/cpu",
+          "custom/dgpu",
           "custom/memory",
           "network",
           "backlight",

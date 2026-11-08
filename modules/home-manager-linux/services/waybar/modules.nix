@@ -6,6 +6,8 @@
   wlogout-sh = pkgs.writeShellScript "waybar-wlogout" (builtins.readFile ./scripts/wlogout.sh);
   weather-py = pkgs.writers.writePython3 "waybar-weather" {libraries = [pkgs.python3Packages.pyquery];} ./scripts/weather.py;
   memory-usage-sh = pkgs.writeShellScript "memory-usage" (builtins.readFile ./scripts/memory_usage.sh);
+  cpu-sh = pkgs.writeShellScript "waybar-cpu" (builtins.readFile ./scripts/cpu.sh);
+  dgpu-sh = pkgs.writeShellScript "waybar-dgpu" (builtins.readFile ./scripts/dgpu.sh);
   hyprsunset-sh = pkgs.writeShellScript "waybar-hyprsunset" (builtins.readFile ./scripts/hyprsunset.sh);
 in {
   xdg.configFile."waybar/modules".text =
@@ -50,19 +52,18 @@ in {
               "format": "<span color='#202020' bgcolor='#ea6962' >  </span> {free}",
               "interval": 20
           },
-          "cpu": {
-              "format": "<span color='#202020' bgcolor='#e78a4e' >  </span> {usage}%",
+          "custom/cpu": {
+              "exec": "${cpu-sh}",
+              "return-type": "json",
               "tooltip": false,
-              "interval": 1,
+              "format": "{}",
               "on-click-right": "${pkgs.ghostty}/bin/ghostty --title=btop -e btop"
           },
-          "temperature": {
+          "custom/dgpu": {
+              "exec": "${dgpu-sh}",
+              "return-type": "json",
               "tooltip": false,
-              "thermal-zone": 2,
-              "hwmon-path": "/sys/class/hwmon/hwmon1/temp1_input",
-              "critical-threshold": 70,
-              "format": "<span color='#202020' bgcolor='#d8a657' >  </span> {temperatureC}°C",
-              "format-critical": "<span color='#202020' bgcolor='#cc241d' >  </span> {temperatureC}°C",
+              "format": "{}",
               "on-click-right": "${pkgs.ghostty}/bin/ghostty --title=nvtop -e nvtop"
           },
           "backlight": {

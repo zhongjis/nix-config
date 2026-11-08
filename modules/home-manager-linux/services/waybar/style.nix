@@ -51,9 +51,10 @@
       #window,
       #tray,
       #disk,
-      #cpu,
-      #temperature,
-      #temperature.critical,
+      #custom-cpu,
+      #custom-cpu.critical,
+      #custom-dgpu,
+      #custom-dgpu.critical,
       #backlight,
       #custom-memory,
       #custom-hyprsunset,
@@ -79,9 +80,10 @@
       #window,
       #tray,
       #disk,
-      #cpu,
-      #temperature,
-      #temperature.critical,
+      #custom-cpu,
+      #custom-cpu.critical,
+      #custom-dgpu,
+      #custom-dgpu.critical,
       #backlight,
       #custom-memory,
       #custom-hyprsunset,
@@ -168,18 +170,22 @@
       /* ================================ */
       /*            cpu                  */
       /* ================================ */
-      #cpu {
+      #custom-cpu {
         color: #e78a4e;
+      }
+
+      #custom-cpu.critical {
+        color: #cc241d;
       }
 
       /* ================================ */
       /*            temp                  */
       /* ================================ */
-      #temperature {
+      #custom-dgpu {
         color: #d8a657;
       }
 
-      #temperature.critical {
+      #custom-dgpu.critical {
         color: #cc241d;
       }
 
