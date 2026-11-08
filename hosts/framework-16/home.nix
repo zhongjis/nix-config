@@ -12,6 +12,9 @@ in {
     ../../modules/home-manager-linux
   ];
   programs.icm.daemon.enable = true;
+  # Lighter than the multilingual-e5-large default and keeps Chinese support.
+  # The database's recorded model wins until `icm embed --migrate` runs.
+  programs.icm.settings.embeddings.model = "intfloat/multilingual-e5-base";
   myHomeManager.aiProfile = "personal";
   myHomeManager.bundles.general.enable = true;
   myHomeManager.obsidian.enable = true;
