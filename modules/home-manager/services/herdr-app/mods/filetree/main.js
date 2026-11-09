@@ -9,7 +9,10 @@ import { v_flex, h_flex, Editor, EditorState, InputState, Input, Scrollbar, v_vi
 import { agentKind, parseEtime, SessionFiles, discoverSession, readSession } from "./agent-files.js";
 import { terminals } from "herdr";
 import ICONS from "./icons.js"; // copied from the file-icons mod (mods cannot import across folders)
-import { spaces, panes, agents, focused, exec, readTextFile, watchFolder, theme, settings, window, layout, home, appHome, props, run, notify, openOverlay, closeOverlay, shared, setShared } from "herdr";
+import { Sync } from "./sync.js";
+import { place } from "./lib.js";
+import { hidePanel, panelState, showFiles } from "./panel.js";
+import { spaces, panes, agents, focused, exec, readTextFile, watchFolder, theme, settings, window, layout, home, appHome, props, run, nextCommand, notify, openOverlay, closeOverlay, shared, setShared } from "herdr";
 
 const NAME = "filetree";
 const ICON = (name) => `mods/${NAME}/${name}.svg`;
@@ -307,7 +310,21 @@ export default class FileTree extends View {
   init(_props, cx) {
     this.menu = props()?.menu ?? null;
     if (this.menu) return;
+    if (props()?.role === "sync") { this.controller = new Sync(cx); return; }
+    if (props()?.overlay) {
+      this.toggleOverlay = true;
+      const p = panelState(layout());
+      if (p?.files) hidePanel(p);
+      else if (p) showFiles(p);
+      closeOverlay(props().overlay);
+      return;
+    }
     this.handle = cx.focus_handle();
+    cx.spawn(async (cx) => {
+      for (;;) {
+        if (await nextCommand() === "focus") { this.handle.focus(); cx.notify(); }
+      }
+    });
     this.scroll = VirtualListScrollHandle.new();
     this.config = { ...DEFAULTS };
     let prefs = {};
@@ -789,11 +806,17 @@ export default class FileTree extends View {
     if (!inRender) cx.notify();
   }
 
-  // Double-click and Enter: config.json's "open". "preview" shows it here; "" the default
-  // app; anything else is a command with {path} and {dir}, run without a shell.
+  // Double-click and Enter: "nvim" uses the tab's persistent pane; "preview"
+  // stays here; "" uses the default app; other commands support {path} and {dir}.
   openFile(rel, cx) {
     const how = String(this.config.open ?? "preview").trim(), abs = join(this.root, rel);
     if (how === "preview" || this.on) { this.show(rel, cx); return; }
+    if (how === "nvim") {
+      const at = place();
+      if (!at || !panelState(layout())) { this.show(rel, cx); return; }
+      run(`${NAME}.open:${encodeURIComponent(JSON.stringify({ at, file: abs, root: this.root, rel }))}`);
+      return;
+    }
     cx.spawn(async (cx) => {
       try {
         if (!how) await openExternal(abs);
@@ -1004,6 +1027,8 @@ export default class FileTree extends View {
 
   render(cx) {
     if (this.menu) return this.renderMenu(cx);
+    if (this.controller) { this.controller.look(cx); return div(); }
+    if (this.toggleOverlay) return div();
     this.sync(cx);
     const req = shared(`${NAME}.preview`);
     if (req && req.n !== this.seenPreview) { this.seenPreview = req.n; if (req.root === this.root) this.show(req.rel, cx, true); }
@@ -1011,7 +1036,7 @@ export default class FileTree extends View {
     const want = shared(`${NAME}.view`);
     if (want && want.n !== this.seenView) {
       this.seenView = want.n;
-      if (VIEWS.some(([v]) => v === want.view) && want.view !== this.view) { this.view = want.view; this.hits = null; this.closePreview(); this.savePrefs(); }
+      if (VIEWS.some(([v]) => v === want.view)) { this.view = want.view; this.hits = null; this.closePreview(); this.savePrefs(); }
     }
     if (this.stale && onScreen()) { this.stale = false; this.refresh(cx); }
     const t = theme(), look = frameLook(), R = look.radius, now = Date.now(), panel = Boolean(props()?.panel);
@@ -1062,7 +1087,10 @@ export default class FileTree extends View {
     const root = v_flex().id(NAME).size_full().min_h(0).overflow_hidden().bg(t.background).text_color(t.foreground).text_size(13)
       .when(panel, (el) => el.border_t(1).border_b(1).border_color(t.border))
       .track_focus(this.handle).on_key_down((e, cx) => this.key(e, cx))
-      .on_size_change((size, cx) => { if (Math.abs(size.width - this.width) > 4) { this.width = size.width; cx.notify(); } })
+      .on_size_change((size, cx) => {
+        if (size.width > 0 && size.height > 0) setShared(`${NAME}.tree-laid-out`, (shared(`${NAME}.tree-laid-out`) ?? 0) + 1);
+        if (Math.abs(size.width - this.width) > 4) { this.width = size.width; cx.notify(); }
+      })
       .child(header);
 
     if (this.file) {

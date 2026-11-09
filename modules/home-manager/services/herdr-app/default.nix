@@ -69,6 +69,9 @@ in {
       global = {
         "ctrl-shift-f" = "mod.open:picker";
         "ctrl-b" = "mod.open:tmux-prefix";
+        "cmd-e" = "mod.open:filetree";
+        "cmd-shift-e" = "filetree.reveal";
+        "cmd-o" = "filetree.recent";
       };
       # Herdr seeds its default keymap only into a new keys.json; one created by
       # activation first has none, so keep the terminal clipboard keys here.
@@ -102,7 +105,7 @@ in {
       # herdr.dev/mods/herdrdev/tmux-prefix
       tmux-prefix = ./mods/tmux-prefix;
       # Vendored and customized (not pinned); upstream LICENSE kept in each folder.
-      # github.com/cybertron288/herdr-mods filetree, without its Claude hook bridge.
+      # github.com/cybertron288/herdr-mods filetree with ChmaraX/herdr-nvim's vendored controller.
       filetree = ./mods/filetree;
       # github.com/cybertron288/herdr-mods file-icons; filetree reads its icons/.
       file-icons = ./mods/file-icons;

@@ -193,6 +193,17 @@
       "resizable": false
     }
   ],
+  "floating": [
+    {
+      "id": "filetree-sync",
+      "content": {
+        "mod": "filetree",
+        "props": {
+          "role": "sync"
+        }
+      }
+    }
+  ],
   "background": "canvas",
   "terminal_padding": [
     14,
