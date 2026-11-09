@@ -340,6 +340,12 @@ export default class Focus extends View {
     const ns = (k.argv ?? []).find((x) => x.startsWith("AGENT_BROWSER_NAMESPACE="));
     const resume = ns ? `env ${ns} ${line}` : line;
     await hc(["label", k.address, `resume=${resume}`, "resume.pid="]).catch(() => null);
+    // A worker resumed in a recovered shell (a reboot) is back at that shell's prompt, still live: ended here, keep
+    // off first (keep recovers a killed program too), so it finishes like any other and revive's `hc rm` works.
+    if (SHELL.test((await this.inspect(k.address))?.foreground?.name ?? "")) {
+      await hc(["keep", k.address, "--off"]).catch(() => null);
+      await hc(["kill", k.address]).catch(() => null);
+    }
     const program = t.program && { name: t.program.name, icon: t.program.icon, tint: t.program.tint };
     setShared(HIBERNATED, [{ address: k.address, name: k.name, parent: k.parent, space: k.labels?.space, cwd: k.cwd, line: resume, at, title, program },
       ...(shared(HIBERNATED) ?? []).filter((r) => r.address !== k.address)]);
