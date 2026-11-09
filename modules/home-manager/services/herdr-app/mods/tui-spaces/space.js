@@ -27,3 +27,11 @@ export function inSpace(all, filter) {
   const walk = (k, depth) => [{ k, depth }, ...mine.filter((c) => c.parent === k.address).flatMap((c) => walk(c, depth + 1))];
   return mine.filter((k) => !ids.has(k.parent)).flatMap((k) => walk(k, 0));
 }
+
+// Live main agents (no parent; the program reports a status) matching the filter, as inSpace's rows (depth 0).
+// Idle and blocked count too: running is what matters here, status is tui-focus's.
+export function mainIn(all, filter) {
+  const byAddress = new Map(all.map((k) => [k.address, k]));
+  return all.filter((k) => !k.parent && k.state === "live" && k.status && matches(spaceOf(k, byAddress), k.cwd, filter))
+    .map((k) => ({ k, depth: 0 }));
+}

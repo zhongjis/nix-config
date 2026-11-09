@@ -1,6 +1,7 @@
-// A popup listing an agent's live sub-agents (props().parent), all the way down, or the sub-agents a tui-spaces row
-// counts (props().filter: {space, folder, except}, space.js); a click peeks at one. Opened from tui-focus cards' sub-agents line and
-// tui-spaces' sub-agents chip. Hibernated workers (shared "tui-focus.hibernated") show a moon and
+// A popup listing an agent's live sub-agents (props().parent), all the way down, or the main agents a tui-spaces row
+// counts (props().filter: {space, folder, except}, mainIn in space.js), most urgent status first; a click peeks at one.
+// Opened from tui-focus cards' sub-agents line and tui-spaces' agents chip. Under a parent, hibernated workers
+// (shared "tui-focus.hibernated") show a moon and
 // how long ago; a click revives one where it was (same name, folder, parent, session), then peeks at it.
 // A live worker on a branch of its own shows that branch's PR (tui-spaces' shared "tui-spaces.prs"), as a space row does.
 // The keyboard works it too: j/k or the arrows pick a row, Enter peeks or revives, p opens the picked worker's PR
@@ -10,7 +11,7 @@
 import { View, div, image, svg } from "gpui-kit";
 import { v_flex, h_flex, v_virtual_list, Scrollbar, VirtualListScrollHandle } from "gpui-base";
 import { agents, terminals, theme, run, props, closeOverlay, exec, hc, shared, setShared, notify, window } from "herdr";
-import { inSpace, spaceOf, matches } from "./space.js";
+import { mainIn } from "./space.js";
 
 const HIBERNATED = "tui-focus.hibernated";
 // A row's height with the 2px under it: a live one has two lines (the second kept even empty, so a git answer
@@ -54,8 +55,11 @@ const icon = (p, size, color) => !p?.icon ? null
 // Live sub-agents of `addr`, depth first, with their depth.
 const tree = (all, addr, depth = 0) => all.filter((k) => k.parent === addr && k.state === "live")
   .flatMap((k) => [{ k, depth }, ...tree(all, k.address, depth + 1)]);
-// What the popup lists: a space's sub-agents, else the parent's.
-const listOf = (all, p) => p?.filter ? inSpace(all, p.filter) : tree(all, p?.parent);
+// What the popup lists: a space's main agents, else the parent's sub-agents.
+const listOf = (all, p) => p?.filter ? mainIn(all, p.filter) : tree(all, p?.parent);
+// Most urgent first, as a space's status goes: blocked > done > working > idle; no word last.
+const URGENCY = ["blocked", "done", "working", "idle"];
+const urgency = (s) => { const i = URGENCY.indexOf(s); return i < 0 ? URGENCY.length : i; };
 
 const base = (path) => path.replace(/[\\/]+$/, "").split(/[\\/]/).pop() || path;
 
@@ -102,6 +106,8 @@ export default class SubAgents extends View {
     const word = (k) => { const s = listed.get(k.address) ?? k.status; return s === "error" ? "blocked" : s; };
     const color = { working: t.working, blocked: t.blocked, done: t.done, idle: t.idle };
     const rows = listOf(terminals(), props());
+    // A space's main agents by status; a parent's tree keeps its depth-first order.
+    if (filter) rows.sort((a, b) => urgency(word(a.k)) - urgency(word(b.k)));
     const mine = this.places[parent] ?? {};
     // A worker's PR: the open one on its branch in its repo, its author's first, as a space row's badge picks.
     // None on the parent's branch: that PR is the parent's.
@@ -112,10 +118,8 @@ export default class SubAgents extends View {
       return on.find((p) => p.mine) ?? on[0] ?? null;
     };
     const under = new Set([parent, ...rows.map((r) => r.k.address)]), now = Date.now();
-    const byAddress = new Map(terminals().map((k) => [k.address, k]));
-    // A row from before workers carried `space` goes by its parent's.
-    const sleeping = (shared(HIBERNATED) ?? []).filter((r) => filter
-      ? matches(r.space ?? spaceOf({ parent: r.parent }, byAddress), r.cwd, filter) : under.has(r.parent));
+    // Hibernated workers are sub-agents: listed under their parent, never in a space's main agents.
+    const sleeping = filter ? [] : (shared(HIBERNATED) ?? []).filter((r) => under.has(r.parent));
     // One list for the pointer and the keyboard: live rows, then hibernated ones.
     const items = [...rows.map((r) => ({ key: `sub:${r.k.address}`, h: LIVE, live: r, pr: prOf(this.places[r.k.address]) })),
       ...sleeping.map((r) => ({ key: `hib:${r.address}`, h: ASLEEP, asleep: r }))];
@@ -208,7 +212,7 @@ export default class SubAgents extends View {
         cx.stop_propagation();
         cx.notify();
       })
-      .when(items.length === 0, (el) => el.child(div().p(8).text_color(t.dim).child("No workers.")))
+      .when(items.length === 0, (el) => el.child(div().p(8).text_color(t.dim).child(filter ? "No agents." : "No workers.")))
       // A popup takes its content's height and a virtual list has none of its own: state it, capped as openers
       // cap the popup (360 less the 12px padding and the footer).
       .when(items.length > 0, (el) => el.child(div().relative().flex_none().h(Math.min(348 - FOOT, items.reduce((s, x) => s + x.h, 0)))

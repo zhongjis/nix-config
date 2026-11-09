@@ -1,15 +1,15 @@
 // Workspace spaces: stable colored avatars, worktrees under their checkout,
 // grouped by machine when more than one is known. After a space's name, the repo
 // its first terminal is in now, only where unusual: branch, ahead/behind. Agent state lives in the agents list, not here,
-// except a chip counting sub-agents (live and hibernated, space.js) that opens tui-subagents: on a shown worktree's
-// row those working in it, on a space's row the rest working for that space. Click to
+// except a green chip counting running main agents (no sub-agents, mainIn in space.js) that opens tui-subagents: on a
+// shown worktree's row those working in it, on a space's row the rest working for that space. Click to
 // switch, right-click for its menu, drag to reorder. A repo's worktrees go by their branch, folded behind a count
 // on its row; the open ones bright, the rest dim (a click opens one as a space).
 
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { Repositories } from "./repos.js";
-import { inSpace, spaceOf, matches } from "./space.js";
+import { mainIn } from "./space.js";
 import { spaces, machines, panes, terminals, focused, keys, run, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout } from "herdr";
 
 function find(node, id) {
@@ -455,28 +455,26 @@ export default class Spaces extends View {
       .child(svg(`mods/workspace-chrome/chevron-${r.open ? "down" : "right"}.svg`).size(10).flex_none());
   }
 
-  // Each row's sub-agent filter (space.js), read once per render: a shown worktree row takes those working in its
+  // Each row's main-agent filter (space.js), read once per render: a shown worktree row takes those working in its
   // folder; a space row the rest of that space's. `rows` are the drawn rows.
   subFilters(rows) {
-    const all = terminals(), byAddress = new Map(all.map((k) => [k.address, k]));
-    const sleeping = shared("tui-focus.hibernated") ?? [];
-    const count = (f) => [inSpace(all, f).length, sleeping.filter((r) => matches(r.space ?? spaceOf({ parent: r.parent }, byAddress), r.cwd, f)).length];
+    const all = terminals();
     const trees = rows.filter((r) => r.tree && r.g?.folder).map((r) => r.g.folder);
     const out = new Map();
     for (const r of rows) {
       const f = r.tree && r.g?.folder ? { folder: r.g.folder } : r.vacant ? null : { space: r.w.id, except: trees };
-      const [live, asleep] = f ? count(f) : [0, 0];
-      if (live + asleep) out.set(r, { filter: f, n: live + asleep, live, asleep });
+      const live = f ? mainIn(all, f).length : 0;
+      if (live) out.set(r, { filter: f, n: live, live, asleep: 0 });
     }
     return out;
   }
 
-  // How many sub-agents a row counts; a click lists them (tui-subagents), to peek at or revive.
+  // How many main agents run on a row, in green; a click lists them (tui-subagents), by status, to peek at.
   subChip(w, { filter, n, live, asleep }, t) {
-    return h_flex().id(`subs-${w.id}`).flex_none().h(22).gap(3).px(6).items_center().rounded(5).text_size(11).text_color(t.dim)
-      .cursor_pointer().hover(s => s.bg(t.hover).text_color(t.foreground))
-      .role("button").accessibility_label("Show workers")
-      .tooltip(`${n} worker${n > 1 ? "s" : ""}`)
+    return h_flex().id(`subs-${w.id}`).flex_none().h(22).gap(3).px(6).items_center().rounded(5).text_size(11).text_color(t.ansi2)
+      .cursor_pointer().hover(s => s.bg(t.hover))
+      .role("button").accessibility_label("Show agents")
+      .tooltip(`${n} agent${n > 1 ? "s" : ""} running`)
       .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
       .on_mouse_up("left", (_e, cx) => {
         cx.stop_propagation();
