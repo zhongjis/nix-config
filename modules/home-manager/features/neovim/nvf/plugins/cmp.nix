@@ -50,11 +50,6 @@
         enabled = true;
       };
       sources = {
-        default = [
-          "snippets"
-          "lsp"
-          "path"
-        ];
         providers = {};
       };
     };
