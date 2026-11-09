@@ -1,11 +1,13 @@
 // filetree: an IDE-style file tree for any Herdr layout. A port of claude-code-filetree
 // (MIT, Kurt Buhler): git status with line and file counts, a branch row, search across
-// unopened folders, date or size column, keyboard navigation, previews, and Claude's reads,
-// writes and git actions shimmering in the tree (fed by mods/filetree/bridge.ts).
+// unopened folders, date or size column, keyboard navigation, previews, and agent reads
+// and writes shimmering in the tree (mined from pi and Claude Code session logs).
 // Layout-neutral: colors come from theme(), corners and header height from the shown
 // layout's pane frame, fonts from settings().
 import { View, div, svg, image } from "gpui-kit";
 import { v_flex, h_flex, Editor, EditorState, InputState, Input, Scrollbar, v_virtual_list, VirtualListScrollHandle, TextView } from "gpui-base";
+import { agentKind, parseEtime, SessionFiles, discoverSession, readSession } from "./agent-files.js";
+import { terminals } from "herdr";
 import ICONS from "./icons.js"; // copied from the file-icons mod (mods cannot import across folders)
 import { spaces, panes, agents, focused, exec, readTextFile, watchFolder, theme, settings, window, layout, home, appHome, props, run, notify, openOverlay, closeOverlay, shared, setShared } from "herdr";
 
@@ -15,7 +17,7 @@ const ROW = 26;
 const PER_FOLDER = 2000;
 const FIND_LIMIT = 200;
 const FLASH_MS = 2700, TINT_MS = 45000, RUNNING_MS = 600000, CHIP_MS = 45000;
-const READ_REVEAL = 12, SEARCH_REVEAL = 60;
+const READ_REVEAL = 12;
 const PRUNE = [".git", "node_modules", "target", ".venv", "__pycache__", "dist", ".next"];
 const HOME_PRUNE = ["Library", "AppData", ".Trash"];
 const DEFAULTS = { activity: "reads and writes", follow: true, column: "date", open: "preview" };
@@ -314,12 +316,13 @@ export default class FileTree extends View {
     this.showSize = prefs.showSize ?? null;
     this.follow = true; this.pinned = null;
     this.view = VIEWS.some(([v]) => v === prefs.view) ? prefs.view : "tree";
-    try { this.history = JSON.parse(localStorage.getItem("history") ?? "[]"); } catch { this.history = []; }
+    /** @type {{abs: string, kind: string, at: number, newlyCreated?: boolean}[]} */
+    this.history = [];
     this.agoAt = 0;
-    this.saved = new Map(); this.flashes = new Map(); this.bashStarts = new Map(); this.recent = [];
+    this.saved = new Map(); this.flashes = new Map(); this.recent = [];
     this.sizes = new Map(); this.sizing = new Set(); this.visible = [];
     this.chip = null; this.branchFlash = null; this.width = 320; this.query = ""; this.hits = null; this.searchSeq = 0;
-    this.seenAt = Date.now() - 2000; this.seenPreview = shared(`${NAME}.preview`)?.n ?? 0; this.seenView = shared(`${NAME}.view`)?.n ?? 0;
+    this.seenPreview = shared(`${NAME}.preview`)?.n ?? 0; this.seenView = shared(`${NAME}.view`)?.n ?? 0;
     this.input = InputState.new({ placeholder: "Filter files" });
     this.input.on("change", (_e, cx) => this.search(this.input.value(), cx));
     this.input.on("submit", (_e, cx) => this.jump(cx));
@@ -566,7 +569,7 @@ export default class FileTree extends View {
     return out;
   }
 
-  // Recent: what Claude read, wrote or committed here, newest first, one row per file.
+  // Recent: this tab's agent session, newest first, one row per file.
   recentRows(q) {
     const seen = new Set(), out = [];
     for (let i = this.history.length - 1; i >= 0; i--) {
@@ -590,50 +593,81 @@ export default class FileTree extends View {
     return false;
   }
 
-  // ── Claude activity, from the hook bridge ────────────────────────────────────────────
+  // ── Agent session activity (herdr-nvim's miner, no hooks) ────────────────────────────
+  /** @param {import("gpui-kit").Context} cx */
   watchActivity(cx) {
-    const dir = `${home()}/.local/state/herdr-filetree`;
-    cx.spawn(async (cx) => {
-      try { await exec("mkdir", ["-p", dir]); } catch {}
-      try {
-        for (;;) {
-          await watchFolder(dir);
-          await this.readActivity(`${dir}/activity.jsonl`, cx);
-        }
-      } catch {}
-    });
+    /** @type {Map<string, import("./agent-files.js").Source & {path: string | null, miner: SessionFiles | null}>} */
+    this.activitySessions = new Map();
+    /** @type {string | null} */
+    this.activityKey = null;
+    /** @param {import("gpui-kit").Context} cx */
+    const poll = (cx) => {
+      if (this.activityBusy) return;
+      const f = focused(), tab = panes().find((p) => p.pane === props()?.pane)?.tab ?? f?.tab;
+      const candidates = agents().filter((a) => a.tab === tab && agentKind(a.app, a.program?.key));
+      const agent = candidates.find((a) => a.address === f?.terminal || a.focused) ?? candidates[0];
+      const facts = agent && terminals().find((t) => t.address === agent.address);
+      const key = facts ? JSON.stringify([tab, agent.address, facts.foreground?.pid, facts.created_ms]) : null;
+      if (key !== this.activityKey) {
+        this.activityKey = key; this.activityRestoring = true;
+        this.history = []; this.flashes.clear(); cx.notify();
+      }
+      if (!key) return;
+      this.activityBusy = true;
+      cx.spawn(async (cx) => {
+        try { await this.readActivity({ key, agent, facts }, cx); }
+        catch (error) {
+          // Remote cores can disappear; keep the last good list and retry on the next poll.
+          if (this.activityKey === key) this.activityError = String(error);
+        } finally { this.activityBusy = false; }
+      });
+    };
+    poll(cx);
+    // Polling also discovers new/resumed logs and works on remote machines (watchFolder is local).
+    cx.timer.every(1000, poll);
   }
 
-  async readActivity(file, cx) {
-    const text = await readTextFile(file).catch(() => null);
-    if (!text) return;
-    const fresh = [];
-    for (const line of text.split("\n")) {
-      if (!line) continue;
-      try { const e = JSON.parse(line); if (e.at > this.seenAt) fresh.push(e); } catch {}
+  /**
+   * @param {{key: string, agent: import("herdr").AgentInfo, facts: {created_ms: number, cwd: string, foreground?: {pid?: number, cwd?: string}}}} request
+   * @param {import("gpui-kit").Context} cx
+   */
+  async readActivity({ key, agent, facts }, cx) {
+    let state = this.activitySessions.get(key);
+    const on = agent.address.includes("/") ? agent.address.split("/")[0] : null;
+    if (!state) {
+      let since = facts.created_ms;
+      if (facts.foreground?.pid) {
+        const result = await exec("ps", ["-o", "etime=", "-p", String(facts.foreground.pid)], { on });
+        const age = result.code === 0 ? parseEtime(result.stdout) : null;
+        if (age !== null) since = Date.now() - age;
+      }
+      if (!Number.isFinite(since)) return;
+      state = { kind: agentKind(agent.app, agent.program?.key), cwd: facts.foreground?.cwd || facts.cwd,
+        since, on, path: null, miner: null };
+      if (!state.cwd) return;
+      this.activitySessions.set(key, state);
     }
-    if (!fresh.length) return;
-    this.seenAt = Math.max(...fresh.map((e) => e.at));
-    const mode = this.config.activity, reads = mode === "reads and writes" || mode === "reads", writes = mode === "reads and writes" || mode === "writes";
-    for (const e of fresh) {
-      if (e.kind === "read" && reads) this.flash(e.paths ?? [], "purple", cx, e.paths?.length > 1 ? SEARCH_REVEAL : READ_REVEAL);
-      else if (e.kind === "write" && writes) this.flash(e.paths ?? [], "orange", cx, READ_REVEAL);
-      else if (e.kind === "mention") this.reveal(e.paths ?? [], cx);
-      else if (e.kind === "bash-start") this.bashStarts.set(e.id, e.at);
-      else if (e.kind === "bash-end" && writes) {
-        const start = this.bashStarts.get(e.id) ?? e.at - 5000;
-        this.bashStarts.delete(e.id);
-        // The folder watch reports Bash's writes a moment later; take what changed while it ran.
-        cx.timer.after(1200, (cx) => {
-          const paths = new Set();
-          for (const r of this.recent) if (r.at >= start - 300 && r.at <= e.at + 1200) for (const p of r.paths) {
-            const rel = relTo(this.root, p);
-            if (rel && rel !== ".git" && !rel.startsWith(".git/") && !this.isIgnored(rel)) paths.add(p);
-          }
-          this.flash([...paths].slice(0, 60), "orange", cx, READ_REVEAL);
-        });
-      } else if (e.kind === "git") this.gitEvent(e, cx);
+    const path = await discoverSession(exec, state);
+    if (!path || this.activityKey !== key) return;
+    const restore = this.activityRestoring || path !== state.path;
+    if (path !== state.path) {
+      state.path = path; state.miner = new SessionFiles(state);
     }
+    const fresh = await readSession(exec, state, state.miner);
+    if (this.activityKey !== key || (!fresh.length && !restore)) return;
+    const mode = this.config.activity;
+    for (const event of fresh) {
+      if (Date.now() - event.at > TINT_MS) continue;
+      if (mode === "reads and writes" || mode === (event.kind === "read" ? "reads" : "writes"))
+        this.flash([event.abs], event.kind === "read" ? "purple" : "orange", cx, READ_REVEAL);
+    }
+    // flash supplies the existing reveal/tints; mined history supplies session timestamps,
+    // deduplication and first-op-write badges, without persisting another tab's activity.
+    const history = new Map((restore ? state.miner.history() : this.history).map((h) => [h.abs, h]));
+    for (const event of fresh) { history.delete(event.abs); history.set(event.abs, event); }
+    this.history = [...history.values()].sort((a, b) => a.at - b.at);
+    this.activityRestoring = false;
+    this.activityError = null;
     cx.notify();
   }
 
@@ -659,12 +693,9 @@ export default class FileTree extends View {
     for (const abs of paths) {
       const path = abs.replace(/\\/g, "/");
       this.flashes.set(path, { tone, at: now });
-      this.history.push({ abs: path, kind: KIND[tone] ?? "write", at: now });
       const rel = relTo(this.root, abs);
       if (rel) inside.push(rel);
     }
-    if (this.history.length > 120) this.history = this.history.slice(-80);
-    try { localStorage.setItem("history", JSON.stringify(this.history)); } catch {}
     if (!inside.length || !this.config.follow || this.hits || this.view !== "tree") { cx.notify(); return; }
     const shown = inside.slice(0, limit), last = shown[shown.length - 1];
     this.open(shown.flatMap((rel) => ancestors(rel)), cx, () => { this.scrollTo = last; });
@@ -881,7 +912,7 @@ export default class FileTree extends View {
       .child(this.pill(h.kind === "read" ? "R" : h.kind === "commit" ? "C" : "W", color, t, R).when(Boolean(fl?.bright), pulse))
       .child(div().flex_none().max_w(Math.max(80, this.width * 0.5)).truncate().text_color(lit ?? t.foreground).child(e.name))
       .child(div().flex_1().min_w(0).truncate().text_size(11).text_color(t.dim).child(dirOf(rel)))
-      .child(div().flex_none().text_size(11).text_color(color).child(h.kind === "read" ? "read" : h.kind === "commit" ? "committed" : "wrote"))
+      .child(div().flex_none().text_size(11).text_color(color).child(h.newlyCreated ? "new" : h.kind === "read" ? "read" : h.kind === "commit" ? "committed" : "wrote"))
       .child(div().flex_none().w(26).text_size(11).text_color(t.dim).text_right().child(ago(h.at)));
   }
 
