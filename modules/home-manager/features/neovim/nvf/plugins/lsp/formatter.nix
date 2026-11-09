@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   vim.extraPackages = with pkgs; [
     stylua
     nixpkgs-fmt
@@ -60,6 +64,19 @@
         html = ["prettierd"];
         graphql = ["prettierd"];
       };
+      # Reads the flags set by :FormatEnable/:FormatDisable (lua/usrcmds.lua).
+      format_on_save = lib.generators.mkLuaInline ''
+        function(bufnr)
+          if vim.g.formatsave == false or vim.b[bufnr].disableFormatSave then
+            return
+          end
+          return {
+            lsp_format = "fallback",
+            -- google-java-format is a JVM; cold starts exceed 500ms
+            timeout_ms = vim.bo[bufnr].filetype == "java" and 3000 or 500,
+          }
+        end
+      '';
       format_after_save = null;
     };
   };

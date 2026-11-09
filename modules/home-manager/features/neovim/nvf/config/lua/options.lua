@@ -21,6 +21,9 @@ vim.opt.shiftwidth = 4 -- Number of spaces to use for each step of (auto)indent
 vim.opt.expandtab = true -- Convert tabs to spaces
 vim.opt.smartindent = true -- Enable smart indentation
 
+-- Format on save (toggled by :FormatEnable/:FormatDisable)
+vim.g.formatsave = true
+
 -- Search
 vim.opt.hlsearch = true -- Enable search highlighting
 vim.opt.incsearch = true -- Enable incremental search
