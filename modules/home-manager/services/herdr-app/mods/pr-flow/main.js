@@ -1,4 +1,4 @@
-// PR Flow: this repo's open PRs from tui-spaces. A side panel with a list; a PR opens
+// PR Flow: this repo's open PRs from panda-spaces. A side panel with a list; a PR opens
 // in the same panel. It only reads: nothing here writes to GitHub or sends to an agent.
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex, Scrollbar, TextView, v_virtual_list, VirtualListScrollHandle } from "gpui-base";
@@ -96,7 +96,7 @@ export default class PrFlow extends View {
     this.repo = null;
     this.scopeKey = null;
     this.selection = null;
-    this.tracker.sync(shared("tui-spaces.prs"));
+    this.tracker.sync(shared("panda-spaces.prs"));
     this.url = null; // the open PR; null shows the list
     this.selected = 0;
     this.logs = new Map(); // run id -> { name, runId, repo, tail, full, failed }
@@ -323,7 +323,7 @@ export default class PrFlow extends View {
 
   // A badge's explicit scope wins; otherwise follow the selected space's cwd.
   syncScope(cx) {
-    this.tracker.sync(shared("tui-spaces.prs"));
+    this.tracker.sync(shared("panda-spaces.prs"));
     const space = spaces().find(s => s.active);
     const tabs = new Set((space?.tabs ?? []).map(t => t.id));
     const pane = panes().find(p => tabs.has(p.tab) && p.cwd);

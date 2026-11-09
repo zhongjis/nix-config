@@ -3,7 +3,7 @@
 // Settled lives on the agent's own terminal as `settled=<ms>:<turn>`: it ends with the terminal, every mod
 // sees it, and a turn ended since says there was new work even while no window watched. Looking doesn't count.
 // Settled Claude Code or Pi is also freed at once (by its Settle or by Clear): the agent is exited as a person
-// would, the resume command it prints is kept (shared "tui-focus.closed"), and its pane closes. Clicking that
+// would, the resume command it prints is kept (shared "panda-focus.closed"), and its pane closes. Clicking that
 // closed row resumes it in a new tab.
 // Reboots: each local Claude Code or Pi terminal is kept by the core and labelled with the line that resumes its
 // session (`resume=`) and its terminal's pid (`resume.pid=`). Claude Code's line comes from its own pid file; Pi's
@@ -11,7 +11,7 @@
 // with a new pid in the same pane: the line is typed into it, or, for a settled one, kept as a closed row.
 // Hibernating: an orchestrator worker (a sub-agent labelled `hibernate=ok`) idle past HIBERNATE is exited the same
 // way. Its terminal finishes with `hibernated=<ms>` and `resume=<line>` on it, so its parent can revive it (rm,
-// then run the line); shared "tui-focus.hibernated" lists them for the cards and the sub-agents popup.
+// then run the line); shared "panda-focus.hibernated" lists them for the cards and the sub-agents popup.
 
 import { View, div, image, svg } from "gpui-kit";
 import { v_flex, h_flex, Scrollbar } from "gpui-base";
@@ -40,7 +40,7 @@ function ink(t, color) {
   };
   return contrast(t.background) > contrast(t.foreground) ? t.background : t.foreground;
 }
-// tui-subagents' rows (live 50px, hibernated 32px), padding and, under any rows, its key footer (24px): its popup's
+// panda-subagents' rows (live 50px, hibernated 32px), padding and, under any rows, its key footer (24px): its popup's
 // height for what it will list.
 const subsHeight = (live, asleep) => Math.min(360, Math.max(46, 12 + 50 * live + 32 * asleep + (live + asleep ? 24 : 0)));
 // The list's header row (px): the lifted row's copy stays below it and the Pinned label.
@@ -54,9 +54,9 @@ const GRACE = 2000;
 // The last word when times tie, so the order doesn't follow the order the data came in.
 const byAddress = (x, y) => x.address.localeCompare(y.address);
 // Closed settled agents: [{key, title, space, cwd, program, argv, at}], newest first.
-const CLOSED = "tui-focus.closed";
+const CLOSED = "panda-focus.closed";
 // Hibernated workers: [{address, name, parent, space, cwd, line, at, title, program}], newest first.
-const HIBERNATED = "tui-focus.hibernated";
+const HIBERNATED = "panda-focus.hibernated";
 // How each agent exits from its prompt, and the resume line it prints then (both checked by hand: Claude Code
 // "Resume this session with: claude --resume <uuid>", Pi "To resume this session: pi --session <id>").
 const EXIT = { "claude-code": ["ctrl+c", "ctrl+c"], pi: ["ctrl+d"] };
@@ -263,7 +263,7 @@ export default class Focus extends View {
   // so a Pi already running reports its session after its next start. mkdir + cp, not `install -D`: BSD install
   // (macOS) reads -D as a destdir.
   async installPi() {
-    const pi = `${home()}/.pi/agent`, from = `${appHome()}/mods/tui-focus/integrations/pi.ts`, to = `${home()}/${PI_EXTENSION}`;
+    const pi = `${home()}/.pi/agent`, from = `${appHome()}/mods/panda-focus/integrations/pi.ts`, to = `${home()}/${PI_EXTENSION}`;
     if ((await exec("test", ["-d", pi]).catch(() => null))?.code !== 0) return;
     if ((await exec("cmp", ["-s", from, to]).catch(() => null))?.code === 0) return;
     const fail = (e) => ({ code: 1, stderr: String(e) });
@@ -502,7 +502,7 @@ export default class Focus extends View {
       cx.notify();
     };
     const lit = (id, color) => (this.hot === id ? t.foreground : color);
-    // A space's avatar, as tui-spaces draws it: the theme's color of that name, the letter in whichever theme
+    // A space's avatar, as panda-spaces draws it: the theme's color of that name, the letter in whichever theme
     // text color reads best on it.
     const avatar = (id, name, size) => {
       const color = (shared("space.colors") ?? {})[id] ?? "ansi6", fill = color.startsWith("#") ? color : t[color] ?? t.accent;
@@ -547,7 +547,7 @@ export default class Focus extends View {
       this.ticking = false;
       const ring = (a) => {
         const st = state(a), round = (el) => el.absolute().top(0).left(0).size(24).rounded_full();
-        return st === "working" ? [svg("mods/tui-focus/ring-working.svg").absolute().top(0).left(0).size(24).text_color(t.working).spin(1400)]
+        return st === "working" ? [svg("mods/panda-focus/ring-working.svg").absolute().top(0).left(0).size(24).text_color(t.working).spin(1400)]
           : st === "blocked" ? [round(div()).border(2).border_color(t.blocked).loop("opacity", { from: 1, to: 0.5, period: 1600 }),
             // At 45° on the ring, 6px of red in a 1px ring of the rail's color.
             div().absolute().top(0).left(16).size(8).rounded_full().border(1).border_color(t.chrome).bg(t.blocked)]
@@ -635,7 +635,7 @@ export default class Focus extends View {
     const verb = !plan ? null : plan.section === "pinned" ? (from === "pinned" ? null : "pin")
       : plan.section === "settled" ? "settle" : from === "pinned" ? "unpin" : from === "settled" ? "unsettle" : null;
     const BADGE = { pin: ["mods/workspace-chrome/pin.svg", "Pin"], unpin: ["mods/workspace-chrome/pin-off.svg", "Unpin"],
-      settle: ["mods/workspace-chrome/circle-check.svg", "Settle"], unsettle: ["mods/tui-focus/undo.svg", "Unsettle"] };
+      settle: ["mods/workspace-chrome/circle-check.svg", "Settle"], unsettle: ["mods/panda-focus/undo.svg", "Unsettle"] };
     const badge = (v) => h_flex().id(`badge-${v}`).h(20).px(6).gap(4).flex_none().items_center().rounded(4)
       .border(1).border_color(tint(t.accent, 0.4, t.accent)).bg(tint(t.accent, 0.1, t.selected)).text_size(11).font_medium().text_color(t.accent)
       .child(svg(BADGE[v][0]).size(12).flex_none().text_color(t.accent)).child(BADGE[v][1]);
@@ -813,7 +813,7 @@ export default class Focus extends View {
           // Only the one in view is bright, as in T3.
           .child(div().flex_1().min_w(0).truncate().text_size(13).text_color(on ? t.foreground : t.muted).child(title(a)))
           .when(Boolean(pic), (el) => el.child(pic)))
-        // The sub-agents part opens a list of them (tui-subagents); a click there peeks at one.
+        // The sub-agents part opens a list of them (panda-subagents); a click there peeks at one.
         .when(Boolean(branch || live), (el) => el.child(h_flex().min_w(0).gap(4).items_center().text_size(12).text_color(t.dim)
           .when(Boolean(branch), (el) => el.child(div().min_w(0).truncate().child(branch)))
           .when(Boolean(branch && live), (el) => el.child(div().flex_none().child("·")))
@@ -826,7 +826,7 @@ export default class Focus extends View {
               // Sized for what it will list: the live ones under it and the hibernated ones they or it left.
               const subs = descendants(terminals(), a.address), under = new Set([a.address, ...subs.map((k) => k.address)]);
               const asleep = (shared(HIBERNATED) ?? []).filter((r) => under.has(r.parent)).length;
-              openOverlay({ mod: "tui-subagents", kind: "popup", width: 300, height: subsHeight(subs.length, asleep), props: { parent: a.address } });
+              openOverlay({ mod: "panda-subagents", kind: "popup", width: 300, height: subsHeight(subs.length, asleep), props: { parent: a.address } });
             })
             .child(going ? `${going} worker${going > 1 ? "s" : ""} working` : "View finished workers")))));
     };
@@ -848,7 +848,7 @@ export default class Focus extends View {
           unsettle(a, cx, true);
           cx.notify();
         })
-        .child(svg("mods/tui-focus/undo.svg").size(14).flex_none().text_color(lit(`unsettle-${a.address}`, t.muted)));
+        .child(svg("mods/panda-focus/undo.svg").size(14).flex_none().text_color(lit(`unsettle-${a.address}`, t.muted)));
       const base = h_flex().id(`${ghost ? "ghost-" : ""}slim-${a.address}`).h(30).px(10).gap(8).flex_none().items_center().rounded(8);
       return (ghost ? base : row(base, a).role("button").accessibility_label(title(a)).on_hover(hover(a)).on_click(open(a)).cursor_pointer())
         .when(on, (el) => el.bg(t.selected))
@@ -891,7 +891,7 @@ export default class Focus extends View {
             .on_click((_e, cx) => { cx.stop_propagation(); this.hovered = null; forget(r); cx.notify(); })
             .child(svg("mods/workspace-chrome/x.svg").size(14).flex_none().text_color(lit(id, t.muted)))
           : h_flex().flex_none().gap(4).items_center().text_size(12).text_color(t.dim)
-            .child(svg("mods/tui-focus/moon.svg").size(12).flex_none().text_color(t.dim)).child(ago(r.at, now)));
+            .child(svg("mods/panda-focus/moon.svg").size(12).flex_none().text_color(t.dim)).child(ago(r.at, now)));
     };
 
     // A shelf's header, folding it: label, then count and chevron at the far edge.

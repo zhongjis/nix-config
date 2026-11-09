@@ -1,4 +1,4 @@
-// Herdr's workspace-chrome footer (Settings, Add machine) for herdr-tui's sidebar-footer, drawn as herdr-t3's footer:
+// Herdr's workspace-chrome footer (Settings, Add machine) for herdr-panda's sidebar-footer, drawn as herdr-t3's footer:
 // one row of icon buttons named by their tooltips; the brand row stays on the shipped workspace-chrome.
 // On the rail the buttons shrink to 28px so both fit its 76px (macOS) width.
 
@@ -32,6 +32,6 @@ export default class SidebarFooter extends View {
       // An update waiting: a dot on the gear's corner.
       .child(button("settings", "mods/workspace-chrome/settings.svg", "Settings", () => run("app.settings"))
         .when(ready, el => el.child(div().absolute().top(4).right(4).size(6).rounded_full().bg(t.accent))))
-      .child(button("machine", "mods/herdr-tui-chrome/server.svg", "Add machine", () => run("mod.open", { name: "machine-add" })));
+      .child(button("machine", "mods/panda-chrome/server.svg", "Add machine", () => run("mod.open", { name: "machine-add" })));
   }
 }

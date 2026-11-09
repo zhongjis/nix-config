@@ -1,6 +1,6 @@
-// Installed by the Herdr app's tui-focus mod, which overwrites this file whenever its copy changes.
+// Installed by the Herdr app's panda-focus mod, which overwrites this file whenever its copy changes.
 // Labels this Pi's herdr-core terminal with the line that resumes its session (`resume=pi --session <id>`),
-// so tui-focus can bring it back after a reboot. Runs again on /new and /resume. Does nothing outside herdr-core.
+// so panda-focus can bring it back after a reboot. Runs again on /new and /resume. Does nothing outside herdr-core.
 // @ts-nocheck
 
 import { execFile } from "node:child_process";

@@ -29,7 +29,7 @@ export function inSpace(all, filter) {
 }
 
 // Live main agents (no parent; the program reports a status) matching the filter, as inSpace's rows (depth 0).
-// Idle and blocked count too: running is what matters here, status is tui-focus's.
+// Idle and blocked count too: running is what matters here, status is panda-focus's.
 export function mainIn(all, filter) {
   const byAddress = new Map(all.map((k) => [k.address, k]));
   return all.filter((k) => !k.parent && k.state === "live" && k.status && matches(spaceOf(k, byAddress), k.cwd, filter))

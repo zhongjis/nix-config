@@ -1,4 +1,4 @@
-// Run: nix shell nixpkgs#nodejs --command node --experimental-vm-modules tests/tui-focus.mjs
+// Run: nix shell nixpkgs#nodejs --command node --experimental-vm-modules tests/panda-focus.mjs
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
@@ -61,7 +61,7 @@ async function load(url) {
   if (!cache.has(url.href)) cache.set(url.href, new vm.SourceTextModule(await readFile(url, "utf8"), { context, identifier: url.href }));
   return cache.get(url.href);
 }
-const mod = await load(new URL("../modules/home-manager/services/herdr-app/mods/tui-focus/main.js", import.meta.url));
+const mod = await load(new URL("../modules/home-manager/services/herdr-app/mods/panda-focus/main.js", import.meta.url));
 await mod.link((name, parent) => natives[name] ?? load(new URL(name, parent.identifier)));
 await mod.evaluate();
 const Focus = mod.namespace.default;
@@ -87,7 +87,7 @@ await drain();
 assert.deepEqual(actions(), ["hc.run", "pane.close"]);
 assert.equal(liveSpaces.length, 1);
 assert.ok(liveSpaces[0].tabs[0].blank);
-assert.equal(saved.get("tui-focus.closed")[0].argv.join(" "), "pi --session abc123");
+assert.equal(saved.get("panda-focus.closed")[0].argv.join(" "), "pi --session abc123");
 
 for (const extra of [{ address: "remote/t1" }, { app: "codex" }]) {
   fixture(extra).retire(liveAgents[0], cx); await drain(); assert.deepEqual(actions(), []);
@@ -118,4 +118,4 @@ for (const failed of [false, true]) {
 const f = fixture(), worker = { parent: "parent", address: "worker", labels: { hibernate: "ok" }, status: { state: "idle" } };
 assert.equal(f.sleepy({ ...worker, status_ms: now - 299999 }), false);
 assert.equal(f.sleepy({ ...worker, status_ms: now - 300000 }), true);
-console.log("tui-focus regression checks passed");
+console.log("panda-focus regression checks passed");

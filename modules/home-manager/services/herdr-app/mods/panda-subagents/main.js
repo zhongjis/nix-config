@@ -1,19 +1,19 @@
-// A popup listing an agent's live sub-agents (props().parent), all the way down, or the main agents a tui-spaces row
+// A popup listing an agent's live sub-agents (props().parent), all the way down, or the main agents a panda-spaces row
 // counts (props().filter: {space, folder, except}, mainIn in space.js), most urgent status first; a click peeks at one.
-// Opened from tui-focus cards' sub-agents line and tui-spaces' agents chip. Under a parent, hibernated workers
-// (shared "tui-focus.hibernated") show a moon and
+// Opened from panda-focus cards' sub-agents line and panda-spaces' agents chip. Under a parent, hibernated workers
+// (shared "panda-focus.hibernated") show a moon and
 // how long ago; a click revives one where it was (same name, folder, parent, session), then peeks at it.
-// A live worker on a branch of its own shows that branch's PR (tui-spaces' shared "tui-spaces.prs"), as a space row does.
+// A live worker on a branch of its own shows that branch's PR (panda-spaces' shared "panda-spaces.prs"), as a space row does.
 // The keyboard works it too: j/k or the arrows pick a row, Enter peeks or revives, p opens the picked worker's PR
 // in the PR panel, Esc closes; a footer under the rows says so.
-// Rows keep one height each (LIVE, ASLEEP), the footer FOOT: openers size the popup from them (tui-focus, tui-spaces).
+// Rows keep one height each (LIVE, ASLEEP), the footer FOOT: openers size the popup from them (panda-focus, panda-spaces).
 
 import { View, div, image, svg } from "gpui-kit";
 import { v_flex, h_flex, v_virtual_list, Scrollbar, VirtualListScrollHandle } from "gpui-base";
 import { agents, terminals, theme, run, props, closeOverlay, exec, hc, shared, setShared, notify, window } from "herdr";
 import { mainIn } from "./space.js";
 
-const HIBERNATED = "tui-focus.hibernated";
+const HIBERNATED = "panda-focus.hibernated";
 // A row's height with the 2px under it: a live one has two lines (the second kept even empty, so a git answer
 // arriving doesn't move the rows), a hibernated one a single line.
 const LIVE = 50, ASLEEP = 32;
@@ -22,7 +22,7 @@ const FOOT = 24;
 // Indents stop here, so a deep tree keeps room for its names.
 const DEPTH = 3;
 
-// As tui-focus times: no "ago", nothing past days.
+// As panda-focus times: no "ago", nothing past days.
 function ago(ms, now) {
   const m = Math.floor((now - ms) / 60000);
   if (m < 1) return "just now";
@@ -65,7 +65,7 @@ const base = (path) => path.replace(/[\\/]+$/, "").split(/[\\/]/).pop() || path;
 
 // Where a terminal works: its project (the main checkout's folder, so a worktree reads as its repo) and
 // branch. Outside git: the folder's name, no branch. A terminal on another machine (`vps/t7`) runs git there.
-// `common`, the repo's git folder, finds its PRs in tui-spaces' feed, which has only this machine's.
+// `common`, the repo's git folder, finds its PRs in panda-spaces' feed, which has only this machine's.
 async function place(k) {
   const on = k.address.includes("/") ? k.address.split("/")[0] : undefined;
   try {
@@ -111,7 +111,7 @@ export default class SubAgents extends View {
     const mine = this.places[parent] ?? {};
     // A worker's PR: the open one on its branch in its repo, its author's first, as a space row's badge picks.
     // None on the parent's branch: that PR is the parent's.
-    const prs = Object.entries(shared("tui-spaces.prs") ?? {}).flatMap(([repo, list]) => list.map((p) => ({ ...p, repo })));
+    const prs = Object.entries(shared("panda-spaces.prs") ?? {}).flatMap(([repo, list]) => list.map((p) => ({ ...p, repo })));
     const prOf = (at) => {
       if (!at?.common || !at.branch || at.branch === mine.branch) return null;
       const on = prs.filter((p) => p.common === at.common && p.branch === at.branch);
@@ -190,7 +190,7 @@ export default class SubAgents extends View {
           ? h_flex().flex_none().gap(4).items_center().text_size(11).text_color(t.muted)
             .child(svg("mods/workspace-chrome/spinner.svg").size(11).flex_none().text_color(t.muted).spin(900)).child("Reviving…")
           : h_flex().flex_none().gap(4).items_center().text_size(11).text_color(t.dim)
-            .child(svg("mods/tui-focus/moon.svg").size(11).flex_none().text_color(t.dim)).child(ago(r.at, now)))
+            .child(svg("mods/panda-focus/moon.svg").size(11).flex_none().text_color(t.dim)).child(ago(r.at, now)))
         .when(Boolean(pic), (el) => el.child(pic));
     };
     // The keys, under the rows: a cap per key, p's lit while the picked row has a PR to open.

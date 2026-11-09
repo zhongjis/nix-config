@@ -42,10 +42,10 @@ export class Repositories {
           const me = this.logins[host];
           const r = await exec("gh", ["pr", "list", "-R", group.github, "--state", "open", "--limit", "200", "--json", "number,headRefName,title,url,statusCheckRollup,reviewDecision,author,updatedAt"], { cwd });
           if (r.code !== 0) throw new Error("PRs unavailable");
-          // `common`: the checkout group's git common dir, which tui-subagents matches a worker's checkout against.
+          // `common`: the checkout group's git common dir, which panda-subagents matches a worker's checkout against.
           cache.list = JSON.parse(r.stdout).map(p => ({ number: p.number, branch: p.headRefName, title: p.title, url: p.url, ci: ciRollup(p.statusCheckRollup), review: p.reviewDecision, author: p.author?.login ?? null, mine: Boolean(me) && p.author?.login === me, bot: Boolean(p.author?.is_bot), updatedAt: p.updatedAt, folder: group.worktrees.find(w => w.branch === p.headRefName)?.folder ?? cwd, common }));
           const value = Object.fromEntries(Object.entries(this.prs).map(([repo, data]) => [repo, data.list]));
-          if (JSON.stringify(value) !== JSON.stringify(shared("tui-spaces.prs"))) setShared("tui-spaces.prs", value);
+          if (JSON.stringify(value) !== JSON.stringify(shared("panda-spaces.prs"))) setShared("panda-spaces.prs", value);
         } catch { cache.at = Date.now() + 300000; }
         finally { cache.busy = false; }
       } catch { group.at = Date.now() + 300000; }

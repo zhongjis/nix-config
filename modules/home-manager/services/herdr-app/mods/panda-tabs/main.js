@@ -15,7 +15,7 @@ function find(node, id) {
 // or a dot, and its word on hover.
 const STATUS = {
   working: ["Working", t => svg("mods/workspace-chrome/spinner.svg").size(12).text_color(t.working).spin(900)],
-  blocked: ["Needs you", t => svg("mods/tui-tabs/alert.svg").size(12).text_color(t.blocked)],
+  blocked: ["Needs you", t => svg("mods/panda-tabs/alert.svg").size(12).text_color(t.blocked)],
   done: ["Done", t => div().size(6).rounded(3).bg(t.done)],
 };
 
@@ -119,8 +119,8 @@ export default class Tabs extends View {
       .when(enabled.includes("changes"), el => el.child(panelButton("changes", "Changes", "mods/changes/changes.svg")))
       .when(enabled.includes("pr"), el => el.child(panelButton("pr", "Pull requests", "mods/pr-flow/merge.svg")))
       .when(enabled.includes("ci"), el => el.child(panelButton("ci", "CI runs", "mods/ci-dash/ci.svg")))
-      .when(w?.buttons, el => el.child(button("minimize", svg("mods/tui-tabs/win-min.svg").size(caption), "Minimize", () => run("window.minimize")))
-        .child(button("maximize", svg(`mods/tui-tabs/${w.maximized ? "win-restore" : "win-max"}.svg`).size(caption), w.maximized ? "Restore" : "Maximize", () => run("window.maximize")))
-        .child(button("close-window", svg("mods/tui-tabs/win-close.svg").size(caption), "Close window", () => run("window.close"))));
+      .when(w?.buttons, el => el.child(button("minimize", svg("mods/panda-tabs/win-min.svg").size(caption), "Minimize", () => run("window.minimize")))
+        .child(button("maximize", svg(`mods/panda-tabs/${w.maximized ? "win-restore" : "win-max"}.svg`).size(caption), w.maximized ? "Restore" : "Maximize", () => run("window.maximize")))
+        .child(button("close-window", svg("mods/panda-tabs/win-close.svg").size(caption), "Close window", () => run("window.close"))));
   }
 }

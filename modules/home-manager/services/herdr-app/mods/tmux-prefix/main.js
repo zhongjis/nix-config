@@ -4,7 +4,7 @@ import { closeOverlay, focused, hc, layout, nextCommand, props, run, settings, t
 
 const find = (node, id) => node?.id === id ? node : (node?.children ?? []).reduce((hit, c) => hit ?? find(c, id), null);
 
-// The right panel stack (herdr-tui): show `child`, or hide the panel when it already shows.
+// The right panel stack (herdr-panda): show `child`, or hide the panel when it already shows.
 function togglePanel(child) {
   const root = layout(), panel = find(root, "panel"), body = find(root, "panel-body");
   if (!panel || !body) return;

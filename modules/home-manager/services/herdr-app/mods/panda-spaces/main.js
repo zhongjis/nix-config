@@ -1,7 +1,7 @@
 // Workspace spaces: stable colored avatars, worktrees under their checkout,
 // grouped by machine when more than one is known. After a space's name, the repo
 // its first terminal is in now, only where unusual: branch, ahead/behind. Agent state lives in the agents list, not here,
-// except a green chip counting running main agents (no sub-agents, mainIn in space.js) that opens tui-subagents: on a
+// except a green chip counting running main agents (no sub-agents, mainIn in space.js) that opens panda-subagents: on a
 // shown worktree's row those working in it, on a space's row the rest working for that space. Click to
 // switch, right-click for its menu, drag to reorder. A repo's worktrees go by their branch, folded behind a count
 // on its row; the open ones bright, the rest dim (a click opens one as a space).
@@ -62,7 +62,7 @@ function ink(t, color) {
   };
   return contrast(t.background) > contrast(t.foreground) ? t.background : t.foreground;
 }
-// tui-subagents' rows (live 50px, hibernated 32px), padding and, under any rows, its key footer (24px): its popup's
+// panda-subagents' rows (live 50px, hibernated 32px), padding and, under any rows, its key footer (24px): its popup's
 // height for what it will list.
 const subsHeight = (live, asleep) => Math.min(360, Math.max(46, 12 + 50 * live + 32 * asleep + (live + asleep ? 24 : 0)));
 
@@ -469,7 +469,7 @@ export default class Spaces extends View {
     return out;
   }
 
-  // How many main agents run on a row, in green; a click lists them (tui-subagents), by status, to peek at.
+  // How many main agents run on a row, in green; a click lists them (panda-subagents), by status, to peek at.
   subChip(w, { filter, n, live, asleep }, t) {
     return h_flex().id(`subs-${w.id}`).flex_none().h(22).gap(3).px(6).items_center().rounded(5).text_size(11).text_color(t.ansi2)
       .cursor_pointer().hover(s => s.bg(t.hover))
@@ -478,7 +478,7 @@ export default class Spaces extends View {
       .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
       .on_mouse_up("left", (_e, cx) => {
         cx.stop_propagation();
-        openOverlay({ mod: "tui-subagents", kind: "popup", width: 300, height: subsHeight(live, asleep), props: { filter } });
+        openOverlay({ mod: "panda-subagents", kind: "popup", width: 300, height: subsHeight(live, asleep), props: { filter } });
       })
       .child(svg("icons/agent.svg").size(12).flex_none())
       .child(String(n));
@@ -598,7 +598,7 @@ export default class Spaces extends View {
       .child(this.avatar(w, t, [...w.name][0]?.toUpperCase() ?? "?").relative()
         // 8px of red in a 1px ring of the rail's color, so it stands off the avatar.
         .when(failing, (el) => el.child(h_flex().absolute().right(-4).bottom(-4).size(10).rounded(3).border(1).border_color(t.chrome).bg(t.blocked)
-          .items_center().justify_center().child(svg("mods/tui-spaces/ci-fail.svg").size(6).text_color(t.chrome)))));
+          .items_center().justify_center().child(svg("mods/panda-spaces/ci-fail.svg").size(6).text_color(t.chrome)))));
   }
 
   // The rail's top: the macOS traffic lights fill the brand row there, so expanding gets its own row under it (the

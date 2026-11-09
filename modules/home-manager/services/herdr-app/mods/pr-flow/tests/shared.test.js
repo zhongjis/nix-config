@@ -5,7 +5,7 @@ import { createTracker } from '../tracker.js';
 import { checkState, ciSummary } from '../status.js';
 import { createGh, parseRemote, parsePrUrl } from '../gh.js';
 import { orderCards, conversation, descPreview } from '../present.js';
-import { checkouts, ciRollup, githubRepo } from '../../tui-spaces/tracking.js';
+import { checkouts, ciRollup, githubRepo } from '../../panda-spaces/tracking.js';
 
 test('CI reduction matches the detail check states; failure wins over pending', () => {
   const checks = [

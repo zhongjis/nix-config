@@ -80,23 +80,23 @@ in {
         "ctrl-b" = "mod.open:tmux-prefix";
       };
       "mod:tmux-prefix"."ctrl-b" = "tmux-prefix.send-prefix";
-      # Settle the focused agent in the herdr-tui sidebar (tui-focus mod).
-      "layout:herdr-tui" = {
-        "cmd-shift-s" = "tui-focus.settle";
-        "ctrl-shift-s" = "tui-focus.settle";
+      # Settle the focused agent in the herdr-panda sidebar (panda-focus mod).
+      "layout:herdr-panda" = {
+        "cmd-shift-s" = "panda-focus.settle";
+        "ctrl-shift-s" = "panda-focus.settle";
       };
     };
-    # Herdr's default `main` layout with the tui-focus agent cards in the sidebar.
-    layouts.herdr-tui = lib.importJSON ./layouts/herdr-tui.json;
+    # Herdr's default `main` layout with the panda-focus agent cards in the sidebar.
+    layouts.herdr-panda = lib.importJSON ./layouts/herdr-panda.json;
     mods = {
-      tui-focus = ./mods/tui-focus;
-      tui-subagents = ./mods/tui-subagents;
+      panda-focus = ./mods/panda-focus;
+      panda-subagents = ./mods/panda-subagents;
       # Herdr's `spaces` mod with the repo/branch on its own line.
-      tui-spaces = ./mods/tui-spaces;
+      panda-spaces = ./mods/panda-spaces;
       # Herdr's `tabs` mod with icon-only Files/Changes/PR/CI panel buttons.
-      tui-tabs = ./mods/tui-tabs;
+      panda-tabs = ./mods/panda-tabs;
       # Herdr's `workspace-chrome` footer (Settings, Add machine) with centered icons on the collapsed rail.
-      herdr-tui-chrome = ./mods/herdr-tui-chrome;
+      panda-chrome = ./mods/panda-chrome;
       # Replaces Herdr's shipped `changes` panel (reuses its git listing): inline diffs, opens hunk, sends hunk notes to the tab's agent.
       hunk-review = ./mods/hunk-review;
       # herdr.dev/mods/herdrdev/tmux-prefix
@@ -106,7 +106,7 @@ in {
       filetree = ./mods/filetree;
       # github.com/cybertron288/herdr-mods file-icons; filetree reads its icons/.
       file-icons = ./mods/file-icons;
-      # github.com/jjangsky/herdr-pr-flow, fed by tui-spaces' PR list.
+      # github.com/jjangsky/herdr-pr-flow, fed by panda-spaces' PR list.
       pr-flow = ./mods/pr-flow;
       # github.com/cybertron288/herdr-mods ci-dash (GitHub Actions runs, dispatch, artifacts).
       ci-dash = ./mods/ci-dash;
