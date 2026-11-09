@@ -71,6 +71,8 @@ const GLOW = 1200;
 const closable = (a) => Boolean(EXIT[a.app]) && !a.address.includes("/");
 // How often the resume labels are brought up to date (ms): a reboot loses at most this much of a session switch.
 const REMEMBER = 15000;
+// How long after the mod starts it looks for recovered shells more often (ms).
+const STARTUP = 60000;
 // Where Pi loads integrations/pi.ts from.
 const PI_EXTENSION = ".pi/agent/extensions/herdr-app-session.ts";
 // A shell at its prompt, by the foreground process's name (a login shell's starts with "-").
@@ -133,6 +135,10 @@ export default class Focus extends View {
       await this.sessions(cx);
     });
     cx.timer.every(REMEMBER, (cx) => this.sessions(cx));
+    // The first pass usually runs before the core has given lost terminals their shells (a reboot), so for the
+    // first STARTUP the passes come every 2s: resumes land in seconds instead of on the next REMEMBER.
+    const started = Date.now();
+    cx.timer.every(2000, (cx) => { if (Date.now() - started < STARTUP) this.sessions(cx); });
     // `t3-focus.settle` (cmd-shift-s in keys.json): see settleKey in render.
     cx.spawn(async (cx) => {
       for (;;) {
