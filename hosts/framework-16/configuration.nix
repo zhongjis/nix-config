@@ -111,7 +111,7 @@
 
   # Logitech Blutooth Devices
   hardware.logitech.wireless.enable = true;
-  hardware.logitech.wireless.enableGraphical = true; # for solaar to be included
+  programs.solaar.enable = true;
 
   environment.systemPackages = with pkgs; [];
 
