@@ -34,6 +34,8 @@
     virt-manager.enable = true;
   };
 
+  services.tailscale.extraSetFlags = ["--ssh"];
+
   # xremap
   hardware.uinput.enable = true;
   users.groups = {
