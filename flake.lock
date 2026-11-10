@@ -21,11 +21,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1794265162,
-        "narHash": "sha256-SqHvXw0gILjTVwmdZcFywndTrxZoJSXnZTRzvMzvFks=",
+        "lastModified": 1794342761,
+        "narHash": "sha256-o/H3Ukauih8Cc5w+c/qozEiyr8bfyF5+Ut+0wZZt/SA=",
         "ref": "refs/heads/main",
-        "rev": "0e87ee7dc5908ce7bf4a8b4892bfb943744690e4",
-        "revCount": 211,
+        "rev": "396ee08af83b9c78d40066702b734d8817cb6ca1",
+        "revCount": 214,
         "type": "git",
         "url": "ssh://git@github.com/zhongjis/agent-skills.git"
       },
