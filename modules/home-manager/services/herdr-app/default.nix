@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   lib,
   pkgs,
   ...
@@ -11,6 +12,7 @@ in {
   ];
 
   home.packages = [
+    inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.herdr-core
     (pkgs.writeShellScriptBin "sessionizer" ''
       export PATH=${lib.makeBinPath [pkgs.jq pkgs.fzf pkgs.findutils pkgs.coreutils pkgs.gnused config.programs.herdr-app.package]}:"$PATH"
       ${builtins.readFile ./scripts/herdr-sessionizer.sh}
