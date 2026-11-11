@@ -4,10 +4,13 @@
 // @ts-nocheck
 
 import { execFile } from "node:child_process";
+import { homedir } from "node:os";
 
 export default function (pi) {
   const terminal = process.env.HC_TERMINAL_ID;
   if (!terminal) return;
+  // `hc` lives in ~/.local/bin, which a terminal's PATH may lack.
+  const env = { ...process.env, PATH: `${process.env.PATH ?? ""}:${homedir()}/.local/bin` };
   pi.on("session_start", (_event, ctx) => {
     // Headless runs (RPC, JSON, print) inherit the terminal id from their parent; only the TUI owns the pane.
     if (ctx?.mode !== "tui") return;
@@ -17,6 +20,8 @@ export default function (pi) {
     } catch {
       return;
     }
-    if (typeof id === "string" && id) execFile("hc", ["label", terminal, `resume=pi --session ${id}`], () => {});
+    if (typeof id === "string" && id) execFile("hc", ["label", terminal, `resume=pi --session ${id}`], { env }, (error) => {
+      if (error) ctx.ui?.notify?.(`Herdr can't resume this session after a reboot: ${error.message}`, "warning");
+    });
   });
 }
