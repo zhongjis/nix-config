@@ -375,8 +375,9 @@ export default class Focus extends View {
       } catch {}
       if (id) line = `claude --resume ${id}`;
     } else if (!line) {
-      const at = (k.argv ?? []).indexOf("--session");
-      if (at >= 0 && k.argv[at + 1]) line = `pi --session ${k.argv[at + 1]}`;
+      // The foreground's argv: Pi typed at a shell prompt runs under the terminal's shell argv.
+      const argv = k.foreground?.argv ?? k.argv ?? [], at = argv.indexOf("--session");
+      if (at >= 0 && argv[at + 1]) line = `pi --session ${argv[at + 1]}`;
     }
     if (!line) return;
     if (!k.keep) await hc(["keep", k.address]).catch(() => null);
