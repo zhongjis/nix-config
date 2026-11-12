@@ -5,6 +5,8 @@
 // Settled Claude Code or Pi is also freed at once (by its Settle or by Clear): the agent is exited as a person
 // would, the resume command it prints is kept (shared "panda-focus.closed"), and its pane closes. Clicking that
 // closed row resumes it in a new tab.
+// Snoozed, as T3's threads: `snoozed=<wake ms>:<ms snoozed>` on the terminal hides the agent on a Snoozed shelf (still
+// running) until its wake time, until it needs the person (blocked), or until Wake. Pinning or settling ends it.
 // Reboots: each local Claude Code or Pi terminal is kept by the core and labelled with the line that resumes its
 // session (`resume=`) and its terminal's pid (`resume.pid=`). The line comes from integrations/claude.sh and
 // integrations/pi.ts, which this mod installs into Claude Code and Pi. A kept terminal comes back from a reboot as a shell
@@ -99,6 +101,27 @@ function ago(ms, now) {
   return `${Math.floor(m / 1440)}d`;
 }
 
+// T3's default snooze menu: one and three hours on, 6 PM today (gone once past), 9 AM tomorrow and next Monday
+// (on a Sunday that's tomorrow, so it shows once).
+function snoozes(now) {
+  const at = (days, h) => { const d = new Date(now); d.setDate(d.getDate() + days); d.setHours(h, 0, 0, 0); return d.getTime(); };
+  return [
+    { id: "1h", label: "In 1 hour", until: now + 3600000 },
+    { id: "3h", label: "In 3 hours", until: now + 3 * 3600000 },
+    { id: "evening", label: "This evening", until: at(0, 18) },
+    { id: "tomorrow", label: "Tomorrow", until: at(1, 9) },
+    { id: "monday", label: "Monday", until: at((8 - new Date(now).getDay()) % 7 || 7, 9) },
+  ].filter((p, i, xs) => p.until > now && !xs.slice(0, i).some((q) => q.until === p.until));
+}
+
+// When a snooze ends: 6:00 PM, Tomorrow 9:00 AM, Mon 9:00 AM, 3/14 9:00 AM.
+const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+function wakes(ms, now) {
+  const d = new Date(ms), h = d.getHours(), time = `${h % 12 || 12}:${String(d.getMinutes()).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`;
+  const days = Math.round((new Date(ms).setHours(0, 0, 0, 0) - new Date(now).setHours(0, 0, 0, 0)) / 86400000);
+  return days <= 0 ? time : days === 1 ? `Tomorrow ${time}` : days < 7 ? `${DAYS[d.getDay()]} ${time}` : `${d.getMonth() + 1}/${d.getDate()} ${time}`;
+}
+
 // How long it's been working, as T3's Working pill: 9s, 4m, 1h 5m.
 function took(ms, now) {
   const s = Math.max(0, Math.floor((now - ms) / 1000)), m = Math.floor(s / 60);
@@ -113,14 +136,19 @@ function icon(p, size, color) {
 
 export default class Focus extends View {
   init(_props, cx) {
+    // This mod opened as its own snooze menu (props().snooze): no timers, passes or commands of its own.
+    if (props()?.snooze) return;
     // Each agent's last state, when we saw it set going or come back (ms; 0: before we were watching), the turns
     // it had ended then, and for one that just stopped, when its run started.
     this.changed = JSON.parse(localStorage.getItem("changes") ?? "{}");
     this.open = localStorage.getItem("open") === "true";
     this.workOpen = localStorage.getItem("working-open") === "true";
+    this.napOpen = localStorage.getItem("snoozed-open") === "true";
     this.limit = FIRST;
-    // Settled labels written but not back from the core yet: address → value ("" = removed).
-    this.pending = {};
+    // Labels written but not back from the core yet: label → address → value ("" = removed).
+    this.pending = { settled: {}, snoozed: {} };
+    // Agents being exited by retire() right now: only these read "closing".
+    this.closing = new Set();
     this.hovered = null;
     // Takes the keyboard while a row is lifted, so Esc can put it back.
     this.keys = cx.focus_handle();
@@ -129,7 +157,7 @@ export default class Focus extends View {
     cx.timer.every(1000, (cx) => { if (this.ticking && window()?.active) cx.notify(); });
     // The cards' times (5m, 2h) move on by the minute, as T3's do.
     cx.timer.every(60000, (cx) => cx.notify());
-    // One retire per settle (`${address}:${settled}`), so a failure doesn't repeat.
+    // One hibernate per idle spell (`hibernate:${address}:${status_ms}`), so a failure doesn't repeat.
     this.tried = new Set();
     // Reboots: install Pi's and Claude Code's halves, then label agents and resume recovered shells, now and every REMEMBER.
     cx.spawn(async (cx) => {
@@ -142,6 +170,12 @@ export default class Focus extends View {
     // first STARTUP the passes come every 2s: resumes land in seconds instead of on the next REMEMBER.
     const started = Date.now();
     cx.timer.every(2000, (cx) => { if (Date.now() - started < STARTUP) this.sessions(cx); });
+    // Pins used to live only in shared "agents.pins", unseen by the phone: move each onto its terminal once.
+    if (localStorage.getItem("pins-moved") !== "true") {
+      this.pinsToMove = [...(shared("agents.pins") ?? [])];
+      localStorage.setItem("pins-moved", "true");
+    }
+    cx.timer.every(2000, () => this.movePins());
     // `t3-focus.settle` (cmd-shift-s in keys.json): see settleKey in render.
     cx.spawn(async (cx) => {
       for (;;) {
@@ -187,46 +221,55 @@ export default class Focus extends View {
 
   // Shown at once; the label comes back from the core a moment later.
   setSettled(addr, value, cx) {
-    this.pending[addr] = value;
+    this.setLabel("settled", addr, value, cx);
+  }
+
+  setLabel(key, addr, value, cx) {
+    this.pending[key][addr] = value;
     cx.spawn(async (cx) => {
-      const r = await hc(["label", addr, `settled=${value}`]).catch((e) => ({ code: 1, stderr: String(e) }));
+      const r = await hc(["label", addr, `${key}=${value}`]).catch((e) => ({ code: 1, stderr: String(e) }));
       if (r.code === 0) return;
-      delete this.pending[addr];
+      delete this.pending[key][addr];
       notify({ title: "Couldn't update the agent", body: r.stderr.trim(), level: "error" });
       cx.notify();
     });
   }
 
   // Frees a settled agent: exits it, keeps the resume line that appears, closes its pane. Local Claude Code and
-  // Pi only. When no new resume line shows (a draft in the prompt, a slow exit), it stays settled by label only.
-
+  // Pi only. When no new resume line shows (a draft in the prompt, a slow exit), it stays settled by label only,
+  // and the next Settle or Clear tries again. One run per agent at a time; only while it runs does its row say
+  // "closing".
   retire(a, cx) {
-    const k = terminals().find((k) => k.address === a.address), once = `${a.address}:${k?.labels?.settled ?? ""}`;
-    if (!closable(a) || this.tried.has(once)) return;
-    this.tried.add(once);
+    if (!closable(a) || this.closing.has(a.address)) return;
+    this.closing.add(a.address);
+    const k = terminals().find((k) => k.address === a.address);
     const rec = { key: `${a.address}-${Date.now()}`, title: namer()(a), space: a.space, cwd: k?.cwd,
       program: a.program && { name: a.program.name, icon: a.program.icon, tint: a.program.tint } };
     const keys = EXIT[a.app];
     cx.spawn(async (cx) => {
-      const read = async () => ((await hc(["read", a.address, "--lines", "80"]).catch(() => null))?.stdout ?? "").match(RESUME) ?? [];
-      const before = (await read()).length;
-      for (const [i, k] of keys.entries()) {
-        if (i) await pause();
-        await hc(["keys", a.address, k]).catch(() => null);
+      try {
+        const read = async () => ((await hc(["read", a.address, "--lines", "80"]).catch(() => null))?.stdout ?? "").match(RESUME) ?? [];
+        const before = (await read()).length;
+        for (const [i, k] of keys.entries()) {
+          if (i) await pause();
+          await hc(["keys", a.address, k]).catch(() => null);
+        }
+        let line = null;
+        for (let i = 0; i < 20 && !line; i++) {
+          await pause();
+          const found = await read();
+          if (found.length > before) line = found.at(-1);
+        }
+        if (!line) {
+          notify({ title: "Settled, still running", body: `${rec.title}: no resume command appeared, so it was left open.`, level: "warning" });
+          return;
+        }
+        setShared(CLOSED, [{ ...rec, argv: line.split(" "), at: Date.now() }, ...(shared(CLOSED) ?? [])]);
+        await this.closePane(a.pane);
+      } finally {
+        this.closing.delete(a.address);
+        cx.notify();
       }
-      let line = null;
-      for (let i = 0; i < 20 && !line; i++) {
-        await pause();
-        const found = await read();
-        if (found.length > before) line = found.at(-1);
-      }
-      if (!line) {
-        notify({ title: "Settled, still running", body: `${rec.title}: no resume command appeared, so it was left open.`, level: "warning" });
-        return;
-      }
-      setShared(CLOSED, [{ ...rec, argv: line.split(" "), at: Date.now() }, ...(shared(CLOSED) ?? [])]);
-      await this.closePane(a.pane);
-      cx.notify();
     });
   }
 
@@ -305,6 +348,18 @@ export default class Focus extends View {
 
   // One pass at a time over every local terminal, sub-agents (no pane of their own) included: a running agent's
   // terminal is labelled, a recovered shell is resumed.
+  // One-time move of old shared pins onto their terminals (`herdr.pinned`). An address not live now is
+  // dropped: pins ended with their terminal anyway.
+  movePins() {
+    if (!this.pinsToMove?.length) return;
+    const live = new Map(terminals().filter((t) => t.state === "live").map((t) => [t.address, t]));
+    for (const address of this.pinsToMove) {
+      const t = live.get(address);
+      if (t && !t.labels?.["herdr.pinned"]) run("terminal.pin", { terminal: address, pinned: true });
+    }
+    this.pinsToMove = [];
+  }
+
   sessions(cx) {
     if (this.syncing) return;
     this.syncing = true;
@@ -452,17 +507,39 @@ export default class Focus extends View {
     return null;
   }
 
+  // The snooze menu, opened by a card's Snooze: T3's presets, soonest first, each with when it wakes.
+  snoozeMenu(t) {
+    const { snooze, overlay } = props(), now = Date.now();
+    return v_flex().w_full().p(5).bg(t.popover).text_size(12.8)
+      .child(div().px(8).pt(4).pb(6).text_size(11).text_color(t.dim).child("Snooze until"))
+      .children(snoozes(now).map((p) => h_flex().id(`snooze-${p.id}`).h(31).px(8).gap(9).rounded(7).items_center()
+        .text_color(t.foreground).cursor_pointer().hover((el) => el.bg(t.hover))
+        .on_click(() => {
+          closeOverlay(overlay);
+          hc(["label", snooze, `snoozed=${p.until}:${Date.now()}`])
+            .then((r) => r.code === 0 || Promise.reject(r.stderr))
+            .catch((e) => notify({ title: "Couldn't snooze the agent", body: String(e).trim(), level: "error" }));
+        })
+        .child(div().flex_1().child(p.label))
+        .child(div().flex_none().text_size(11).text_color(t.dim).child(wakes(p.until, now)))));
+  }
+
   render(cx) {
     const t = theme(), now = Date.now();
+    if (props()?.snooze) return this.snoozeMenu(t);
     const every = agents(), all = terminals(), ps = panes(), sp = spaces();
     const list = every;
     const listed = new Map(every.map((a) => [a.address, a.status]));
     const term = new Map(all.map((k) => [k.address, k]));
-    for (const [k, v] of Object.entries(this.pending)) if (!term.has(k) || (term.get(k).labels?.settled ?? "") === v) delete this.pending[k];
-    const settledAt = (a) => {
-      const v = this.pending[a.address] ?? term.get(a.address)?.labels?.settled;
+    for (const [key, m] of Object.entries(this.pending)) {
+      for (const [k, v] of Object.entries(m)) if (!term.has(k) || (term.get(k).labels?.[key] ?? "") === v) delete m[k];
+    }
+    // A `<ms>:<n>` label (settled, snoozed) as numbers, the one just written first; null when unset.
+    const label = (key, a) => {
+      const v = this.pending[key][a.address] ?? term.get(a.address)?.labels?.[key];
       return v ? v.split(":").map(Number) : null;
     };
+    const settledAt = (a) => label("settled", a);
     const kids = new Map(every.map((a) => [a.address, descendants(all, a.address).map((k) => kidStatus(k, listed))]));
     // It, or anything under it, is working or needs the person.
     const busy = (a) => BUSY.has(a.status) || kids.get(a.address).some((s) => BUSY.has(s));
@@ -474,11 +551,26 @@ export default class Focus extends View {
     // It with what's under it (tree.js).
     const state = (a) => treeStatus(a.status, kids.get(a.address));
     const running = (a) => state(a) === "working";
-    // Pins are the agents list's (t3-agents), one set for both: pinned agents stay up top in pin order, whatever their state.
-    const pins = shared("agents.pins") ?? [];
+    // Pins are the core's (`herdr.pinned`), so the phone and every window share them: pinned agents stay up top,
+    // whatever their state. Shared "agents.pins" only keeps this window's hand-made order; new pins go last.
+    const order = shared("agents.pins") ?? [];
+    const pins = every.filter((a) => a.pinned).map((a) => a.address)
+      .sort((x, y) => (order.indexOf(x) + 1 || Infinity) - (order.indexOf(y) + 1 || Infinity) || (x < y ? -1 : x > y ? 1 : 0));
+    // A snooze ends at its time, or early when it needs the person (it can't be snoozed while it does): back on top
+    // of the list, as T3 wakes a thread. Pinning or settling ends one quietly. Checked on the minute tick.
+    for (const a of every) {
+      const z = label("snoozed", a);
+      if (!z) continue;
+      if (pins.includes(a.address) || settledAt(a)) { this.setLabel("snoozed", a.address, "", cx); continue; }
+      if (z[0] > now && state(a) !== "blocked") continue;
+      this.setLabel("snoozed", a.address, "", cx);
+      this.changed[a.address] = { ...this.changed[a.address], at: now, start: null };
+      localStorage.setItem("changes", JSON.stringify(this.changed));
+    }
+    const snoozedAt = (a) => label("snoozed", a);
     this.track(every.map((a) => ({
       address: a.address, s: state(a) === "blocked" ? "blocked" : running(a) ? "working" : "idle",
-      turn: term.get(a.address)?.turn ?? 0, excluded: pins.includes(a.address) || Boolean(settledAt(a)),
+      turn: term.get(a.address)?.turn ?? 0, excluded: pins.includes(a.address) || Boolean(settledAt(a) || snoozedAt(a)),
     })), all, now, cx);
     const mark = (a) => this.changed[a.address];
     // Seen changing, then; before that, the core's time of its last change. terminals() only has that as of
@@ -497,15 +589,19 @@ export default class Focus extends View {
       : Math.min(Infinity, ...descendants(all, a.address).filter((k) => kidStatus(k, listed) === "working").map((k) => k.status_ms).filter(Boolean)));
     const pinned = pins.map((p) => list.find((a) => a.address === p)).filter(Boolean);
     const rest = list.filter((a) => !pins.includes(a.address));
-    const out = rest.filter((a) => !settledAt(a) && !working(a)).sort(newest);
-    const work = rest.filter((a) => !settledAt(a) && working(a)).sort((x, y) => begun(y) - begun(x) || byAddress(x, y));
+    const awake = rest.filter((a) => !settledAt(a) && !snoozedAt(a));
+    const out = awake.filter((a) => !working(a)).sort(newest);
+    const work = awake.filter(working).sort((x, y) => begun(y) - begun(x) || byAddress(x, y));
+    // Snoozed, soonest to wake first; working or not, it stays here until it wakes.
+    const nap = rest.filter((a) => !settledAt(a) && snoozedAt(a)).sort((x, y) => snoozedAt(x)[0] - snoozedAt(y)[0] || byAddress(x, y));
     const put = rest.filter(settledAt).sort((x, y) => settledAt(y)[0] - settledAt(x)[0] || byAddress(x, y));
     // Shelves fold by default on this screen; the one in view stays out even folded or past the page, so it's never lost.
     const busyRows = this.workOpen ? work : work.filter((a) => a.focused);
+    const napRows = this.napOpen ? nap : nap.filter((a) => a.focused);
     // Section changes reorder at once. A card arriving in Active needing the person glows: drawn full on the render
     // that sees it arrive, then one render ~50ms later sets its fade's target, and the fade runs natively (shine).
     const sectionNow = new Map([...pinned.map((a) => [a.address, "pinned"]), ...out.map((a) => [a.address, "active"]),
-      ...work.map((a) => [a.address, "working"]), ...put.map((a) => [a.address, "settled"])]);
+      ...work.map((a) => [a.address, "working"]), ...nap.map((a) => [a.address, "snoozed"]), ...put.map((a) => [a.address, "settled"])]);
     for (const [k, s] of sectionNow) {
       const was = this.sections?.get(k);
       if (!was || was === s || s !== "active" || this.drag?.moved) continue;
@@ -519,7 +615,7 @@ export default class Focus extends View {
     this.sections = sectionNow;
     // agent.next goes as the list reads. Only while this list shows: the agents list (t3-agents) sets its own.
     const find = (n) => n?.id === "sidebar-lists" ? n : (n?.children ?? []).map(find).find(Boolean);
-    if (find(layout())?.active !== "lists") setAgentOrder([...pinned, ...out, ...work, ...put].map((a) => a.address));
+    if (find(layout())?.active !== "lists") setAgentOrder([...pinned, ...out, ...work, ...nap, ...put].map((a) => a.address));
 
     const title = namer();
     const hover = (a) => (on, cx) => {
@@ -544,9 +640,9 @@ export default class Focus extends View {
     };
     // Brought back, it's news again: the top of the list. Brought back by the person (`look`), it's also what
     // they look at next; new work bringing it back on its own never moves their focus.
-    const unsettle = (a, cx, look = false) => {
+    const unsettle = (a, cx, look = false, key = "settled") => {
       if (look) run("agent.focus", { terminal: a.address });
-      this.setSettled(a.address, "", cx);
+      this.setLabel(key, a.address, "", cx);
       this.changed[a.address] = { ...this.changed[a.address], at: Date.now(), start: null };
       localStorage.setItem("changes", JSON.stringify(this.changed));
     };
@@ -601,25 +697,36 @@ export default class Focus extends View {
         .on_click(() => run("agent.focus", { terminal: a.address }))
         .child(h_flex().relative().size(24).flex_none().items_center().justify_center()
           .child(avatar(a.space, a.space_name, 18).rounded_full()).children(ring(a)));
-      const shelved = put.length + (shared(CLOSED) ?? []).length, inView = put.some((a) => a.focused);
-      const shelfTile = h_flex().id("rail-settled").h(28).flex_none().items_center().justify_center().cursor_pointer()
-        // The one in view settled: its row is folded in here, so the band marks this.
-        .when(inView, (el) => el.bg(t.raised)).when(!inView, (el) => el.hover((s) => s.bg(t.hover)))
-        .role("button").accessibility_label("Show settled agents").tooltip(`${shelved} settled`)
-        .on_click(() => {
-          this.open = true;
-          this.limit = FIRST;
-          localStorage.setItem("open", "true");
-          expandSidebar();
-        })
-        .child(h_flex().size(18).flex_none().items_center().justify_center().rounded(5).border(1).border_color(t.dim)
-          .child(svg("mods/workspace-chrome/check.svg").size(10).text_color(t.dim)));
+      const shelved = put.length + (shared(CLOSED) ?? []).length;
+      // Snoozed and Settled are one outlined tile each that unfolds the sidebar with that shelf open.
+      const shelfTile = (id, word, count, xs, glyph, unfold) => {
+        const inView = xs.some((a) => a.focused);
+        return h_flex().id(`rail-${id}`).h(28).flex_none().items_center().justify_center().cursor_pointer()
+          // The one in view shelved: its row is folded in here, so the band marks this.
+          .when(inView, (el) => el.bg(t.raised)).when(!inView, (el) => el.hover((s) => s.bg(t.hover)))
+          .role("button").accessibility_label(`Show ${word} agents`).tooltip(`${count} ${word}`)
+          .on_click(() => {
+            unfold();
+            expandSidebar();
+          })
+          .child(h_flex().size(18).flex_none().items_center().justify_center().rounded(5).border(1).border_color(t.dim)
+            .child(svg(glyph).size(10).text_color(t.dim)));
+      };
+      const napTile = nap.length > 0 && shelfTile("snoozed", "snoozed", nap.length, nap, "mods/workspace-chrome/clock.svg", () => {
+        this.napOpen = true;
+        localStorage.setItem("snoozed-open", "true");
+      });
+      const putTile = shelved > 0 && shelfTile("settled", "settled", shelved, put, "mods/workspace-chrome/check.svg", () => {
+        this.open = true;
+        this.limit = FIRST;
+        localStorage.setItem("open", "true");
+      });
       const spaced = (groups) => groups.filter(Boolean).flatMap((xs, i) => (i ? [div().h(12).flex_none(), ...xs] : xs));
       const top = spaced([
         pinned.length > 0 && [div().h(28).flex_none().flex().items_center().justify_center().child(svg("mods/workspace-chrome/pin.svg").size(16).text_color(t.dim)), ...pinned.map(tile)],
         out.length > 0 && out.map(tile),
       ]);
-      const bottom = spaced([busyRows.length > 0 && busyRows.map(tile), shelved > 0 && [shelfTile]]);
+      const bottom = spaced([busyRows.length > 0 && busyRows.map(tile), napTile && [napTile], putTile && [putTile]]);
       // As the wide list: the top groups scroll, the shelves below them keep to the bottom.
       return v_flex().id("focus-rail").size_full().min_h(0).py(8).bg(t.chrome)
         .child(v_flex().id("focus-rail-list").flex_1().min_h(0).overflow_y_scroll().children(top))
@@ -636,7 +743,7 @@ export default class Focus extends View {
     if (d && !list.some((a) => a.address === d.from)) d = this.drag = null;
     const dragging = Boolean(d?.moved);
     const lifted = dragging ? list.find((a) => a.address === d.from) : null;
-    const sectionOf = (a) => pins.includes(a.address) ? "pinned" : settledAt(a) ? "settled" : working(a) ? "working" : "active";
+    const sectionOf = (a) => pins.includes(a.address) ? "pinned" : settledAt(a) ? "settled" : snoozedAt(a) ? "snoozed" : working(a) ? "working" : "active";
     const from = lifted ? sectionOf(lifted) : null;
     const others = (xs) => xs.filter((x) => x.address !== d?.from);
     const pinTo = (before) => ({ section: "pinned", before: before ?? null });
@@ -715,16 +822,16 @@ export default class Focus extends View {
       .when(hot(section), (el) => el.bg(tint(t.accent, 0.05, t.hover)))
       .on_mouse_move((_e, cx) => aim({ section }, cx))
       .child(text);
-    // Picked up anywhere on a row that can move (not Working, not one whose Settle is still on its way).
+    // Picked up anywhere on a row that can move (not Working or Snoozed, not one whose Settle is still on its way).
     const row = (el, a) => el
       .on_mouse_down("left", (e) => {
-        if (sectionOf(a) === "working" || this.pending[a.address] !== undefined) return;
+        if (["working", "snoozed"].includes(sectionOf(a)) || this.pending.settled[a.address] !== undefined) return;
         this.drag = { from: a.address, at: e.position, grab: e.local_position?.y ?? 0, height: e.bounds?.height ?? 0, moved: false, target: null };
       })
       .on_mouse_move((e, cx) => {
         if (this.sweep?.moved) return sweepTo(a, cx);
         const s = sectionOf(a);
-        aim(s === "pinned" ? pinNear(a, (e.local_position?.y ?? 0) < (e.bounds?.height ?? 0) / 2) : s === "working" ? null : { section: s }, cx);
+        aim(s === "pinned" ? pinNear(a, (e.local_position?.y ?? 0) < (e.bounds?.height ?? 0) / 2) : s === "working" || s === "snoozed" ? null : { section: s }, cx);
       });
     // A drag's or sweep's release doesn't also click the row or button it ends on.
     const justDropped = () => this.drag?.moved || this.sweep?.moved || Date.now() - (this.dropped ?? 0) < 250;
@@ -736,8 +843,13 @@ export default class Focus extends View {
     const drop = (cx) => {
       if (!plan) return false;
       const a = lifted;
-      if (plan.section === "pinned") setShared("agents.pins", plan.order);
-      else if (pins.includes(a.address)) setShared("agents.pins", pins.filter((p) => p !== a.address));
+      if (plan.section === "pinned") {
+        if (!a.pinned) run("terminal.pin", { terminal: a.address, pinned: true });
+        setShared("agents.pins", plan.order);
+      } else if (pins.includes(a.address)) {
+        run("terminal.pin", { terminal: a.address, pinned: false });
+        setShared("agents.pins", pins.filter((p) => p !== a.address));
+      }
       if (plan.section === "settled") return settle([a], cx);
       if (!settledAt(a)) return false;
       unsettle(a, cx, true);
@@ -786,6 +898,21 @@ export default class Focus extends View {
       // Hovered, the corner offers Settle, but only for what's finished: a working or stuck tree stays in sight.
       const offer = !dragging && !this.sweep?.moved && this.hovered === a.address && !busy(a) && !pins.includes(a.address);
       const id = `settle-${a.address}`;
+      // Hovered, Snooze sits beside it, as T3's: working too (it keeps going, out of sight), not while it needs the
+      // person (that would wake it at once), not pinned (pinning ends a snooze).
+      const nid = `snooze-${a.address}`;
+      const doze = !ghost && !swept(a) && !dragging && !this.sweep?.moved && this.hovered === a.address && st !== "blocked" && !pins.includes(a.address)
+        && h_flex().id(nid).size(22).flex_none().items_center().justify_center().rounded(5)
+          .on_hover(glow(nid)).cursor_pointer().hover((s) => s.bg(t.hover))
+          .role("button").accessibility_label("Snooze").tooltip("Snooze")
+          .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
+          .on_click((_e, cx) => {
+            cx.stop_propagation();
+            if (justDropped()) return;
+            this.hovered = null;
+            openOverlay({ mod: "panda-focus", kind: "popup", at: "pointer", width: 220, height: 40 + 31 * snoozes(Date.now()).length, props: { snooze: a.address } });
+          })
+          .child(svg("mods/workspace-chrome/clock.svg").size(12).flex_none().text_color(lit(nid, t.muted)));
       // As in T3, the corner says the state when there's one worth saying (Working, Needs you, Done: finished
       // and not yet seen), else how long ago it last changed. Sized as T3's: 16px mark, 4px gaps, and the
       // time a separate monospace child, so spacing and width don't hang on the interface font.
@@ -840,6 +967,7 @@ export default class Focus extends View {
           // Lifted, a pin keeps its glyph only while it stays among the pins.
           .when(pins.includes(a.address) && (!ghost || plan?.section === "pinned" || !plan), (el) => el.child(svg("mods/workspace-chrome/pin.svg").size(12).flex_none().text_color(t.dim)))
           .child(div().flex_1().min_w(0).truncate().child(machine ? `${a.space_name} · ${machine}` : a.space_name ?? ""))
+          .when(Boolean(doze), (el) => el.child(doze))
           .child(corner))
         .child(h_flex().gap(8).items_center()
           // Only the one in view is bright, as in T3.
@@ -888,9 +1016,34 @@ export default class Focus extends View {
         .child(h_flex().size(16).flex_none().items_center().justify_center().opacity(bright ? 1 : 0.5).when(Boolean(pic), (el) => el.child(pic)))
         .child(div().flex_1().min_w(0).truncate().text_color(bright ? t.foreground : t.muted).child(title(a)))
         .child(ghost ? (verb ? badge(verb) : div()) : swept(a) ? badge("unsettle")
-          // No settle time (its label is on its way back from the core): no time on it.
-          : over ? undo : div().flex_none().text_size(12).text_color(t.dim).child(!settledAt(a) ? "" : closable(a)
+          // No settle time (its label is on its way back from the core): no time on it. "closing" only while
+          // retire() runs: a failed or never-started exit reads its settle time.
+          : over ? undo : div().flex_none().text_size(12).text_color(t.dim).child(!settledAt(a) ? "" : this.closing.has(a.address)
             ? "closing" : ago(settledAt(a)[0], now)));
+    };
+
+    // A snoozed row: the slim row's look with when it wakes; a click looks at it (it stays snoozed), hovered its
+    // time becomes Wake, which brings it back on top of the list.
+    const napRow = (a) => {
+      const on = a.focused, over = !dragging && this.hovered === a.address, bright = on || over, id = `wake-${a.address}`;
+      const pic = icon(a.program, 14, t.dim), z = snoozedAt(a);
+      return h_flex().id(`nap-${a.address}`).h(30).px(10).gap(8).flex_none().items_center().rounded(8)
+        .role("button").accessibility_label(title(a)).cursor_pointer().on_hover(hover(a)).on_click(open(a))
+        .when(on, (el) => el.bg(t.selected)).when(!on && !dragging, (el) => el.hover((s) => s.bg(t.hover)))
+        .child(h_flex().size(16).flex_none().items_center().justify_center().opacity(bright ? 1 : 0.5).when(Boolean(pic), (el) => el.child(pic)))
+        .child(div().flex_1().min_w(0).truncate().text_color(bright ? t.foreground : t.muted).child(title(a)))
+        .child(over
+          ? h_flex().id(id).size(24).flex_none().items_center().justify_center().rounded(6).cursor_pointer().hover((s) => s.bg(t.hover))
+            .on_hover(glow(id)).role("button").accessibility_label("Wake").tooltip("Wake")
+            .on_click((_e, cx) => {
+              cx.stop_propagation();
+              this.hovered = null;
+              unsettle(a, cx, true, "snoozed");
+              cx.notify();
+            })
+            .child(svg("mods/panda-focus/undo.svg").size(14).flex_none().text_color(lit(id, t.muted)))
+          : h_flex().flex_none().gap(4).items_center().text_size(12).text_color(t.dim)
+            .child(svg("mods/workspace-chrome/clock.svg").size(12).flex_none().text_color(t.dim)).child(z ? wakes(z[0], now) : ""));
     };
 
     // A closed settled agent: the slim row's look; a click resumes it where it was, hovered its time becomes forget.
@@ -951,7 +1104,14 @@ export default class Focus extends View {
           this.workOpen = !this.workOpen;
           localStorage.setItem("working-open", String(this.workOpen));
         }).on_mouse_move((_e, cx) => aim(null, cx)))
-        .child(v_flex().children(lane("working", busyRows, (a) => card(a), 2))));
+        .child(v_flex().children(lane("working", busyRows, (a) => card(a), 2))))
+      // T3's Snoozed shelf, between Working and Settled; nothing drops into it (a snooze needs a wake time).
+      .when(nap.length > 0, (el) => el
+        .child(shelf("snoozed-header", "Snoozed", nap.length, this.napOpen, () => {
+          this.napOpen = !this.napOpen;
+          localStorage.setItem("snoozed-open", String(this.napOpen));
+        }).on_mouse_move((_e, cx) => aim(null, cx)))
+        .children(napRows.map(napRow)));
     // Clear closes settled agents' panes; Herdr then closes emptied tabs. The one in view stays.
     const spaceNow = sp.find((s) => s.active), tabNow = spaceNow?.tabs.find((c) => c.active)?.id;
     const doomed = put.filter((a) => a.pane && !a.focused && a.tab !== tabNow);
