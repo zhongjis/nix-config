@@ -59,6 +59,9 @@ const byAddress = (x, y) => x.address.localeCompare(y.address);
 const CLOSED = "panda-focus.closed";
 // Hibernated workers: [{address, name, parent, space, cwd, line, at, title, program}], newest first.
 const HIBERNATED = "panda-focus.hibernated";
+// A snooze picked in the menu, for the sidebar to write: {address, until, at}. The menu closes as it's picked,
+// which ends that copy before an `hc label` of its own would run.
+const SNOOZE = "panda-focus.snooze";
 // How each agent exits from its prompt, and the resume line it prints then (both checked by hand: Claude Code
 // "Resume this session with: claude --resume <uuid>", Pi "To resume this session: pi --session <id>").
 const EXIT = { "claude-code": ["ctrl+c", "ctrl+c"], pi: ["ctrl+d"] };
@@ -515,10 +518,8 @@ export default class Focus extends View {
       .children(snoozes(now).map((p) => h_flex().id(`snooze-${p.id}`).h(31).px(8).gap(9).rounded(7).items_center()
         .text_color(t.foreground).cursor_pointer().hover((el) => el.bg(t.hover))
         .on_click(() => {
+          setShared(SNOOZE, { address: snooze, until: p.until, at: Date.now() });
           closeOverlay(overlay);
-          hc(["label", snooze, `snoozed=${p.until}:${Date.now()}`])
-            .then((r) => r.code === 0 || Promise.reject(r.stderr))
-            .catch((e) => notify({ title: "Couldn't snooze the agent", body: String(e).trim(), level: "error" }));
         })
         .child(div().flex_1().child(p.label))
         .child(div().flex_none().text_size(11).text_color(t.dim).child(wakes(p.until, now)))));
@@ -540,6 +541,12 @@ export default class Focus extends View {
       return v ? v.split(":").map(Number) : null;
     };
     const settledAt = (a) => label("settled", a);
+    // The menu's pick (snoozeMenu), written here, shown at once.
+    const ask = shared(SNOOZE);
+    if (ask) {
+      setShared(SNOOZE, null);
+      this.setLabel("snoozed", ask.address, `${ask.until}:${ask.at}`, cx);
+    }
     const kids = new Map(every.map((a) => [a.address, descendants(all, a.address).map((k) => kidStatus(k, listed))]));
     // It, or anything under it, is working or needs the person.
     const busy = (a) => BUSY.has(a.status) || kids.get(a.address).some((s) => BUSY.has(s));

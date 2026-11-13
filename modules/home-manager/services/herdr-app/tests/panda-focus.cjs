@@ -107,11 +107,16 @@ test("needing the person wakes it early", async () => {
 });
 
 test("the menu snoozes the agent it was opened for", async () => {
-  const f = fixture({ snooze: "A", overlay: 7 }); f.add("A");
+  // The menu is its own copy and ends as it closes: the sidebar copy writes the label.
+  const shared = {}, menu = fixture({ snooze: "A", overlay: 7 }, shared), f = fixture({}, shared); menu.add("A"); f.add("A");
+  menu.render(1000);
+  find(menu.tree, "snooze-1h").handlers.on_click({}, menu.cx);
+  assert.deepEqual(menu.hc, [], "the closing menu sends nothing itself");
   f.render(1000);
-  find(f.tree, "snooze-1h").handlers.on_click({}, f.cx);
-  await new Promise((r) => setImmediate(r));
+  assert.ok(find(f.tree, "nap-A") || !find(f.tree, "card-A"), "hidden at once");
+  await f.drain();
   assert.deepEqual(Array.from(f.hc.at(-1)), ["label", "A", "snoozed=3601000:1000"]);
+  assert.equal(shared["panda-focus.snooze"], null);
 });
 
 test("pins are the core's, in this window's order; old shared pins move onto their terminals once", () => {
