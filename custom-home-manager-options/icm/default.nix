@@ -100,37 +100,51 @@
     fi
   '';
 
+  # Pi talks to the daemon through `icm-mcp`: one model load in the daemon instead of
+  # one per `icm` CLI call. Hosts without the daemon use the CLI directly.
+  piMcp = cfg.daemon.enable && pkgs.stdenv.hostPlatform.isLinux;
+  icmMcp = pkgs.writeShellApplication {
+    name = "icm-mcp";
+    runtimeInputs = [cfg.package pkgs.curl pkgs.jq];
+    text = builtins.readFile ./icm-mcp.sh;
+  };
+  # Starts with `icm`, so Pi's icm extension skips its output when sampling tool results.
+  icmCmd =
+    if piMcp
+    then "icm-mcp"
+    else "icm";
+
   # Adapted from icm's built-in AGENTS.md block (crates/icm-cli/src/main.rs, `icm init --mode cli`).
   piContext = ''
     ## Persistent memory (ICM)
 
     [ICM](https://github.com/rtk-ai/icm) provides persistent memory shared across sessions and agents.
-    Use it actively.
+    Use it actively.${lib.optionalString piMcp " Where `icm-mcp` appears below, do not swap in `icm`: it takes the same arguments and reuses the ICM daemon's loaded model instead of loading it per call."}
 
     ### Recall (before starting work)
     ```bash
-    icm recall "query"                        # search memories
-    icm recall "query" -t "topic-name"        # filter by topic
+    ${icmCmd} recall "query"                        # search memories
+    ${icmCmd} recall "query" -t "topic-name"        # filter by topic
     icm recall-context "query" --limit 5      # formatted for prompt injection
     ```
 
     ### Store triggers
-    Call `icm store` when any of the following happens:
-    1. **Error resolved**: `icm store -t errors-resolved -c "description" -i high -k "keyword1,keyword2"`
-    2. **Architecture/design decision**: `icm store -t decisions-{project} -c "description" -i high`
-    3. **User preference discovered**: `icm store -t preferences -c "description" -i critical`
-    4. **Significant task completed**: `icm store -t context-{project} -c "summary of work done" -i high`
+    Call `${icmCmd} store` when any of the following happens:
+    1. **Error resolved**: `${icmCmd} store -t errors-resolved -c "description" -i high -k "keyword1,keyword2"`
+    2. **Architecture/design decision**: `${icmCmd} store -t decisions-{project} -c "description" -i high`
+    3. **User preference discovered**: `${icmCmd} store -t preferences -c "description" -i critical`
+    4. **Significant task completed**: `${icmCmd} store -t context-{project} -c "summary of work done" -i high`
     5. **Conversation exceeds ~20 tool calls without a store**: store a progress summary
 
     Do NOT store: trivial details, info already in this file, ephemeral state (build logs, git status), secrets.
 
     ### Other commands
     ```bash
-    icm forget <id>                          # remove a memory by ID
+    ${icmCmd} forget <id>                          # remove a memory by ID
     icm list --all                           # list all memories
     icm list --topic <name>                  # list memories in a topic
-    icm update <id> -c "updated content"     # edit memory in-place
-    icm topics                               # list all topics
+    ${icmCmd} update <id> -c "updated content"     # edit memory in-place
+    ${icmCmd} topics                               # list all topics
     ```
   '';
 
@@ -147,7 +161,7 @@
       Search ICM memory for the user's query. Run:
 
       ```bash
-      icm recall "<query>" --limit 10
+      ${icmCmd} recall "<query>" --limit 10
       ```
 
       With no query, load the wake-up pack instead:
@@ -164,10 +178,14 @@
 
       # icm-remember
 
-      Store the user's text in ICM memory. Run:
+      Store the user's text in ICM memory${lib.optionalString piMcp " under the current project's name"}. Run:
 
       ```bash
-      icm remember "<text>"
+      ${
+        if piMcp
+        then "icm-mcp store -t \"<project>\" -c \"<text>\""
+        else "icm remember \"<text>\""
+      }
       ```
     '';
   };
@@ -284,6 +302,9 @@ in {
     (lib.mkIf piEnabled {
       programs.pi.context = lib.mkAfter piContext;
       programs.pi.skills = piSkills;
+    })
+    (lib.mkIf (piEnabled && piMcp) {
+      home.packages = [icmMcp];
     })
     (lib.mkIf opencodeEnabled {
       xdg.configFile."opencode/plugins/icm.ts".source = icmSrc + "/plugins/opencode-icm.ts";
