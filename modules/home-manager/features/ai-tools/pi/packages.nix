@@ -22,7 +22,7 @@ in {
     [
       "git:github.com/davebcn87/pi-autoresearch@v1.9.0"
       "git:github.com/nicobailon/pi-web-access@v0.47.0"
-      "git:github.com/nicobailon/pi-interactive-shell@v0.18.0"
+      "npm:pi-simple-background-tasks@0.5.0"
       "git:github.com/nicobailon/pi-intercom@v0.18.1"
       "git:github.com/championswimmer/pi-context-usage@v2.1.0"
       "git:github.com/championswimmer/pi-cache-graph@v1.0.2"
