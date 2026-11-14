@@ -899,6 +899,8 @@ export default class Focus extends View {
       const machine = a.address.includes("/") ? a.address.split("/")[0] : null;
       const branch = ps.find((p) => p.pane === a.pane)?.branch;
       const going = kids.get(a.address).filter((s) => s === "working").length;
+      // Stuck sub-agents leave the parent at work (tree.js), so the chip says so: one without a pane has no card.
+      const stuck = kids.get(a.address).filter((s) => s === "blocked").length;
       // Live sub-agents, finished ones too: with none working, the line still opens the list.
       const live = kids.get(a.address).length + (shared(HIBERNATED) ?? []).filter((r) => r.parent === a.address).length;
       const pic = icon(a.program, 16, t.muted);
@@ -984,7 +986,7 @@ export default class Focus extends View {
         .when(Boolean(branch || live), (el) => el.child(h_flex().min_w(0).gap(4).items_center().text_size(12).text_color(t.dim)
           .when(Boolean(branch), (el) => el.child(div().min_w(0).truncate().child(branch)))
           .when(Boolean(branch && live), (el) => el.child(div().flex_none().child("·")))
-          .when(Boolean(live) && !ghost, (el) => el.child(div().id(`subs-${a.address}`).flex_none().h(22).px(6).flex().items_center().rounded(5)
+          .when(Boolean(live) && !ghost, (el) => el.child(h_flex().id(`subs-${a.address}`).flex_none().h(22).px(6).gap(4).items_center().rounded(5)
             .cursor_pointer().role("button").accessibility_label("Show workers").tooltip(`${live} worker${live > 1 ? "s" : ""}`)
             .hover((s) => s.text_color(t.foreground).bg(t.hover))
             .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
@@ -995,7 +997,9 @@ export default class Focus extends View {
               const asleep = (shared(HIBERNATED) ?? []).filter((r) => under.has(r.parent)).length;
               openOverlay({ mod: "panda-subagents", kind: "popup", width: 300, height: subsHeight(subs.length, asleep), props: { parent: a.address } });
             })
-            .child(going ? `${going} worker${going > 1 ? "s" : ""} working` : "View finished workers")))));
+            .when(stuck > 0, (el) => el.text_color(t.blocked)
+              .child(div().size(14).flex_none().rounded(4).bg(tint(t.blocked, 0.15, t.hover)).text_size(11).font_bold().flex().items_center().justify_center().child("!")))
+            .child(stuck ? `${stuck} worker${stuck > 1 ? "s" : ""} stuck` : going ? `${going} worker${going > 1 ? "s" : ""} working` : "View finished workers")))));
     };
 
     // A settled row: one dim line; viewing it leaves it settled. Hovered it brightens and its time
