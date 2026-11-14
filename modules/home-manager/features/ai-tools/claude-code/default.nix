@@ -65,6 +65,7 @@ in {
   home.sessionVariables.CLAUDE_CODE_DISABLE_BG_SHELL_PRESSURE_REAP = "1";
 
   # Keep settings.json writable and preserve settings managed by Claude Code and plugins.
+  # Hide Claude Code's commit trailer and pull request footer (`attribution: false`).
   home.activation.claudeCodePermissions = lib.hm.dag.entryAfter ["writeBoundary"] ''
     run ${pkgs.bash}/bin/bash -eu -c ${lib.escapeShellArg ''
       settings=${lib.escapeShellArg "${config.programs.claude-code.configDir}/settings.json"}
@@ -72,9 +73,9 @@ in {
       temporary=$(mktemp "$settings.XXXXXX")
       trap 'rm -f "$temporary"' EXIT
       if [[ -e "$settings" ]]; then
-        ${pkgs.jq}/bin/jq '.permissions.defaultMode = "bypassPermissions"' "$settings" > "$temporary"
+        ${pkgs.jq}/bin/jq '.permissions.defaultMode = "bypassPermissions" | .attribution = false' "$settings" > "$temporary"
       else
-        printf '%s\n' '{"permissions":{"defaultMode":"bypassPermissions"}}' > "$temporary"
+        printf '%s\n' '{"permissions":{"defaultMode":"bypassPermissions"},"attribution":false}' > "$temporary"
       fi
       mv "$temporary" "$settings"
     ''}
