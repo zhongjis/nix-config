@@ -11,6 +11,8 @@
 // session (`resume=`) and its terminal's pid (`resume.pid=`). The line comes from integrations/claude.sh and
 // integrations/pi.ts, which this mod installs into Claude Code and Pi. A kept terminal comes back from a reboot as a shell
 // with a new pid in the same pane: the line is typed into it, or, for a settled one, kept as a closed row.
+// The same integrations re-inject an orchestrator's state after a context compaction: on a terminal labelled
+// `orch-context=<script>` they run that script and add its output to the agent's context.
 // Hibernating: an orchestrator worker (a sub-agent labelled `hibernate=ok`) idle past HIBERNATE is exited the same
 // way. Its terminal finishes with `hibernated=<ms>` and `resume=<line>` on it, so its parent can revive it (rm,
 // then run the line); shared "panda-focus.hibernated" lists them for the cards and the sub-agents popup.
