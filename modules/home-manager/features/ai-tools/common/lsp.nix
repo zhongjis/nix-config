@@ -64,6 +64,10 @@
         (lib.getExe pkgs.typescript-language-server)
         "--stdio"
       ];
+      # One tsserver per workspace: drops the separate syntax-only tsserver process.
+      initialization = {
+        tsserver.useSyntaxServer = "never";
+      };
       extensions = [
         ".ts"
         ".tsx"
