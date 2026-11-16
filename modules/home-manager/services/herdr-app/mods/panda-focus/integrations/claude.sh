@@ -1,5 +1,5 @@
 #!/bin/sh
-# Installed by the Herdr app's panda-focus mod, which overwrites this file whenever its copy changes.
+# Loaded per launch: inside Herdr terminals the `claude` shim passes claude-plugin/ (--plugin-dir), whose hook runs this.
 # Claude Code SessionStart hook: labels this Claude's herdr-core terminal with the line that resumes its session
 # (`resume=claude --resume <id>`), so panda-focus can bring it back after a reboot. Runs again on /clear,
 # /resume and compaction. Does nothing outside herdr-core or for sub-agents.

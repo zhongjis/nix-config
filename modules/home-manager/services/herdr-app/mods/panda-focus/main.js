@@ -9,7 +9,8 @@
 // running) until its wake time, until it needs the person (blocked), or until Wake. Pinning or settling ends it.
 // Reboots: each local Claude Code or Pi terminal is kept by the core and labelled with the line that resumes its
 // session (`resume=`) and its terminal's pid (`resume.pid=`). The line comes from integrations/claude.sh and
-// integrations/pi.ts, which this mod installs into Claude Code and Pi. A kept terminal comes back from a reboot as a shell
+// integrations/pi.ts, which the `claude`/`pi` shims (Home Manager, first on PATH only in Herdr shells) pass to each
+// launch; nothing is installed into Claude Code or Pi. A kept terminal comes back from a reboot as a shell
 // with a new pid in the same pane: the line is typed into it, or, for a settled one, kept as a closed row.
 // The same integrations re-inject an orchestrator's state after a context compaction: on a terminal labelled
 // `orch-context=<script>` they run that script and add its output to the agent's context.
@@ -19,7 +20,7 @@
 
 import { View, div, image, svg } from "gpui-kit";
 import { v_flex, h_flex, Scrollbar } from "gpui-base";
-import { agents, terminals, panes, spaces, focused, run, openOverlay, hc, exec, notify, theme, shared, setShared, setAgentOrder, props, nextCommand, settings, layout, home, appHome, readTextFile, writeTextFile, window } from "herdr";
+import { agents, terminals, panes, spaces, focused, run, openOverlay, hc, exec, notify, theme, shared, setShared, setAgentOrder, props, nextCommand, settings, layout, home, readTextFile, window } from "herdr";
 import { namer } from "./name.js";
 import { kidStatus, descendants, treeStatus } from "./tree.js";
 
@@ -80,10 +81,6 @@ const closable = (a) => Boolean(EXIT[a.app]) && !a.address.includes("/");
 const REMEMBER = 15000;
 // How long after the mod starts it looks for recovered shells more often (ms).
 const STARTUP = 60000;
-// Where Pi loads integrations/pi.ts from.
-const PI_EXTENSION = ".pi/agent/extensions/herdr-app-session.ts";
-// Where integrations/claude.sh goes, beside Herdr's own Claude Code hook; settings.json runs it on SessionStart.
-const CLAUDE_HOOK = ".claude/hooks/herdr-app-session.sh";
 // A shell at its prompt, by the foreground process's name (a login shell's starts with "-").
 const SHELL = /^-?(zsh|bash|fish|sh|dash|nu)$/;
 
@@ -164,12 +161,8 @@ export default class Focus extends View {
     cx.timer.every(60000, (cx) => cx.notify());
     // One hibernate per idle spell (`hibernate:${address}:${status_ms}`), so a failure doesn't repeat.
     this.tried = new Set();
-    // Reboots: install Pi's and Claude Code's halves, then label agents and resume recovered shells, now and every REMEMBER.
-    cx.spawn(async (cx) => {
-      await this.installPi();
-      await this.installClaude();
-      await this.sessions(cx);
-    });
+    // Reboots: label agents and resume recovered shells, now and every REMEMBER.
+    cx.spawn(async (cx) => this.sessions(cx));
     cx.timer.every(REMEMBER, (cx) => this.sessions(cx));
     // The first pass usually runs before the core has given lost terminals their shells (a reboot), so for the
     // first STARTUP the passes come every 2s: resumes land in seconds instead of on the next REMEMBER.
@@ -310,47 +303,6 @@ export default class Focus extends View {
     return false;
   }
 
-  // Copies integrations/pi.ts into Pi's extensions when it differs (Pi installed only). Pi loads it at start,
-  // so a Pi already running reports its session after its next start. mkdir + cp, not `install -D`: BSD install
-  // (macOS) reads -D as a destdir.
-  async installPi() {
-    const pi = `${home()}/.pi/agent`, from = `${appHome()}/mods/panda-focus/integrations/pi.ts`, to = `${home()}/${PI_EXTENSION}`;
-    if ((await exec("test", ["-d", pi]).catch(() => null))?.code !== 0) return;
-    if ((await exec("cmp", ["-s", from, to]).catch(() => null))?.code === 0) return;
-    const fail = (e) => ({ code: 1, stderr: String(e) });
-    let r = await exec("mkdir", ["-p", to.slice(0, to.lastIndexOf("/"))]).catch(fail);
-    if (r.code === 0) r = await exec("cp", ["-f", from, to]).catch(fail);
-    if (r.code !== 0) notify({ title: "Couldn't install the Pi session hook", body: r.stderr.trim(), level: "error" });
-  }
-
-  // Copies integrations/claude.sh beside Herdr's Claude Code hook when it differs, and adds it to settings.json's
-  // SessionStart hooks once (Claude Code installed only). A Claude already running reports its session after its
-  // next start, /clear or /resume. Run through sh, so the copy needs no exec bit.
-  async installClaude() {
-    const dir = `${home()}/.claude`, from = `${appHome()}/mods/panda-focus/integrations/claude.sh`, to = `${home()}/${CLAUDE_HOOK}`;
-    if ((await exec("test", ["-d", dir]).catch(() => null))?.code !== 0) return;
-    const fail = (e) => ({ code: 1, stderr: String(e) });
-    let r = await exec("cmp", ["-s", from, to]).catch(fail);
-    if (r.code !== 0) {
-      r = await exec("mkdir", ["-p", `${dir}/hooks`]).catch(fail);
-      if (r.code === 0) r = await exec("cp", ["-f", from, to]).catch(fail);
-      if (r.code !== 0) return notify({ title: "Couldn't install the Claude Code session hook", body: r.stderr.trim(), level: "error" });
-    }
-    const path = `${dir}/settings.json`, command = `sh '${to}'`;
-    const text = await readTextFile(path).catch(() => null);
-    let conf;
-    try {
-      conf = text ? JSON.parse(text) : {};
-    } catch {
-      return; // Not ours to repair.
-    }
-    const starts = conf.hooks?.SessionStart ?? [];
-    if (starts.some((e) => (e.hooks ?? []).some((h) => h.command === command))) return;
-    conf.hooks = { ...conf.hooks, SessionStart: [...starts, { hooks: [{ type: "command", command, timeout: 10 }] }] };
-    await writeTextFile(path, JSON.stringify(conf, null, 2) + "\n", text)
-      .catch((e) => notify({ title: "Couldn't add the Claude Code session hook", body: String(e), level: "error" }));
-  }
-
   // One pass at a time over every local terminal, sub-agents (no pane of their own) included: a running agent's
   // terminal is labelled, a recovered shell is resumed.
   // One-time move of old shared pins onto their terminals (`herdr.pinned`). An address not live now is
@@ -454,7 +406,7 @@ export default class Focus extends View {
 
   // While an agent runs: its terminal is kept, and labelled with its resume line and its terminal's pid.
   // Claude Code's session id is in ~/.claude/sessions/<its pid>.json, read again every pass. Pi labels
-  // itself (integrations/pi.ts); one started before that was installed is read from its own `--session <id>`.
+  // itself (integrations/pi.ts); one started without it (outside the shim) is read from its own `--session <id>`.
   async remember(k) {
     const labels = k.labels ?? {};
     let line = labels.resume;

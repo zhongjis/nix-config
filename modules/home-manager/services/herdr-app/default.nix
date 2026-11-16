@@ -6,6 +6,28 @@
   ...
 }: let
   stylixEnabled = config.stylix.enable or false;
+  # panda-focus's session hooks, passed per launch instead of installed into Claude Code and Pi.
+  integrations = "${config.xdg.configHome}/herdr-app/mods/panda-focus/integrations";
+  # Runs the next `name` on PATH after itself; inside Herdr (HC_TERMINAL_ID) it adds `flags`.
+  # PATH stays as it is, so the agent's children (start-worker.sh's `hc run`) keep the shims.
+  agentShim = name: flags:
+    pkgs.writeShellScriptBin name ''
+      real=
+      IFS=: read -ra dirs <<<"$PATH"
+      for d in "''${dirs[@]}"; do
+        if [ -x "$d/${name}" ] && ! [ "$d/${name}" -ef "$0" ]; then real=$d/${name}; break; fi
+      done
+      [ -n "$real" ] || { echo "${name}: not found on PATH" >&2; exit 127; }
+      [ -n "''${HC_TERMINAL_ID:-}" ] || exec "$real" "$@"
+      exec "$real" ${flags} "$@"
+    '';
+  agentShims = pkgs.symlinkJoin {
+    name = "herdr-agent-shims";
+    paths = [
+      (agentShim "claude" "--plugin-dir ${lib.escapeShellArg "${integrations}/claude-plugin"}")
+      (agentShim "pi" "-e ${lib.escapeShellArg "${integrations}/pi.ts"}")
+    ];
+  };
 in {
   imports = [
     ../../../../custom-home-manager-options/herdr-app
@@ -18,6 +40,11 @@ in {
       ${builtins.readFile ./scripts/herdr-sessionizer.sh}
     '')
   ];
+
+  # Only Herdr's shells (agents from the app, typed, resumed after a reboot) see the shims.
+  programs.zsh.initContent = lib.mkAfter ''
+    [[ -n $HC_TERMINAL_ID ]] && path=(${agentShims}/bin $path)
+  '';
 
   programs.herdr-app = {
     enable = true;
