@@ -18,18 +18,63 @@
   codexRtkCfg = config.programs.codex.rtk;
   claudeRtkEnabled = config.programs.claude-code.rtk.enable;
 
-  # Stable profile path, not a /nix/store path, so the hook survives package bumps.
-  # Also the marker that identifies the RTK-owned hook entry for removal.
-  claudeRtkHook = "${config.home.profileDirectory}/bin/rtk hook claude";
-  claudeRtkHookEntry = {
-    matcher = "Bash";
-    hooks = [
-      {
-        type = "command";
-        command = claudeRtkHook;
-      }
-    ];
-  };
+  # Same note `rtk init -g` writes to RTK.md, loaded as instructions instead.
+  rtkNote =
+    /*
+    markdown
+    */
+    ''
+      # Command output
+
+      Command output here is condensed to save tokens, keeping every signal and
+      dropping costly noise. Treat it as the complete result: run commands
+      normally, and batch related commands into one call to avoid extra turns.
+      Truncated results state their recovery path in their own output. Re-run a
+      command as `rtk bypass <cmd>` only when its result is unusable: empty when
+      output was clearly expected, contradicting its exit code, or garbled.
+    '';
+
+  # Merges RTK's Bash PreToolUse hook into a writable hooks JSON file shared with
+  # other tools. Runs even when disabled so turning the toggle off removes the hook;
+  # other hooks and keys are left untouched. The hook uses the stable profile path,
+  # not a /nix/store path, so it survives package bumps; that command, plus the bare
+  # `rtk hook <agent>` entry `rtk init` writes, identifies the RTK-owned entry.
+  rtkHookScript = file: enable: agent: let
+    command = "${config.home.profileDirectory}/bin/rtk hook ${agent}";
+    entry = {
+      matcher = "Bash";
+      hooks = [
+        {
+          type = "command";
+          inherit command;
+        }
+      ];
+    };
+  in ''
+    rtk_file=${lib.escapeShellArg file}
+    if [ -f "$rtk_file" ] || ${lib.boolToString enable}; then
+      [ -e "$rtk_file" ] || { $DRY_RUN_CMD mkdir -p "$(dirname "$rtk_file")"; $DRY_RUN_CMD sh -c 'printf "{}\n" > "$1"' sh "$rtk_file"; }
+      if [ -f "$rtk_file" ]; then
+        rtk_tmp="$(mktemp)"
+        ${lib.getExe pkgs.jq} \
+          --arg cmd ${lib.escapeShellArg command} \
+          --arg bare ${lib.escapeShellArg "rtk hook ${agent}"} \
+          --argjson enable ${lib.boolToString enable} \
+          --argjson entry ${lib.escapeShellArg (builtins.toJSON entry)} '
+            def isRtk: any((.hooks // [])[]; (.command? // "") | type == "string" and (. == $cmd or . == $bare));
+            (.hooks.PreToolUse // [] | map(select(isRtk | not))) as $pre
+            | ($pre + (if $enable then [$entry] else [] end)) as $pre
+            | if $pre == [] then del(.hooks.PreToolUse) else .hooks.PreToolUse = $pre end
+            | if .hooks == {} then del(.hooks) else . end
+          ' "$rtk_file" > "$rtk_tmp"
+        # Write only on a semantic change so repeated switches leave the file byte-identical.
+        if ! ${lib.getExe pkgs.jq} -e -n --slurpfile a "$rtk_file" --slurpfile b "$rtk_tmp" '$a == $b' > /dev/null; then
+          $DRY_RUN_CMD sh -c 'cat "$1" > "$2"' sh "$rtk_tmp" "$rtk_file"
+        fi
+        rm -f "$rtk_tmp"
+      fi
+    fi
+  '';
 
   # Lazy: only evaluated when a consumer that sources upstream hooks is enabled (opencode or pi).
   rtkPluginSrc = pkgs.fetchFromGitHub {
@@ -118,63 +163,20 @@ in {
         }
       ];
     }
-    (lib.mkIf (codexRtkCfg.package != null) {
-      # Delegate file creation, merging, and cleanup to RTK so this stays identical
-      # to `rtk init -g --codex` across upstream format changes.
-      home.activation.rtkCodex = lib.hm.dag.entryAfter ["linkGeneration"] ''
-        if ${lib.boolToString codexRtkCfg.enable}; then
-          $DRY_RUN_CMD env CODEX_HOME=${lib.escapeShellArg "${config.home.homeDirectory}/.codex"} ${lib.getExe codexRtkCfg.package} init -g --codex
-        else
-          $DRY_RUN_CMD env CODEX_HOME=${lib.escapeShellArg "${config.home.homeDirectory}/.codex"} ${lib.getExe codexRtkCfg.package} init -g --codex --uninstall
-        fi
-      '';
-    })
     {
-      # Runs even when disabled so turning the toggle off removes RTK's hook.
-      # Other hooks and keys in the writable settings.json are left untouched.
-      home.activation.rtkClaudeHook = lib.hm.dag.entryAfter ["linkGeneration"] ''
-        rtk_file=${lib.escapeShellArg "${config.programs.claude-code.configDir}/settings.json"}
-        if [ -f "$rtk_file" ] || ${lib.boolToString claudeRtkEnabled}; then
-          [ -e "$rtk_file" ] || { $DRY_RUN_CMD mkdir -p "$(dirname "$rtk_file")"; $DRY_RUN_CMD sh -c 'printf "{}\n" > "$1"' sh "$rtk_file"; }
-          if [ -f "$rtk_file" ]; then
-            rtk_tmp="$(mktemp)"
-            ${lib.getExe pkgs.jq} \
-              --arg cmd ${lib.escapeShellArg claudeRtkHook} \
-              --argjson enable ${lib.boolToString claudeRtkEnabled} \
-              --argjson entry ${lib.escapeShellArg (builtins.toJSON claudeRtkHookEntry)} '
-                # Also claims a bare `rtk hook claude` entry left by `rtk init -g`.
-                def isRtk: any((.hooks // [])[]; (.command? // "") | type == "string" and (. == $cmd or . == "rtk hook claude"));
-                (.hooks.PreToolUse // [] | map(select(isRtk | not))) as $pre
-                | ($pre + (if $enable then [$entry] else [] end)) as $pre
-                | if $pre == [] then del(.hooks.PreToolUse) else .hooks.PreToolUse = $pre end
-                | if .hooks == {} then del(.hooks) else . end
-              ' "$rtk_file" > "$rtk_tmp"
-            # Write only on a semantic change so repeated switches leave the file byte-identical.
-            if ! ${lib.getExe pkgs.jq} -e -n --slurpfile a "$rtk_file" --slurpfile b "$rtk_tmp" '$a == $b' > /dev/null; then
-              $DRY_RUN_CMD sh -c 'cat "$1" > "$2"' sh "$rtk_tmp" "$rtk_file"
-            fi
-            rm -f "$rtk_tmp"
-          fi
-        fi
-      '';
+      home.activation.rtkClaudeHook = lib.hm.dag.entryAfter ["linkGeneration"] (
+        rtkHookScript "${config.programs.claude-code.configDir}/settings.json" claudeRtkEnabled "claude"
+      );
+      home.activation.rtkCodexHook = lib.hm.dag.entryAfter ["linkGeneration"] (
+        rtkHookScript "${config.home.homeDirectory}/.codex/hooks.json" codexRtkCfg.enable "codex"
+      );
     }
     (lib.mkIf claudeRtkEnabled {
       home.packages = [defaultRtkPackage];
-      # Same note `rtk init -g` writes to ~/.claude/RTK.md, loaded as a rule instead.
-      programs.claude-code.rules."rtk" =
-        /*
-        markdown
-        */
-        ''
-          # Command output
-
-          Command output here is condensed to save tokens, keeping every signal and
-          dropping costly noise. Treat it as the complete result: run commands
-          normally, and batch related commands into one call to avoid extra turns.
-          Truncated results state their recovery path in their own output. Re-run a
-          command as `rtk bypass <cmd>` only when its result is unusable: empty when
-          output was clearly expected, contradicting its exit code, or garbled.
-        '';
+      programs.claude-code.rules."rtk" = rtkNote;
+    })
+    (lib.mkIf codexRtkCfg.enable {
+      programs.codex.context = lib.mkAfter rtkNote;
     })
     (lib.mkIf (codexRtkCfg.enable || claudeRtkEnabled || opencodeRtkCfg.enable || ompRtkCfg.enable || piRtkCfg.enable) {
       home.file."rtk/config.toml" = {

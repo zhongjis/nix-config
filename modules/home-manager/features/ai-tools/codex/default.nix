@@ -9,10 +9,7 @@
 }: let
   inherit (pkgs.stdenv.hostPlatform) system;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
-  codexContext = builtins.concatStringsSep "\n\n" (
-    (map builtins.readFile commonInstructions)
-    ++ ["@${config.home.homeDirectory}/.codex/RTK.md"]
-  );
+  codexContext = builtins.concatStringsSep "\n\n" (map builtins.readFile commonInstructions);
   selectedSkills = inputs.agent-skills.lib.skillsFor {
     profile = aiProfileHelpers.profile;
     harness = "codex";
