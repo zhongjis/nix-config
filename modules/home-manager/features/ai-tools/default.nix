@@ -52,7 +52,6 @@ in {
         # llmAgentsPackages.agentsview
         llmAgentsPackages.skills
         llmAgentsPackages.agent-browser
-        llmAgentsPackages.t3code-desktop
         inputs.self.packages.${system}.before-and-after
 
         # for before-and-after skill
@@ -60,6 +59,7 @@ in {
         pkgs.ffmpeg
       ]
       ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+        llmAgentsPackages.t3code-desktop
         llmAgentsPackages.chatgpt
       ];
   };
