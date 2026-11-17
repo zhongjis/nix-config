@@ -15,6 +15,7 @@
   opencodeRtkCfg = config.programs.opencode.rtk;
   ompRtkCfg = config.programs."oh-my-pi".rtk;
   piRtkCfg = config.programs.pi.rtk;
+  codexRtkCfg = config.programs.codex.rtk;
   claudeRtkEnabled = config.programs.claude-code.rtk.enable;
 
   # Stable profile path, not a /nix/store path, so the hook survives package bumps.
@@ -38,6 +39,17 @@
     hash = "sha256-ZCDVS/AFljljMac+cAzQztYPQgvQrcEhKIHHRhkMsv8=";
   };
 in {
+  options.programs.codex.rtk = {
+    enable = lib.mkEnableOption "RTK integration for Codex";
+
+    package = lib.mkOption {
+      type = lib.types.nullOr lib.types.package;
+      default = defaultRtkPackage;
+      defaultText = lib.literalExpression "inputs.llm-agents.packages.\${pkgs.stdenv.hostPlatform.system}.rtk";
+      description = "RTK runtime package installed when programs.codex.rtk.enable is true.";
+    };
+  };
+
   options.programs.claude-code.rtk.enable =
     lib.mkEnableOption "RTK PreToolUse hook and output note for Claude Code";
 
@@ -84,6 +96,13 @@ in {
     {
       assertions = [
         {
+          assertion = !codexRtkCfg.enable || codexRtkCfg.package != null;
+          message = ''
+            programs.codex.rtk.package must be set when programs.codex.rtk.enable is true.
+            If you import this module outside this flake, pass the package explicitly or provide inputs.llm-agents.
+          '';
+        }
+        {
           assertion = !ompRtkCfg.enable || ompRtkCfg.package != null;
           message = ''
             programs."oh-my-pi".rtk.package must be set when programs."oh-my-pi".rtk.enable is true.
@@ -99,6 +118,17 @@ in {
         }
       ];
     }
+    (lib.mkIf (codexRtkCfg.package != null) {
+      # Delegate file creation, merging, and cleanup to RTK so this stays identical
+      # to `rtk init -g --codex` across upstream format changes.
+      home.activation.rtkCodex = lib.hm.dag.entryAfter ["linkGeneration"] ''
+        if ${lib.boolToString codexRtkCfg.enable}; then
+          $DRY_RUN_CMD env CODEX_HOME=${lib.escapeShellArg "${config.home.homeDirectory}/.codex"} ${lib.getExe codexRtkCfg.package} init -g --codex
+        else
+          $DRY_RUN_CMD env CODEX_HOME=${lib.escapeShellArg "${config.home.homeDirectory}/.codex"} ${lib.getExe codexRtkCfg.package} init -g --codex --uninstall
+        fi
+      '';
+    })
     {
       # Runs even when disabled so turning the toggle off removes RTK's hook.
       # Other hooks and keys in the writable settings.json are left untouched.
@@ -146,7 +176,7 @@ in {
           output was clearly expected, contradicting its exit code, or garbled.
         '';
     })
-    (lib.mkIf (claudeRtkEnabled || opencodeRtkCfg.enable || ompRtkCfg.enable || piRtkCfg.enable) {
+    (lib.mkIf (codexRtkCfg.enable || claudeRtkEnabled || opencodeRtkCfg.enable || ompRtkCfg.enable || piRtkCfg.enable) {
       home.file."rtk/config.toml" = {
         target =
           if pkgs.stdenv.hostPlatform.isDarwin
@@ -166,6 +196,9 @@ in {
           retriever.mode = "tee";
         };
       };
+    })
+    (lib.mkIf codexRtkCfg.enable {
+      home.packages = [codexRtkCfg.package];
     })
     (lib.mkIf opencodeRtkCfg.enable {
       home.packages = [defaultRtkPackage];

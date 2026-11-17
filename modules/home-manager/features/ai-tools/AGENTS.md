@@ -21,6 +21,7 @@ Run from the repo root:
 ## BOOTSTRAP AND MAINTENANCE
 
 - Set `myHomeManager.aiProfile` in `hosts/{name}/home.nix` before enabling ai-tools; profile helpers and profile-filtered content depend on it
+- The Codex module puts Node.js 24 on `PATH`; installed OMO hooks and MCP runtimes invoke `node` directly.
 - Skills come from the `agent-skills` flake input through `lib.skillsFor`; maintain them in the sibling `agent-skills` repository. `common/instructions/*` files remain locally auto-discovered. Tool-specific instructions, MCP servers, and shared agents stay defined in their respective `default.nix` files
 - For upstream/shared skill sync and update policy, follow the `skill-maintainer` workflow instead of inventing ad hoc local conventions here
 
