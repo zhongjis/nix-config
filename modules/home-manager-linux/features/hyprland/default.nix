@@ -102,10 +102,13 @@
             match.class = ''^(steam_app_.*|steam_proton|gamescope)$'';
             content = "game";
           }
-          # vrr = 3 also fires on video content; keep fullscreen browser video at fixed refresh
+          # Browsers (and Chromium app windows): no auto-HDR, since its BT2020
+          # switch forces a modeset and washes out SDR video on the OLED; no VRR
+          # on fullscreen video either
           {
-            match.class = ''^(helium|zen-beta)$'';
+            match.class = ''^(helium|zen-beta|chrome-.*)$'';
             no_vrr = true;
+            no_auto_hdr = true;
           }
           # Pavucontrol floating - combine effects
           {
