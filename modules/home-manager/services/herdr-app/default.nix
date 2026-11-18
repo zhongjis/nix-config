@@ -6,7 +6,7 @@
   ...
 }: let
   stylixEnabled = config.stylix.enable or false;
-  # panda-focus's session hooks, passed per launch instead of installed into Claude Code and Pi.
+  # panda-focus's session hooks, passed per launch instead of installed into Claude Code, Pi and Codex.
   integrations = "${config.xdg.configHome}/herdr-app/mods/panda-focus/integrations";
   # Runs the next `name` on PATH after itself; inside Herdr (HC_TERMINAL_ID) it adds `flags`.
   # PATH stays as it is, so the agent's children (start-worker.sh's `hc run`) keep the shims.
@@ -26,6 +26,8 @@
     paths = [
       (agentShim "claude" "--plugin-dir ${lib.escapeShellArg "${integrations}/claude-plugin"}")
       (agentShim "pi" "-e ${lib.escapeShellArg "${integrations}/pi.ts"}")
+      # Codex runs an inline hook only once trusted (/hooks); the trust is kept in ~/.codex/config.toml.
+      (agentShim "codex" "-c ${lib.escapeShellArg ''hooks.SessionStart=[{hooks=[{type="command",command="sh ${integrations}/codex.sh",timeout=10}]}]''}")
     ];
   };
 in {

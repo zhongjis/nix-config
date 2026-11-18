@@ -2,15 +2,15 @@
 // Below, as in T3: Working (busy agents, folded) and Settled (put away by hand until new work brings them back).
 // Settled lives on the agent's own terminal as `settled=<ms>:<turn>`: it ends with the terminal, every mod
 // sees it, and a turn ended since says there was new work even while no window watched. Looking doesn't count.
-// Settled Claude Code or Pi is also freed at once (by its Settle or by Clear): the agent is exited as a person
+// Settled Claude Code, Pi or Codex is also freed at once (by its Settle or by Clear): the agent is exited as a person
 // would, the resume command it prints is kept (shared "panda-focus.closed"), and its pane closes. Clicking that
 // closed row resumes it in a new tab.
 // Snoozed, as T3's threads: `snoozed=<wake ms>:<ms snoozed>` on the terminal hides the agent on a Snoozed shelf (still
 // running) until its wake time, until it needs the person (blocked), or until Wake. Pinning or settling ends it.
-// Reboots: each local Claude Code or Pi terminal is kept by the core and labelled with the line that resumes its
-// session (`resume=`) and its terminal's pid (`resume.pid=`). The line comes from integrations/claude.sh and
-// integrations/pi.ts, which the `claude`/`pi` shims (Home Manager, first on PATH only in Herdr shells) pass to each
-// launch; nothing is installed into Claude Code or Pi. A kept terminal comes back from a reboot as a shell
+// Reboots: each local Claude Code, Pi or Codex terminal is kept by the core and labelled with the line that resumes
+// its session (`resume=`) and its terminal's pid (`resume.pid=`). The line comes from integrations/claude.sh,
+// integrations/pi.ts and integrations/codex.sh, which the `claude`/`pi`/`codex` shims (Home Manager, first on PATH
+// only in Herdr shells) pass to each launch; nothing is installed into Claude Code, Pi or Codex. A kept terminal comes back from a reboot as a shell
 // with a new pid in the same pane: the line is typed into it, or, for a settled one, kept as a closed row.
 // The same integrations re-inject an orchestrator's state after a context compaction: on a terminal labelled
 // `orch-context=<script>` they run that script and add its output to the agent's context.
@@ -66,9 +66,12 @@ const HIBERNATED = "panda-focus.hibernated";
 // which ends that copy before an `hc label` of its own would run.
 const SNOOZE = "panda-focus.snooze";
 // How each agent exits from its prompt, and the resume line it prints then (both checked by hand: Claude Code
-// "Resume this session with: claude --resume <uuid>", Pi "To resume this session: pi --session <id>").
-const EXIT = { "claude-code": ["ctrl+c", "ctrl+c"], pi: ["ctrl+d"] };
-const RESUME = /claude --resume [0-9a-f-]{36}|pi --session [0-9a-zA-Z-]+/g;
+// "Resume this session with: claude --resume <uuid>", Pi "To resume this session: pi --session <id>", Codex
+// "To continue this session, run: codex resume <uuid>"; a Codex quit before its first message prints none).
+const EXIT = { "claude-code": ["ctrl+c", "ctrl+c"], pi: ["ctrl+d"], codex: ["ctrl+c", "ctrl+c"] };
+const RESUME = /claude --resume [0-9a-f-]{36}|pi --session [0-9a-zA-Z-]+|codex resume [0-9a-f-]{36}/g;
+// Codex must run with --no-daemon inside herdr-core, or its commands run outside it: its printed line gets the flag.
+const resumeLine = (line) => line.replace(/^codex resume /, "codex --no-daemon resume ");
 const pause = () => exec("sleep", ["0.3"]).catch(() => null);
 // How long an orchestrator worker sits idle before it's hibernated (ms).
 const HIBERNATE = 5 * 60000;
@@ -256,7 +259,7 @@ export default class Focus extends View {
         for (let i = 0; i < 20 && !line; i++) {
           await pause();
           const found = await read();
-          if (found.length > before) line = found.at(-1);
+          if (found.length > before) line = resumeLine(found.at(-1));
         }
         if (!line) {
           notify({ title: "Settled, still running", body: `${rec.title}: no resume command appeared, so it was left open.`, level: "warning" });
@@ -371,7 +374,7 @@ export default class Focus extends View {
     for (let i = 0; i < 20 && !line; i++) {
       await pause();
       const found = await read();
-      if (found.length > before) line = found.at(-1);
+      if (found.length > before) line = resumeLine(found.at(-1));
     }
     const title = namer()(t);
     if (!line) {
@@ -407,6 +410,7 @@ export default class Focus extends View {
   // While an agent runs: its terminal is kept, and labelled with its resume line and its terminal's pid.
   // Claude Code's session id is in ~/.claude/sessions/<its pid>.json, read again every pass. Pi labels
   // itself (integrations/pi.ts); one started without it (outside the shim) is read from its own `--session <id>`.
+  // Codex labels itself too (integrations/codex.sh); one started without it is read from its own `resume <id>`.
   async remember(k) {
     const labels = k.labels ?? {};
     let line = labels.resume;
@@ -419,8 +423,10 @@ export default class Focus extends View {
       if (id) line = `claude --resume ${id}`;
     } else if (!line) {
       // The foreground's argv: Pi typed at a shell prompt runs under the terminal's shell argv.
-      const argv = k.foreground?.argv ?? k.argv ?? [], at = argv.indexOf("--session");
-      if (at >= 0 && argv[at + 1]) line = `pi --session ${argv[at + 1]}`;
+      const argv = k.foreground?.argv ?? k.argv ?? [];
+      const at = argv.indexOf(k.status.app === "codex" ? "resume" : "--session"), id = at >= 0 && !argv[at + 1]?.startsWith("-") ? argv[at + 1] : null;
+      if (id && k.status.app === "codex") line = `codex --no-daemon resume ${id}`;
+      else if (id) line = `pi --session ${id}`;
     }
     if (!line) return;
     if (!k.keep) await hc(["keep", k.address]).catch(() => null);
@@ -610,7 +616,7 @@ export default class Focus extends View {
     // Settling the agent in view moves on to the next card down the list, from the top past the end, as T3 does;
     // one in the background moves nothing.
     const settle = (xs, cx) => {
-      // Settling is the person's call: Claude Code and Pi are freed at once, no countdown.
+      // Settling is the person's call: Claude Code, Pi and Codex are freed at once, no countdown.
       for (const a of xs) { this.setSettled(a.address, `${Date.now()}:${term.get(a.address)?.turn ?? 0}`, cx); this.retire(a, cx); }
       const cards = [...pinned, ...out, ...busyRows], i = cards.findIndex((a) => a.focused);
       if (i < 0 || !xs.includes(cards[i])) return false;
@@ -1102,7 +1108,7 @@ export default class Focus extends View {
       for (const id of new Set(doomed.map((a) => a.space))) {
         const s = sp.find((s) => s.id === id), tabs = s?.tabs.map((c) => c.id) ?? [];
         const mine = ps.filter((p) => tabs.includes(p.tab));
-        // Claude Code and Pi skip the countdown but keep their resume command; anything else just closes.
+        // Claude Code, Pi and Codex skip the countdown but keep their resume command; anything else just closes.
         const close = (cx) => { for (const a of doomed.filter((a) => a.space === id)) closable(a) ? this.retire(a, cx) : run("pane.close", { pane: a.pane }); };
         // The space stays: pane.close refuses its last pane, so a space left empty gets a fresh shell tab first,
         // where its terminals are now: an unnamed space is named after that, and s.folder is only where it began.

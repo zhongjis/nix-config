@@ -1,5 +1,6 @@
 // panda-focus session integrations: after a compaction, an orchestrator terminal (label `orch-context=<script>`)
-// gets the script's output back in context; every other session start only sets the resume label.
+// gets the script's output back in context; every other session start only sets the resume label. Codex sets it
+// only from the terminal's own foreground Codex.
 // Run: nix shell nixpkgs#nodejs nixpkgs#jq --command node --test modules/home-manager/services/herdr-app/tests/session-integrations.mjs
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
@@ -40,6 +41,25 @@ test("claude: startup or a terminal without the label prints nothing", () => {
   assert.equal(claude(f, "startup"), "");
   assert.equal(claude(f, "compact"), "");
   assert.match(f.calls(), /resume=claude --resume abc-123/);
+});
+
+// codex.sh's parent is this test process: it plays the terminal's foreground Codex, or a nested one.
+const codex = (f, fg) => {
+  writeFileSync(join(f.root, "labels.json"), JSON.stringify({ foreground: { pid: fg } }));
+  execFileSync("sh", [join(dir, "codex.sh")], { env: f.env, input: JSON.stringify({ session_id: "01a1-ec05", source: "startup" }) });
+  try {
+    return f.calls();
+  } catch {
+    return "";
+  }
+};
+
+test("codex: the terminal's own Codex labels its resume line", () => {
+  assert.match(codex(fixture(false), process.pid), /label t1 resume=codex --no-daemon resume 01a1-ec05/);
+});
+
+test("codex: a nested codex exec leaves the label alone", () => {
+  assert.doesNotMatch(codex(fixture(false), process.pid + 1), /label/);
 });
 
 test("pi: the first turn after a compaction carries the script output, once", async () => {
