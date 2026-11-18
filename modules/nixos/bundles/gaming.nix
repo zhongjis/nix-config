@@ -20,7 +20,9 @@
   programs.gamescope = {
     enable = true;
     # package = pkgs.gamescope_git;
-    capSysNice = true;
+    # capSysNice wrapper dies inside Steam's sandbox (no_new_privs):
+    # "failed to inherit capabilities: Operation not permitted"
+    capSysNice = false;
   };
 
   programs.steam = {
@@ -40,6 +42,8 @@
 
   environment.systemPackages = with pkgs; [
     gamescope
+    # Vulkan WSI layer: games inside gamescope only see HDR swapchains with it
+    gamescope-wsi
     mangohud
     protonup-qt
     dxvk
@@ -54,6 +58,6 @@
     steamtinkerlaunch
   ];
 
-  # dota 2 - gamescope: LD_PRELOAD= gamescope -W 3840 -H 2160 --force-grab-cursor --expose-wayland --rt -r 144 --mangoapp -f -- env LD_PRELOAD="$LD_PRELOAD" gamemoderun %command%
+  # gamescope + HDR (ASUS PG27UCDM 4K 240Hz): LD_PRELOAD= gamescope -W 3840 -H 2160 -r 240 --hdr-enabled --force-grab-cursor --expose-wayland --mangoapp -f -- env LD_PRELOAD="$LD_PRELOAD" DXVK_HDR=1 gamemoderun %command%
   # dota 2 - no gamescope: DRI_PRIME=1 gamemoderun %command%
 }
