@@ -54,7 +54,7 @@
       '  allow-remote: false' \
       "  secret-key: $managementKeyYaml" \
       'routing:' \
-      '  strategy: round-robin' \
+      '  strategy: weighted-round-robin' \
       '  cooldown:' \
       '    transient-error-cooldown-seconds: 30' > "$configTmp"
     ${pkgs.coreutils}/bin/chmod 600 "$configTmp"
