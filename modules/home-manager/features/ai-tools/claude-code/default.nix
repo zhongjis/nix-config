@@ -57,12 +57,19 @@ in {
     ../common/agents
   ];
 
-  # ICM is the memory store; disable Claude Code's built-in auto memory.
-  home.sessionVariables.CLAUDE_CODE_DISABLE_AUTO_MEMORY = "1";
-
-  # Keep long-running background watchers alive; Claude Code otherwise reaps
-  # idle background shells under critical memory pressure (undocumented knob).
-  home.sessionVariables.CLAUDE_CODE_DISABLE_BG_SHELL_PRESSURE_REAP = "1";
+  home.sessionVariables = {
+    # ICM is the memory store; disable Claude Code's built-in auto memory.
+    CLAUDE_CODE_DISABLE_AUTO_MEMORY = "1";
+    # Keep long-running background watchers alive; Claude Code otherwise reaps
+    # idle background shells under critical memory pressure (undocumented knob).
+    CLAUDE_CODE_DISABLE_BG_SHELL_PRESSURE_REAP = "1";
+    # Experimental Code Mode (v2.1.323+); only honored from user settings or the shell.
+    CLAUDE_CODE_EXPERIMENTAL_CODE_MODE = "1";
+    # `fileCheckpointingEnabled = false`.
+    CLAUDE_CODE_DISABLE_FILE_CHECKPOINTING = "1";
+    # `env` block.
+    CLAUDE_CODE_FORCE_TERMINAL_IMAGES = "1";
+  };
 
   # Keep settings.json writable and preserve settings managed by Claude Code and plugins.
   # Hide Claude Code's commit trailer and pull request footer (`attribution: false`).
