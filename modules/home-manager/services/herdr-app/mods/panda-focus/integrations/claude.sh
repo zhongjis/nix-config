@@ -3,8 +3,8 @@
 # Claude Code SessionStart hook: labels this Claude's herdr-core terminal with the line that resumes its session
 # (`resume=claude --resume <id>`), so panda-focus can bring it back after a reboot. Runs again on /clear,
 # /resume and compaction. Does nothing outside herdr-core or for sub-agents.
-# After a compaction, a terminal labelled `orch-context=<script>` (an orchestrate-using-herdr-app orchestrator) also
-# gets that script's output back in context, since compaction summarizes the orchestrator's state away.
+# After a compaction, a terminal labelled `orch-context=<script>` (an orchestrator or worker) also
+# gets that script's output back in context, since compaction summarizes the session's state away.
 
 input=$(cat)
 [ -n "${HC_TERMINAL_ID:-}" ] || exit 0

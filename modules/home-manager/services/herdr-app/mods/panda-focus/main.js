@@ -12,7 +12,7 @@
 // integrations/pi.ts and integrations/codex.sh, which the `claude`/`pi`/`codex` shims (Home Manager, first on PATH
 // only in Herdr shells) pass to each launch; nothing is installed into Claude Code, Pi or Codex. A kept terminal comes back from a reboot as a shell
 // with a new pid in the same pane: the line is typed into it, or, for a settled one, kept as a closed row.
-// The same integrations re-inject an orchestrator's state after a context compaction: on a terminal labelled
+// The same integrations re-inject an orchestrator's or worker's state after a context compaction: on a terminal labelled
 // `orch-context=<script>` they run that script and add its output to the agent's context.
 // Hibernating: an orchestrator worker (a sub-agent labelled `hibernate=ok`) idle past HIBERNATE is exited the same
 // way. Its terminal finishes with `hibernated=<ms>` and `resume=<line>` on it, so its parent can revive it (rm,

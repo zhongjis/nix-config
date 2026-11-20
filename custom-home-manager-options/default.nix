@@ -1,4 +1,5 @@
 {
+  beads = ./beads;
   caveman = ./caveman;
   codex = ./codex;
   herdr-app = ./herdr-app;

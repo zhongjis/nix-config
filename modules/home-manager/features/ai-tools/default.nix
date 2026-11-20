@@ -10,6 +10,7 @@
   llmAgentsPackages = inputs.llm-agents.packages.${system};
 in {
   imports = [
+    ../../../../custom-home-manager-options/beads
     ../../../../custom-home-manager-options/caveman
     ../../../../custom-home-manager-options/codex
     ../../../../custom-home-manager-options/icm
@@ -44,10 +45,14 @@ in {
       isPersonal = cfg == "personal";
     };
 
+    programs.beads = {
+      enable = true;
+      server.enable = true;
+    };
+
     home.packages =
       [
         llmAgentsPackages.qmd
-        llmAgentsPackages.beads
         llmAgentsPackages.codegraph
         # llmAgentsPackages.agentsview
         llmAgentsPackages.skills

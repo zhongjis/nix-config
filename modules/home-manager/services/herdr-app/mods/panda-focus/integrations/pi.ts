@@ -1,8 +1,8 @@
 // Loaded per launch: inside Herdr terminals the `pi` shim passes this file with `-e`.
 // Labels this Pi's herdr-core terminal with the line that resumes its session (`resume=pi --session <id>`),
 // so panda-focus can bring it back after a reboot. Runs again on /new and /resume. Does nothing outside herdr-core.
-// After a compaction, a terminal labelled `orch-context=<script>` (an orchestrate-using-herdr-app orchestrator) also
-// gets that script's output back in context on its next turn, since compaction summarizes the orchestrator's state away.
+// After a compaction, a terminal labelled `orch-context=<script>` (an orchestrator or worker) also
+// gets that script's output back in context on its next turn, since compaction summarizes the session's state away.
 // @ts-nocheck
 
 import { execFile } from "node:child_process";

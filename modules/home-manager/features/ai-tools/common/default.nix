@@ -3,6 +3,7 @@
     ./instructions
     ./mcp
     ./lsp.nix
+    ./beads.nix
   ];
 
   # Python dependency required by skills with Python helpers.

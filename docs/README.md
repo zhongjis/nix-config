@@ -32,6 +32,7 @@ ADR history is append-only; supersede via a new ADR with reciprocal links.
 
 ## Guides
 
+- [Global beads](guides/beads.md) — shared local database, login service, tracker configuration, and checks.
 - [Local models](guides/local-models.md) — install, manage, and run local GGUF models.
 
 ## Related
