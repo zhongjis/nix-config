@@ -138,7 +138,6 @@
       contextWindow = 500000;
       maxTokens = 128000;
     }
-    # ponytail: Codex catalog does not list gpt-6.2 yet; 272K matches its Sol/Astra entries. Raise once the catalog publishes 6.2 limits.
     {
       id = "gpt-6.2-sol";
       reasoning = true;
@@ -152,7 +151,7 @@
         max = "max";
       };
       input = ["text" "image"];
-      contextWindow = 272000;
+      contextWindow = 500000;
       maxTokens = 128000;
     }
     {
