@@ -17,7 +17,10 @@ Linux uses `beads.service`, a systemd user oneshot with `RemainAfterExit`.
 macOS uses the `org.nix-community.home.beads` launchd agent. Its wrapper stays
 alive so launchd termination runs `bd dolt stop`. Both start with
 `bd dolt start`, then run idempotent `bd init --shared-server --init-if-missing`
-without installing agent files or git hooks.
+without installing agent files or git hooks. The bootstrap seeds a writable
+`config.yaml` workspace marker before starting. Init uses
+`--db "$BEADS_DIR/dolt" --database global` so bd 1.3.4 persists anchor metadata
+when shared storage lives elsewhere; this does not move the shared server data. [4]
 
 The module installs `PRIME.md` inside the anchor's `.beads`. In bd 1.3.4,
 `bd prime` checks the current directory's `.beads/PRIME.md` first, then the
@@ -56,3 +59,4 @@ Sources:
 [1] [bd 1.3.4 PRIME resolution](https://github.com/steveyegge/beads/blob/v1.3.4/cmd/bd/prime.go)
 [2] [bd 1.3.4 Linear mapping](https://github.com/steveyegge/beads/blob/v1.3.4/internal/linear/mapping.go)
 [3] [bd 1.3.4 Jira mapping](https://github.com/steveyegge/beads/blob/v1.3.4/internal/jira/fieldmapper.go)
+[4] [bd 1.3.4 shared-server initialization](https://github.com/steveyegge/beads/blob/v1.3.4/cmd/bd/init.go)

@@ -39,6 +39,7 @@ let
   darwin = evaluate inputs.nixpkgs.legacyPackages.aarch64-darwin false enabled;
   custom = evaluate pkgs false (enabled // {xdg.dataHome = "/home/beads-test/data";});
   service = linux.systemd.user.services.beads;
+  bootstrap = builtins.head service.Service.ExecStart;
   agent = darwin.launchd.agents.beads.config;
   prime = builtins.readFile linux.home.file.beads-prime.source;
 in
@@ -57,6 +58,9 @@ in
   assert service.Service.Type == "oneshot";
   assert service.Service.RemainAfterExit;
   assert !(service.Service ? Restart);
+  assert lib.hasInfix "touch \"$BEADS_DIR/config.yaml\"" bootstrap.text;
+  assert lib.hasInfix "dolt start" bootstrap.text;
+  assert lib.hasInfix "init --shared-server --database global --init-if-missing" bootstrap.text;
   assert lib.hasInfix "dolt stop" service.Service.ExecStop;
   assert service.Service.WorkingDirectory == "/home/beads-test/.local/share/beads/global";
   assert service.Install.WantedBy == ["default.target"];
@@ -70,4 +74,5 @@ in
   assert !(lib.hasInfix "herdr" (lib.toLower prime));
   assert !(lib.hasInfix "orchestration" (lib.toLower prime));
   assert lib.hasInfix "Never run `bd dolt push`" prime;
-    pkgs.writeText "beads-prime-checked" prime
+  assert builtins.isString darwin.home.activationPackage.drvPath;
+    linux.home.activationPackage
