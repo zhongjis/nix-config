@@ -3,7 +3,7 @@
 The ai-tools feature enables `programs.beads` and `programs.beads.server.enable`.
 The module is also exported as `homeManagerModules.beads`. Set `package` to
 override the CLI; `settings` supplies non-secret `bd config set` values after
-each start. Disabling `server.enable` keeps only the CLI installed.
+each start when values differ. Disabling `server.enable` keeps only the CLI installed.
 
 ## Database and login service
 
@@ -12,6 +12,7 @@ each start. Disabling `server.enable` keeps only the CLI installed.
 `global` directory is the initialization anchor, not `.beads` itself.
 The service uses bd's default port and server data directory, without a
 restart policy, remote, or auto-commit override.
+To read another embedded database, use `BEADS_DOLT_SHARED_SERVER= BEADS_DIR=/path/to/.beads bd show <id>`.
 
 Linux uses `beads.service`, a systemd user oneshot with `RemainAfterExit`.
 macOS uses the `org.nix-community.home.beads` launchd agent. Its wrapper stays
@@ -37,8 +38,8 @@ are open; completed and canceled are closed. Unknown states fall back to open. [
 Work-profile tracker credentials and configuration stay in `nix-config-private`.
 Jira 1.3.4 uses `jira.status_map.<beads-status>=<one Jira state name>`, not an
 arbitrary inbound state map. Configuring the closed alias to Cancelled retains
-the built-in Done/Closed/Resolved closed mappings. In Progress and In Review
-still import as `in_progress`; Blocked still imports as `blocked`. Other unknown
+the built-in Done/Closed/Resolved closed mappings. The open alias maps In Progress
+to `open`; In Review still imports as `in_progress`, and Blocked as `blocked`. Other unknown
 names default to open. [3] Ticket wf-zr1.3 owns post-pull normalization to open.
 No tracker pull, sync or push runs during activation or service startup.
 

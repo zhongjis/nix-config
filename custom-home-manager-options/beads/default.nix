@@ -14,15 +14,19 @@
   };
   bootstrap = pkgs.writeShellScript "beads-start" ''
     set -eu
-    export PATH=${lib.makeBinPath [cfg.package pkgs.dolt pkgs.coreutils]}:$PATH
     # bd requires a project marker before dolt start can resolve a fresh anchor.
-    touch "$BEADS_DIR/config.yaml"
+    ${pkgs.coreutils}/bin/touch "$BEADS_DIR/config.yaml"
     ${bd} -C ${lib.escapeShellArg anchor} dolt start
     # Keep workspace metadata local while bd stores shared-server data at its default location.
     ${bd} -C ${lib.escapeShellArg anchor} --db "$BEADS_DIR/dolt" init --shared-server --database global --init-if-missing --skip-agents --skip-hooks
-    ${lib.concatStringsSep "\n" (lib.mapAttrsToList (key: value: "${bd} -C ${lib.escapeShellArg anchor} config set ${lib.escapeShellArg key} ${lib.escapeShellArg value}") cfg.settings)}
+    ${lib.concatStringsSep "\n" (lib.mapAttrsToList (key: value: ''
+        if [ "$(${bd} -C ${lib.escapeShellArg anchor} config get ${lib.escapeShellArg key})" != ${lib.escapeShellArg value} ]; then
+          ${bd} -C ${lib.escapeShellArg anchor} config set ${lib.escapeShellArg key} ${lib.escapeShellArg value}
+        fi
+      '')
+      cfg.settings)}
   '';
-  launch = pkgs.writeShellScript "beads-launch" ''
+  launch = ''
     set -eu
     ${bootstrap}
     trap '${bd} -C ${lib.escapeShellArg anchor} dolt stop; exit' TERM INT
@@ -71,7 +75,7 @@ in {
         enable = true;
         config = {
           Label = "org.nix-community.home.beads";
-          ProgramArguments = ["${launch}"];
+          ProgramArguments = [pkgs.runtimeShell "-c" launch];
           EnvironmentVariables = environment;
           WorkingDirectory = anchor;
           RunAtLoad = true;

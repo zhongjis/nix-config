@@ -41,11 +41,15 @@ let
   service = linux.systemd.user.services.beads;
   bootstrap = builtins.head service.Service.ExecStart;
   agent = darwin.launchd.agents.beads.config;
+  launch = builtins.elemAt agent.ProgramArguments 2;
   prime = builtins.readFile linux.home.file.beads-prime.source;
+  primeLineCount = builtins.length (lib.splitString "\n" (lib.removeSuffix "\n" prime));
 in
   assert !(disabled.systemd.user.services ? beads);
   assert !(disabled.home.file ? beads-prime);
   assert !(cli.home.sessionVariables ? BEADS_DIR);
+  assert !(cli.home.file ? beads-prime);
+  assert !(cli.systemd.user.services ? beads);
   assert linux.home.sessionVariables.BEADS_DIR == "/home/beads-test/.local/share/beads/global/.beads";
   assert linux.home.sessionVariables.BEADS_DOLT_SHARED_SERVER == "1";
   assert linux.home.sessionVariables.LINEAR_TEAM_ID == "bfeea957-f57b-4c82-afd7-1b3eca55fd0e";
@@ -67,7 +71,12 @@ in
   assert agent.RunAtLoad && !agent.KeepAlive;
   assert agent.EnvironmentVariables.BEADS_DIR == darwin.home.sessionVariables.BEADS_DIR;
   assert agent.EnvironmentVariables.BEADS_DOLT_SHARED_SERVER == "1";
-  assert builtins.length agent.ProgramArguments == 1;
+  assert builtins.length agent.ProgramArguments == 3;
+  assert builtins.elemAt agent.ProgramArguments 1 == "-c";
+  assert lib.hasInfix "beads-start" launch;
+  assert lib.hasInfix "dolt stop" launch;
+  assert lib.hasInfix "TERM INT" launch;
+  assert primeLineCount >= 40 && primeLineCount <= 60;
   assert "${linux.home.homeDirectory}/${linux.home.file.beads-prime.target}" == "${linux.home.sessionVariables.BEADS_DIR}/PRIME.md";
   assert darwin.home.file.beads-prime.source == linux.home.file.beads-prime.source;
   assert custom.home.sessionVariables.BEADS_DIR == "/home/beads-test/data/beads/global/.beads";

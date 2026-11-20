@@ -70,6 +70,8 @@ Run from the repo root:
 - Verify module configuration without activation: `nix eval --impure --raw --expr '(import ./tests/icm.nix).drvPath'` ([regression check](tests/icm.nix)).
 - Migrating a host's icm database to the `intfloat/multilingual-e5-base` embedding model: follow the user-invoked [`icm-migrate` skill](.agents/skills/icm-migrate/SKILL.md).
 
+- Beads: [module](custom-home-manager-options/beads), [eval check](tests/beads.nix), and [operations guide](docs/guides/beads.md) own the global shared database and login service.
+
 ## MODULE SYSTEM
 
 - `myLib.extendModules` scans directories for `.nix` files and wraps each with an enable option plus `mkIf`.

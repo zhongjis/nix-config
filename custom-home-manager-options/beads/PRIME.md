@@ -18,6 +18,7 @@ Otherwise find or create your own session epic and inspect its children.
 Use only `bd ready --parent <epic> --json` to find ready work.
 Never run unscoped `bd ready` or use `--claim` with readiness queries.
 Ready means dependencies allow work; it does not grant ownership.
+Statuses: open = not started; in_progress = claimed; blocked = waiting; closed = done.
 
 ## Structure and dependencies
 An epic groups a session's work; a parent scopes its child beads.

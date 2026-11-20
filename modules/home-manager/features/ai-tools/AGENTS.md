@@ -25,6 +25,8 @@ Run from the repo root:
 - Skills come from the `agent-skills` flake input through `lib.skillsFor`; maintain them in the sibling `agent-skills` repository. `common/instructions/*` files remain locally auto-discovered. Tool-specific instructions, MCP servers, and shared agents stay defined in their respective `default.nix` files
 - For upstream/shared skill sync and update policy, follow the `skill-maintainer` workflow instead of inventing ad hoc local conventions here
 
+- [Personal beads configuration](common/beads.nix) owns Linear session credentials and inbound state mapping.
+
 ## LSP OWNERSHIP
 
 - `common/lsp.nix` owns the global AI-tool LSP server definitions and exports `commonLsp` via `_module.args`.
