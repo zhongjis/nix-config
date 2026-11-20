@@ -38,8 +38,9 @@ Comments are append-only milestones, questions and reports, not a second notepad
 Start each milestone comment with `event=<name>` on its first line.
 
 ## Plain-session tracking
+Set BEADS_ACTOR to your unique session name before creating plain-session work.
 Create a session epic, then create your tasks under that epic.
-Claim your own open task with `bd update <id> --assignee "$BEADS_ACTOR" --if-status open`.
+Claim your own open task with `bd update <id> --assignee "$BEADS_ACTOR" --status in_progress --if-status open`.
 Close only your own finished tasks with `bd close <id>`.
 Leave incomplete tasks visible; do not close work merely because the session ends.
 
