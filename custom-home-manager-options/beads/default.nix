@@ -15,6 +15,8 @@
   bootstrap = pkgs.writeShellScript "beads-start" ''
     set -eu
     export PATH=${lib.makeBinPath [cfg.package pkgs.dolt pkgs.coreutils]}:$PATH
+    # bd requires a project marker before dolt start can resolve a fresh anchor.
+    touch "$BEADS_DIR/config.yaml"
     ${bd} -C ${lib.escapeShellArg anchor} dolt start
     ${bd} -C ${lib.escapeShellArg anchor} init --shared-server --init-if-missing --skip-agents --skip-hooks
     ${lib.concatStringsSep "\n" (lib.mapAttrsToList (key: value: "${bd} -C ${lib.escapeShellArg anchor} config set ${lib.escapeShellArg key} ${lib.escapeShellArg value}") cfg.settings)}
