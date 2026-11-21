@@ -65,6 +65,11 @@
       input = ["text" "image"];
     }
     {
+      id = "gemini-4-neon-xhigh";
+      reasoning = true;
+      input = ["text" "image"];
+    }
+    {
       id = "gpt-5.6-luna";
       reasoning = true;
       input = ["text" "image"];
