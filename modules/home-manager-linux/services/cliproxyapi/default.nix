@@ -55,6 +55,8 @@
       "  secret-key: $managementKeyYaml" \
       'routing:' \
       '  strategy: weighted-round-robin' \
+      '  session-affinity: true' \
+      '  session-affinity-rebind-on: "quota"' \
       '  cooldown:' \
       '    transient-error-cooldown-seconds: 30' > "$configTmp"
     ${pkgs.coreutils}/bin/chmod 600 "$configTmp"
