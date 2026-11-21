@@ -95,8 +95,10 @@ assert.equal(JSON.stringify(repos.groups[JSON.stringify(["vps", "/r/.git"])].wor
 // The worktree menu: uncommitted changes are counted first; with some, removal goes with --force.
 {
   const src = await readFile(new URL("../mods/panda-worktree-menu/main.js", import.meta.url), "utf8");
-  const shared = [];
-  const names = { props: () => ({ folder: "/wt", common: "/r/.git", machine: null, repo: "k", overlay: 1 }), setShared: (k, v) => shared.push([k, v]), closeOverlay() {}, notify() {}, run() {}, theme: () => ({}) };
+  const shared = [], ran = [];
+  let menuProps = { folder: "/wt", common: "/r/.git", machine: null, repo: "k", overlay: 1, space: null };
+  const names = { props: () => menuProps, setShared: (k, v) => shared.push([k, v]), closeOverlay() {}, notify() {}, run: (n, a) => ran.push([n, a]), theme: () => ({}),
+    spaces: () => [{ id: "s9", tabs: [{ id: "t" }] }], panes: () => [{ tab: "t", terminal: "a" }, { tab: "t", terminal: "b" }], agents: () => [{ space: "s9", status: "working" }] };
   const mk = (list, from) => new vm.SyntheticModule(list, function () {
     for (const n of list) this.setExport(n, n in names ? names[n] : n === "exec" ? async (...a) => (execs.push(a), onExec(...a)) : class {});
   }, { context });
@@ -105,9 +107,11 @@ assert.equal(JSON.stringify(repos.groups[JSON.stringify(["vps", "/r/.git"])].wor
   const m = new vm.SourceTextModule(src, { context });
   await m.link((name) => mods[name]);
   await m.evaluate();
-  const menu = Object.create(m.namespace.default.prototype);
-  Object.assign(menu, { asking: false, busy: false, error: null, dirty: null });
-  const jobs = [], cx = { notify() {}, spawn: (fn) => jobs.push(fn(cx)) };
+  const Menu = m.namespace.default;
+  const jobs = [], cx = { notify() {}, spawn: (fn) => jobs.push(fn(cx)), focus_handle: () => ({ focus() {} }) };
+  const menu = new Menu();
+  menu.init({}, cx);
+  assert.equal(menu.at, -1); // nothing looks selected on open
   execs = [];
   onExec = (_c, args) => args[0] === "status" ? { code: 0, stdout: " M a\n?? b\n" } : { code: 0, stdout: "" };
   menu.remove(cx); // not counted yet: nothing runs
@@ -118,6 +122,32 @@ assert.equal(JSON.stringify(repos.groups[JSON.stringify(["vps", "/r/.git"])].wor
   await Promise.all(jobs.splice(0));
   assert.equal(JSON.stringify(execs.map(([, a]) => a)), JSON.stringify([["status", "--porcelain"], ["worktree", "remove", "--force", "/wt"]]));
   assert.equal(shared[0][0], "panda-spaces.stale");
+  assert.equal(ran.length, 0);
+
+  // A space open there: its own items; the worktree goes first, then the space closes.
+  menuProps = { ...menuProps, space: "s9" };
+  const open = new Menu();
+  open.init({}, cx);
+  execs = [];
+  onExec = (_c, args) => args[0] === "status" ? { code: 0, stdout: "" } : { code: 0, stdout: "" };
+  open.choose(3, cx);
+  await Promise.all(jobs.splice(0));
+  open.remove(cx);
+  await Promise.all(jobs.splice(0));
+  assert.equal(JSON.stringify(execs.map(([, a]) => a)), JSON.stringify([["status", "--porcelain"], ["worktree", "remove", "/wt"]]));
+  assert.equal(JSON.stringify(ran), JSON.stringify([["space.close", { id: "s9", confirmed: true }]]));
+
+  // A refusal leaves the space open.
+  ran.length = 0;
+  onExec = (_c, args) => args[0] === "status" ? { code: 0, stdout: "" } : { code: 128, stderr: "fatal: working trees containing submodules cannot be moved or removed" };
+  const refused = new Menu();
+  refused.init({}, cx);
+  refused.choose(3, cx);
+  await Promise.all(jobs.splice(0));
+  refused.remove(cx);
+  await Promise.all(jobs.splice(0));
+  assert.equal(ran.length, 0);
+  assert.match(refused.error, /submodules/);
 }
 
 // Real git: from the common dir, a removed worktree is gone from the list.

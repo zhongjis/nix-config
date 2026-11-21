@@ -346,11 +346,11 @@ export default class Spaces extends View {
     });
   }
 
-  // A worktree without a space: open it, copy its path, remove it (panda-worktree-menu).
-  worktreeMenu({ w, g }) {
+  // Any worktree row, with or without a space (panda-worktree-menu); a popup is as tall as its items, height the most.
+  worktreeMenu({ w, g, vacant }) {
     const [, common] = JSON.parse(g.repo);
-    openOverlay({ mod: "panda-worktree-menu", kind: "popup", width: 260, height: 200,
-      props: { folder: g.folder, branch: g.branch ?? null, machine: w.machine ?? null, repo: g.repo, common } });
+    openOverlay({ mod: "panda-worktree-menu", kind: "popup", width: 260, height: 260,
+      props: { folder: g.folder, branch: g.branch ?? null, machine: w.machine ?? null, repo: g.repo, common, space: vacant ? null : w.id } });
   }
 
   menu(w) {
@@ -620,7 +620,8 @@ export default class Spaces extends View {
         } else this.endDrag();
         cx.notify();
       })
-      .on_mouse_down("right", () => this.menu(w))
+      // A worktree's space gets the worktree menu; the rest Herdr's.
+      .on_mouse_down("right", () => g?.linked ? this.worktreeMenu(r) : this.menu(w))
       .child(
         h_flex()
           .gap(9)
