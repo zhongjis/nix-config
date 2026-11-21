@@ -5,6 +5,7 @@
   lib,
   commonInstructions,
   aiProfileHelpers,
+  currentSystemName,
   ...
 }: let
   inherit (pkgs.stdenv.hostPlatform) system;
@@ -46,6 +47,18 @@
       ];
     }
     // lib.optionalAttrs (matcher != null) {inherit matcher;};
+  # Route Claude Code through the local CLIProxyAPI; the proxy owns upstream credentials.
+  cliproxyapiEnabled =
+    currentSystemName
+    == "framework-16"
+    && aiProfileHelpers.isPersonal
+    && lib.attrByPath ["myHomeManager" "services" "cliproxyapi" "enable"] false config;
+  proxyFilter =
+    if cliproxyapiEnabled
+    then ''.env.ANTHROPIC_BASE_URL = "http://127.0.0.1:8317" | .apiKeyHelper = "cat ${config.xdg.stateHome}/cliproxyapi/api-key"''
+    else "del(.env.ANTHROPIC_BASE_URL, .apiKeyHelper)";
+  settingsFilter = ''.permissions.defaultMode = "bypassPermissions" | .attribution = false | ${proxyFilter}'';
+
   direnvHooks = {
     SessionStart = direnvHookEntry null;
     CwdChanged = direnvHookEntry null;
@@ -80,9 +93,9 @@ in {
       temporary=$(mktemp "$settings.XXXXXX")
       trap 'rm -f "$temporary"' EXIT
       if [[ -e "$settings" ]]; then
-        ${pkgs.jq}/bin/jq '.permissions.defaultMode = "bypassPermissions" | .attribution = false' "$settings" > "$temporary"
+        ${pkgs.jq}/bin/jq ${lib.escapeShellArg settingsFilter} "$settings" > "$temporary"
       else
-        printf '%s\n' '{"permissions":{"defaultMode":"bypassPermissions"},"attribution":false}' > "$temporary"
+        ${pkgs.jq}/bin/jq -n ${lib.escapeShellArg "{} | ${settingsFilter}"} > "$temporary"
       fi
       mv "$temporary" "$settings"
     ''}
