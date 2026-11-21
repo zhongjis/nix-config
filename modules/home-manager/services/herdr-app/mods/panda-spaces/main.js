@@ -2,15 +2,17 @@
 // grouped by machine when more than one is known. After a space's name, the repo
 // its first terminal is in now, only where unusual: branch, ahead/behind. Agent state lives in the agents list, not here,
 // except a green chip counting running main agents (no sub-agents, mainIn in space.js) that opens panda-subagents: on a
-// shown worktree's row those working in it, on a space's row the rest working for that space. Click to
-// switch, right-click for its menu, drag to reorder. A repo's worktrees go by their branch, folded behind a count
-// on its row; the open ones bright, the rest dim (a click opens one as a space).
+// shown worktree's row those working in it, on a space's row the rest working for that space. Click to go to
+// its first terminal (a new shell tab when it has none), right-click for its menu, drag to reorder. A repo's
+// worktrees go by their branch, folded behind a count on its row; the open ones bright, the rest dim (a click opens
+// one as a space, right-click for panda-worktree-menu). A removed worktree's row goes, unless a space is open there.
 
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { Repositories } from "./repos.js";
 import { mainIn } from "./space.js";
-import { spaces, machines, panes, terminals, focused, keys, run, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout } from "herdr";
+import { firstTerminal, firstFolder } from "./terminal.js";
+import { spaces, machines, panes, terminals, focused, keys, run, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout, home } from "herdr";
 
 function find(node, id) {
   if (node?.id === id) return node;
@@ -33,9 +35,10 @@ function expandSidebar() {
 
 // Where a space is now: its first terminal's live folder, else where it was made.
 // `ps`: panes(), read once by the caller (each read copies every pane).
+// A removed folder reads "<folder> (deleted)" (Linux /proc): the same place, so what it was (a worktree) is kept.
 function place(s, ps) {
   const tabs = new Set((s.tabs ?? []).map((c) => c.id));
-  return ps.find((p) => tabs.has(p.tab) && p.cwd)?.cwd || s.folder;
+  return (ps.find((p) => tabs.has(p.tab) && p.cwd)?.cwd || s.folder).replace(/ \(deleted\)$/, "");
 }
 const rowHeight = ({ tree }) => (tree ? 28 : 30);
 const where = (s, ps) => JSON.stringify([s.machine ?? null, place(s, ps)]);
@@ -81,6 +84,8 @@ export default class Spaces extends View {
     this.ready = {}; // machine -> its layout was readable at the last look
     this.at = {}; // space -> its where() at the last look
     this.watching = new Set(); // local repos' git folders
+    this.gone = {}; // where() -> { main, worktree } for a space whose folder was removed (main: its repo's main checkout)
+    this.opening = {}; // space -> when a click asked for its new shell tab
     // Spaces made while this runs wait (at most a moment) for their git, so a
     // worktree appears under its repo instead of jumping there.
     this.shown = new Set(spaces().map((s) => s.id));
@@ -112,6 +117,12 @@ export default class Spaces extends View {
     }
     const due = this.due(now, sp, ps);
     if (due.size) this.refreshGit(due, cx);
+    // panda-worktree-menu removed a worktree: its repo's list is looked at again now.
+    const stale = shared("panda-spaces.stale");
+    if (stale && stale.at !== this.staleAt) {
+      this.staleAt = stale.at;
+      if (this.repos.groups[stale.repo]) this.repos.groups[stale.repo].at = 0;
+    }
     if (window()?.active) {
       const known = new Set(sp.map(s => this.git[where(s, ps)]?.repo));
       for (const g of Object.values(this.git)) if (g && known.has(g.repo)) this.repos.refresh(g, cx);
@@ -139,6 +150,16 @@ export default class Spaces extends View {
     const due = new Set([...keys].filter((k) => !(k in this.git)));
     for (const [id, k] of Object.entries(at)) if (this.at[id] && this.at[id] !== k && keys.has(k)) due.add(k);
     this.at = at;
+    // Places no space is at now are forgotten: a closed space, an old cd, a removed worktree.
+    const live = new Set(Object.values(at));
+    for (const k of new Set([...Object.keys(this.git), ...Object.keys(this.gone)])) {
+      if (live.has(k)) continue;
+      delete this.git[k];
+      delete this.checked[k];
+      delete this.gone[k];
+      this.unsure.delete(k);
+    }
+    for (const id of Object.keys(this.born)) if (!(id in at)) delete this.born[id];
     const spaceOf = {};
     for (const s of sp) for (const t of s.tabs ?? []) spaceOf[t.id] = s;
     const busy = {};
@@ -249,6 +270,7 @@ export default class Spaces extends View {
       // No optional locks: a status that touched the index would wake the watch again.
       // Writes nothing under .git (index lock, fsmonitor cookie): watch() would wake on it.
       const r = await exec("git", ["--no-optional-locks", "-c", "core.fsmonitor=false", "status", "--porcelain=v2", "--branch"], { cwd, on });
+      delete this.gone[key];
       if (r.code !== 0) {
         // Only git's own "no" is remembered as no repo; anything else is asked again.
         if (!/not a git repository/i.test(r.stderr)) this.unsure.add(key);
@@ -273,6 +295,15 @@ export default class Spaces extends View {
       if (!on) this.watch(repo, cx);
       if (window()?.active || !this.repos.groups[info.repo]) this.repos.refresh(info, cx);
     } catch {
+      // Its folder is gone (a removed worktree; the shells there stay): a plain space now, not asked again. Its repo's
+      // main checkout is kept, for the shell a click opens.
+      const there = await exec("test", ["-d", cwd], { on }).then((r) => r.code === 0, () => null);
+      if (there === false) {
+        const was = this.git[key];
+        this.gone[key] = was ? { main: this.repos.groups[was.repo]?.worktrees[0]?.folder ?? null, worktree: was.linked } : this.gone[key] ?? { main: null, worktree: false };
+        this.git[key] = null;
+        return;
+      }
       // Couldn't ask (the machine is away): keep what it showed, look again later.
       this.git[key] ??= null;
       this.unsure.add(key);
@@ -287,10 +318,39 @@ export default class Spaces extends View {
         while (this.watching.has(repo)) {
           await watchFolder(repo);
           const mine = JSON.stringify([null, repo]);
+          // A worktree added or removed shows at once, not at the list's next minute.
+          if (this.repos.groups[mine]) this.repos.groups[mine].at = 0;
           if (this.watching.has(repo)) this.refreshGit(Object.keys(this.git).filter((k) => this.git[k]?.repo === mine), cx);
         }
       } catch { this.watching.delete(repo); }
     });
+  }
+
+  // A click goes to the space's first terminal (not an agent). Without one it opens a shell tab there, in a folder
+  // that still exists; clicks before that tab lists open no second one.
+  go(w, cx) {
+    run("space.select", { id: w.id });
+    const s = spaces().find((x) => x.id === w.id);
+    if (!s) return;
+    const ps = panes();
+    const t = firstTerminal(s, ps);
+    if (t) { run("pane.focus", { pane: t.pane }); return; }
+    if (Date.now() - (this.opening[w.id] ?? 0) < 3000) return;
+    this.opening[w.id] = Date.now();
+    const on = s.machine ?? null;
+    const folders = [place(s, ps), this.gone[where(s, ps)]?.main, s.folder];
+    cx.spawn(async () => {
+      // ponytail: on another machine with none of them left, tab.new falls back to the focused terminal's folder.
+      const folder = (await firstFolder(folders, on)) ?? (on ? null : home());
+      run("tab.new", { space: w.id, focus: true, ...(folder ? { folder } : {}) });
+    });
+  }
+
+  // A worktree without a space: open it, copy its path, remove it (panda-worktree-menu).
+  worktreeMenu({ w, g }) {
+    const [, common] = JSON.parse(g.repo);
+    openOverlay({ mod: "panda-worktree-menu", kind: "popup", width: 260, height: 200,
+      props: { folder: g.folder, branch: g.branch ?? null, machine: w.machine ?? null, repo: g.repo, common } });
   }
 
   menu(w) {
@@ -303,7 +363,7 @@ export default class Spaces extends View {
     const sp = spaces(), ps = panes();
     const ready = (w) => this.shown.has(w.id) || where(w, ps) in this.git || Date.now() - (this.born[w.id] ??= Date.now()) > 1500;
     for (const w of sp) if (!this.shown.has(w.id) && ready(w)) this.shown.add(w.id);
-    const list = sp.map((w, i) => ({ w, i, g: this.git[where(w, ps)] ?? null })).filter((r) => this.shown.has(r.w.id));
+    const list = sp.map((w, i) => ({ w, i, g: this.git[where(w, ps)] ?? null, gone: this.gone[where(w, ps)] ?? null })).filter((r) => this.shown.has(r.w.id));
     const out = [], placed = new Set();
     for (const r of list) {
       if (!r.g) { out.push(r); continue; }
@@ -490,6 +550,7 @@ export default class Spaces extends View {
     return h_flex().id(`worktree-${g.repo}-${g.folder}`).h(28).flex_none().px(8).gap(9).items_center().rounded(8).cursor_pointer().hover(s => s.bg(t.hover))
       .tooltip(`Open ${base(g.folder)} as a space`)
       .on_click(() => run("space.new", { folder: g.folder, machine: w.machine ?? "" }))
+      .on_mouse_down("right", () => this.worktreeMenu(r))
       .child(h_flex().pl(22).flex_none().child(svg("mods/workspace-chrome/branch.svg").size(13).text_color(t.dim)))
       .child(this.branchLabel(g.branch ?? w.name, t.muted, t))
       .child(div().flex_1())
@@ -504,12 +565,13 @@ export default class Spaces extends View {
   }
 
   row(r, t) {
-    const { w, i, g, tree } = r;
+    const { w, i, g, tree, gone } = r;
     const on = w.active;
     // A worktree goes by its branch; a name the person gave its space comes first, the branch under it.
     const branch = tree ? g?.branch ?? null : null;
     const own = Boolean(branch) && w.named && w.name !== branch;
-    const where = tree ? (own ? branch : "") : this.gitWhere(g, tree, w.name);
+    // A removed folder says so: its shells still run there, and a click opens a new one elsewhere.
+    const where = gone ? `${gone.worktree ? "worktree" : "folder"} removed` : tree ? (own ? branch : "") : this.gitWhere(g, tree, w.name);
     const subs = this.subs?.get(r);
     return v_flex()
       .relative()
@@ -554,7 +616,7 @@ export default class Spaces extends View {
           run("space.move", { id: spaces()[from].id, index: i + 1 });
         } else if (from === i) {
           this.endDrag(false);
-          run("space.select", { id: w.id });
+          this.go(w, cx);
         } else this.endDrag();
         cx.notify();
       })
@@ -594,7 +656,7 @@ export default class Spaces extends View {
       .when(w.active, (el) => el.bg(t.raised).child(div().absolute().left(0).top(6).bottom(6).w(2).rounded(1).bg(t.accent)))
       .hover((s) => s.bg(w.active ? t.raised : t.hover))
       .tooltip(failing ? `${w.name} · CI failing` : w.name)
-      .on_click(() => run("space.select", { id: w.id }))
+      .on_click((_e, cx) => this.go(w, cx))
       .child(this.avatar(w, t, [...w.name][0]?.toUpperCase() ?? "?").relative()
         // 8px of red in a 1px ring of the rail's color, so it stands off the avatar.
         .when(failing, (el) => el.child(h_flex().absolute().right(-4).bottom(-4).size(10).rounded(3).border(1).border_color(t.chrome).bg(t.blocked)

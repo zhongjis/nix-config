@@ -30,12 +30,13 @@
       fi
     '';
   # Overwrites the mod's files in place; files Herdr generates there (jsconfig.json, .d.ts) stay.
+  # Symlinks are copied as the files they point to: Herdr refuses imports from outside the mod folder.
   # ponytail: a file deleted from the Nix mod folder stays in the live folder; delete it there by hand.
   copyMod = name: dir: let
     target = lib.escapeShellArg "${configDir}/mods/${name}";
   in ''
     run mkdir -p ${target}
-    run ${pkgs.coreutils}/bin/cp -rT --no-preserve=mode,ownership ${dir} ${target}
+    run ${pkgs.coreutils}/bin/cp -rTL --no-preserve=mode,ownership ${dir} ${target}
   '';
 in {
   options.programs.herdr-app = {

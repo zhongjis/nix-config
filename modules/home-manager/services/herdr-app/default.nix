@@ -122,11 +122,14 @@ in {
     };
     # Herdr's default `main` layout with the panda-focus agent cards in the sidebar.
     layouts.herdr-panda = lib.importJSON ./layouts/herdr-panda.json;
+    # Mods linking files from mods/shared come from the whole mods folder, so the links resolve when copied.
     mods = {
-      panda-focus = ./mods/panda-focus;
-      panda-subagents = ./mods/panda-subagents;
+      panda-focus = "${./mods}/panda-focus";
+      panda-subagents = "${./mods}/panda-subagents";
       # Herdr's `spaces` mod with the repo/branch on its own line.
-      panda-spaces = ./mods/panda-spaces;
+      panda-spaces = "${./mods}/panda-spaces";
+      # panda-spaces' right-click menu on a worktree without a space.
+      panda-worktree-menu = ./mods/panda-worktree-menu;
       # Herdr's `tabs` mod with icon-only Files/Changes/PR/CI panel buttons.
       panda-tabs = ./mods/panda-tabs;
       # Herdr's `workspace-chrome` footer (Settings, Add machine) with centered icons on the collapsed rail.

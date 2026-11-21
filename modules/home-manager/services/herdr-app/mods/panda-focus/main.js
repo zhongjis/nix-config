@@ -23,6 +23,7 @@ import { v_flex, h_flex, Scrollbar } from "gpui-base";
 import { agents, terminals, panes, spaces, focused, run, openOverlay, hc, exec, notify, theme, shared, setShared, setAgentOrder, props, nextCommand, settings, layout, home, readTextFile, window } from "herdr";
 import { namer } from "./name.js";
 import { kidStatus, descendants, treeStatus } from "./tree.js";
+import { firstFolder } from "./terminal.js";
 
 const BUSY = new Set(["working", "blocked"]);
 // A theme color at some opacity (#rgb or #rrggbb); any other color gives `solid` instead.
@@ -289,8 +290,10 @@ export default class Focus extends View {
   // A fresh shell tab for a space about to lose its last pane, out of sight: tab.new would select it. A core
   // terminal labelled with a tab id Herdr doesn't know becomes that tab, unselected; no argv runs that machine's
   // shell. True once Herdr lists the tab, so the pane close after it can't take the space.
-  async keepSpace(s, folder) {
+  async keepSpace(s, want) {
     const on = s.machine ?? null, local = (id) => id.split("/").pop();
+    // A removed worktree can't hold the shell: then the space's own folder, else that machine's home (no --cwd).
+    const folder = await firstFolder([want, s.folder], on);
     const tab = `tb${Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}`;
     const args = ["run", "--bg", "--keep", "--no-parent", "--json", "--label", `herdr.space=${local(s.id)}`, "--label", `herdr.tab=${tab}`];
     if (folder) args.push("--cwd", folder);

@@ -52,6 +52,7 @@ function fixture(props = {}, shared = {}) {
   };
   const strip = (s) => s.replace(/^import .*;\r?\n/gm, "").replace(/export (function|const) /g, "$1 ");
   const src = strip(fs.readFileSync(path.join(dir, "tree.js"), "utf8"))
+    + strip(fs.readFileSync(path.join(dir, "terminal.js"), "utf8"))
     + strip(fs.readFileSync(path.join(dir, "main.js"), "utf8")).replace("export default class", "globalThis.Mod = class");
   vm.runInContext(src, vm.createContext(env));
   f.mod = new env.Mod(); f.mod.init({}, cx);

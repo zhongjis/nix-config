@@ -18,11 +18,12 @@ export class Repositories {
       const [on, common] = JSON.parse(g.repo);
       group.at = Date.now() + 60000;
       try {
-        const result = await exec("git", ["-c", "core.quotePath=false", "worktree", "list", "--porcelain"], { cwd: g.folder, on });
+        // From the git common dir: it lasts as long as the repo, where a space's folder can be a removed worktree.
+        const result = await exec("git", ["-c", "core.quotePath=false", "worktree", "list", "--porcelain"], { cwd: common, on });
         if (result.code !== 0) throw new Error("worktrees unavailable");
         group.worktrees = checkouts(result.stdout);
         if (on) return;
-        const cwd = group.worktrees[0]?.folder ?? g.folder;
+        const cwd = group.worktrees[0]?.folder ?? common;
         if (!group.github) {
           const remote = await exec("git", ["remote", "get-url", "origin"], { cwd });
           group.github = remote.code === 0 ? githubRepo(remote.stdout) : null;
