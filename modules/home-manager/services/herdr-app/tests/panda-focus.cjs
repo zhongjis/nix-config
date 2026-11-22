@@ -1,4 +1,4 @@
-// panda-focus checks: settled agents retire on every settle, "closing" shows only while exiting, and snooze.
+// panda-focus checks: settled agents retire on every settle, "closing" shows only while exiting, snooze, and reboot resumes.
 // Run: nix shell nixpkgs#nodejs --command node --test modules/home-manager/services/herdr-app/tests/panda-focus.cjs
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
@@ -48,7 +48,11 @@ function fixture(props = {}, shared = {}) {
     openOverlay: (o) => f.overlays.push(o), closeOverlay() {}, home: () => "/h", appHome: () => "/a",
     exec: async () => ({ code: 1 }), readTextFile: async () => null, writeTextFile: async () => {},
     nextCommand: () => new Promise(() => {}),
-    hc: async (args) => { f.hc.push(args); return args[0] === "read" ? { code: 0, stdout: f.screen ?? "" } : { code: 0, stdout: "" }; },
+    hc: async (args) => {
+      f.hc.push(args);
+      if (args[0] === "get" && f.get?.[args[1]]) return { code: 0, stdout: JSON.stringify(f.get[args[1]]) };
+      return args[0] === "read" ? { code: 0, stdout: f.screen ?? "" } : { code: 0, stdout: "" };
+    },
   };
   const strip = (s) => s.replace(/^import .*;\r?\n/gm, "").replace(/export (function|const) /g, "$1 ");
   const src = strip(fs.readFileSync(path.join(dir, "tree.js"), "utf8"))
@@ -129,4 +133,22 @@ test("pins are the core's, in this window's order; old shared pins move onto the
   f.mod.movePins(); f.mod.movePins();
   assert.deepEqual(JSON.parse(JSON.stringify(f.calls.filter((c) => c[0] === "terminal.pin"))), [["terminal.pin", { terminal: "A", pinned: true }]],
     "only A moves: C is pinned already, `gone` isn't live, and the move runs once");
+});
+
+test("a resume line that doesn't bring its agent back is kept as a closed row", async () => {
+  const f = fixture(), line = "claude --resume 049f0907-574a-46f6-9784-68a7ceea3505";
+  const k = { address: "A", pid: 2, cwd: "/w", labels: { resume: line, "resume.pid": "1", where: "x / ci", "herdr.space": "s1" } };
+  // Claude refused and exited: the shell is back at its prompt, no agent status.
+  f.get = { A: { address: "A", state: "live", foreground: { name: "zsh" }, status: null } };
+  await f.mod.restore(k);
+  assert.deepEqual(Array.from(f.hc.find((x) => x[0] === "send")), ["send", "A", line]);
+  await f.mod.confirmResume(k, line);
+  assert.equal(f.shared["panda-focus.closed"][0].argv.join(" "), line);
+  assert.equal(f.notes.at(-1).title, "Couldn't resume the agent");
+  // Came up (or still starting behind a dialog): nothing kept.
+  for (const now of [{ foreground: { name: ".claude-wrapped" }, status: { app: "claude-code" } }, { foreground: { name: ".claude-wrapped" }, status: null }]) {
+    const g = fixture(); g.get = { A: { address: "A", state: "live", ...now } };
+    await g.mod.confirmResume(k, line);
+    assert.equal(g.shared["panda-focus.closed"], undefined);
+  }
 });

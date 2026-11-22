@@ -83,6 +83,8 @@ const GLOW = 1200;
 const closable = (a) => Boolean(EXIT[a.app]) && !a.address.includes("/");
 // How often the resume labels are brought up to date (ms): a reboot loses at most this much of a session switch.
 const REMEMBER = 15000;
+// How long a typed resume line gets to bring its agent up before it counts as failed (ms).
+const RESUMING = 90000;
 // How long after the mod starts it looks for recovered shells more often (ms).
 const STARTUP = 60000;
 // A shell at its prompt, by the foreground process's name (a login shell's starts with "-").
@@ -448,9 +450,7 @@ export default class Focus extends View {
     // No pid yet (quit before a pass labelled it) or the same pid: quit by hand, not lost.
     if (!was || String(k.pid) === was) return;
     if (k.labels.settled) {
-      // The shell's program icon would be wrong here, so the row goes without one.
-      setShared(CLOSED, [{ key: `${k.address}-${Date.now()}`, title: k.labels["pi.session"] || k.labels.where || line.split(" ")[0],
-        space: k.labels["herdr.space"], cwd: k.cwd, program: null, argv: line.split(" "), at: Date.now() }, ...(shared(CLOSED) ?? [])]);
+      this.shelve(k, line);
       const p = panes().find((p) => p.terminal === k.address);
       if (p) await this.closePane(p.pane);
       else await hc(["kill", k.address]).catch(() => null);
@@ -460,6 +460,27 @@ export default class Focus extends View {
     // (direnv included). A shell that drops early input would need a prompt check (`hc read --lines 3`) first.
     const r = await hc(["send", k.address, line]).catch((e) => ({ code: 1, stderr: String(e) }));
     if (r.code !== 0) notify({ title: "Couldn't resume the agent", body: `${k.address}: ${line}\n${r.stderr.trim()}`, level: "error" });
+    // Not awaited: one slow start mustn't hold up the pass for the other recovered terminals.
+    else this.confirmResume(k, line);
+  }
+
+  // The labels are gone once the line is typed, so an agent that refuses it (Claude Code won't resume a Code Mode
+  // session through ANTHROPIC_BASE_URL or an apiKeyHelper) would leave the thread only in scrollback. After
+  // RESUMING, no agent status and the shell back at its prompt means it didn't come up: the line becomes a closed
+  // row, said in a toast. A program still in front (a dialog, a slow direnv) counts as up.
+  async confirmResume(k, line) {
+    await exec("sleep", [String(RESUMING / 1000)]).catch(() => null);
+    const now = await this.inspect(k.address);
+    if (!now || now.state !== "live" || EXIT[now.status?.app] || !SHELL.test(now.foreground?.name ?? "")) return;
+    this.shelve(k, line);
+    notify({ title: "Couldn't resume the agent", body: `${k.labels.where ?? k.address}: \`${line}\` didn't start it; it's kept under Settled. See the pane for why.`, level: "error" });
+  }
+
+  // A recovered terminal's resume line as a closed row. The shell's program icon would be wrong here, so the row
+  // goes without one.
+  shelve(k, line) {
+    setShared(CLOSED, [{ key: `${k.address}-${Date.now()}`, title: k.labels["pi.session"] || k.labels.where || line.split(" ")[0],
+      space: k.labels["herdr.space"], cwd: k.cwd, program: null, argv: line.split(" "), at: Date.now() }, ...(shared(CLOSED) ?? [])]);
   }
 
   // Ends a drag or sweep, and hands the keyboard back to the pane that had it, unless the drop moved on to
