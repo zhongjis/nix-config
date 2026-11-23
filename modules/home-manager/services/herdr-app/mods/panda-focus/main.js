@@ -479,7 +479,7 @@ export default class Focus extends View {
   // A recovered terminal's resume line as a closed row. The shell's program icon would be wrong here, so the row
   // goes without one.
   shelve(k, line) {
-    setShared(CLOSED, [{ key: `${k.address}-${Date.now()}`, title: k.labels["pi.session"] || k.labels.where || line.split(" ")[0],
+    setShared(CLOSED, [{ key: `${k.address}-${Date.now()}`, title: panes().find((p) => p.terminal === k.address)?.name || k.labels.where || line.split(" ")[0],
       space: k.labels["herdr.space"], cwd: k.cwd, program: null, argv: line.split(" "), at: Date.now() }, ...(shared(CLOSED) ?? [])]);
   }
 
