@@ -35,5 +35,6 @@ When subagents are used:
 ## 3. Stop and Decide
 
 - Stop researching once the answer or the files to change can be named, or sources start repeating. Sufficient beats complete.
-- Treat findings as evidence, not conclusions: read the cited lines behind claims the answer rests on and resolve conflicts between agents.
+- Before answering, back every claim the answer rests on with a line you read or a command you ran in this session. A subagent's `file:line` is a lead to read, not a verified fact. Resolve conflicts between agents.
+- Recommend against the user's stated goal. Give each adjacent gap the research turned up one line under "Also found", outside the proposal.
 - Summarize what the agents found; the user cannot see their output.
