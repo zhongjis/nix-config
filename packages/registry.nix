@@ -15,6 +15,7 @@
 #                         `{pkgs, lib}`; resolved in packages.nix via argSources.
 #   linuxOnly  (optional) when true, only assembled on Linux systems. Use for
 #                         files that `throw` at import on unsupported platforms.
+#   platforms  (optional) list of system strings to publish this package on.
 #   updatable  (optional) when true, the update workflow tracks this package
 #                         (the package must declare `passthru.updateScript`).
 #   selfUpdateScript (optional) when true, `passthru.updateScript` is a fully
@@ -48,7 +49,7 @@
   };
   fincept-terminal = {
     path = ./fincept-terminal.nix;
-    linuxOnly = true;
+    platforms = ["x86_64-linux"];
     updatable = true;
   };
   lark = {

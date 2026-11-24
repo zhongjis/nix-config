@@ -17,7 +17,9 @@
         bun2nix = inputs.bun2nix.packages.${system}.default;
         agentBrowser = inputs.llm-agents.packages.${system}.agent-browser;
       };
-      isAvailable = spec: !(spec.linuxOnly or false) || pkgs.stdenv.hostPlatform.isLinux;
+      isAvailable = spec:
+        (!(spec.linuxOnly or false) || pkgs.stdenv.hostPlatform.isLinux)
+        && builtins.elem system (spec.platforms or [system]);
       importCustomPackage = _name: spec:
         import spec.path ({
             inherit pkgs;
