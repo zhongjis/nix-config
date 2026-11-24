@@ -11,18 +11,26 @@ let
     lib.listToAttrs (
       map
         (path: {
-          name = lib.removeSuffix ".nix" (builtins.baseNameOf path);
+          name =
+            if builtins.baseNameOf path == "default.nix"
+            then builtins.baseNameOf (builtins.dirOf path)
+            else lib.removeSuffix ".nix" (builtins.baseNameOf path);
           value = path;
         })
         files
     );
+  nixosFeatures = discoverModules ../modules/nixos/features;
 in
 {
   flake = {
     # NixOS modules - auto-discovered
     nixosModules =
       { default = ../modules/nixos; }
-      // discoverModules ../modules/nixos/features
+      // builtins.removeAttrs nixosFeatures ["hyprland" "kde"]
+      // {
+        hyprland-feature = nixosFeatures.hyprland;
+        kde-feature = nixosFeatures.kde;
+      }
       // discoverModules ../modules/nixos/bundles
       // discoverModules ../modules/nixos/services;
 
