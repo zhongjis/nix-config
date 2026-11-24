@@ -14,13 +14,14 @@ in {
     ../../../../custom-home-manager-options/caveman
     ../../../../custom-home-manager-options/codex
     ../../../../custom-home-manager-options/icm
+    ../../../../custom-home-manager-options/oh-my-pi
     ../../../../custom-home-manager-options/rtk
     ./common
     ./codex
-    ./opencode
+    # ./opencode
     ./claude-code
-    ./factory
-    ./omp
+    # ./factory
+    # ./omp
     ./pi
   ];
 
@@ -57,6 +58,8 @@ in {
         # llmAgentsPackages.agentsview
         llmAgentsPackages.skills
         llmAgentsPackages.agent-browser
+        llmAgentsPackages.antigravity-cli
+        llmAgentsPackages.open-code-review
         inputs.self.packages.${system}.before-and-after
 
         # for before-and-after skill
@@ -64,8 +67,8 @@ in {
         pkgs.ffmpeg
       ]
       ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
-        llmAgentsPackages.t3code-desktop
-        llmAgentsPackages.chatgpt
+        # llmAgentsPackages.t3code-desktop
+        # llmAgentsPackages.chatgpt
       ];
   };
 }
