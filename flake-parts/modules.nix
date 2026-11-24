@@ -1,6 +1,7 @@
 { inputs, lib, ... }:
 let
   tree = inputs.import-tree.withLib lib;
+  customHomeManagerModules = import ../custom-home-manager-options;
 
   # Helper to discover and convert to attrset
   discoverModules = dir:
@@ -32,8 +33,9 @@ in
       // discoverModules ../modules/darwin/bundles;
 
     # Home Manager modules
+    modules.homeManager = customHomeManagerModules;
     homeManagerModules = {
       default = ../modules/home-manager;
-    } // import ../custom-home-manager-options;
+    } // customHomeManagerModules;
   };
 }

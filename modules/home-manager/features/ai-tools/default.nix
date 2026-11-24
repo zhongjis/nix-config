@@ -8,14 +8,15 @@
   inherit (pkgs.stdenv.hostPlatform) system;
   cfg = config.myHomeManager.aiProfile;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
+  customModules = import ../../../../custom-home-manager-options;
 in {
   imports = [
-    ../../../../custom-home-manager-options/beads
-    ../../../../custom-home-manager-options/caveman
-    ../../../../custom-home-manager-options/codex
-    ../../../../custom-home-manager-options/icm
-    ../../../../custom-home-manager-options/oh-my-pi
-    ../../../../custom-home-manager-options/rtk
+    customModules.beads
+    customModules.caveman
+    customModules.codex
+    customModules.icm
+    customModules.oh-my-pi
+    customModules.rtk
     ./common
     ./codex
     # ./opencode

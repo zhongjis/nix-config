@@ -111,6 +111,7 @@
       ];
 
       imports = [
+        flake-parts.flakeModules.modules
         ./flake-parts/packages.nix
         ./flake-parts/systems.nix
         ./flake-parts/overlays.nix
