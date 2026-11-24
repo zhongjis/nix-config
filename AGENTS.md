@@ -31,8 +31,8 @@ Run from the repo root:
 - `nix flake check`
 - `nix build .#neovim`
 - `nix build .#helium`
-- `nix develop .#nodejs26`
-- `nix develop .#java8`
+- `nix develop ./templates/nodejs26`
+- `nix develop ./templates/java8`
 - `nh search <query>`
 
 ## WHERE TO LOOK
