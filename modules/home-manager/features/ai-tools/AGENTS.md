@@ -1,6 +1,6 @@
 # AI TOOLS MODULE
 
-Profile-based, tool-agnostic configuration for Codex, OpenCode, Claude Code, Pi-family tools, and Factory.ai. Manages skills, plugins, agents, instructions, MCP servers, and permissions.
+Profile-based, tool-agnostic configuration for Antigravity CLI (agy), Codex, OpenCode, Claude Code, Pi-family tools, and Factory.ai. Manages skills, plugins, agents, instructions, MCP servers, and permissions.
 
 ## PROFILE SYSTEM
 
@@ -26,6 +26,15 @@ Run from the repo root:
 - For upstream/shared skill sync and update policy, follow the `skill-maintainer` workflow instead of inventing ad hoc local conventions here
 
 - [Personal beads configuration](common/beads.nix) owns Linear session credentials and inbound state mapping.
+
+## AGY
+
+- Configure agy through upstream `programs.antigravity-cli`. Rules go to `~/.gemini/GEMINI.md`, skills to `~/.gemini/antigravity-cli/skills/`, and MCP servers to `~/.gemini/config/mcp_config.json`.
+- Leave `programs.antigravity-cli.settings` unset; agy rewrites `~/.gemini/antigravity-cli/settings.json` on every start. Set `programs.antigravity-cli.managedSettings` instead ([module](../../../../custom-home-manager-options/antigravity-cli/default.nix)): activation merges it into the live file, managed keys win, permission lists are unioned. Never write `~/.gemini/settings.json`; it belongs to the legacy Gemini CLI.
+- Verify the merge: `nix build --no-link -f tests/antigravity-cli.nix`.
+- agy's terminal sandbox mounts only an FHS allowlist plus allowed read paths. On NixOS keep `read_file(/nix/store)` and `read_file(/run/current-system)` in `permissions.allow`, or every sandboxed command fails with `connecting to sandbox server: ... connection reset by peer`.
+- Use absolute paths in permission rules. A relative rule such as `read_file(.env)` makes every sandboxed command fail with `non-absolute file path`. The merge only adds rules, so delete a removed rule from the live file by hand.
+- `programs.antigravity-cli.icm.enable` (ICM module) appends ICM rules and skills. Codegraph rules and MCP are set in `agy/default.nix`.
 
 ## LSP OWNERSHIP
 
@@ -59,6 +68,7 @@ ai-tools/
 │   ├── mcp/                 # MCP server definitions
 │   ├── agents/              # Agent configuration
 │   └── lsp.nix              # Global LSP server source of truth exported as commonLsp
+├── agy/                     # Antigravity CLI via upstream programs.antigravity-cli
 ├── codex/                   # Codex CLI config (global config + shared skills)
 ├── opencode/                # OpenCode-specific
 │   ├── plugins/             # oh-my-opencode plugins

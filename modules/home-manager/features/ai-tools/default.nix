@@ -11,6 +11,7 @@
   customModules = import ../../../../custom-home-manager-options;
 in {
   imports = [
+    customModules.antigravity-cli
     customModules.beads
     customModules.caveman
     customModules.codex
@@ -18,6 +19,7 @@ in {
     customModules.oh-my-pi
     customModules.rtk
     ./common
+    ./agy
     ./codex
     # ./opencode
     ./claude-code
@@ -59,7 +61,6 @@ in {
         # llmAgentsPackages.agentsview
         llmAgentsPackages.skills
         llmAgentsPackages.agent-browser
-        llmAgentsPackages.antigravity-cli
         llmAgentsPackages.open-code-review
         inputs.self.packages.${system}.before-and-after
 
