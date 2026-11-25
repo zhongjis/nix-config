@@ -47,13 +47,12 @@ in {
       icm.enable = true;
       managedSettings = {
         "$schema" = "https://antigravity.google/schemas/v1/settings.json";
-        # Runs tools without prompts, with terminal commands inside the sandbox.
-        toolPermission = "proceed-in-sandbox";
-        enableTerminalSandbox = true;
-        # Reach sibling repos with `agy --add-dir <path>`.
-        allowNonWorkspaceAccess = false;
-        # The sandbox mounts only an FHS allowlist plus allowed read paths. NixOS
-        # keeps every program, /etc target and agy's own loader in the store.
+        # Runs tools without prompts or terminal sandboxing (YOLO mode, matching
+        # Claude Code's bypassPermissions); permissions.deny below still applies.
+        toolPermission = "always-proceed";
+        enableTerminalSandbox = false;
+        allowNonWorkspaceAccess = true;
+        # Kept so NixOS commands still work if the terminal sandbox is enabled ad hoc.
         permissions.allow = [
           "read_file(/nix/store)"
           "read_file(/run/current-system)"
