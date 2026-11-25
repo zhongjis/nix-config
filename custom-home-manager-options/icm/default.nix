@@ -24,8 +24,9 @@
   claudeEnabled = config.programs.claude-code.icm.enable;
   codexEnabled = config.programs.codex.icm.enable;
   piEnabled = config.programs.pi.icm.enable;
+  agyEnabled = config.programs.antigravity-cli.icm.enable;
   opencodeEnabled = config.programs.opencode.icm.enable;
-  anyIntegrationEnabled = claudeEnabled || codexEnabled || piEnabled || opencodeEnabled;
+  anyIntegrationEnabled = claudeEnabled || codexEnabled || piEnabled || agyEnabled || opencodeEnabled;
   anyEnabled = anyIntegrationEnabled || cfg.daemon.enable;
 
   # Stable profile path, not a /nix/store path, so hooks survive package bumps.
@@ -225,6 +226,7 @@ in {
   options.programs.claude-code.icm.enable = lib.mkEnableOption "icm hooks for Claude Code";
   options.programs.codex.icm.enable = lib.mkEnableOption "icm hooks for Codex";
   options.programs.pi.icm.enable = lib.mkEnableOption "icm context and skills for Pi";
+  options.programs.antigravity-cli.icm.enable = lib.mkEnableOption "icm context and skills for Antigravity CLI";
   options.programs.opencode.icm.enable = lib.mkEnableOption "icm plugin for OpenCode";
 
   config = lib.mkMerge [
@@ -303,7 +305,11 @@ in {
       programs.pi.context = lib.mkAfter piContext;
       programs.pi.skills = piSkills;
     })
-    (lib.mkIf (piEnabled && piMcp) {
+    (lib.mkIf agyEnabled {
+      programs.antigravity-cli.context.GEMINI = lib.mkAfter piContext;
+      programs.antigravity-cli.skills = piSkills;
+    })
+    (lib.mkIf ((piEnabled || agyEnabled) && piMcp) {
       home.packages = [icmMcp];
     })
     (lib.mkIf opencodeEnabled {
