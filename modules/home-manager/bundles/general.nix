@@ -48,5 +48,7 @@
 
   home.sessionVariables = {
     NH_FLAKE = "${config.home.homeDirectory}/personal/nix-config";
+    # Standalone Home Manager has no backup option; activation reads this.
+    HOME_MANAGER_BACKUP_EXT = "hm-backup";
   };
 }
