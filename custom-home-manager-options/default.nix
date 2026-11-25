@@ -1,4 +1,5 @@
 {
+  antigravity-cli = ./antigravity-cli;
   beads = ./beads;
   caveman = ./caveman;
   codex = ./codex;
