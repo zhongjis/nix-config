@@ -1,10 +1,12 @@
 {
+  config,
   lib,
   pkgs,
   inputs,
   aiProfileHelpers,
   ...
 }: let
+  aiCfg = config.myHomeManager.ai-tools;
   # Import plugin library
   pluginLib = import ./lib.nix {inherit lib;};
 
@@ -50,7 +52,7 @@ in {
 
   _module.args.hasPlugin = hasPlugin;
 
-  programs.opencode.settings = {
+  programs.opencode.settings = lib.mkIf (aiCfg.enable && aiCfg.opencode.enable) {
     plugin = plugins;
   };
 }

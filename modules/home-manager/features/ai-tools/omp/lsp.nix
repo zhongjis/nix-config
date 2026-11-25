@@ -1,8 +1,10 @@
 {
+  config,
   lib,
   pkgs,
   ...
 }: let
+  aiCfg = config.myHomeManager.ai-tools;
   mkServer = {
     command,
     extensions,
@@ -188,5 +190,7 @@
     };
   };
 in {
-  programs."oh-my-pi".lsp = lspConfig;
+  config = lib.mkIf (aiCfg.enable && aiCfg.omp.enable) {
+    programs."oh-my-pi".lsp = lspConfig;
+  };
 }

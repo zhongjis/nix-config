@@ -6,6 +6,7 @@
   ...
 }: let
   jsonFormat = pkgs.formats.json {};
+  aiCfg = config.myHomeManager.ai-tools;
   cfg = config.programs.opencode.ohMyOpenCode;
 
   sharedConfig = {
@@ -73,7 +74,7 @@ in {
     };
   };
 
-  config = lib.mkIf (hasPlugin "oh-my-opencode") {
+  config = lib.mkIf (aiCfg.enable && aiCfg.opencode.enable && hasPlugin "oh-my-opencode") {
     programs.opencode.ohMyOpenCode.settings = sharedConfig;
 
     # Force replacement of OMO's mutable migration output with a Nix store symlink.

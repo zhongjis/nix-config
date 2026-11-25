@@ -9,34 +9,34 @@
 #
 # NOTE: Profile changes require `nh darwin switch .` to take effect.
 {
+  config,
   inputs,
   lib,
   aiProfileHelpers,
   commonInstructions,
   ...
 }: let
+  aiCfg = config.myHomeManager.ai-tools;
   catalogSkills = inputs.agent-skills.lib.skillsFor {
     profile = aiProfileHelpers.profile;
     harness = "factory";
   };
 in {
-  imports = [
-    ../common/instructions
-  ];
-
-  # Create symlinks to all skills in ~/.factory/skills/
-  # Each skill directory is symlinked to its nix store path
-  home.file =
-    lib.mapAttrs' (name: path: {
-      name = ".factory/skills/${name}";
-      value = {source = path;};
-    })
-    catalogSkills
-    // {
-      # Assemble AGENTS.md from all common instructions
-      # Each instruction file is concatenated with double newlines as separator
-      ".factory/AGENTS.md".text = builtins.concatStringsSep "\n\n" (
-        map builtins.readFile commonInstructions
-      );
-    };
+  config = lib.mkIf (aiCfg.enable && aiCfg.factory.enable) {
+    # Create symlinks to all skills in ~/.factory/skills/
+    # Each skill directory is symlinked to its nix store path
+    home.file =
+      lib.mapAttrs' (name: path: {
+        name = ".factory/skills/${name}";
+        value = {source = path;};
+      })
+      catalogSkills
+      // {
+        # Assemble AGENTS.md from all common instructions
+        # Each instruction file is concatenated with double newlines as separator
+        ".factory/AGENTS.md".text = builtins.concatStringsSep "\n\n" (
+          map builtins.readFile commonInstructions
+        );
+      };
+  };
 }

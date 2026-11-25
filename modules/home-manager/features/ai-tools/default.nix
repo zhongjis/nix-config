@@ -6,7 +6,7 @@
   ...
 }: let
   inherit (pkgs.stdenv.hostPlatform) system;
-  cfg = config.myHomeManager.aiProfile;
+  profile = config.myHomeManager.aiProfile;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
   customModules = import ../../../../custom-home-manager-options;
 in {
@@ -17,36 +17,38 @@ in {
     customModules.codex
     customModules.icm
     customModules.oh-my-pi
+    customModules.pi
     customModules.rtk
+    ./profile-option.nix
     ./common
     ./agy
-    ./codex
-    # ./opencode
     ./claude-code
-    # ./factory
-    # ./omp
+    ./codex
+    ./copilot
+    ./factory
+    ./omp
+    ./opencode
     ./pi
   ];
 
-  options.myHomeManager.aiProfile = lib.mkOption {
-    type = lib.types.enum ["work" "personal"];
-    description = "AI tools profile: 'work' for work-specific configuration, 'personal' for personal use";
-    example = "work";
+  options.myHomeManager.ai-tools = {
+    agy.enable = lib.mkEnableOption "Antigravity CLI (agy) configuration";
+    claude-code.enable = lib.mkEnableOption "Claude Code configuration";
+    codex.enable = lib.mkEnableOption "Codex configuration";
+    copilot.enable = lib.mkEnableOption "GitHub Copilot CLI configuration";
+    factory.enable = lib.mkEnableOption "Factory.ai configuration";
+    omp.enable = lib.mkEnableOption "Oh My Pi configuration";
+    opencode.enable = lib.mkEnableOption "OpenCode configuration";
+    pi.enable = lib.mkEnableOption "Pi configuration";
   };
 
   config = {
-    assertions = [
-      {
-        assertion = !config.myHomeManager.ai-tools.enable || cfg != null;
-        message = "myHomeManager.aiProfile must be set when myHomeManager.ai-tools is enabled";
-      }
-    ];
-
-    # Export helpers via config attribute
-    _module.args.aiProfileHelpers = {
-      profile = cfg;
-      isWork = cfg == "work";
-      isPersonal = cfg == "personal";
+    myHomeManager.ai-tools = {
+      agy.enable = lib.mkDefault (profile == "personal");
+      claude-code.enable = lib.mkDefault (profile == "personal");
+      codex.enable = lib.mkDefault (profile == "personal");
+      copilot.enable = lib.mkDefault (profile == "work");
+      pi.enable = lib.mkDefault true;
     };
 
     programs.beads = {

@@ -2,6 +2,15 @@
 
 Profile-based, tool-agnostic configuration for Antigravity CLI (agy), Codex, OpenCode, Claude Code, Pi-family tools, and Factory.ai. Manages skills, plugins, agents, instructions, MCP servers, and permissions.
 
+## GRANULAR TOOL OPTIONS
+
+`myHomeManager.ai-tools.enable` gates shared infrastructure (`common/`, `beads`, shared CLI packages) and is the master switch for every tool under `myHomeManager.ai-tools.<tool>.enable`. Profile defaults use `lib.mkDefault` so any host can override them:
+- **`work` defaults:** `pi`, `copilot`
+- **`personal` defaults:** `agy`, `claude-code`, `codex`, `pi`
+- **Opt-in (default `false` on all profiles):** `factory`, `omp`, `opencode`
+
+Verify toggle isolation without activation: `nix eval --impure --raw --expr '(import ./tests/ai-tools.nix).drvPath'`.
+
 ## PROFILE SYSTEM
 
 `myHomeManager.aiProfile` (enum: `"work"` | `"personal"`) → `aiProfileHelpers` exposed via `_module.args`:
@@ -21,7 +30,7 @@ Run from the repo root:
 ## BOOTSTRAP AND MAINTENANCE
 
 - Set `myHomeManager.aiProfile` in `hosts/{name}/home.nix` before enabling ai-tools; profile helpers and profile-filtered content depend on it
-- The Codex module puts Node.js 24 on `PATH`; installed OMO hooks and MCP runtimes invoke `node` directly.
+- `common/default.nix` puts Python 3.12 and Node.js 24 on `PATH` for shared skills, hooks, and MCP runtimes.
 - Skills come from the `agent-skills` flake input through `lib.skillsFor`; maintain them in the sibling `agent-skills` repository. `common/instructions/*` files remain locally auto-discovered. Tool-specific instructions, MCP servers, and shared agents stay defined in their respective `default.nix` files
 - For upstream/shared skill sync and update policy, follow the `skill-maintainer` workflow instead of inventing ad hoc local conventions here
 
@@ -70,6 +79,7 @@ ai-tools/
 │   └── lsp.nix              # Global LSP server source of truth exported as commonLsp
 ├── agy/                     # Antigravity CLI via upstream programs.antigravity-cli
 ├── codex/                   # Codex CLI config (global config + shared skills)
+├── copilot/                 # GitHub Copilot CLI via upstream programs.github-copilot-cli
 ├── opencode/                # OpenCode-specific
 │   ├── plugins/             # oh-my-opencode plugins
 │   ├── agents/              # Agent definitions

@@ -3,68 +3,72 @@
   lib,
   aiProfileHelpers,
   ...
-}: {
-  programs.pi.settings = lib.mkMerge [
-    {
-      # UI & Display
-      # The Stylix base16 theme comes from ./stylix-theme.nix.
-      theme =
-        if config.stylix.enable
-        then "stylix"
-        else "system";
-      collapseChangelog = true;
-      enableInstallTelemetry = false;
-      treeFilterMode = "no-tools";
-      editorPaddingX = 0;
-      quietStartup = true;
-      doubleEscapeAction = "tree";
-      defaultProjectTrust = "always";
-      tuiMode = "fullscreen";
-      fullscreenExitOutput = "resume-hint";
+}: let
+  aiCfg = config.myHomeManager.ai-tools;
+in {
+  config = lib.mkIf (aiCfg.enable && aiCfg.pi.enable) {
+    programs.pi.settings = lib.mkMerge [
+      {
+        # UI & Display
+        # The Stylix base16 theme comes from ./stylix-theme.nix.
+        theme =
+          if config.stylix.enable
+          then "stylix"
+          else "system";
+        collapseChangelog = true;
+        enableInstallTelemetry = false;
+        treeFilterMode = "no-tools";
+        editorPaddingX = 0;
+        quietStartup = true;
+        doubleEscapeAction = "tree";
+        defaultProjectTrust = "always";
+        tuiMode = "fullscreen";
+        fullscreenExitOutput = "resume-hint";
 
-      # Warnings
-      warnings.anthropicExtraUsage = false;
+        # Warnings
+        warnings.anthropicExtraUsage = false;
 
-      # Compaction
-      compaction = {
-        enabled = true;
-        reserveTokens = 54400;
-        keepRecentTokens = 20000;
-      };
+        # Compaction
+        compaction = {
+          enabled = true;
+          reserveTokens = 54400;
+          keepRecentTokens = 20000;
+        };
 
-      # Branch Summary
-      branchSummary.skipPrompt = false;
+        # Branch Summary
+        branchSummary.skipPrompt = false;
 
-      # Retry
-      retry = {
-        enabled = true;
-        # 10, 20, 40, then 60s waits: ~370s window covers typical 2-6 min provider overloads.
-        maxRetries = 8;
-        baseDelayMs = 10000;
-        maxAgentDelayMs = 60000;
-        provider.maxRetryDelayMs = 60000;
-      };
+        # Retry
+        retry = {
+          enabled = true;
+          # 10, 20, 40, then 60s waits: ~370s window covers typical 2-6 min provider overloads.
+          maxRetries = 8;
+          baseDelayMs = 10000;
+          maxAgentDelayMs = 60000;
+          provider.maxRetryDelayMs = 60000;
+        };
 
-      # Message Delivery
-      steeringMode = "all";
-      followUpMode = "all";
-      transport = "auto";
-      httpIdleTimeoutMs = 30000;
-      websocketConnectTimeoutMs = 10000;
+        # Message Delivery
+        steeringMode = "all";
+        followUpMode = "all";
+        transport = "auto";
+        httpIdleTimeoutMs = 30000;
+        websocketConnectTimeoutMs = 10000;
 
-      # Tools
-      defaultTools = ["+codemode"];
+        # Tools
+        defaultTools = ["+codemode"];
 
-      npmCommand = ["bash" "${config.home.homeDirectory}/.pi/agent/scripts/pi-package-npm.sh"];
+        npmCommand = ["bash" "${config.home.homeDirectory}/.pi/agent/scripts/pi-package-npm.sh"];
 
-      permissionLevel = "high";
-    }
-    (lib.mkIf aiProfileHelpers.isWork {
-      defaultProvider = "anthropic";
-      defaultModel = "claude-opus-4-8";
-    })
-    # Personal profile:
-    # defaultProvider = "llama-swap";
-    # defaultModel = "qwen2.5-coder:14b";
-  ];
+        permissionLevel = "high";
+      }
+      (lib.mkIf aiProfileHelpers.isWork {
+        defaultProvider = "anthropic";
+        defaultModel = "claude-opus-4-8";
+      })
+      # Personal profile:
+      # defaultProvider = "llama-swap";
+      # defaultModel = "qwen2.5-coder:14b";
+    ];
+  };
 }

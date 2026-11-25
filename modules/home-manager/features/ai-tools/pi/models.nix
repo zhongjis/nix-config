@@ -5,6 +5,7 @@
   currentSystemName,
   ...
 }: let
+  aiCfg = config.myHomeManager.ai-tools;
   cliproxyapiEnabled =
     currentSystemName
     == "framework-16"
@@ -177,29 +178,31 @@
     }
   ];
 in {
-  programs.pi.models = {
-    providers =
-      {
-        llama-swap = {
-          baseUrl = "http://127.0.0.1:9292/v1";
-          api = "openai-completions";
-          apiKey = "llama-swap";
-          compat = {
-            supportsDeveloperRole = false;
-            supportsReasoningEffort = false;
+  config = lib.mkIf (aiCfg.enable && aiCfg.pi.enable) {
+    programs.pi.models = {
+      providers =
+        {
+          llama-swap = {
+            baseUrl = "http://127.0.0.1:9292/v1";
+            api = "openai-completions";
+            apiKey = "llama-swap";
+            compat = {
+              supportsDeveloperRole = false;
+              supportsReasoningEffort = false;
+            };
+            models = localLlamaModels;
           };
-          models = localLlamaModels;
+        }
+        // lib.optionalAttrs cliproxyapiEnabled {
+          cliproxyapi = {
+            baseUrl = "http://127.0.0.1:8317/backend-api/codex";
+            api = "openai-codex-responses";
+            # ponytail: public placeholder satisfies today's account parser; signature validation needs a client/account option, never silently substitute a real token.
+            apiKey = "eyJhbGciOiJub25lIn0.eyJodHRwczovL2FwaS5vcGVuYWkuY29tL2F1dGgiOnsiY2hhdGdwdF9hY2NvdW50X2lkIjoibG9jYWwtY2xpcHJveHlhcGkifX0.placeholder";
+            headers."X-Api-Key" = "!cat ${config.xdg.stateHome}/cliproxyapi/api-key";
+            models = cliproxyapiModels;
+          };
         };
-      }
-      // lib.optionalAttrs cliproxyapiEnabled {
-        cliproxyapi = {
-          baseUrl = "http://127.0.0.1:8317/backend-api/codex";
-          api = "openai-codex-responses";
-          # ponytail: public placeholder satisfies today's account parser; signature validation needs a client/account option, never silently substitute a real token.
-          apiKey = "eyJhbGciOiJub25lIn0.eyJodHRwczovL2FwaS5vcGVuYWkuY29tL2F1dGgiOnsiY2hhdGdwdF9hY2NvdW50X2lkIjoibG9jYWwtY2xpcHJveHlhcGkifX0.placeholder";
-          headers."X-Api-Key" = "!cat ${config.xdg.stateHome}/cliproxyapi/api-key";
-          models = cliproxyapiModels;
-        };
-      };
+    };
   };
 }

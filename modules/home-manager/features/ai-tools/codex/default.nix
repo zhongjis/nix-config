@@ -8,6 +8,7 @@
   ...
 }: let
   inherit (pkgs.stdenv.hostPlatform) system;
+  aiCfg = config.myHomeManager.ai-tools;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
   codexContext = builtins.concatStringsSep "\n\n" (map builtins.readFile commonInstructions);
   selectedSkills = inputs.agent-skills.lib.skillsFor {
@@ -92,23 +93,23 @@
       mcp_servers = codexMcpServers;
     };
 in {
-  home.packages = [pkgs.nodejs_24];
-
-  programs.codex = {
-    enable = true;
-    seedSettings = codexSeedSettings;
-    caveman = {
+  config = lib.mkIf (aiCfg.enable && aiCfg.codex.enable) {
+    programs.codex = {
       enable = true;
-      mode = "full";
+      seedSettings = codexSeedSettings;
+      caveman = {
+        enable = true;
+        mode = "full";
+      };
+      package = llmAgentsPackages.codex;
+      icm.enable = true;
+      rtk.enable = true;
+      context = codexContext;
+      rules = {};
+      # Codex mutates ~/.codex/config.toml for project trust and local state.
+      # Keep Home Manager from owning the live file; seed defaults via programs.codex.seedSettings.
+      settings = {};
+      skills = selectedSkills;
     };
-    package = llmAgentsPackages.codex;
-    icm.enable = true;
-    rtk.enable = true;
-    context = codexContext;
-    rules = {};
-    # Codex mutates ~/.codex/config.toml for project trust and local state.
-    # Keep Home Manager from owning the live file; seed defaults via programs.codex.seedSettings.
-    settings = {};
-    skills = selectedSkills;
   };
 }

@@ -9,10 +9,11 @@
   inputs,
   ...
 }: let
+  aiCfg = config.myHomeManager.ai-tools;
   sopsFile = inputs.self + "/secrets/ai-tokens.yaml";
   secretPath = config.sops.secrets.supermemory_api_key.path;
 in
-  lib.mkIf (hasPlugin "opencode-supermemory") {
+  lib.mkIf (aiCfg.enable && aiCfg.opencode.enable && hasPlugin "opencode-supermemory") {
     sops.secrets.supermemory_api_key = {
       inherit sopsFile;
     };

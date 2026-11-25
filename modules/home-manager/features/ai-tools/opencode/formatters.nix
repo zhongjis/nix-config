@@ -2,49 +2,54 @@
 # Defines code formatters for different programming languages
 # from: https://github.com/khaneliman/khanelinix/blob/main/modules/home/programs/terminal/tools/opencode/formatters.nix
 {
+  config,
   lib,
   pkgs,
   ...
-}: {
-  programs.opencode.settings.formatter = {
-    alejandra = {
-      command = [
-        (lib.getExe pkgs.alejandra)
-        "$FILE"
-      ];
-      extensions = [".nix"];
-    };
+}: let
+  aiCfg = config.myHomeManager.ai-tools;
+in {
+  config = lib.mkIf (aiCfg.enable && aiCfg.opencode.enable) {
+    programs.opencode.settings.formatter = {
+      alejandra = {
+        command = [
+          (lib.getExe pkgs.alejandra)
+          "$FILE"
+        ];
+        extensions = [".nix"];
+      };
 
-    black = {
-      command = [
-        (lib.getExe pkgs.black)
-        "--line-length"
-        "85"
-        "$FILE"
-      ];
-      extensions = [".py"];
-    };
+      black = {
+        command = [
+          (lib.getExe pkgs.black)
+          "--line-length"
+          "85"
+          "$FILE"
+        ];
+        extensions = [".py"];
+      };
 
-    prettierd = {
-      command = [
-        (lib.getExe pkgs.prettierd)
-        "$FILE"
-      ];
-      extensions = [
-        ".js"
-        ".jsx"
-        ".ts"
-        ".tsx"
-        ".mjs"
-        ".cjs"
-        ".mts"
-        ".cts"
-        ".json"
-        ".yaml"
-        ".yml"
-        ".md"
-        ".css"
-      ];
+      prettierd = {
+        command = [
+          (lib.getExe pkgs.prettierd)
+          "$FILE"
+        ];
+        extensions = [
+          ".js"
+          ".jsx"
+          ".ts"
+          ".tsx"
+          ".mjs"
+          ".cjs"
+          ".mts"
+          ".cts"
+          ".json"
+          ".yaml"
+          ".yml"
+          ".md"
+          ".css"
+        ];
+      };
     };
   };
 }

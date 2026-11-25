@@ -1,4 +1,5 @@
 {
+  config,
   inputs,
   pkgs,
   lib,
@@ -7,6 +8,7 @@
   ...
 }: let
   inherit (pkgs.stdenv.hostPlatform) system;
+  aiCfg = config.myHomeManager.ai-tools;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
   selectedSkills = inputs.agent-skills.lib.skillsFor {
     profile = aiProfileHelpers.profile;
@@ -52,37 +54,37 @@
   );
 in {
   imports = [
-    ../common/instructions
-    ../../../../../custom-home-manager-options/oh-my-pi
     ./lsp.nix
   ];
 
-  programs."oh-my-pi" = {
-    enable = true;
-    package = llmAgentsPackages.omp;
+  config = lib.mkIf (aiCfg.enable && aiCfg.omp.enable) {
+    programs."oh-my-pi" = {
+      enable = true;
+      package = llmAgentsPackages.omp;
 
-    settings = ompConfig;
-    skills = selectedSkills;
-    instructions = commonInstructions;
+      settings = ompConfig;
+      skills = selectedSkills;
+      instructions = commonInstructions;
 
-    rtk.enable = true;
+      rtk.enable = true;
 
-    # models = {};
-    # extensions = {
-    #   # The upstream direnv extension imports shared helpers from ../_shared.
-    #   _shared = piAgentKitExtensions + "/_shared";
-    #   direnv = piAgentKitExtensions + "/direnv";
-    #   "ultrawork.ts" = ./extensions/ultrawork.ts;
-    #   "plan.ts" = ./extensions/plan.ts;
-    # };
-    # commands = {};
-    # rules = {
-    #   sisyphus-protocol = ./rules/sisyphus-protocol.md;
-    # };
-    # agents = {
-    #   prometheus = ./agents/prometheus.md;
-    #   metis = ./agents/metis.md;
-    #   momus = ./agents/momus.md;
-    # };
+      # models = {};
+      # extensions = {
+      #   # The upstream direnv extension imports shared helpers from ../_shared.
+      #   _shared = piAgentKitExtensions + "/_shared";
+      #   direnv = piAgentKitExtensions + "/direnv";
+      #   "ultrawork.ts" = ./extensions/ultrawork.ts;
+      #   "plan.ts" = ./extensions/plan.ts;
+      # };
+      # commands = {};
+      # rules = {
+      #   sisyphus-protocol = ./rules/sisyphus-protocol.md;
+      # };
+      # agents = {
+      #   prometheus = ./agents/prometheus.md;
+      #   metis = ./agents/metis.md;
+      #   momus = ./agents/momus.md;
+      # };
+    };
   };
 }

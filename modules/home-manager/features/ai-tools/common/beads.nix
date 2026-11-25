@@ -5,7 +5,7 @@
   pkgs,
   ...
 }: {
-  config = lib.mkIf aiProfileHelpers.isPersonal {
+  config = lib.mkIf (config.programs.beads.enable && aiProfileHelpers.isPersonal) {
     home.sessionVariables.LINEAR_TEAM_ID = "bfeea957-f57b-4c82-afd7-1b3eca55fd0e";
     home.sessionVariablesExtra = ''
       export LINEAR_API_KEY="$( ${pkgs.coreutils}/bin/cat ${lib.escapeShellArg config.sops.secrets.linear_api_key.path} )"

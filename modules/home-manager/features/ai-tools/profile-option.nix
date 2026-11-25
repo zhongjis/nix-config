@@ -6,7 +6,8 @@
   cfg = config.myHomeManager.aiProfile;
 in {
   options.myHomeManager.aiProfile = lib.mkOption {
-    type = lib.types.enum ["work" "personal"];
+    type = lib.types.nullOr (lib.types.enum ["work" "personal"]);
+    default = null;
     description = "AI tools profile: 'work' for work-specific configuration, 'personal' for personal use";
     example = "work";
   };
@@ -18,12 +19,12 @@ in {
         message = "myHomeManager.aiProfile must be set when myHomeManager.ai-tools is enabled";
       }
     ];
-  };
 
-  # Export helpers for use in other modules
-  _module.args.aiProfileHelpers = {
-    profile = cfg;
-    isWork = cfg == "work";
-    isPersonal = cfg == "personal";
+    # Export helpers for use in other modules
+    _module.args.aiProfileHelpers = {
+      profile = cfg;
+      isWork = cfg == "work";
+      isPersonal = cfg == "personal";
+    };
   };
 }

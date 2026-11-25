@@ -1,9 +1,11 @@
 {
+  config,
   lib,
   pkgs,
   aiProfileHelpers,
   ...
 }: let
+  aiCfg = config.myHomeManager.ai-tools;
   # pi-web-access reads $XDG_CONFIG_HOME/pi/web-search.json first: Copilot-hosted
   # web_search on a GPT model, Exa when Copilot search is unavailable.
   # ponytail: fixed Copilot Business endpoint; another Copilot plan needs its host here.
@@ -18,37 +20,39 @@
     };
   };
 in {
-  programs.pi.settings.packages = lib.mkMerge [
-    # All packages should use git sources (git:github.com/...), not npm.
-    [
-      "git:github.com/davebcn87/pi-autoresearch@v1.9.0"
-      "git:github.com/nicobailon/pi-web-access@v0.47.0"
-      "git:github.com/jlsalvador/pi-simple-background-tasks@v0.5.0"
-      "git:github.com/nicobailon/pi-intercom@v0.18.1"
-      "git:github.com/championswimmer/pi-context-usage@v2.1.0"
-      "git:github.com/championswimmer/pi-cache-graph@v1.0.2"
-      {
-        source = "git:github.com/backnotprop/plannotator@v0.28.51";
-        extensions = ["apps/pi-extension"];
-        skills = ["apps/pi-extension/skills"];
-      }
-    ]
-    (lib.mkIf aiProfileHelpers.isWork [
-      # "git:github.com/aliou/pi-guardrails@v0.15.0"
-    ])
-    (lib.mkIf aiProfileHelpers.isPersonal [
-      # "git:github.com/Rahularya01/pi-antigravity"
-    ])
-  ];
+  config = lib.mkIf (aiCfg.enable && aiCfg.pi.enable) {
+    programs.pi.settings.packages = lib.mkMerge [
+      # All packages should use git sources (git:github.com/...), not npm.
+      [
+        "git:github.com/davebcn87/pi-autoresearch@v1.9.0"
+        "git:github.com/nicobailon/pi-web-access@v0.47.0"
+        "git:github.com/jlsalvador/pi-simple-background-tasks@v0.5.0"
+        "git:github.com/nicobailon/pi-intercom@v0.18.1"
+        "git:github.com/championswimmer/pi-context-usage@v2.1.0"
+        "git:github.com/championswimmer/pi-cache-graph@v1.0.2"
+        {
+          source = "git:github.com/backnotprop/plannotator@v0.28.51";
+          extensions = ["apps/pi-extension"];
+          skills = ["apps/pi-extension/skills"];
+        }
+      ]
+      (lib.mkIf aiProfileHelpers.isWork [
+        # "git:github.com/aliou/pi-guardrails@v0.15.0"
+      ])
+      (lib.mkIf aiProfileHelpers.isPersonal [
+        # "git:github.com/Rahularya01/pi-antigravity"
+      ])
+    ];
 
-  home.file = {
-    ".pi/agent/intercom/config.json".text = builtins.toJSON {
-      brokerCommand = lib.getExe pkgs.bun;
-      brokerArgs = [];
+    home.file = {
+      ".pi/agent/intercom/config.json".text = builtins.toJSON {
+        brokerCommand = lib.getExe pkgs.bun;
+        brokerArgs = [];
+      };
     };
-  };
 
-  xdg.configFile = lib.optionalAttrs aiProfileHelpers.isWork {
-    "pi/web-search.json".text = builtins.toJSON piWorkWebSearch;
+    xdg.configFile = lib.optionalAttrs aiProfileHelpers.isWork {
+      "pi/web-search.json".text = builtins.toJSON piWorkWebSearch;
+    };
   };
 }

@@ -9,6 +9,7 @@
   ...
 }: let
   inherit (pkgs.stdenv.hostPlatform) system;
+  aiCfg = config.myHomeManager.ai-tools;
   llmAgentsPackages = inputs.llm-agents.packages.${system};
   selectedSkills = inputs.agent-skills.lib.skillsFor {
     profile = aiProfileHelpers.profile;
@@ -65,81 +66,78 @@
     FileChanged = direnvHookEntry ".envrc";
   };
 in {
-  imports = [
-    ../common/mcp
-    ../common/agents
-  ];
+  config = lib.mkIf (aiCfg.enable && aiCfg.claude-code.enable) {
+    home.sessionVariables =
+      {
+        # ICM is the memory store; disable Claude Code's built-in auto memory.
+        CLAUDE_CODE_DISABLE_AUTO_MEMORY = "1";
+        # Keep long-running background watchers alive; Claude Code otherwise reaps
+        # idle background shells under critical memory pressure (undocumented knob).
+        CLAUDE_CODE_DISABLE_BG_SHELL_PRESSURE_REAP = "1";
+        # `fileCheckpointingEnabled = false`.
+        CLAUDE_CODE_DISABLE_FILE_CHECKPOINTING = "1";
+        # `env` block.
+        CLAUDE_CODE_FORCE_TERMINAL_IMAGES = "1";
+      }
+      # Experimental Code Mode (v2.1.323+); only honored from user settings or the shell.
+      # Claude Code refuses it behind a base URL or apiKeyHelper, and won't resume a Code Mode
+      # session through them, so it stays off where CLIProxyAPI is in front.
+      // lib.optionalAttrs (!cliproxyapiEnabled) {
+        CLAUDE_CODE_EXPERIMENTAL_CODE_MODE = "1";
+      };
 
-  home.sessionVariables =
-    {
-      # ICM is the memory store; disable Claude Code's built-in auto memory.
-      CLAUDE_CODE_DISABLE_AUTO_MEMORY = "1";
-      # Keep long-running background watchers alive; Claude Code otherwise reaps
-      # idle background shells under critical memory pressure (undocumented knob).
-      CLAUDE_CODE_DISABLE_BG_SHELL_PRESSURE_REAP = "1";
-      # `fileCheckpointingEnabled = false`.
-      CLAUDE_CODE_DISABLE_FILE_CHECKPOINTING = "1";
-      # `env` block.
-      CLAUDE_CODE_FORCE_TERMINAL_IMAGES = "1";
-    }
-    # Experimental Code Mode (v2.1.323+); only honored from user settings or the shell.
-    # Claude Code refuses it behind a base URL or apiKeyHelper, and won't resume a Code Mode
-    # session through them, so it stays off where CLIProxyAPI is in front.
-    // lib.optionalAttrs (!cliproxyapiEnabled) {
-      CLAUDE_CODE_EXPERIMENTAL_CODE_MODE = "1";
-    };
+    # Keep settings.json writable and preserve settings managed by Claude Code and plugins.
+    # Hide Claude Code's commit trailer and pull request footer (`attribution: false`).
+    home.activation.claudeCodePermissions = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      run ${pkgs.bash}/bin/bash -eu -c ${lib.escapeShellArg ''
+        settings=${lib.escapeShellArg "${config.programs.claude-code.configDir}/settings.json"}
+        mkdir -p "$(dirname "$settings")"
+        temporary=$(mktemp "$settings.XXXXXX")
+        trap 'rm -f "$temporary"' EXIT
+        if [[ -e "$settings" ]]; then
+          ${pkgs.jq}/bin/jq ${lib.escapeShellArg settingsFilter} "$settings" > "$temporary"
+        else
+          ${pkgs.jq}/bin/jq -n ${lib.escapeShellArg "{} | ${settingsFilter}"} > "$temporary"
+        fi
+        mv "$temporary" "$settings"
+      ''}
+    '';
 
-  # Keep settings.json writable and preserve settings managed by Claude Code and plugins.
-  # Hide Claude Code's commit trailer and pull request footer (`attribution: false`).
-  home.activation.claudeCodePermissions = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    run ${pkgs.bash}/bin/bash -eu -c ${lib.escapeShellArg ''
-      settings=${lib.escapeShellArg "${config.programs.claude-code.configDir}/settings.json"}
-      mkdir -p "$(dirname "$settings")"
-      temporary=$(mktemp "$settings.XXXXXX")
-      trap 'rm -f "$temporary"' EXIT
-      if [[ -e "$settings" ]]; then
-        ${pkgs.jq}/bin/jq ${lib.escapeShellArg settingsFilter} "$settings" > "$temporary"
-      else
-        ${pkgs.jq}/bin/jq -n ${lib.escapeShellArg "{} | ${settingsFilter}"} > "$temporary"
-      fi
-      mv "$temporary" "$settings"
-    ''}
-  '';
+    # Merge the direnv hooks into the writable settings.json, replacing earlier
+    # generations of this hook and leaving every other hook untouched.
+    home.activation.claudeCodeDirenvHooks = lib.hm.dag.entryAfter ["claudeCodePermissions"] ''
+      run ${pkgs.bash}/bin/bash -eu -c ${lib.escapeShellArg ''
+        settings=${lib.escapeShellArg "${config.programs.claude-code.configDir}/settings.json"}
+        temporary=$(mktemp "$settings.XXXXXX")
+        trap 'rm -f "$temporary"' EXIT
+        ${lib.getExe pkgs.jq} --argjson add ${lib.escapeShellArg (builtins.toJSON direnvHooks)} '
+          def isDirenv: any((.hooks // [])[]; (.command? // "") | type == "string" and endswith("-claude-direnv-hook"));
+          reduce ($add | to_entries[]) as $e (.;
+            .hooks[$e.key] = (((.hooks[$e.key] // []) | map(select(isDirenv | not))) + [$e.value]))
+        ' "$settings" > "$temporary"
+        if ! ${lib.getExe pkgs.jq} -e -n --slurpfile a "$settings" --slurpfile b "$temporary" '$a == $b' > /dev/null; then
+          cat "$temporary" > "$settings"
+        fi
+      ''}
+    '';
 
-  # Merge the direnv hooks into the writable settings.json, replacing earlier
-  # generations of this hook and leaving every other hook untouched.
-  home.activation.claudeCodeDirenvHooks = lib.hm.dag.entryAfter ["claudeCodePermissions"] ''
-    run ${pkgs.bash}/bin/bash -eu -c ${lib.escapeShellArg ''
-      settings=${lib.escapeShellArg "${config.programs.claude-code.configDir}/settings.json"}
-      temporary=$(mktemp "$settings.XXXXXX")
-      trap 'rm -f "$temporary"' EXIT
-      ${lib.getExe pkgs.jq} --argjson add ${lib.escapeShellArg (builtins.toJSON direnvHooks)} '
-        def isDirenv: any((.hooks // [])[]; (.command? // "") | type == "string" and endswith("-claude-direnv-hook"));
-        reduce ($add | to_entries[]) as $e (.;
-          .hooks[$e.key] = (((.hooks[$e.key] // []) | map(select(isDirenv | not))) + [$e.value]))
-      ' "$settings" > "$temporary"
-      if ! ${lib.getExe pkgs.jq} -e -n --slurpfile a "$settings" --slurpfile b "$temporary" '$a == $b' > /dev/null; then
-        cat "$temporary" > "$settings"
-      fi
-    ''}
-  '';
-
-  programs.claude-code = {
-    enable = true;
-    enableMcpIntegration = false;
-    package = llmAgentsPackages.claude-code;
-    icm.enable = true;
-    rtk.enable = true;
-    caveman = {
+    programs.claude-code = {
       enable = true;
-      mode = "full";
-    };
-    skills = selectedSkills;
-    # Research subagents adapted from humanlayer/humanlayer .claude/agents;
-    # implementer subagents adapted from Pi jintong/yunu
-    agentsDir = ./agents;
+      enableMcpIntegration = false;
+      package = llmAgentsPackages.claude-code;
+      icm.enable = true;
+      rtk.enable = true;
+      caveman = {
+        enable = true;
+        mode = "full";
+      };
+      skills = selectedSkills;
+      # Research subagents adapted from humanlayer/humanlayer .claude/agents;
+      # implementer subagents adapted from Pi jintong/yunu
+      agentsDir = ./agents;
 
-    # Use rules instead of settings.instructions so settings.json is not managed by HM
-    rules = instructionRules // {"20-intent-gate" = ./rules/20-intent-gate.md;};
+      # Use rules instead of settings.instructions so settings.json is not managed by HM
+      rules = instructionRules // {"20-intent-gate" = ./rules/20-intent-gate.md;};
+    };
   };
 }

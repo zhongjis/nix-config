@@ -64,26 +64,28 @@
     };
   };
 in {
-  sops.secrets.context7_api_key = {
-    inherit sopsFile;
-  };
-  sops.secrets.exa_api_key = {
-    inherit sopsFile;
-  };
-  sops.secrets.linear_api_key = lib.mkIf aiProfileHelpers.isPersonal {
-    inherit sopsFile;
-  };
+  config = lib.mkIf config.myHomeManager.ai-tools.enable {
+    sops.secrets.context7_api_key = {
+      inherit sopsFile;
+    };
+    sops.secrets.exa_api_key = {
+      inherit sopsFile;
+    };
+    sops.secrets.linear_api_key = lib.mkIf aiProfileHelpers.isPersonal {
+      inherit sopsFile;
+    };
 
-  #
-  #     if [[ -r "${secretPath_exa}" ]]; then
-  #       export EXA_API_KEY="$(<"${secretPath_exa}")"
-  #     fi
+    #
+    #     if [[ -r "${secretPath_exa}" ]]; then
+    #       export EXA_API_KEY="$(<"${secretPath_exa}")"
+    #     fi
 
-  programs.mcp = {
-    enable = true;
-    servers =
-      commonMcps
-      // lib.optionalAttrs aiProfileHelpers.isWork workMcps
-      // lib.optionalAttrs aiProfileHelpers.isPersonal personalMcps;
+    programs.mcp = {
+      enable = true;
+      servers =
+        commonMcps
+        // lib.optionalAttrs aiProfileHelpers.isWork workMcps
+        // lib.optionalAttrs aiProfileHelpers.isPersonal personalMcps;
+    };
   };
 }
