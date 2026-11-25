@@ -38,9 +38,11 @@
       # Retry
       retry = {
         enabled = true;
-        maxRetries = 5;
-        baseDelayMs = 2000;
-        maxDelayMs = 60000;
+        # 10, 20, 40, then 60s waits: ~370s window covers typical 2-6 min provider overloads.
+        maxRetries = 8;
+        baseDelayMs = 10000;
+        maxAgentDelayMs = 60000;
+        provider.maxRetryDelayMs = 60000;
       };
 
       # Message Delivery
