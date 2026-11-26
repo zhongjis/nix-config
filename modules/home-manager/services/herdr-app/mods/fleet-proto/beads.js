@@ -31,7 +31,7 @@ const toComment = (x) => { const o = obj(x); return { text: str(o.text), created
 
 /** The login shell's BEADS_DIR ("" when it sets none, or the shell can't say). */
 export async function beadsDir() {
-  const r = await exec("/bin/zsh", ["-lc", 'printf %s "$BEADS_DIR"'], { timeout: 10000 });
+  const r = await exec("zsh", ["-lc", 'printf %s "$BEADS_DIR"'], { timeout: 10000 });
   return r.code === 0 ? r.stdout.trim() : "";
 }
 
