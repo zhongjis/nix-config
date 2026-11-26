@@ -123,6 +123,7 @@ in {
         "cmd-e" = "mod.open:filetree";
         "cmd-shift-e" = "filetree.reveal";
         "cmd-o" = "filetree.recent";
+        ${if pkgs.stdenv.hostPlatform.isDarwin then "cmd-shift-p" else "ctrl-shift-p"} = "app.palette";
       };
       # Herdr seeds its default keymap only into a new keys.json; one created by
       # activation first has none, so keep the terminal clipboard keys here.
