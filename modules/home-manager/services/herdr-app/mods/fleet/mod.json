@@ -1,0 +1,10 @@
+{
+  "place": "none",
+  "title": "Agent Fleet",
+  "focusable": true,
+  "overlay": { "kind": "dialog", "width": 0.96, "height": 0.94 },
+  "palette": [
+    { "title": "Agent Fleet (work area)", "command": "layout.select", "args": { "stack": "work-switch", "child": "fleet" }, "words": "agents fleet tree workers sub-agents beads orchestrator herdr-fleet" },
+    { "title": "Agent Fleet (overlay)", "command": "mod.open", "args": { "name": "fleet" }, "words": "agents fleet tree workers sub-agents beads orchestrator" }
+  ]
+}

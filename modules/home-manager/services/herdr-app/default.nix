@@ -6,6 +6,10 @@
   ...
 }: let
   stylixEnabled = config.stylix.enable or false;
+  fleetKey =
+    if pkgs.stdenv.hostPlatform.isDarwin
+    then "cmd-shift-a"
+    else "ctrl-shift-a";
   # panda-focus's session hooks, passed per launch instead of installed into Claude Code, Pi, Codex and Copilot.
   # agy has no per-launch plugin flag: its hook is a plugin linked into agy's plugins folder below.
   integrations = "${config.xdg.configHome}/herdr-app/mods/panda-focus/integrations";
@@ -140,13 +144,30 @@ in {
         "cmd-shift-s" = "panda-focus.settle";
         "ctrl-shift-s" = "panda-focus.settle";
       };
+      # herdr-fleet: same settle keys; Cmd/Ctrl+Shift+A swaps the work area for the Agent Fleet (fleet mod) and back.
+      "layout:herdr-fleet" = {
+        "cmd-shift-s" = "panda-focus.settle";
+        "ctrl-shift-s" = "panda-focus.settle";
+        ${fleetKey} = {
+          command = "layout.select";
+          args = {
+            stack = "work-switch";
+            child = "fleet";
+          };
+        };
+      };
+      "mod:fleet".${fleetKey} = "fleet.toggle";
     };
     # Herdr's default `main` layout with the panda-focus agent cards in the sidebar.
     layouts.herdr-panda = lib.importJSON ./layouts/herdr-panda.json;
+    # herdr-panda with its work area in a stack: the tabs' panes and panel, or the Agent Fleet.
+    layouts.herdr-fleet = lib.importJSON ./layouts/herdr-fleet.json;
     # Mods linking files from mods/shared come from the whole mods folder, so the links resolve when copied.
     mods = {
       panda-focus = "${./mods}/panda-focus";
       panda-subagents = "${./mods}/panda-subagents";
+      # Agent Fleet: agents, their workers and their beads as a tree; herdr-fleet's work-area alternative.
+      fleet = ./mods/fleet;
       # Herdr's `spaces` mod with the repo/branch on its own line.
       panda-spaces = "${./mods}/panda-spaces";
       # panda-spaces' right-click menu on a worktree without a space.
