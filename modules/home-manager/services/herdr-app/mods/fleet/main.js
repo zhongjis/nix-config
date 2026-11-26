@@ -2,7 +2,7 @@
 // sub-agents, tools and tasks branch to the right (below it when narrow) on connector lines, and a click on a
 // card opens its detail beside the tree (in its place when narrow): bead events, the last screen lines,
 // Focus / Peek / Keep / Answer.
-// Two homes. Embedded (props {embedded: true}): herdr-fleet's work area is the stack `work-switch`, this block
+// Two homes. Embedded (props {embedded: true}): herdr-panda's work area is the stack `work-switch`, this block
 // one child and the tabs' panes (`work-body`) the other; layout.select shows it, and Esc, fleet.toggle, Back to
 // work, focusing an agent or another tab/space shows the work again. Elsewhere: an overlay, mod.open fleet (again,
 // or Esc, closes it).
@@ -40,7 +40,7 @@ const NARROW = 900;
 const LINE = 18;
 // Below this window width the summary moves under the title, so the header's two ends never collide.
 const COMPACT = 1000;
-// herdr-fleet's work area: the stack, this block's child id in it, and the tabs' panes.
+// herdr-panda's work area: the stack, this block's child id in it, and the tabs' panes.
 const STACK = "work-switch", SELF = "fleet", WORK = "work-body";
 // Connector geometry: the stub from a root to its spine, each child's arm, and where a line meets a card
 // (the middle of its icon tile: 11 px padding + 12).
@@ -124,7 +124,7 @@ export default class Fleet extends View {
   init(_props, cx) {
     /** @type {"fixture" | "live"} live beads unless fleet.fixture asks for the sample */
     this.mode = "live";
-    // A block in herdr-fleet's work area rather than an overlay.
+    // A block in herdr-panda's work area rather than an overlay.
     this.embedded = Boolean(props()?.embedded);
     // Whether the last render showed it, and the tab and space it showed over: a change there means the person
     // went to their work, so the work area comes back.
@@ -381,8 +381,10 @@ export default class Fleet extends View {
     // Wide: the tree and an inspector side by side, centered, the inspector waiting for a card when none is picked.
     // Else the detail docks at the right edge when picked, or (narrow) takes the tree's place with a way back.
     const size = sizesFor(this.width);
-    const depth = openRoot ? depthOf(openRoot) : 0;
-    const treeW = size.root + (depth ? STUB + ARM + size.child + (depth - 1) * (16 + ARM) : 0) + 48;
+    // The tree column fits the deepest tree in the fleet (one level of workers at least), not the open one, so
+    // picking an agent without workers doesn't shrink it and slide the inspector.
+    const depth = Math.max(1, ...roots.map((r) => depthOf(r.node)));
+    const treeW = size.root + STUB + ARM + size.child + (depth - 1) * (16 + ARM) + 48;
     // What's left beside the tree (less a gutter and the right margin) goes to the inspector, up to its width.
     const room = Math.min(size.detail, this.width - treeW - 32);
     const inspector = room >= 400;

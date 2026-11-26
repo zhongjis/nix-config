@@ -127,7 +127,11 @@ in {
         "cmd-e" = "mod.open:filetree";
         "cmd-shift-e" = "filetree.reveal";
         "cmd-o" = "filetree.recent";
-        ${if pkgs.stdenv.hostPlatform.isDarwin then "cmd-shift-p" else "ctrl-shift-p"} = "app.palette";
+        ${
+          if pkgs.stdenv.hostPlatform.isDarwin
+          then "cmd-shift-p"
+          else "ctrl-shift-p"
+        } = "app.palette";
       };
       # Herdr seeds its default keymap only into a new keys.json; one created by
       # activation first has none, so keep the terminal clipboard keys here.
@@ -139,13 +143,9 @@ in {
         "ctrl-b" = "mod.open:tmux-prefix";
       };
       "mod:tmux-prefix"."ctrl-b" = "tmux-prefix.send-prefix";
-      # Settle the focused agent in the herdr-panda sidebar (panda-focus mod).
+      # herdr-panda: Cmd/Ctrl+Shift+S settles the focused agent (panda-focus mod); Cmd/Ctrl+Shift+A swaps the work
+      # area for the Agent Fleet (fleet mod) and back.
       "layout:herdr-panda" = {
-        "cmd-shift-s" = "panda-focus.settle";
-        "ctrl-shift-s" = "panda-focus.settle";
-      };
-      # herdr-fleet: same settle keys; Cmd/Ctrl+Shift+A swaps the work area for the Agent Fleet (fleet mod) and back.
-      "layout:herdr-fleet" = {
         "cmd-shift-s" = "panda-focus.settle";
         "ctrl-shift-s" = "panda-focus.settle";
         ${fleetKey} = {
@@ -158,18 +158,15 @@ in {
       };
       "mod:fleet".${fleetKey} = "fleet.toggle";
     };
-    # Herdr's default `main` layout with the panda-focus agent cards in the sidebar.
+    # Herdr's default `main` layout with the panda-focus agent cards in the sidebar, its work area in a stack:
+    # the tabs' panes and panel, or the Agent Fleet.
     layouts.herdr-panda = lib.importJSON ./layouts/herdr-panda.json;
-    # herdr-panda with its work area in a stack: the tabs' panes and panel, or the Agent Fleet.
-    layouts.herdr-fleet = lib.importJSON ./layouts/herdr-fleet.json;
     # Mods linking files from mods/shared come from the whole mods folder, so the links resolve when copied.
     mods = {
       panda-focus = "${./mods}/panda-focus";
       panda-subagents = "${./mods}/panda-subagents";
-      # Agent Fleet: agents, their workers and their beads as a tree; herdr-fleet's work-area alternative.
+      # Agent Fleet: agents, their workers and their beads as a tree; herdr-panda's work-area alternative.
       fleet = ./mods/fleet;
-      # The Agent Fleet's overlay prototype (mod.open fleet-proto), kept beside the fleet mod it became.
-      fleet-proto = ./mods/fleet-proto;
       # Herdr's `spaces` mod with the repo/branch on its own line.
       panda-spaces = "${./mods}/panda-spaces";
       # panda-spaces' right-click menu on a worktree without a space.
