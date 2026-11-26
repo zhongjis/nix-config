@@ -168,6 +168,8 @@ in {
       panda-subagents = "${./mods}/panda-subagents";
       # Agent Fleet: agents, their workers and their beads as a tree; herdr-fleet's work-area alternative.
       fleet = ./mods/fleet;
+      # The Agent Fleet's overlay prototype (mod.open fleet-proto), kept beside the fleet mod it became.
+      fleet-proto = ./mods/fleet-proto;
       # Herdr's `spaces` mod with the repo/branch on its own line.
       panda-spaces = "${./mods}/panda-spaces";
       # panda-spaces' right-click menu on a worktree without a space.

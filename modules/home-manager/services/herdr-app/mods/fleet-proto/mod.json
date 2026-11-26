@@ -1,0 +1,8 @@
+{
+  "place": "none",
+  "title": "Agent Fleet",
+  "overlay": { "kind": "dialog", "width": 0.96, "height": 0.94 },
+  "palette": [
+    { "title": "Agent Fleet", "command": "mod.open", "args": { "name": "fleet-proto" }, "words": "agents fleet tree workers sub-agents beads orchestrator" }
+  ]
+}
