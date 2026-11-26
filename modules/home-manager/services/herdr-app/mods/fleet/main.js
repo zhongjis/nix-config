@@ -2,17 +2,16 @@
 // sub-agents, tools and tasks branch to the right (below it when narrow) on connector lines, and a click on a
 // card opens its detail beside the tree (in its place when narrow): bead events, the last screen lines,
 // Focus / Peek / Keep / Answer.
-// Two homes. Embedded (props {embedded: true}): herdr-panda's work area is the stack `work-switch`, this block
-// one child and the tabs' panes (`work-body`) the other; layout.select shows it, and Esc, fleet.toggle, Back to
-// work, focusing an agent or another tab/space shows the work again. Elsewhere: an overlay, mod.open fleet (again,
-// or Esc, closes it).
+// herdr-panda's work area is the stack `work-switch`, this block one child and the tabs' panes (`work-body`) the
+// other; layout.select shows it, and Esc, fleet.toggle, Back to work, focusing an agent or another tab/space shows
+// the work again.
 // The arrows, Enter and Esc also arrive as fleet.<up|down|left|right|enter|escape> commands (keys.json, herdr-app
 // do); fleet.fixture / fleet.live switch between sample and live beads.
 // Herdr's live data (agents, terminals) redraws it by itself; only live beads poll, every 10 s while it shows.
 
 import { View, div, svg, image } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
-import { agents, terminals, spaces, theme, settings, props, run, hc, closeOverlay, setAgentOrder, checking, window, nextCommand, layout, focused } from "herdr";
+import { agents, terminals, spaces, theme, settings, run, hc, setAgentOrder, checking, window, nextCommand, layout, focused } from "herdr";
 import { buildFleet, descendants, STEPS, age } from "./model.js";
 import { fixtureEpics } from "./fixtures.js";
 import { beadsDir, loadLive } from "./beads.js";
@@ -124,8 +123,6 @@ export default class Fleet extends View {
   init(_props, cx) {
     /** @type {"fixture" | "live"} live beads unless fleet.fixture asks for the sample */
     this.mode = "live";
-    // A block in herdr-panda's work area rather than an overlay.
-    this.embedded = Boolean(props()?.embedded);
     // Whether the last render showed it, and the tab and space it showed over: a change there means the person
     // went to their work, so the work area comes back.
     this.wasShown = false;
@@ -156,13 +153,11 @@ export default class Fleet extends View {
     this.typing = false;
     this.sending = false;
     this.keys = cx.focus_handle();
-    if (!this.embedded) this.keys.focus();
     this.answer = InputState.new({ placeholder: "Answer this agent…" });
     this.answer.on("submit", (_e, cx) => this.send(cx));
     this.answer.on("focus", (_e, cx) => { this.typing = true; cx.notify(); });
     this.answer.on("blur", (_e, cx) => { this.typing = false; cx.notify(); });
     if (checking()) return;
-    if (!this.embedded) cx.timer.after(300, () => { if (!this.typing) this.keys.focus(); });
     if (this.isShown()) this.loadBeads(cx);
     // A hidden copy keeps running (the stack's other child, another tab): poll only while this one shows.
     cx.timer.every(POLL, (cx) => { if (this.mode === "live" && window()?.visible && this.isShown()) this.loadBeads(cx); });
@@ -177,9 +172,9 @@ export default class Fleet extends View {
     });
   }
 
-  /** An overlay shows while it exists; the embedded block while its stack has it selected. */
+  /** Whether its stack has it selected. */
   isShown() {
-    return !this.embedded || findNode(layout(), STACK)?.active === SELF;
+    return findNode(layout(), STACK)?.active === SELF;
   }
 
   /** Orchestrators' epics from bd, with the login shell's BEADS_DIR. On failure the cards keep what they had and
@@ -210,17 +205,16 @@ export default class Fleet extends View {
     cx.notify();
   }
 
-  // Back to the work: the stack shows the tabs' panes again, or the overlay closes. (Not View's close(cx) hook,
-  // which Herdr calls as a copy goes.)
+  // Back to the work: the stack shows the tabs' panes again. (Not View's close(cx) hook, which Herdr calls as a
+  // copy goes.)
   dismiss() {
-    if (!this.embedded) { closeOverlay(props()?.overlay); return; }
     this.wasShown = false;
     run("layout.select", { stack: STACK, child: WORK });
   }
 
-  /** fleet.toggle: back to the work when showing; an embedded copy that's hidden shows itself. */
+  /** fleet.toggle: back to the work when showing, else shows itself. */
   toggle() {
-    if (this.embedded && !this.isShown()) run("layout.select", { stack: STACK, child: SELF });
+    if (!this.isShown()) run("layout.select", { stack: STACK, child: SELF });
     else this.dismiss();
   }
 
@@ -245,19 +239,17 @@ export default class Fleet extends View {
     cx.notify();
   }
 
-  /** Goes to the terminal: embedded, the work area comes back first so the focused pane shows.
+  /** Goes to the terminal: the work area comes back first so the focused pane shows.
    * @param {Node} node */
   focus(node) {
-    if (this.embedded) this.dismiss();
+    this.dismiss();
     run(node.kind === "tool" ? "pane.focus" : "agent.focus", { terminal: node.address });
-    if (!this.embedded) this.dismiss();
   }
 
-  /** A peek opens over the work area; embedded, the fleet stays under it, an overlay closes (it would cover it).
+  /** A peek opens over the work area; the fleet stays under it.
    * @param {Node} node */
   peek(node) {
     run("terminal.peek", { terminal: node.address });
-    if (!this.embedded) this.dismiss();
   }
 
   /** @param {Node} node @param {Cx} cx */
@@ -366,15 +358,15 @@ export default class Fleet extends View {
     const shown = this.detail ? byId.get(this.detail) ?? null : null;
     this.detailNode = shown;
     this.nav = { roots: roots.map((r) => r.node.id), kids, byId, open };
-    // Showing anew, take the keyboard (embedded, the hidden work area's terminal had it) and refresh live beads.
-    // Embedded, another tab or space while showing means the person went to their work: show it.
+    // Showing anew, take the keyboard (the hidden work area's terminal had it) and refresh live beads.
+    // Another tab or space while showing means the person went to their work: show it.
     const visible = this.isShown() && !checking();
     const f = focused(), where = `${f?.space ?? ""}|${f?.tab ?? ""}`;
     if (visible && !this.wasShown) cx.timer.after(0, (cx) => {
       if (!this.typing) this.keys.focus();
-      if (this.embedded && this.mode === "live") this.loadBeads(cx);
+      if (this.mode === "live") this.loadBeads(cx);
     });
-    else if (visible && this.embedded && where !== this.where) cx.timer.after(0, () => this.dismiss());
+    else if (visible && where !== this.where) cx.timer.after(0, () => this.dismiss());
     this.wasShown = visible;
     this.where = where;
 
@@ -404,7 +396,7 @@ export default class Fleet extends View {
     return v_flex().id("fleet").track_focus(this.keys).on_key_down((e, cx) => this.onKey(e, cx))
       .on_size_change((sz, cx) => { if (Math.abs(sz.width - this.width) > 1) { this.width = sz.width; cx.notify(); } })
       .size_full().bg(t.canvas).text_color(t.foreground).text_size(MD)
-      .when(this.embedded, (el) => el.rounded(10).border_1().border_color(t.border).overflow_hidden())
+      .rounded(10).border_1().border_color(t.border).overflow_hidden()
       .child(this.header(t, fleet.summary, this.beadsWarning(roots), this.width < COMPACT))
       .child(h_flex().flex_1().min_h(0).items_start()
         .when(inspector, (el) => el.justify_center().gap(16).pr(16)
@@ -454,15 +446,11 @@ export default class Fleet extends View {
         .text_size(SM).text_color(t.blocked).tooltip(warning ?? "")
         .child(svg(`${ME}/alert.svg`).size(13).flex_none().text_color(t.blocked))
         .child(div().min_w(0).truncate().child(warning ?? ""))))
-      .when(this.embedded, (el) => el.child(h_flex().id("fleet-back").h(28).px(10).gap(6).flex_none().items_center().rounded(6)
+      .child(h_flex().id("fleet-back").h(28).px(10).gap(6).flex_none().items_center().rounded(6)
         .border_1().border_color(t.input).bg(t.raised).cursor_pointer().role("button").accessibility_label("Back to work")
         .tooltip("Back to the tabs' panes (Esc)").text_size(SM).font_medium().text_color(t.foreground)
         .hover((st) => st.bg(t.hover)).on_click(() => this.dismiss())
-        .child(svg("mods/workspace-chrome/chevron-left.svg").size(14).flex_none().text_color(t.muted)).child("Back to work")))
-      .when(!this.embedded, (el) => el.child(div().id("fleet-close").size(28).flex_none().flex().items_center().justify_center().rounded(6)
-        .cursor_pointer().role("button").accessibility_label("Close Agent Fleet").tooltip("Close (Esc)")
-        .text_color(t.muted).hover((st) => st.bg(t.hover).text_color(t.foreground))
-        .on_click(() => this.dismiss()).child(svg("mods/workspace-chrome/x.svg").size(15))));
+        .child(svg("mods/workspace-chrome/chevron-left.svg").size(14).flex_none().text_color(t.muted)).child("Back to work"));
     return v_flex().id("fleet-header").flex_none().px(20).border_b_1().border_color(t.border).bg(t.chrome)
       .child(top).when(compact, (el) => el.child(h_flex().h(28).pb(8).items_center().child(summary)));
   }
@@ -471,7 +459,7 @@ export default class Fleet extends View {
   footer(t) {
     return h_flex().id("fleet-footer").h(30).flex_none().px(20).gap(16).items_center().border_t_1().border_color(t.border)
       .bg(t.chrome).text_size(XS).text_color(t.muted)
-      .child(div().flex_none().child(`↑↓←→ move · Enter open · Esc ${this.embedded ? "back to work" : "close"}`))
+      .child(div().flex_none().child("↑↓←→ move · Enter open · Esc back to work"))
       .child(div().flex_1())
       .when(this.mode === "live" && Boolean(this.beadsDir), (el) => el.child(div().min_w(0).truncate()
         .child(`beads ${(this.beadsDir ?? "").replace(/^\/Users\/[^/]+|^\/home\/[^/]+/, "~")}`)));
