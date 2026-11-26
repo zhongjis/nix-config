@@ -6,7 +6,9 @@ in
   pkgs.runCommand "hyprland-graphics-regression" {
     nativeBuildInputs = [pkgs.python3];
   }
-  /* bash */
+  /*
+  bash
+  */
   ''
     python -c 'import ctypes; ctypes.CDLL("${config.hardware.graphics.package}/lib/gbm/dri_gbm.so")'
     echo 'PASS: system GBM backend loads with the host libc'

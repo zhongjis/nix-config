@@ -159,7 +159,6 @@ in {
       default = {};
       description = "YAML data written to ~/.omp/agent/lsp.yaml.";
     };
-
   };
 
   config = lib.mkMerge [

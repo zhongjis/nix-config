@@ -1,31 +1,32 @@
-{ inputs, lib, ... }:
-let
+{
+  inputs,
+  lib,
+  ...
+}: let
   tree = inputs.import-tree.withLib lib;
   customHomeManagerModules = import ../custom-home-manager-options;
 
   # Helper to discover and convert to attrset
-  discoverModules = dir:
-    let
-      files = (tree.addPath dir).files;
-    in
+  discoverModules = dir: let
+    files = (tree.addPath dir).files;
+  in
     lib.listToAttrs (
       map
-        (path: {
-          name =
-            if builtins.baseNameOf path == "default.nix"
-            then builtins.baseNameOf (builtins.dirOf path)
-            else lib.removeSuffix ".nix" (builtins.baseNameOf path);
-          value = path;
-        })
-        files
+      (path: {
+        name =
+          if builtins.baseNameOf path == "default.nix"
+          then builtins.baseNameOf (builtins.dirOf path)
+          else lib.removeSuffix ".nix" (builtins.baseNameOf path);
+        value = path;
+      })
+      files
     );
   nixosFeatures = discoverModules ../modules/nixos/features;
-in
-{
+in {
   flake = {
     # NixOS modules - auto-discovered
     nixosModules =
-      { default = ../modules/nixos; }
+      {default = ../modules/nixos;}
       // builtins.removeAttrs nixosFeatures ["hyprland" "kde"]
       // {
         hyprland-feature = nixosFeatures.hyprland;
@@ -36,14 +37,16 @@ in
 
     # Darwin modules - auto-discovered
     darwinModules =
-      { default = ../modules/darwin; }
+      {default = ../modules/darwin;}
       // discoverModules ../modules/darwin/features
       // discoverModules ../modules/darwin/bundles;
 
     # Home Manager modules
     modules.homeManager = customHomeManagerModules;
-    homeManagerModules = {
-      default = ../modules/home-manager;
-    } // customHomeManagerModules;
+    homeManagerModules =
+      {
+        default = ../modules/home-manager;
+      }
+      // customHomeManagerModules;
   };
 }

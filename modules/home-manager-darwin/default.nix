@@ -37,7 +37,9 @@
       then myLib.filesIn ./services
       else [];
   in
-    if serviceFiles == [] then [] else
+    if serviceFiles == []
+    then []
+    else
       myLib.extendModules
       (name: {
         extraOptions = {

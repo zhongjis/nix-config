@@ -1,13 +1,15 @@
-{ inputs, lib, ... }:
-let
-  overlays = import ../overlays { inherit inputs; };
+{
+  inputs,
+  lib,
+  ...
+}: let
+  overlays = import ../overlays {inherit inputs;};
   myLib = import ../lib/default.nix {
     inherit overlays;
     nixpkgs = inputs.nixpkgs;
     inherit inputs;
   };
-in
-{
+in {
   flake = with myLib; {
     nixosConfigurations = {
       framework-16 = mkSystem "framework-16" {

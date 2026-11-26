@@ -1,4 +1,3 @@
-{ inputs, ... }:
-{
-  flake.overlays = import ../overlays { inherit inputs; };
+{inputs, ...}: {
+  flake.overlays = import ../overlays {inherit inputs;};
 }
