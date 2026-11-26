@@ -173,8 +173,14 @@ export default class Fleet extends View {
     this.agentFor = null;
     // When this copy last moved the focus (agent.focus picks the agent's own space and tab): not a move to the work.
     this.movedAt = 0;
-    // The side frame's width, kept while the agent block takes it (this block is narrower then).
+    // The side frame's width, and the agent block's as last set (the layout file's until then).
     this.sideW = 0;
+    this.agentPx = 620;
+    // The whole row's width, this block's and the agent block's: measured only when a size change lands, so a
+    // frame where the agent block has come or gone but this block's size hasn't followed yet draws the same.
+    this.full = 1400;
+    /** @type {string | null} the detail kept in the side frame until the agent block takes it */
+    this.keepDetail = null;
     // Whether the last render had room for the side frame.
     this.split = true;
     /** @type {Set<number>} expanded events, by position */
@@ -267,9 +273,11 @@ export default class Fleet extends View {
   /** An agent's live terminal in the side frame, in place of a detail. agent.focus picks its space and tab too.
    * @param {Node} node @param {Cx} cx */
   showAgent(node, cx) {
+    this.keepDetail = this.detail;
     this.detail = null;
     this.agentFor = node.id;
     this.movedAt = Date.now();
+    this.agentPx = this.sideW;
     run("layout.resize", { id: AGENT, px: this.sideW });
     run("layout.show", { id: AGENT });
     run("agent.focus", { terminal: node.address });
@@ -458,13 +466,14 @@ export default class Fleet extends View {
     // Two frames side by side: the fleet (header, tree, footer) and a side frame for the picked card, the same
     // size whatever is picked. An agent's side frame is the layout's agent block, beside this block, which is
     // narrower by that much then; a worker's or a bead's is drawn here. Too narrow for both: the detail takes the
-    // tree's place, with a way back.
+    // tree's place, with a way back, and an agent's terminal isn't shown. Every width comes from the whole row
+    // (this.full), so switching between the two draws nothing in between.
+    const laidOut = this.agentShown();
     // Right after showAgent the layout may not say so yet: trust this copy for a second, then the layout (a hidden
     // block or an agent gone ends it).
     const fresh = now - this.movedAt < 1000;
-    const agentShown = this.agentFor !== null && byId.has(this.agentFor) && (fresh || this.agentShown());
-    if (!agentShown && this.agentFor !== null) this.agentFor = null;
-    const full = agentShown ? this.width + this.sideW + SPLIT : this.width;
+    if (this.agentFor !== null && !(byId.has(this.agentFor) && (fresh || laidOut))) this.agentFor = null;
+    const full = this.full;
     const size = sizesFor(full);
     // The tree column fits the deepest tree in the fleet (one level of workers at least), not the open one, so
     // picking an agent without workers doesn't shrink it.
@@ -472,14 +481,20 @@ export default class Fleet extends View {
     const treeW = size.root + STUB + ARM + size.child + (depth - 1) * (16 + ARM) + 48;
     const sideW = Math.min(size.detail, full - treeW - SPLIT);
     const split = sideW >= 400;
-    if (split && sideW !== this.sideW) {
-      this.sideW = sideW;
-      if (agentShown) run("layout.resize", { id: AGENT, px: sideW });
-    }
     this.split = split;
+    if (split) this.sideW = sideW;
+    if (split && sideW !== this.agentPx) {
+      this.agentPx = sideW;
+      run("layout.resize", { id: AGENT, px: sideW });
+    }
+    if (!split && (this.agentFor !== null || laidOut)) cx.timer.after(0, () => this.hideAgent());
+    const agent = split ? this.agentFor : null;
+    if (agent === null || laidOut) this.keepDetail = null;
+    // Until the agent block shows, the side frame keeps what it had.
+    const side = shown ?? (agent !== null && this.keepDetail ? byId.get(this.keepDetail) ?? null : null);
     const replace = !split && Boolean(shown);
     /** @type {Ui} */
-    const ui = { t, now, open, size, narrow: !split && full < NARROW, split, agent: agentShown ? this.agentFor : null };
+    const ui = { t, now, open, size, narrow: !split && full < NARROW, split, agent };
     const list = () => v_flex().id("fleet-body").flex_1().h_full().min_w(0).overflow_y_scrollbar().px(24).pt(18).pb(32)
       .child(v_flex().w_full().max_w(split ? treeW - 48 : size.content).mx_auto().gap(10)
         .when(roots.length === 0, (b) => b.child(this.empty(t)))
@@ -490,16 +505,20 @@ export default class Fleet extends View {
     const frame = () => v_flex().h_full().min_h(0).rounded(10).border_1().border_color(t.border).overflow_hidden();
 
     return h_flex().id("fleet").track_focus(this.keys).on_key_down((e, cx) => this.onKey(e, cx))
-      .on_size_change((sz, cx) => { if (Math.abs(sz.width - this.width) > 1) { this.width = sz.width; cx.notify(); } })
-      .size_full().gap(SPLIT).text_color(t.foreground).text_size(MD)
-      .child(frame().flex_1().min_w(0).bg(t.canvas)
-        .child(this.header(t, fleet.summary, this.beadsWarning(), this.width < COMPACT))
+      .on_size_change((sz, cx) => {
+        const row = sz.width + (this.agentShown() ? this.agentPx + SPLIT : 0);
+        this.width = sz.width;
+        if (Math.abs(row - this.full) > 1) { this.full = row; cx.notify(); }
+      })
+      .size_full().gap(SPLIT).overflow_hidden().text_color(t.foreground).text_size(MD)
+      .child(frame().when(split, (el) => el.w(full - sideW - SPLIT).flex_none()).when(!split, (el) => el.flex_1()).min_w(0).bg(t.canvas)
+        .child(this.header(t, fleet.summary, this.beadsWarning(), (split ? full - sideW - SPLIT : this.width) < COMPACT))
         .child(h_flex().flex_1().min_h(0).items_start()
           .when(replace && Boolean(shown), (el) => (shown ? el.child(this.detailPanel(ui, shown, true).flex_1().min_w(0).h_full()) : el))
           .when(!replace, (el) => el.child(list())))
         .child(this.footer(t)))
-      .when(split && !agentShown, (el) => el.child(frame().w(sideW).flex_none().bg(t.popover)
-        .child(shown ? this.detailPanel(ui, shown, false).size_full() : this.inspectorHint(t))));
+      .when(split && !laidOut, (el) => el.child(frame().w(sideW).flex_none().bg(t.popover)
+        .child(side ? this.detailPanel(ui, side, false).size_full() : this.inspectorHint(t))));
   }
 
   /** The inspector before a card is picked: what it will show and how to pick one. @param {Palette} t */
