@@ -11,6 +11,8 @@
       config.allowUnfree = true;
     };
 
+    formatter = pkgs.alejandra;
+
     packages = let
       registry = import ../packages/registry.nix;
       argSources = {

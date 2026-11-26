@@ -84,7 +84,7 @@ Run from the repo root:
 - Use camelCase for variables/functions/attrs and kebab-case for files/directories.
 - Keep `imports` at the top of attrsets and prefer `let ... in` for local bindings.
 - Use comment language hints such as `/* bash */` and `/* json */` for multi-line strings.
-- Format Nix with `alejandra`.
+- Format Nix with `nix fmt` (runs `alejandra`; enforced on staged `.nix` files by `.githooks/pre-commit`).
 - Shell scripts use 2 spaces and descriptive comments.
 
 ## SUBDIRECTORY AGENTS
