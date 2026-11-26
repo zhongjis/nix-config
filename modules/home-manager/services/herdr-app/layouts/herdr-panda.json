@@ -186,11 +186,36 @@
             },
             {
               "id": "fleet",
-              "type": "block",
+              "type": "row",
+              "gap": 8,
               "padding": 8,
-              "content": {
-                "mod": "fleet"
-              }
+              "children": [
+                {
+                  "id": "fleet-tree",
+                  "type": "block",
+                  "content": {
+                    "mod": "fleet"
+                  }
+                },
+                {
+                  "id": "fleet-agent",
+                  "type": "block",
+                  "hidden": true,
+                  "size": {
+                    "px": 620
+                  },
+                  "resizable": false,
+                  "content": {
+                    "agent": "focused"
+                  },
+                  "background": "background",
+                  "radius": 10,
+                  "border": {
+                    "width": 1,
+                    "color": "border"
+                  }
+                }
+              ]
             }
           ]
         },

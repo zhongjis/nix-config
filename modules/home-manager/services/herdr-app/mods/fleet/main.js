@@ -2,9 +2,10 @@
 // sub-agents, tools and tasks branch to the right (below it when narrow) on connector lines, and a click on a
 // card opens its detail beside the tree (in its place when narrow): bead events, the last screen lines,
 // Focus / Peek / Keep / Answer.
-// herdr-panda's work area is the stack `work-switch`, this block one child and the tabs' panes (`work-body`) the
-// other; layout.select shows it, and Esc, fleet.toggle, Back to work, focusing an agent or another tab/space shows
-// the work again.
+// herdr-panda's work area is the stack `work-switch`: the tabs' panes (`work-body`) or the row `fleet`, this block
+// and the agent block `fleet-agent` beside it. layout.select shows it, and Esc, fleet.toggle, Back to work, focusing
+// an agent or another tab/space shows the work again. Picking an agent shows its live terminal in `fleet-agent`, in
+// the frame a worker's or a bead's detail takes.
 // The arrows, Enter and Esc also arrive as fleet.<up|down|left|right|enter|escape> commands (keys.json, herdr-app
 // do); fleet.fixture / fleet.live switch between sample and live beads.
 // Herdr's live data (agents, terminals) redraws it by itself; only live beads poll, every 10 s while it shows.
@@ -24,10 +25,11 @@ import { beadsDir, loadLive } from "./beads.js";
  * @typedef {import("./model.js").ShownRoot} ShownRoot
  * @typedef {import("./model.js").Summary} Summary
  * @typedef {import("./model.js").Epic} Epic
+ * @typedef {import("./model.js").BeadEvent} BeadEvent
  * @typedef {import("./model.js").Tier} Tier
  * @typedef {Record<string, Color>} Palette
  * @typedef {{ root: number, child: number, detail: number, content: number }} Sizes
- * @typedef {{ t: Palette, now: number, open: string | null, narrow: boolean, size: Sizes }} Ui
+ * @typedef {{ t: Palette, now: number, open: string | null, narrow: boolean, size: Sizes, split: boolean, agent: string | null }} Ui
  * @typedef {{ roots: string[], kids: string[], byId: Map<string, Node>, open: string | null }} Nav
  * @typedef {{ id: string, state: "loading" | "ready" | "error" | "none", lines: string[], error?: string }} Screen
  */
@@ -41,6 +43,12 @@ const LINE = 18;
 const COMPACT = 1000;
 // herdr-panda's work area: the stack, this block's child id in it, and the tabs' panes.
 const STACK = "work-switch", SELF = "fleet", WORK = "work-body";
+// The layout's agent block beside this one, and the row's gap between them.
+const AGENT = "fleet-agent", SPLIT = 8;
+// How long a screen read may take before the detail says it's unavailable (ms).
+const SCREEN_WAIT = 4000;
+// Bead events shown before "Show all".
+const EVENTS = 5;
 // Connector geometry: the stub from a root to its spine, each child's arm, and where a line meets a card
 // (the middle of its icon tile: 11 px padding + 12).
 const STUB = 26, ARM = 22, ANCHOR = 23, GAP = 10;
@@ -108,8 +116,26 @@ function brief(body) {
   const text = lines.slice(0, 3).join("\n");
   return lines.length > 3 || text.length > 360 ? `${text.slice(0, 360).trimEnd()}…` : text;
 }
-/** A live agent that can be typed to. @param {Node} n */
-const answerable = (n) => n.kind === "agent" && n.live && Boolean(n.address);
+/** A live agent that can be typed to: not one that's finished. @param {Node} n */
+const answerable = (n) => n.kind === "agent" && n.live && Boolean(n.address) && n.status !== "done" && n.status !== "ended";
+/** What each bead event is called; a report by its kind. @type {Record<string, string>} */
+const EVENT = {
+  dispatched: "Dispatched", "re-instructed": "Re-instructed", decided: "Decided", note: "Note", reaped: "Reaped",
+  "handed-off": "Handed off", adopted: "Adopted", blocked: "Blocked", ready: "Ready", queued: "Queued", mode: "Mode",
+};
+/** @type {Record<string, string>} */
+const REPORT = { "pr-opened": "PR opened", "ready-local": "Ready for local review", done: "Reported done" };
+/** @param {BeadEvent} e */
+const eventName = (e) => (e.name === "report" ? REPORT[e.fields.kind] ?? "Report"
+  : EVENT[e.name] ?? e.name.replace(/-/g, " ").replace(/^./, (c) => c.toUpperCase()));
+/** An event's few facts worth a glance (its PR, commit, who), not every field. @param {BeadEvent} e */
+function eventFacts(e) {
+  const f = e.fields, pr = prNumber(f.pr);
+  return [pr ? `PR #${pr}` : null, f.head ? f.head.slice(0, 7) : null, f.agent ?? null, f.by ? `by ${f.by}` : null,
+    e.name === "decided" && f.a ? f.a : null].filter(Boolean).join(" · ");
+}
+/** An event body's first line. @param {string} body */
+const firstLine = (body) => body.split("\n").find((l) => l.trim())?.trim() ?? "";
 /** "idle 3h", "needs you 12m", "settled 40m": how long the state it names has held. @param {Node} n @param {number} now */
 function ageLabel(n, now) {
   const a = age(n.since, now);
@@ -143,6 +169,17 @@ export default class Fleet extends View {
     this.detailNode = null;
     /** @type {Screen | null} */
     this.screen = null;
+    /** @type {string | null} the agent whose live terminal shows beside the tree */
+    this.agentFor = null;
+    // When this copy last moved the focus (agent.focus picks the agent's own space and tab): not a move to the work.
+    this.movedAt = 0;
+    // The side frame's width, kept while the agent block takes it (this block is narrower then).
+    this.sideW = 0;
+    // Whether the last render had room for the side frame.
+    this.split = true;
+    /** @type {Set<number>} expanded events, by position */
+    this.expanded = new Set();
+    this.allEvents = false;
     /** @type {{ text: string, error: boolean } | null} what the last action said */
     this.note = null;
     this.width = 1400;
@@ -158,6 +195,8 @@ export default class Fleet extends View {
     this.answer.on("focus", (_e, cx) => { this.typing = true; cx.notify(); });
     this.answer.on("blur", (_e, cx) => { this.typing = false; cx.notify(); });
     if (checking()) return;
+    // A fresh copy starts without an agent beside it.
+    run("layout.hide", { id: AGENT });
     if (this.isShown()) this.loadBeads(cx);
     // A hidden copy keeps running (the stack's other child, another tab): poll only while this one shows.
     cx.timer.every(POLL, (cx) => { if (this.mode === "live" && window()?.visible && this.isShown()) this.loadBeads(cx); });
@@ -208,6 +247,7 @@ export default class Fleet extends View {
   // Back to the work: the stack shows the tabs' panes again. (Not View's close(cx) hook, which Herdr calls as a
   // copy goes.)
   dismiss() {
+    this.hideAgent();
     this.wasShown = false;
     run("layout.select", { stack: STACK, child: WORK });
   }
@@ -218,24 +258,68 @@ export default class Fleet extends View {
     else this.dismiss();
   }
 
+  /** Whether the agent block beside this one shows. */
+  agentShown() {
+    const n = findNode(layout(), AGENT);
+    return Boolean(n) && n?.hidden !== true;
+  }
+
+  /** An agent's live terminal in the side frame, in place of a detail. agent.focus picks its space and tab too.
+   * @param {Node} node @param {Cx} cx */
+  showAgent(node, cx) {
+    this.detail = null;
+    this.agentFor = node.id;
+    this.movedAt = Date.now();
+    run("layout.resize", { id: AGENT, px: this.sideW });
+    run("layout.show", { id: AGENT });
+    run("agent.focus", { terminal: node.address });
+    // The keyboard stays on the tree; Enter on the same card moves it into the terminal.
+    cx.timer.after(60, () => { if (!this.typing) this.keys.focus(); });
+    cx.notify();
+  }
+
+  hideAgent() {
+    if (this.agentFor === null && !this.agentShown()) return;
+    this.agentFor = null;
+    run("layout.hide", { id: AGENT });
+  }
+
   /** Shows a card's detail and reads its screen; `answer` puts the keyboard in the answer field.
    * @param {Node} node @param {Cx} cx @param {boolean} [answer] */
   openDetail(node, cx, answer = false) {
+    this.hideAgent();
     this.detail = node.id;
     this.cursor = node.id;
     this.note = null;
+    this.expanded = new Set();
+    this.allEvents = false;
     this.answer.set_value("");
+    this.readScreen(node, cx);
+    // The field draws on the next frame; focus it then too.
+    if (answer && answerable(node)) { this.answer.focus(); cx.timer.after(60, () => this.answer.focus()); }
+    cx.notify();
+  }
+
+  /** Reads a card's last screen lines; a read that doesn't answer in SCREEN_WAIT says so, and can be retried.
+   * @param {Node} node @param {Cx} cx */
+  readScreen(node, cx) {
     const id = node.id, address = node.live ? node.address : null;
     this.screen = { id, state: address ? "loading" : "none", lines: [] };
-    if (address) cx.spawn(async (cx) => {
+    if (!address) return;
+    const at = Date.now();
+    this.screenAt = at;
+    cx.spawn(async (cx) => {
       const r = await hcSafe(["read", address, "--lines", "20"]);
-      if (this.screen?.id !== id) return;
+      if (this.screen?.id !== id || this.screenAt !== at) return;
       this.screen = r.code === 0 ? { id, state: "ready", lines: tail(r.stdout, 20) }
         : { id, state: "error", lines: [], error: r.stderr.trim() || `hc read exited ${r.code}` };
       cx.notify();
     });
-    // The field draws on the next frame; focus it then too.
-    if (answer && answerable(node)) { this.answer.focus(); cx.timer.after(60, () => this.answer.focus()); }
+    cx.timer.after(SCREEN_WAIT, (cx) => {
+      if (this.screen?.id !== id || this.screenAt !== at || this.screen.state !== "loading") return;
+      this.screen = { id, state: "error", lines: [], error: "Screen unavailable: the terminal didn't answer." };
+      cx.notify();
+    });
     cx.notify();
   }
 
@@ -295,7 +379,7 @@ export default class Fleet extends View {
    */
   walk(key, cx) {
     if (key === "escape") {
-      if (this.detail) this.detail = null; else this.dismiss();
+      if (this.detail) this.detail = null; else if (this.agentFor) this.hideAgent(); else this.dismiss();
       return true;
     }
     if (!["up", "down", "left", "right", "enter"].includes(key)) return false;
@@ -313,7 +397,10 @@ export default class Fleet extends View {
       this.cursor = descendants(node)[0]?.id ?? at;
     } else if (key === "left" && !inRoots) { this.cursor = open; this.detail = null; }
     else if (key === "enter") {
-      if (inRoots && at !== open) { this.open = at; this.detail = null; this.cursor = at; }
+      if (inRoots && this.split && node.live && node.address) {
+        this.open = at;
+        if (this.agentFor === at) this.focus(node); else this.showAgent(node, cx);
+      } else if (inRoots && at !== open) { this.open = at; this.detail = null; this.cursor = at; }
       else if (this.detail === at && node.address && node.live) this.focus(node);
       else this.openDetail(node, cx, node.status === "blocked");
     }
@@ -321,22 +408,19 @@ export default class Fleet extends View {
   }
 
   /**
-   * The header's word on beads: bd's error; or orchestrators that have workers out but no epic, or none having
-   * one at all, both of which mean the database is empty or not the one the agents write.
-   * @param {ShownRoot[]} roots
+   * The header's word on beads: bd's error, or no orchestrator having an epic at all.
    * @returns {string | null}
    */
-  beadsWarning(roots) {
+  beadsWarning() {
     if (this.mode !== "live") return null;
     if (this.live.error) return `Beads: ${this.live.error}`;
     const byOrch = this.live.byOrch;
     if (!byOrch) return null;
-    const none = (/** @type {string} */ a) => !(byOrch.get(a) ?? []).length;
+    // One orchestrator without an epic is ordinary, and its open card says so; none of them having one means the
+    // database is empty or not the one the agents write.
     const asked = [...byOrch.keys()];
-    let missing = roots.flatMap((r) => (r.orch && r.node.kind === "agent" && r.node.address && byOrch.has(r.node.address)
-      && none(r.node.address) && r.node.children.some((c) => c.live && c.labels.orch === r.node.address) ? [r.node.address] : []));
-    if (!missing.length && asked.length && asked.every(none)) missing = asked;
-    return missing.length ? `Beads: no epic for ${missing.join(", ")} — database empty or unreachable` : null;
+    return asked.length > 1 && asked.every((a) => !(byOrch.get(a) ?? []).length)
+      ? "Beads: no orchestrator has an epic — database empty or not the agents' one" : null;
   }
 
   /** @param {Cx} cx */
@@ -359,55 +443,63 @@ export default class Fleet extends View {
     this.detailNode = shown;
     this.nav = { roots: roots.map((r) => r.node.id), kids, byId, open };
     // Showing anew, take the keyboard (the hidden work area's terminal had it) and refresh live beads.
-    // Another tab or space while showing means the person went to their work: show it.
+    // Another tab or space while showing means the person went to their work: show it. Not when this copy just
+    // moved there itself, showing an agent.
     const visible = this.isShown() && !checking();
     const f = focused(), where = `${f?.space ?? ""}|${f?.tab ?? ""}`;
     if (visible && !this.wasShown) cx.timer.after(0, (cx) => {
       if (!this.typing) this.keys.focus();
       if (this.mode === "live") this.loadBeads(cx);
     });
-    else if (visible && where !== this.where) cx.timer.after(0, () => this.dismiss());
+    else if (visible && where !== this.where && now - this.movedAt > 3000) cx.timer.after(0, () => this.dismiss());
     this.wasShown = visible;
     this.where = where;
 
-    // Wide: the tree and an inspector side by side, centered, the inspector waiting for a card when none is picked.
-    // Else the detail docks at the right edge when picked, or (narrow) takes the tree's place with a way back.
-    const size = sizesFor(this.width);
+    // Two frames side by side: the fleet (header, tree, footer) and a side frame for the picked card, the same
+    // size whatever is picked. An agent's side frame is the layout's agent block, beside this block, which is
+    // narrower by that much then; a worker's or a bead's is drawn here. Too narrow for both: the detail takes the
+    // tree's place, with a way back.
+    // Right after showAgent the layout may not say so yet: trust this copy for a second, then the layout (a hidden
+    // block or an agent gone ends it).
+    const fresh = now - this.movedAt < 1000;
+    const agentShown = this.agentFor !== null && byId.has(this.agentFor) && (fresh || this.agentShown());
+    if (!agentShown && this.agentFor !== null) this.agentFor = null;
+    const full = agentShown ? this.width + this.sideW + SPLIT : this.width;
+    const size = sizesFor(full);
     // The tree column fits the deepest tree in the fleet (one level of workers at least), not the open one, so
-    // picking an agent without workers doesn't shrink it and slide the inspector.
+    // picking an agent without workers doesn't shrink it.
     const depth = Math.max(1, ...roots.map((r) => depthOf(r.node)));
     const treeW = size.root + STUB + ARM + size.child + (depth - 1) * (16 + ARM) + 48;
-    // What's left beside the tree (less a gutter and the right margin) goes to the inspector, up to its width.
-    const room = Math.min(size.detail, this.width - treeW - 32);
-    const inspector = room >= 400;
-    const replace = !inspector && Boolean(shown) && this.width < NARROW;
-    const side = !inspector && Boolean(shown) && !replace;
-    const sideW = sizesFor(0).detail;
+    const sideW = Math.min(size.detail, full - treeW - SPLIT);
+    const split = sideW >= 400;
+    if (split && sideW !== this.sideW) {
+      this.sideW = sideW;
+      if (agentShown) run("layout.resize", { id: AGENT, px: sideW });
+    }
+    this.split = split;
+    const replace = !split && Boolean(shown);
     /** @type {Ui} */
-    const ui = { t, now, open, size, narrow: !inspector && this.width - (side ? sideW : 0) < NARROW };
-    const list = () => v_flex().id("fleet-body").h_full().min_w(0).overflow_y_scrollbar().px(24).pt(18).pb(32)
-      .child(v_flex().w_full().max_w(size.content).mx_auto().gap(10)
+    const ui = { t, now, open, size, narrow: !split && full < NARROW, split, agent: agentShown ? this.agentFor : null };
+    const list = () => v_flex().id("fleet-body").flex_1().h_full().min_w(0).overflow_y_scrollbar().px(24).pt(18).pb(32)
+      .child(v_flex().w_full().max_w(split ? treeW - 48 : size.content).mx_auto().gap(10)
         .when(roots.length === 0, (b) => b.child(this.empty(t)))
         .children(roots.flatMap((r, i) => [
           ...(i === 0 || roots[i - 1].tier !== r.tier ? [this.tierHeading(t, r.tier, roots.filter((x) => x.tier === r.tier).length, i > 0)] : []),
           this.rootRow(ui, r),
         ])));
+    const frame = () => v_flex().h_full().min_h(0).rounded(10).border_1().border_color(t.border).overflow_hidden();
 
-    return v_flex().id("fleet").track_focus(this.keys).on_key_down((e, cx) => this.onKey(e, cx))
+    return h_flex().id("fleet").track_focus(this.keys).on_key_down((e, cx) => this.onKey(e, cx))
       .on_size_change((sz, cx) => { if (Math.abs(sz.width - this.width) > 1) { this.width = sz.width; cx.notify(); } })
-      .size_full().bg(t.canvas).text_color(t.foreground).text_size(MD)
-      .rounded(10).border_1().border_color(t.border).overflow_hidden()
-      .child(this.header(t, fleet.summary, this.beadsWarning(roots), this.width < COMPACT))
-      .child(h_flex().flex_1().min_h(0).items_start()
-        .when(inspector, (el) => el.justify_center().gap(16).pr(16)
-          .child(list().w(treeW).flex_none())
-          .child(v_flex().w(room).flex_none().h_full().py(12)
-            .child(v_flex().size_full().rounded(12).border_1().border_color(t.border).bg(t.popover).overflow_hidden()
-              .child(shown ? this.detailPanel(ui, shown, false).size_full() : this.inspectorHint(t)))))
-        .when(replace && Boolean(shown), (el) => (shown ? el.child(this.detailPanel(ui, shown, true).flex_1().min_w(0).h_full()) : el))
-        .when(!inspector && !replace, (el) => el.child(list().flex_1()))
-        .when(side && Boolean(shown), (el) => (shown ? el.child(this.detailPanel(ui, shown, false).w(sideW).h_full().border_l_1()) : el)))
-      .child(this.footer(t));
+      .size_full().gap(SPLIT).text_color(t.foreground).text_size(MD)
+      .child(frame().flex_1().min_w(0).bg(t.canvas)
+        .child(this.header(t, fleet.summary, this.beadsWarning(), this.width < COMPACT))
+        .child(h_flex().flex_1().min_h(0).items_start()
+          .when(replace && Boolean(shown), (el) => (shown ? el.child(this.detailPanel(ui, shown, true).flex_1().min_w(0).h_full()) : el))
+          .when(!replace, (el) => el.child(list())))
+        .child(this.footer(t)))
+      .when(split && !agentShown, (el) => el.child(frame().w(sideW).flex_none().bg(t.popover)
+        .child(shown ? this.detailPanel(ui, shown, false).size_full() : this.inspectorHint(t))));
   }
 
   /** The inspector before a card is picked: what it will show and how to pick one. @param {Palette} t */
@@ -415,7 +507,7 @@ export default class Fleet extends View {
     return v_flex().id("fleet-detail-hint").p(20).gap(6)
       .child(div().text_size(MD).font_medium().text_color(t.foreground).child("No card picked"))
       .child(div().text_size(SM).line_height("18px").text_color(t.muted)
-        .child("Click a card, or move with the arrows and press Enter, to see its bead events, its last screen lines and Focus, Peek, Keep and Answer here."));
+        .child("Pick an agent to work in its terminal here, or a worker or task to see its bead events, its last screen lines and Focus, Peek, Keep and Answer."));
   }
 
   /** Title and summary, then what's off about beads (or that the beads are a sample), and close. Compact: the
@@ -459,7 +551,7 @@ export default class Fleet extends View {
   footer(t) {
     return h_flex().id("fleet-footer").h(30).flex_none().px(20).gap(16).items_center().border_t_1().border_color(t.border)
       .bg(t.chrome).text_size(XS).text_color(t.muted)
-      .child(div().flex_none().child("↑↓←→ move · Enter open · Esc back to work"))
+      .child(div().flex_none().child(`↑↓←→ move · Enter open, again to go to it · Esc ${this.detail || this.agentFor ? "close" : "back to work"}`))
       .child(div().flex_1())
       .when(this.mode === "live" && Boolean(this.beadsDir), (el) => el.child(div().min_w(0).truncate()
         .child(`beads ${(this.beadsDir ?? "").replace(/^\/Users\/[^/]+|^\/home\/[^/]+/, "~")}`)));
@@ -598,7 +690,7 @@ export default class Fleet extends View {
    * @param {ShownRoot | null} root @param {boolean} dim */
   card(ui, n, root, dim) {
     const { t, now } = ui;
-    const cursor = this.cursor === n.id, shown = this.detail === n.id;
+    const cursor = this.cursor === n.id, shown = this.detail === n.id || ui.agent === n.id;
     const since = ageLabel(n, now);
     const meta = (root ? [n.app, n.address, root.space] : n.bead ? [n.bead.id, n.address] : [n.app, n.address])
       .filter((x, i, all) => x && all.indexOf(x) === i).join(" · ");
@@ -617,7 +709,12 @@ export default class Fleet extends View {
       .on_click((_e, cx) => {
         this.cursor = n.id;
         this.keys.focus();
-        if (root && ui.open !== n.id) { this.open = n.id; this.detail = null; cx.notify(); }
+        // An agent shows its live terminal beside the tree (again: goes to it); else, narrow, the first click opens
+        // its tree. A worker or a bead shows its detail.
+        if (root && ui.split && n.live && n.address) {
+          this.open = n.id;
+          if (ui.agent === n.id) this.focus(n); else this.showAgent(n, cx);
+        } else if (root && ui.open !== n.id) { this.open = n.id; this.detail = null; cx.notify(); }
         else this.openDetail(n, cx);
       })
       .child(h_flex().gap(9).items_start()
@@ -669,6 +766,22 @@ export default class Fleet extends View {
       .child(div().flex_1().min_w(0).line_height("18px").text_color(ink ?? t.foreground).child(value));
   }
 
+  /** One bead event: what happened and its few facts on one line, the body's first line under it; a click shows
+   * the body's first lines. The newest reads strongest.
+   * @param {Palette} t @param {BeadEvent} e @param {number} i @param {number} now */
+  event(t, e, i, now) {
+    const open = this.expanded.has(i), facts = eventFacts(e), line = e.body ? firstLine(e.body) : "";
+    return v_flex().id(`ev-${i}`).gap(2).px(8).py(6).mx(-8).rounded(6)
+      .when(Boolean(e.body), (el) => el.cursor_pointer().hover((st) => st.bg(t.hover))
+        .on_click((_e, cx) => { if (open) this.expanded.delete(i); else this.expanded.add(i); cx.notify(); }))
+      .child(h_flex().gap(8).items_center().text_size(SM)
+        .child(div().flex_none().font_medium().text_color(i === 0 ? t.foreground : t.muted).child(eventName(e)))
+        .child(div().flex_1().min_w(0).truncate().text_size(XS).text_color(t.muted).child(facts))
+        .child(div().flex_none().text_size(XS).text_color(t.muted).child(e.at ? `${age(e.at, now)} ago` : "")))
+      .when(Boolean(line) && !open, (el) => el.child(div().text_size(SM).text_color(t.muted).truncate().child(line)))
+      .when(open, (el) => el.child(div().text_size(SM).line_height("18px").text_color(t.muted).child(brief(e.body))));
+  }
+
   /** The detail: beside the tree, or (`replace`, narrow) in its place with a way back.
    * @param {Ui} ui @param {Node} n @param {boolean} replace */
   detailPanel(ui, n, replace) {
@@ -676,10 +789,10 @@ export default class Fleet extends View {
     const terminal = Boolean(n.address && n.live && (n.kind === "agent" || n.kind === "tool"));
     const life = n.life, pr = life?.pr;
     const mono = String(settings()?.font ?? "JetBrains Mono");
-    const events = [...n.events].reverse().slice(0, 10);
     const sc = this.screen?.id === n.id ? this.screen : null;
-    const meta = [n.bead?.id, n.app, n.address, n.tab].filter((x, i, all) => x && all.indexOf(x) === i).join(" · ");
+    const meta = [n.bead?.id, n.app, n.address, n.tab, ageLabel(n, now)].filter((x, i, all) => x && all.indexOf(x) === i).join(" · ");
     const note = this.note;
+    const all = [...n.events].reverse(), events = this.allEvents ? all : all.slice(0, EVENTS);
     /** @param {Cx} cx */
     const back = (cx) => { this.detail = null; cx.notify(); };
     return v_flex().id("fleet-detail").flex_none().min_h(0).bg(t.popover).border_color(t.border)
@@ -701,11 +814,10 @@ export default class Fleet extends View {
       .child(v_flex().id("detail-body").flex_1().min_h(0).min_w(0).overflow_y_scrollbar().px(16).pt(14).pb(18).gap(16)
         .when(Boolean(n.task), (el) => el.child(div().text_size(MD).line_height("20px").text_color(t.foreground).child(n.task)))
         .when(Boolean(life), (el) => (!life ? el : el.child(this.strip(t, n, life, true))))
-        .when(Boolean((n.report && n.report !== n.task) || pr || life?.blocked || ageLabel(n, now)), (el) => el.child(v_flex().gap(6)
+        .when(Boolean((n.report && n.report !== n.task) || pr || life?.blocked), (el) => el.child(v_flex().gap(6)
           .when(Boolean(n.report && n.report !== n.task), (b) => b.child(this.row(t, "Report", n.report)))
           .when(Boolean(pr), (b) => b.child(this.row(t, "PR", pr ?? "")))
-          .when(Boolean(life?.blocked), (b) => b.child(this.row(t, "Blocked", life?.blocked ?? "", t.blocked)))
-          .when(Boolean(ageLabel(n, now)), (b) => b.child(this.row(t, "State", ageLabel(n, now) ?? "", t.muted)))))
+          .when(Boolean(life?.blocked), (b) => b.child(this.row(t, "Blocked", life?.blocked ?? "", t.blocked)))))
         // Without a live terminal there's nothing to focus, peek at or answer: say so once instead.
         .when(!terminal, (el) => el.child(div().text_size(SM).text_color(t.muted)
           .child(n.kind === "bead" && !n.events.some((e) => e.name === "dispatched") ? "No terminal yet." : "Its terminal has ended.")))
@@ -721,17 +833,15 @@ export default class Fleet extends View {
           .when(n.status === "blocked", (b) => b.child(div().text_size(XS).text_color(t.muted)
             .child("Sends with Enter. A program holding a dialog may refuse typed text.")))))
         .when(Boolean(note), (el) => el.child(div().text_size(SM).text_color(note?.error ? t.blocked : t.muted).child(note?.text ?? "")))
-        .child(v_flex().gap(8)
-          .child(this.section(t, "Bead events", n.bead ? `${n.bead.id} · ${this.mode === "fixture" ? "sample" : "live"}` : null))
+        .child(v_flex().gap(4)
+          .child(div().pb(4).child(this.section(t, "Bead events", n.bead ? `${n.bead.id} · ${this.mode === "fixture" ? "sample" : "live"}` : null)))
           .when(events.length === 0, (el) => el.child(div().text_size(SM).text_color(t.muted)
             .child(n.bead ? "No events on this bead yet." : this.mode === "live" && this.live.error ? "Beads unavailable." : "No bead names this terminal.")))
-          .children(events.map((e, i) => v_flex().id(`ev-${i}`).gap(2)
-            .child(h_flex().gap(8).items_center().text_size(SM)
-              .child(div().flex_none().font_medium().text_color(i === 0 ? t.foreground : t.muted).child(e.name))
-              .child(div().flex_1().min_w(0).truncate().text_color(t.muted)
-                .child(Object.entries(e.fields).map(([k, v]) => `${k}=${v}`).join(" ")))
-              .child(div().flex_none().text_size(XS).text_color(t.muted).child(e.at ? `${age(e.at, now)} ago` : "")))
-            .when(Boolean(e.body), (b) => b.child(div().text_size(SM).line_height("18px").text_color(t.muted).child(brief(e.body)))))))
+          .children(events.map((e, i) => this.event(t, e, i, now)))
+          .when(all.length > EVENTS, (el) => el.child(div().id("ev-more").pt(2).text_size(XS).text_color(t.muted).cursor_pointer()
+            .role("button").hover((st) => st.text_color(t.foreground))
+            .on_click((_e, cx) => { this.allEvents = !this.allEvents; cx.notify(); })
+            .child(this.allEvents ? "Show fewer" : `Show all ${all.length}`))))
         .when(terminal, (el) => el.child(v_flex().w_full().min_w(0).gap(8)
           .child(this.section(t, "Screen", sc?.state === "ready" ? `last ${sc.lines.length} lines` : null))
           .child(v_flex().id("screen").w_full().min_w(0).flex_none().h(Math.max(4, sc?.lines.length ?? 0) * LINE + 26).py(12).px(12).rounded(8)
@@ -739,7 +849,9 @@ export default class Fleet extends View {
             .font_family(mono).text_size(SM).line_height(`${LINE}px`)
             .when(sc?.state === "loading", (el) => el.gap(8).children([0.9, 0.7, 0.8, 0.45].map((w, i) => div().id(`sk-${i}`).h(10).w(Math.round(w * 340)).rounded(3).bg(t.raised)
               .loop("opacity", { from: 0.5, to: 1, period: 1100 }))))
-            .when(sc?.state === "error", (el) => el.text_color(t.blocked).child(sc?.error ?? ""))
+            .when(sc?.state === "error", (el) => el.gap(8).items_start().text_color(t.muted)
+              .child(div().child(sc?.error ?? ""))
+              .child(this.button(t, "screen-retry", "Retry", { onClick: (cx) => this.readScreen(n, cx) })))
             .when(sc?.state === "ready", (el) => el.text_color(t.foreground)
               .children((sc?.lines.length ? sc.lines : [" "]).map((l, i) => div().id(`ln-${i}`).w_full().whitespace_nowrap().truncate().child(l || " "))))))));
   }
