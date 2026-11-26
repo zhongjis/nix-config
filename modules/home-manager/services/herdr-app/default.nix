@@ -6,7 +6,8 @@
   ...
 }: let
   stylixEnabled = config.stylix.enable or false;
-  # panda-focus's session hooks, passed per launch instead of installed into Claude Code, Pi and Codex.
+  # panda-focus's session hooks, passed per launch instead of installed into Claude Code, Pi, Codex and Copilot.
+  # agy has no per-launch plugin flag: its hook is a plugin linked into agy's plugins folder below.
   integrations = "${config.xdg.configHome}/herdr-app/mods/panda-focus/integrations";
   # Runs the next `name` on PATH after itself; inside Herdr (HC_TERMINAL_ID) it adds `flags`.
   # PATH stays as it is, so the agent's children (start-worker.sh's `hc run`) keep the shims.
@@ -28,6 +29,7 @@
       (agentShim "pi" "-e ${lib.escapeShellArg "${integrations}/pi.ts"}")
       # Codex runs an inline hook only once trusted (/hooks); the trust is kept in ~/.codex/config.toml.
       (agentShim "codex" "-c ${lib.escapeShellArg ''hooks.SessionStart=[{hooks=[{type="command",command="sh ${integrations}/codex.sh",timeout=10}]}]''}")
+      (agentShim "copilot" "--plugin-dir ${lib.escapeShellArg "${integrations}/copilot-plugin"}")
     ];
   };
 in {
@@ -42,6 +44,24 @@ in {
       ${builtins.readFile ./scripts/herdr-sessionizer.sh}
     '')
   ];
+
+  # agy finds plugins (plugin.json plus a root hooks.json) in its plugins folder, symlinks included.
+  # The hook itself does nothing outside Herdr terminals.
+  home.file = lib.mkIf (config.programs.antigravity-cli.enable or false) {
+    ".gemini/config/plugins/herdr-app-session/plugin.json".text = builtins.toJSON {
+      name = "herdr-app-session";
+      version = "1.0.0";
+      description = "Herdr panda-focus session hook: labels agy terminals inside Herdr with their resume line.";
+    };
+    ".gemini/config/plugins/herdr-app-session/hooks.json".text = builtins.toJSON {
+      herdr-resume.SessionStart = [
+        {
+          type = "command";
+          command = "sh ${lib.escapeShellArg "${integrations}/agy.sh"}";
+        }
+      ];
+    };
+  };
 
   # Only Herdr's shells (agents from the app, typed, resumed after a reboot) see the shims.
   programs.zsh.initContent = lib.mkAfter ''

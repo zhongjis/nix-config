@@ -1,0 +1,5 @@
+{
+  "name": "herdr-app-session",
+  "version": "1.0.0",
+  "description": "Herdr panda-focus session hook, loaded per launch by the copilot shim inside Herdr terminals."
+}

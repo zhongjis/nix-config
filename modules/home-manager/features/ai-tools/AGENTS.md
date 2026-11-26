@@ -44,6 +44,7 @@ Run from the repo root:
 - agy's terminal sandbox mounts only an FHS allowlist plus allowed read paths. On NixOS keep `read_file(/nix/store)` and `read_file(/run/current-system)` in `permissions.allow`, or every sandboxed command fails with `connecting to sandbox server: ... connection reset by peer`.
 - Use absolute paths in permission rules. A relative rule such as `read_file(.env)` makes every sandboxed command fail with `non-absolute file path`. The merge only adds rules, so delete a removed rule from the live file by hand.
 - `programs.antigravity-cli.icm.enable` (ICM module) appends ICM rules and skills. Codegraph rules and MCP are set in `agy/default.nix`.
+- The herdr-app service links its `herdr-app-session` resume-hook plugin into `~/.gemini/config/plugins/` when agy is enabled; the hook lives with the other panda-focus integrations.
 
 ## LSP OWNERSHIP
 

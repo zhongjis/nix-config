@@ -1,6 +1,6 @@
 // panda-focus session integrations: after a compaction, an orchestrator terminal (label `orch-context=<script>`)
 // gets the script's output back in context; every other session start only sets the resume label. Codex sets it
-// only from the terminal's own foreground Codex.
+// only from the terminal's own foreground Codex; agy does too. Copilot skips sub-agents, as Claude does.
 // Run: nix shell nixpkgs#nodejs nixpkgs#jq --command node --test modules/home-manager/services/herdr-app/tests/session-integrations.mjs
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
@@ -60,6 +60,50 @@ test("codex: the terminal's own Codex labels its resume line", () => {
 
 test("codex: a nested codex exec leaves the label alone", () => {
   assert.doesNotMatch(codex(fixture(false), process.pid + 1), /label/);
+});
+
+// agy.sh's parent is this test process: it plays the terminal's foreground agy, or a nested one.
+const agy = (f, fg) => {
+  writeFileSync(join(f.root, "labels.json"), JSON.stringify({ foreground: { pid: fg } }));
+  execFileSync("sh", [join(dir, "agy.sh")], { env: f.env, input: JSON.stringify({ conversationId: "ff97-8260", hookEventName: "SessionStart" }) });
+  try {
+    return f.calls();
+  } catch {
+    return "";
+  }
+};
+
+test("agy: the terminal's own agy labels its resume line", () => {
+  assert.match(agy(fixture(false), process.pid), /label t1 resume=agy --conversation=ff97-8260/);
+});
+
+test("agy: a nested agy leaves the label alone", () => {
+  assert.doesNotMatch(agy(fixture(false), process.pid + 1), /label/);
+});
+
+const copilot = (f, input) => {
+  execFileSync("sh", [join(dir, "copilot.sh")], { env: f.env, input: JSON.stringify(input) });
+  try {
+    return f.calls();
+  } catch {
+    return "";
+  }
+};
+
+test("copilot: a session start labels its resume line", () => {
+  assert.match(copilot(fixture(false), { session_id: "c0f1-0e", source: "startup" }), /label t1 resume=copilot --resume=c0f1-0e/);
+});
+
+test("copilot: a sub-agent leaves the label alone", () => {
+  assert.doesNotMatch(copilot(fixture(false), { session_id: "c0f1-0e", agent_id: "a1" }), /label/);
+});
+
+test("agy and copilot: outside herdr they do nothing", () => {
+  const f = fixture(false);
+  const env = { ...f.env, HC_TERMINAL_ID: "" };
+  execFileSync("sh", [join(dir, "agy.sh")], { env, input: JSON.stringify({ conversationId: "ff97-8260" }) });
+  execFileSync("sh", [join(dir, "copilot.sh")], { env, input: JSON.stringify({ session_id: "c0f1-0e" }) });
+  assert.throws(() => f.calls());
 });
 
 test("pi: the first turn after a compaction carries the script output, once", async () => {
