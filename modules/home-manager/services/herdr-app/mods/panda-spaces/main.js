@@ -72,7 +72,7 @@ const subsHeight = (live, asleep) => Math.min(360, Math.max(46, 12 + 50 * live +
 export default class Spaces extends View {
   init(_props, cx) {
     const panels = shared("workspace.panels") ?? ["files", "changes"];
-    const missing = ["pr", "ci"].filter(id => !panels.includes(id));
+    const missing = ["pr", "ci", "fleet"].filter(id => !panels.includes(id));
     if (missing.length) setShared("workspace.panels", [...panels, ...missing]);
     this.repos = new Repositories();
     this.expanded = new Set(JSON.parse(localStorage.getItem("worktrees.expanded") ?? "[]"));

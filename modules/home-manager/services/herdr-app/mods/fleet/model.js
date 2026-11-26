@@ -1,5 +1,5 @@
 // The fleet as data: which terminals are roots and children, what each one's status, task and lifecycle
-// step are, how urgent each root is, and what the summary strip counts. Pure (no herdr imports), so
+// step are and how urgent each root is. Pure (no herdr imports), so
 // model.check.mjs runs it in node.
 
 /**
@@ -30,8 +30,6 @@
  * @typedef {"needs" | "failed" | "working" | "done" | "idle"} Tier
  * @typedef {{ node: FleetNode, space: string, orch: boolean }} Root
  * @typedef {Root & { rollup: Rollup, tier: Tier }} ShownRoot
- * @typedef {{ agents: number, subAgents: number, working: number, needs: number, failed: number, epics: number,
- *   finished: number, tasks: number }} Summary
  * @typedef {{ mode: "fixture", epics: Epic[] } | { mode: "live", byOrch: Map<string, Epic[]> }} Beads
  */
 
@@ -304,7 +302,7 @@ const standIn = (id, kind, name, task) => ({
 });
 
 /**
- * The whole view: roots most urgent first, each with its tree, rollup and tier, plus the summary counts.
+ * The whole view: roots most urgent first, each with its tree, rollup and tier.
  * Fixture beads attach to the first orchestrator (or a stand-in one); live beads to each orchestrator they name.
  * @param {{ agents: Agent[], terminals: Term[], spaces?: { id: string, name: string }[], beads?: Beads | null }} input
  */
@@ -331,8 +329,6 @@ export function buildFleet({ agents, terminals, spaces = [], beads = null }) {
     roots.push({ node, space: where(kids[0], spaceNames), orch: kids.some((k) => k.labels?.orch === parent) });
   }
 
-  /** @type {Epic[]} */
-  let epics = [];
   if (beads?.mode === "fixture" && beads.epics.length) {
     let host = roots.find((r) => r.orch);
     if (!host) {
@@ -340,12 +336,8 @@ export function buildFleet({ agents, terminals, spaces = [], beads = null }) {
       roots.push(host);
     }
     for (const e of beads.epics) attachTasks(host.node, e.tasks);
-    epics = beads.epics;
   } else if (beads?.mode === "live") {
-    for (const r of roots.filter((x) => x.orch && x.node.address)) for (const e of beads.byOrch.get(r.node.address ?? "") ?? []) {
-      attachTasks(r.node, e.tasks);
-      epics.push(e);
-    }
+    for (const r of roots.filter((x) => x.orch && x.node.address)) for (const e of beads.byOrch.get(r.node.address ?? "") ?? []) attachTasks(r.node, e.tasks);
   }
 
   for (const r of roots) settleShown(r.node);
@@ -354,28 +346,7 @@ export function buildFleet({ agents, terminals, spaces = [], beads = null }) {
   // Most urgent first; within a tier, the order agents() gives (space, tab, pane).
   const ordered = shown.map((r, i) => ({ r, i }))
     .sort((a, b) => TIERS.indexOf(a.r.tier) - TIERS.indexOf(b.r.tier) || a.i - b.i).map((x) => x.r);
-  const everyone = ordered.flatMap((r) => flat([r.node]));
-  const terminalsShown = everyone.filter((n) => n.kind === "agent" || n.kind === "tool");
-  const allTasks = epics.flatMap((e) => e.tasks);
-  /** @type {Summary} */
-  const summary = {
-    agents: ordered.length,
-    subAgents: everyone.filter((n) => n.depth > 0 && n.kind !== "bead").length,
-    working: terminalsShown.filter((n) => n.live && n.status === "working").length,
-    needs: everyone.filter((n) => n.status === "blocked").length,
-    failed: everyone.filter((n) => n.status === "failed").length,
-    epics: epics.length,
-    finished: allTasks.filter((t) => lifecycle(t.bead, t.events).step >= 4 || t.bead.status === "closed").length,
-    tasks: allTasks.length,
-  };
-  return {
-    roots: ordered,
-    summary,
-    // Agents in the order they're drawn, for agent.next / agent.prev.
-    order: everyone.flatMap((n) => (n.kind === "agent" && n.address ? [n.address] : [])),
-    // Open first: the most urgent root with something under it, else the first.
-    defaultOpen: (ordered.find((r) => r.node.children.length) ?? ordered[0])?.node.id ?? null,
-  };
+  return { roots: ordered };
 }
 
 /**

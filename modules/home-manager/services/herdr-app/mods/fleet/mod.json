@@ -1,16 +1,5 @@
 {
   "place": "none",
-  "title": "Agent Fleet",
-  "focusable": true,
-  "palette": [
-    {
-      "title": "Agent Fleet",
-      "command": "layout.select",
-      "args": {
-        "stack": "work-switch",
-        "child": "fleet"
-      },
-      "words": "agents fleet tree workers sub-agents beads orchestrator"
-    }
-  ]
+  "title": "Agents",
+  "focusable": true
 }

@@ -4,5 +4,12 @@
   "cloned_from": {
     "name": "tabs",
     "version": "0.1.13"
-  }
+  },
+  "palette": [
+    {
+      "title": "Agents panel",
+      "command": "panda-tabs.fleet",
+      "words": "agents fleet tree workers sub-agents beads orchestrator panel"
+    }
+  ]
 }

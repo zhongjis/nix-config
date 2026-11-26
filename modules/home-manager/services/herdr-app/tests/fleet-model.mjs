@@ -1,4 +1,4 @@
-// fleet mod checks: the fleet derivation (tree, status, supervising, urgency order, default open root, beads
+// fleet mod checks: the fleet derivation (tree, status, supervising, urgency order, beads
 // meeting their workers) on a small made-up fleet. Exits nonzero on a failure.
 // Run: node modules/home-manager/services/herdr-app/tests/fleet-model.mjs
 import assert from "node:assert/strict";
@@ -40,8 +40,6 @@ const byId = new Map(fleet.roots.map((r) => [r.node.id, r]));
 // Urgency: needs you, failed, working (o1 supervises, a3 works), done (the ended stand-in's finished worker).
 assert.deepEqual(fleet.roots.map((r) => [r.node.id, r.tier]),
   [["a4", "needs"], ["a2", "failed"], ["o1", "working"], ["a3", "working"], ["t40", "done"]]);
-// Default open: the most urgent root with children (a4 has none).
-assert.equal(fleet.defaultOpen, "a2");
 
 // o1 rests while w1 works: it supervises, and its rollup counts the work and its tasks.
 const o1 = byId.get("o1");
@@ -60,8 +58,6 @@ assert.deepEqual([ended?.node.kind, ended?.node.shown, ended?.rollup.text, ended
 assert.deepEqual([byId.get("a2")?.node.children[0].status, byId.get("a2")?.node.children[0].task], ["failed", ""]);
 // Idle with nothing working under it stays idle.
 assert.equal(byId.get("a2")?.node.shown, "idle");
-assert.deepEqual(fleet.summary, { agents: 5, subAgents: 4, working: 2, needs: 1, failed: 1, epics: 1, finished: 1, tasks: 3 });
-assert.deepEqual(fleet.order, ["a4", "a2", "o1", "w1", "w2", "a3", "r9"]);
 
 // Fixture beads land on the first orchestrator; with none, on a stand-in one.
 const fx = buildFleet({ agents, terminals, beads: { mode: "fixture", epics: fixtureEpics(now) } });

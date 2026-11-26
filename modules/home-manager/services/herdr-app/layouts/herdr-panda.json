@@ -87,137 +87,104 @@
           "window_drag": true
         },
         {
-          "id": "work-switch",
-          "type": "stack",
-          "active": "work-body",
+          "id": "work-body",
+          "type": "row",
           "children": [
             {
-              "id": "work-body",
-              "type": "row",
-              "children": [
-                {
-                  "id": "main",
-                  "type": "block",
-                  "content": {
-                    "tab": "active",
-                    "pane": {
-                      "header": {
-                        "content": {
-                          "mod": "pane"
-                        },
-                        "reveal": "always",
-                        "height": 30,
-                        "position": "top"
-                      },
-                      "background": "background",
-                      "border": {
-                        "width": 1,
-                        "color": "border"
-                      },
-                      "focus": {
-                        "width": 1,
-                        "color": "accent"
-                      },
-                      "radius": 10,
-                      "gap": 8,
-                      "lone": true
-                    }
-                  }
-                },
-                {
-                  "id": "panel",
-                  "type": "column",
-                  "children": [
-                    {
-                      "id": "panel-body",
-                      "type": "stack",
-                      "children": [
-                        {
-                          "id": "files",
-                          "type": "block",
-                          "content": {
-                            "mod": "filetree",
-                            "props": {
-                              "panel": true
-                            }
-                          }
-                        },
-                        {
-                          "id": "changes",
-                          "type": "block",
-                          "content": {
-                            "mod": "hunk-review"
-                          }
-                        },
-                        {
-                          "id": "pr",
-                          "type": "block",
-                          "content": {
-                            "mod": "pr-flow",
-                            "props": {
-                              "panel": true
-                            }
-                          }
-                        },
-                        {
-                          "id": "ci",
-                          "type": "block",
-                          "content": {
-                            "mod": "ci-dash",
-                            "props": {
-                              "panel": true
-                            }
-                          }
-                        }
-                      ],
-                      "active": "files"
-                    }
-                  ],
-                  "size": {
-                    "px": 368
-                  },
-                  "min": 280,
-                  "max": 900,
-                  "hidden": true
-                }
-              ],
-              "padding": 8,
-              "gap": 8
-            },
-            {
-              "id": "fleet",
-              "type": "row",
-              "gap": 8,
-              "padding": 8,
-              "children": [
-                {
-                  "id": "fleet-tree",
-                  "type": "block",
-                  "content": {
-                    "mod": "fleet"
-                  }
-                },
-                {
-                  "id": "fleet-agent",
-                  "type": "block",
-                  "hidden": true,
-                  "size": {
-                    "px": 620
-                  },
-                  "resizable": false,
-                  "content": {
-                    "agent": "focused"
+              "id": "main",
+              "type": "block",
+              "content": {
+                "tab": "active",
+                "pane": {
+                  "header": {
+                    "content": {
+                      "mod": "pane"
+                    },
+                    "reveal": "always",
+                    "height": 30,
+                    "position": "top"
                   },
                   "background": "background",
-                  "radius": 10,
                   "border": {
                     "width": 1,
                     "color": "border"
-                  }
+                  },
+                  "focus": {
+                    "width": 1,
+                    "color": "accent"
+                  },
+                  "radius": 10,
+                  "gap": 8,
+                  "lone": true
                 }
-              ]
+              }
+            },
+            {
+              "id": "panel",
+              "type": "column",
+              "children": [
+                {
+                  "id": "panel-body",
+                  "type": "stack",
+                  "children": [
+                    {
+                      "id": "fleet",
+                      "type": "block",
+                      "content": {
+                        "mod": "fleet"
+                      }
+                    },
+                    {
+                      "id": "files",
+                      "type": "block",
+                      "content": {
+                        "mod": "filetree",
+                        "props": {
+                          "panel": true
+                        }
+                      }
+                    },
+                    {
+                      "id": "changes",
+                      "type": "block",
+                      "content": {
+                        "mod": "hunk-review"
+                      }
+                    },
+                    {
+                      "id": "pr",
+                      "type": "block",
+                      "content": {
+                        "mod": "pr-flow",
+                        "props": {
+                          "panel": true
+                        }
+                      }
+                    },
+                    {
+                      "id": "ci",
+                      "type": "block",
+                      "content": {
+                        "mod": "ci-dash",
+                        "props": {
+                          "panel": true
+                        }
+                      }
+                    }
+                  ],
+                  "active": "files"
+                }
+              ],
+              "size": {
+                "px": 368
+              },
+              "min": 280,
+              "max": 900,
+              "hidden": true
             }
-          ]
+          ],
+          "padding": 8,
+          "gap": 8
         },
         {
           "id": "status",

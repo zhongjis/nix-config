@@ -1,18 +1,14 @@
-// Agent Fleet: every reporting agent as a card, most urgent first. One card's tree is open at a time: its
-// sub-agents, tools and tasks branch to the right (below it when narrow) on connector lines, and a click on a
-// card opens its detail beside the tree (in its place when narrow): bead events, the last screen lines,
-// Focus / Peek / Keep / Answer.
-// herdr-panda's work area is the stack `work-switch`: the tabs' panes (`work-body`) or the row `fleet`, this block
-// and the agent block `fleet-agent` beside it. layout.select shows it, and Esc, fleet.toggle, Back to work, focusing
-// an agent or another tab/space shows the work again. Picking an agent shows its live terminal in `fleet-agent`, in
-// the frame a worker's or a bead's detail takes.
-// The arrows, Enter and Esc also arrive as fleet.<up|down|left|right|enter|escape> commands (keys.json, herdr-app
+// Agents panel: the focused agent (focused().agent: the one picked in panda-focus's rail, or the focused pane's)
+// with its sub-agents, tools and tasks down a spine. The rail is the agent list; this panel only follows it, as
+// herdr-panda's right panel (`panel-body` child `fleet`, beside Files, Changes, PR and CI). Picking a card shows its
+// detail in the tree's place, with a way back: bead events, the last screen lines, Focus / Peek / Keep / Answer.
+// The arrows, Enter and Esc also arrive as fleet.<up|down|left|enter|escape> commands (keys.json, herdr-app
 // do); fleet.fixture / fleet.live switch between sample and live beads.
 // Herdr's live data (agents, terminals) redraws it by itself; only live beads poll, every 10 s while it shows.
 
 import { View, div, svg, image } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
-import { agents, terminals, spaces, theme, settings, run, hc, setAgentOrder, checking, window, nextCommand, layout, focused } from "herdr";
+import { agents, terminals, spaces, theme, settings, run, hc, checking, window, nextCommand, layout, focused } from "herdr";
 import { buildFleet, descendants, STEPS, age } from "./model.js";
 import { fixtureEpics } from "./fixtures.js";
 import { beadsDir, loadLive } from "./beads.js";
@@ -23,35 +19,27 @@ import { beadsDir, loadLive } from "./beads.js";
  * @typedef {import("gpui-kit").KeyEvent} KeyEvent
  * @typedef {import("./model.js").FleetNode} Node
  * @typedef {import("./model.js").ShownRoot} ShownRoot
- * @typedef {import("./model.js").Summary} Summary
  * @typedef {import("./model.js").Epic} Epic
  * @typedef {import("./model.js").BeadEvent} BeadEvent
- * @typedef {import("./model.js").Tier} Tier
  * @typedef {Record<string, Color>} Palette
- * @typedef {{ root: number, child: number, detail: number, content: number }} Sizes
- * @typedef {{ t: Palette, now: number, open: string | null, narrow: boolean, size: Sizes, split: boolean, agent: string | null }} Ui
- * @typedef {{ roots: string[], kids: string[], byId: Map<string, Node>, open: string | null }} Nav
+ * @typedef {{ child: number }} Sizes
+ * @typedef {{ t: Palette, now: number, size: Sizes }} Ui
+ * @typedef {{ kids: string[], byId: Map<string, Node> }} Nav
  * @typedef {{ id: string, state: "loading" | "ready" | "error" | "none", lines: string[], error?: string }} Screen
  */
 
 const POLL = 10000;
-// Below this width the tree goes under its card, and the detail takes the tree's place instead of sitting beside it.
-const NARROW = 900;
 // The screen tail's rows: a fixed line height, so the block can be sized to them (a scroll area sizes to nothing).
 const LINE = 18;
-// Below this window width the summary moves under the title, so the header's two ends never collide.
-const COMPACT = 1000;
-// herdr-panda's work area: the stack, this block's child id in it, and the tabs' panes.
-const STACK = "work-switch", SELF = "fleet", WORK = "work-body";
-// The layout's agent block beside this one, and the row's gap between them.
-const AGENT = "fleet-agent", SPLIT = 8;
+// herdr-panda's right panel, its stack, and this block's child id in it.
+const PANEL = "panel", BODY = "panel-body", SELF = "fleet";
 // How long a screen read may take before the detail says it's unavailable (ms).
 const SCREEN_WAIT = 4000;
 // Bead events shown before "Show all".
 const EVENTS = 5;
 // Connector geometry: the stub from a root to its spine, each child's arm, and where a line meets a card
 // (the middle of its icon tile: 11 px padding + 12).
-const STUB = 26, ARM = 22, ANCHOR = 23, GAP = 10;
+const ARM = 22, ANCHOR = 23, GAP = 10;
 // The type scale: metadata, body, names, titles.
 const XS = 11, SM = 12, MD = 13, LG = 15;
 const ME = "mods/fleet";
@@ -61,8 +49,6 @@ const LABEL = {
   working: "Working", supervising: "Supervising", running: "Running", blocked: "Needs you", failed: "Failed",
   done: "Done", idle: "Idle", queued: "Queued", ended: "Ended", sample: "Sample",
 };
-/** @type {Record<Tier, string>} */
-const TIER = { needs: "Needs you", failed: "Failed", working: "Working", done: "Done", idle: "Idle" };
 
 /** @param {string} c @returns {c is Color} */
 const isColor = (c) => c.startsWith("#");
@@ -89,14 +75,8 @@ function tail(text, n) {
 }
 /** Core terminals as the model reads them: entries with an address. @returns {import("./model.js").Term[]} */
 const coreTerminals = () => terminals().flatMap((k) => (typeof k.address === "string" ? [{ ...k, address: k.address }] : []));
-/**
- * Card, detail and column widths for a width: a wide work area gets wider cards and a wider detail, not
- * a wider margin. `content` caps the centered column when no detail sits beside it.
- * @param {number} width @returns {Sizes}
- */
-const sizesFor = (width) => (width >= 2000 ? { root: 400, child: 440, detail: 900, content: 1600 }
-  : width >= 1400 ? { root: 360, child: 380, detail: 620, content: 1320 }
-  : { root: 320, child: 300, detail: 460, content: 1180 });
+/** A tree card's width for the row's width: a wide work area gets wider cards. @param {number} width @returns {Sizes} */
+const sizesFor = (width) => ({ child: width >= 2000 ? 440 : width >= 1400 ? 380 : 300 });
 /** A layout node by id, in layout()'s tree (clicks included: a selected stack child is its `active`).
  * @param {unknown} node @param {string} id @returns {Record<string, unknown> | null} */
 function findNode(node, id) {
@@ -149,18 +129,16 @@ export default class Fleet extends View {
   init(_props, cx) {
     /** @type {"fixture" | "live"} live beads unless fleet.fixture asks for the sample */
     this.mode = "live";
-    // Whether the last render showed it, and the tab and space it showed over: a change there means the person
-    // went to their work, so the work area comes back.
+    // Whether the last render showed it: showing anew refreshes live beads.
     this.wasShown = false;
-    this.where = "";
     // Live beads: the last answer, kept while a refresh runs; error names why bd couldn't answer.
     /** @type {{ byOrch: Map<string, Epic[]> | null, error: string | null, loading: boolean }} */
     this.live = { byOrch: null, error: null, loading: false };
     /** @type {string | null} the login shell's BEADS_DIR, asked once */
     this.beadsDir = null;
     this.fixtureAt = Date.now();
-    /** @type {string | null} the root whose tree shows (null: the fleet's default) */
-    this.open = null;
+    /** @type {string | null} the agent shown, as last seen: picking another one closes the detail */
+    this.selAddr = null;
     /** @type {string | null} the keyboard's card */
     this.cursor = null;
     /** @type {string | null} the card whose detail shows */
@@ -169,30 +147,9 @@ export default class Fleet extends View {
     this.detailNode = null;
     /** @type {Screen | null} */
     this.screen = null;
-    /** @type {string | null} the agent whose live terminal shows beside the tree */
-    this.agentFor = null;
-    // When this copy last moved the focus (agent.focus picks the agent's own space and tab): not a move to the work.
-    this.movedAt = 0;
-    // The side frame's width, and the agent block's as last set (the layout file's until then).
-    this.sideW = 0;
-    this.agentPx = 620;
-    // The whole row's width, this block's and the agent block's: measured only when a size change lands, so a
-    // frame where the agent block has come or gone but this block's size hasn't followed yet draws the same.
-    this.full = 1400;
-    /** @type {string | null} the detail kept in the side frame until the agent block takes it */
-    this.keepDetail = null;
-    // Whether the last render had room for the side frame.
-    this.split = true;
-    /** @type {Set<number>} expanded events, by position */
-    this.expanded = new Set();
-    this.allEvents = false;
-    /** @type {{ text: string, error: boolean } | null} what the last action said */
-    this.note = null;
     this.width = 1400;
-    /** @type {string} */
-    this.orderKey = "";
     /** @type {Nav} what the last render drew, for keys and commands */
-    this.nav = { roots: [], kids: [], byId: new Map(), open: null };
+    this.nav = { kids: [], byId: new Map() };
     this.typing = false;
     this.sending = false;
     this.keys = cx.focus_handle();
@@ -201,8 +158,6 @@ export default class Fleet extends View {
     this.answer.on("focus", (_e, cx) => { this.typing = true; cx.notify(); });
     this.answer.on("blur", (_e, cx) => { this.typing = false; cx.notify(); });
     if (checking()) return;
-    // A fresh copy starts without an agent beside it.
-    run("layout.hide", { id: AGENT });
     if (this.isShown()) this.loadBeads(cx);
     // A hidden copy keeps running (the stack's other child, another tab): poll only while this one shows.
     cx.timer.every(POLL, (cx) => { if (this.mode === "live" && window()?.visible && this.isShown()) this.loadBeads(cx); });
@@ -210,16 +165,17 @@ export default class Fleet extends View {
       for (;;) {
         const c = await nextCommand();
         if (c === "fixture" || c === "live") this.setMode(c, cx);
-        else if (c === "toggle") this.toggle();
         else if (c === "focus") this.keys.focus();
         else if (this.walk(c, cx)) cx.notify();
       }
     });
   }
 
-  /** Whether its stack has it selected. */
+  /** Whether the right panel shows, with this block picked. */
   isShown() {
-    return findNode(layout(), STACK)?.active === SELF;
+    const root = layout(), body = findNode(root, BODY);
+    const active = body?.active ?? (Array.isArray(body?.children) ? body.children[0]?.id : null);
+    return findNode(root, PANEL)?.hidden !== true && active === SELF;
   }
 
   /** Orchestrators' epics from bd, with the login shell's BEADS_DIR. On failure the cards keep what they had and
@@ -250,52 +206,9 @@ export default class Fleet extends View {
     cx.notify();
   }
 
-  // Back to the work: the stack shows the tabs' panes again. (Not View's close(cx) hook, which Herdr calls as a
-  // copy goes.)
-  dismiss() {
-    this.hideAgent();
-    this.wasShown = false;
-    run("layout.select", { stack: STACK, child: WORK });
-  }
-
-  /** fleet.toggle: back to the work when showing, else shows itself. */
-  toggle() {
-    if (!this.isShown()) run("layout.select", { stack: STACK, child: SELF });
-    else this.dismiss();
-  }
-
-  /** Whether the agent block beside this one shows. */
-  agentShown() {
-    const n = findNode(layout(), AGENT);
-    return Boolean(n) && n?.hidden !== true;
-  }
-
-  /** An agent's live terminal in the side frame, in place of a detail. agent.focus picks its space and tab too.
-   * @param {Node} node @param {Cx} cx */
-  showAgent(node, cx) {
-    this.keepDetail = this.detail;
-    this.detail = null;
-    this.agentFor = node.id;
-    this.movedAt = Date.now();
-    this.agentPx = this.sideW;
-    run("layout.resize", { id: AGENT, px: this.sideW });
-    run("layout.show", { id: AGENT });
-    run("agent.focus", { terminal: node.address });
-    // The keyboard stays on the tree; Enter on the same card moves it into the terminal.
-    cx.timer.after(60, () => { if (!this.typing) this.keys.focus(); });
-    cx.notify();
-  }
-
-  hideAgent() {
-    if (this.agentFor === null && !this.agentShown()) return;
-    this.agentFor = null;
-    run("layout.hide", { id: AGENT });
-  }
-
   /** Shows a card's detail and reads its screen; `answer` puts the keyboard in the answer field.
    * @param {Node} node @param {Cx} cx @param {boolean} [answer] */
   openDetail(node, cx, answer = false) {
-    this.hideAgent();
     this.detail = node.id;
     this.cursor = node.id;
     this.note = null;
@@ -331,10 +244,9 @@ export default class Fleet extends View {
     cx.notify();
   }
 
-  /** Goes to the terminal: the work area comes back first so the focused pane shows.
+  /** Goes to the card's terminal.
    * @param {Node} node */
   focus(node) {
-    this.dismiss();
     run(node.kind === "tool" ? "pane.focus" : "agent.focus", { terminal: node.address });
   }
 
@@ -379,39 +291,31 @@ export default class Fleet extends View {
   }
 
   /**
-   * Arrows walk the cards: up/down within the roots or the open tree, right into a tree, left back out.
-   * Enter opens a root's tree, then a card's detail (with the answer field, for one that needs you); on a card
-   * whose detail shows, it focuses that terminal. Esc closes the detail, then the fleet. Answers whether the
-   * key was one of these.
+   * Up/down walk the picked agent's tree; Enter opens a card's detail (with the answer field, for one that needs
+   * you), and on a card whose detail shows, it focuses that terminal. Left and Esc close the detail (back to the
+   * tree). Agents change in the rail (agent.next / agent.prev). Answers
+   * whether the key was one of these.
    * @param {string} key @param {Cx} cx
    */
   walk(key, cx) {
     if (key === "escape") {
-      if (this.detail) this.detail = null; else if (this.agentFor) this.hideAgent(); else this.dismiss();
+      if (!this.detail) return false;
+      this.detail = null;
       return true;
     }
-    if (!["up", "down", "left", "right", "enter"].includes(key)) return false;
-    const { roots, kids, byId, open } = this.nav;
-    const at = this.cursor && byId.has(this.cursor) ? this.cursor : open;
-    const node = at ? byId.get(at) : undefined;
-    if (!at || !node) return true;
-    const inRoots = roots.includes(at);
-    const list = inRoots ? roots : kids;
-    const i = list.indexOf(at);
-    if (key === "up" || key === "down") this.cursor = list[Math.max(0, Math.min(list.length - 1, i + (key === "down" ? 1 : -1)))] ?? at;
-    else if (key === "right" && inRoots) {
-      this.open = at;
-      this.detail = null;
-      this.cursor = descendants(node)[0]?.id ?? at;
-    } else if (key === "left" && !inRoots) { this.cursor = open; this.detail = null; }
-    else if (key === "enter") {
-      if (inRoots && this.split && node.live && node.address) {
-        this.open = at;
-        if (this.agentFor === at) this.focus(node); else this.showAgent(node, cx);
-      } else if (inRoots && at !== open) { this.open = at; this.detail = null; this.cursor = at; }
-      else if (this.detail === at && node.address && node.live) this.focus(node);
-      else this.openDetail(node, cx, node.status === "blocked");
+    if (key === "left") { this.detail = null; return true; }
+    if (!["up", "down", "enter"].includes(key)) return false;
+    const { kids, byId } = this.nav;
+    const at = this.cursor && kids.includes(this.cursor) ? this.cursor : null;
+    if (key === "up" || key === "down") {
+      const i = at ? kids.indexOf(at) : -1;
+      this.cursor = kids[Math.max(0, Math.min(kids.length - 1, i + (key === "down" ? 1 : -1)))] ?? null;
+      return true;
     }
+    const node = at ? byId.get(at) : undefined;
+    if (!node) return true;
+    if (this.detail === at && node.address && node.live) this.focus(node);
+    else this.openDetail(node, cx, node.status === "blocked");
     return true;
   }
 
@@ -439,138 +343,87 @@ export default class Fleet extends View {
       ? { mode: "fixture", epics: fixtureEpics(this.fixtureAt) }
       : { mode: "live", byOrch: this.live.byOrch ?? new Map() };
     const fleet = buildFleet({ agents: agents(), terminals: coreTerminals(), spaces: spaces(), beads });
-    const key = fleet.order.join(",");
-    if (key !== this.orderKey) { this.orderKey = key; setAgentOrder(fleet.order); }
-
     const roots = fleet.roots;
-    const open = roots.some((r) => r.node.id === this.open) ? this.open : fleet.defaultOpen;
     const byId = new Map(roots.flatMap((r) => [r.node, ...descendants(r.node)]).map((n) => [n.id, n]));
-    const openRoot = open ? byId.get(open) : undefined;
-    const kids = openRoot ? descendants(openRoot).map((n) => n.id) : [];
-    const shown = this.detail ? byId.get(this.detail) ?? null : null;
+    // The focused agent: focused().agent, or the root above it when that's one of its sub-agents; else (a shell has
+    // the focus) the one shown before.
+    const fa = focused()?.agent ?? null;
+    const sel = roots.find((r) => r.node.address === fa)
+      ?? roots.find((r) => descendants(r.node).some((n) => n.address === fa))
+      ?? roots.find((r) => r.node.address === this.selAddr) ?? null;
+    const selAddr = sel?.node.address ?? null;
+    if (selAddr !== this.selAddr) { this.selAddr = selAddr; this.detail = null; this.cursor = null; }
+    const kids = sel ? descendants(sel.node).map((n) => n.id) : [];
+    const shown = this.detail && kids.includes(this.detail) ? byId.get(this.detail) ?? null : null;
     this.detailNode = shown;
-    this.nav = { roots: roots.map((r) => r.node.id), kids, byId, open };
-    // Showing anew, take the keyboard (the hidden work area's terminal had it) and refresh live beads.
-    // Another tab or space while showing means the person went to their work: show it. Not when this copy just
-    // moved there itself, showing an agent.
+    this.nav = { kids, byId };
+    // Showing anew, refresh live beads.
     const visible = this.isShown() && !checking();
-    const f = focused(), where = `${f?.space ?? ""}|${f?.tab ?? ""}`;
-    if (visible && !this.wasShown) cx.timer.after(0, (cx) => {
-      if (!this.typing) this.keys.focus();
-      if (this.mode === "live") this.loadBeads(cx);
-    });
-    else if (visible && where !== this.where && now - this.movedAt > 3000) cx.timer.after(0, () => this.dismiss());
+    if (visible && !this.wasShown && this.mode === "live") cx.timer.after(0, (cx) => this.loadBeads(cx));
     this.wasShown = visible;
-    this.where = where;
 
-    // Two frames side by side: the fleet (header, tree, footer) and a side frame for the picked card, the same
-    // size whatever is picked. An agent's side frame is the layout's agent block, beside this block, which is
-    // narrower by that much then; a worker's or a bead's is drawn here. Too narrow for both: the detail takes the
-    // tree's place, with a way back, and an agent's terminal isn't shown. Every width comes from the whole row
-    // (this.full), so switching between the two draws nothing in between.
-    const laidOut = this.agentShown();
-    // Right after showAgent the layout may not say so yet: trust this copy for a second, then the layout (a hidden
-    // block or an agent gone ends it).
-    const fresh = now - this.movedAt < 1000;
-    if (this.agentFor !== null && !(byId.has(this.agentFor) && (fresh || laidOut))) this.agentFor = null;
-    const full = this.full;
-    const size = sizesFor(full);
-    // The tree column fits the deepest tree in the fleet (one level of workers at least), not the open one, so
-    // picking an agent without workers doesn't shrink it.
-    const depth = Math.max(1, ...roots.map((r) => depthOf(r.node)));
-    const treeW = size.root + STUB + ARM + size.child + (depth - 1) * (16 + ARM) + 48;
-    const sideW = Math.min(size.detail, full - treeW - SPLIT);
-    const split = sideW >= 400;
-    this.split = split;
-    if (split) this.sideW = sideW;
-    if (split && sideW !== this.agentPx) {
-      this.agentPx = sideW;
-      run("layout.resize", { id: AGENT, px: sideW });
-    }
-    if (!split && (this.agentFor !== null || laidOut)) cx.timer.after(0, () => this.hideAgent());
-    const agent = split ? this.agentFor : null;
-    if (agent === null || laidOut) this.keepDetail = null;
-    // Until the agent block shows, the side frame keeps what it had.
-    const side = shown ?? (agent !== null && this.keepDetail ? byId.get(this.keepDetail) ?? null : null);
-    const replace = !split && Boolean(shown);
+    // Cards fill the panel, less the spine's indent for the tree's depth: a wider panel gets wider cards.
+    const depth = sel ? Math.max(1, depthOf(sel.node)) : 1;
+    const child = Math.max(200, Math.min(440, this.width - 40 - ARM - (depth - 1) * (16 + ARM)));
     /** @type {Ui} */
-    const ui = { t, now, open, size, narrow: !split && full < NARROW, split, agent };
-    const list = () => v_flex().id("fleet-body").flex_1().h_full().min_w(0).overflow_y_scrollbar().px(24).pt(18).pb(32)
-      .child(v_flex().w_full().max_w(split ? treeW - 48 : size.content).mx_auto().gap(10)
-        .when(roots.length === 0, (b) => b.child(this.empty(t)))
-        .children(roots.flatMap((r, i) => [
-          ...(i === 0 || roots[i - 1].tier !== r.tier ? [this.tierHeading(t, r.tier, roots.filter((x) => x.tier === r.tier).length, i > 0)] : []),
-          this.rootRow(ui, r),
-        ])));
-    const frame = () => v_flex().h_full().min_h(0).rounded(10).border_1().border_color(t.border).overflow_hidden();
+    const ui = { t, now, size: { child } };
+    const tree = () => v_flex().id("fleet-body").flex_1().h_full().min_w(0).overflow_y_scrollbar().px(16).pt(14).pb(24)
+      .when(!roots.length, (b) => b.child(this.empty(t)))
+      .when(roots.length > 0 && !sel, (b) => b.child(div().text_size(SM).line_height("18px").text_color(t.muted)
+        .child("Pick an agent in the sidebar, or focus its pane, to see its workers and tasks here.")))
+      .when(Boolean(sel) && !kids.length, (b) => b.child(div().text_size(SM).text_color(t.muted).child("No workers or beads")))
+      .when(Boolean(sel && kids.length), (b) => (sel ? b.child(this.branch(ui, sel.node.children, "top")) : b));
 
-    return h_flex().id("fleet").track_focus(this.keys).on_key_down((e, cx) => this.onKey(e, cx))
-      .on_size_change((sz, cx) => {
-        const row = sz.width + (this.agentShown() ? this.agentPx + SPLIT : 0);
-        this.width = sz.width;
-        if (Math.abs(row - this.full) > 1) { this.full = row; cx.notify(); }
-      })
-      .size_full().gap(SPLIT).overflow_hidden().text_color(t.foreground).text_size(MD)
-      .child(frame().when(split, (el) => el.w(full - sideW - SPLIT).flex_none()).when(!split, (el) => el.flex_1()).min_w(0).bg(t.canvas)
-        .child(this.header(t, fleet.summary, this.beadsWarning(), (split ? full - sideW - SPLIT : this.width) < COMPACT))
-        .child(h_flex().flex_1().min_h(0).items_start()
-          .when(replace && Boolean(shown), (el) => (shown ? el.child(this.detailPanel(ui, shown, true).flex_1().min_w(0).h_full()) : el))
-          .when(!replace, (el) => el.child(list())))
-        .child(this.footer(t)))
-      .when(split && !laidOut, (el) => el.child(frame().w(sideW).flex_none().bg(t.popover)
-        .child(side ? this.detailPanel(ui, side, false).size_full() : this.inspectorHint(t))));
+    return v_flex().id("fleet").track_focus(this.keys).on_key_down((e, cx) => this.onKey(e, cx))
+      .on_size_change((sz, cx) => { if (Math.abs(sz.width - this.width) > 1) { this.width = sz.width; cx.notify(); } })
+      .size_full().min_w(0).bg(t.canvas).text_color(t.foreground).text_size(MD)
+      .when(Boolean(shown), (el) => (shown ? el.child(this.detailPanel(ui, shown, true).flex_1().min_h(0)) : el))
+      .when(!shown, (el) => el.child(this.header(ui, sel, this.beadsWarning())).child(tree()).child(this.footer(t)));
   }
 
-  /** The inspector before a card is picked: what it will show and how to pick one. @param {Palette} t */
-  inspectorHint(t) {
-    return v_flex().id("fleet-detail-hint").p(20).gap(6)
-      .child(div().text_size(MD).font_medium().text_color(t.foreground).child("No card picked"))
-      .child(div().text_size(SM).line_height("18px").text_color(t.muted)
-        .child("Pick an agent to work in its terminal here, or a worker or task to see its bead events, its last screen lines and Focus, Peek, Keep and Answer."));
-  }
-
-  /** Title and summary, then what's off about beads (or that the beads are a sample), and close. Compact: the
-   * summary on a second row. @param {Palette} t @param {Summary} s @param {string | null} warning @param {boolean} compact */
-  header(t, s, warning, compact) {
-    /** @param {number} n @param {string} one @param {string} many */
-    const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
-    /** @param {string} text @param {Color} [color] */
-    const count = (text, color) => div().text_color(color ?? t.muted).child(text);
-    const parts = [
-      count(`${plural(s.agents, "agent", "agents")} / ${plural(s.subAgents, "sub-agent", "sub-agents")}`),
-      count(`${s.working} working`, s.working ? t.foreground : t.muted),
-      count(`${s.needs} ${s.needs === 1 ? "needs" : "need"} you`, s.needs ? t.blocked : t.muted),
-      ...(s.failed ? [count(`${s.failed} failed`, this.color(t, "failed"))] : []),
-      ...(s.tasks ? [count(`${s.finished}/${s.tasks} tasks done`)] : []),
-    ].flatMap((el, i) => (i ? [div().text_color(t.dim).child("·"), el] : [el]));
-    const summary = h_flex().gap(7).items_center().text_size(SM).whitespace_nowrap().children(parts);
+  /** The picked agent: its tile, name, state and where it runs; under it, its tree's rollup and what's off about its
+   * beads, whether beads are a sample or being read, and the fleet's beads warning.
+   * @param {Ui} ui @param {ShownRoot | null} sel @param {string | null} warning */
+  header(ui, sel, warning) {
+    const { t, now } = ui;
+    const n = sel?.node;
     const reading = this.mode === "live" && !this.live.byOrch && !this.live.error;
-    const top = h_flex().h(compact ? 46 : 52).flex_none().gap(14).items_center()
-      .child(div().flex_none().text_size(LG).font_semibold().child("Agent Fleet"))
-      .when(!compact, (el) => el.child(summary))
+    const meta = n ? [n.app, n.address, sel?.space, ageLabel(n, now)].filter((x, i, all) => x && all.indexOf(x) === i).join(" · ") : "";
+    // Said once for the tree, not on every card: workers no bead names, or an orchestrator with no epic.
+    const r = sel?.rollup;
+    const noEpic = this.mode === "live" && sel?.orch && n?.address && this.live.byOrch?.get(n.address)?.length === 0;
+    const note = r?.unbeaded ? `${r.unbeaded} ${r.unbeaded === 1 ? "worker has" : "workers have"} no bead`
+      : noEpic ? "No open epic for this session" : null;
+    const mark = !r ? "idle" : r.needs ? "blocked" : r.failed ? "failed" : r.working ? "running" : "idle";
+    const top = h_flex().pt(14).pb(10).gap(10).items_start()
+      .when(Boolean(n), (el) => (n ? el.child(this.tile(t, n, 28)) : el))
+      .child(v_flex().flex_1().min_w(0).gap(2)
+        .child(h_flex().gap(8).items_center()
+          .child(div().min_w(0).truncate().text_size(LG).font_semibold().child(n?.name ?? "Agents"))
+          .when(Boolean(n), (el) => (n ? el.child(this.badge(t, n)) : el)))
+        .child(div().text_size(XS).text_color(t.muted).truncate().child(meta)));
+    const status = h_flex().pb(12).gap(8).items_center().text_size(XS).text_color(t.muted)
+      .when(Boolean(r), (el) => el.child(this.glyph(mark, this.color(t, mark === "running" ? "working" : mark === "idle" ? "ended" : mark))))
+      .child(div().flex_none().text_color(r?.needs ? t.foreground : t.muted).child(r?.text ?? ""))
+      .when(Boolean(note), (el) => el.child(div().text_color(t.dim).child("·")).child(div().min_w(0).truncate().child(note ?? "")))
       .child(div().flex_1())
-      .when(this.mode === "fixture", (el) => el.child(div().id("sample-chip").h(22).px(8).flex().flex_none().items_center().rounded(5)
-        .border_1().border_color(t.input).bg(t.raised).text_size(XS).font_medium().text_color(t.foreground)
+      .when(this.mode === "fixture", (el) => el.child(div().id("sample-chip").h(20).px(7).flex().flex_none().items_center().rounded(5)
+        .border_1().border_color(t.input).bg(t.raised).font_medium().text_color(t.foreground)
         .tooltip("Beads here are a made-up sample (fleet.live for real ones)").child("Sample data")))
-      .when(reading, (el) => el.child(div().text_size(XS).text_color(t.muted).child("Reading beads…")))
-      .when(Boolean(warning), (el) => el.child(h_flex().id("beads-warning").min_w(0).max_w(560).gap(6).items_center()
-        .text_size(SM).text_color(t.blocked).tooltip(warning ?? "")
-        .child(svg(`${ME}/alert.svg`).size(13).flex_none().text_color(t.blocked))
-        .child(div().min_w(0).truncate().child(warning ?? ""))))
-      .child(h_flex().id("fleet-back").h(28).px(10).gap(6).flex_none().items_center().rounded(6)
-        .border_1().border_color(t.input).bg(t.raised).cursor_pointer().role("button").accessibility_label("Back to work")
-        .tooltip("Back to the tabs' panes (Esc)").text_size(SM).font_medium().text_color(t.foreground)
-        .hover((st) => st.bg(t.hover)).on_click(() => this.dismiss())
-        .child(svg("mods/workspace-chrome/chevron-left.svg").size(14).flex_none().text_color(t.muted)).child("Back to work"));
-    return v_flex().id("fleet-header").flex_none().px(20).border_b_1().border_color(t.border).bg(t.chrome)
-      .child(top).when(compact, (el) => el.child(h_flex().h(28).pb(8).items_center().child(summary)));
+      .when(reading, (el) => el.child(div().flex_none().child("Reading beads…")))
+      .when(Boolean(warning), (el) => el.child(h_flex().id("beads-warning").min_w(0).gap(6).items_center()
+        .text_color(t.blocked).tooltip(warning ?? "")
+        .child(svg(`${ME}/alert.svg`).size(12).flex_none().text_color(t.blocked))
+        .child(div().min_w(0).truncate().child(warning ?? ""))));
+    return v_flex().id("fleet-header").flex_none().px(16).border_b_1().border_color(t.border).bg(t.chrome)
+      .child(top).when(Boolean(n), (el) => el.child(status));
   }
 
   /** The keys, and which beads database the live view reads. @param {Palette} t */
   footer(t) {
     return h_flex().id("fleet-footer").h(30).flex_none().px(20).gap(16).items_center().border_t_1().border_color(t.border)
       .bg(t.chrome).text_size(XS).text_color(t.muted)
-      .child(div().flex_none().child(`↑↓←→ move · Enter open, again to go to it · Esc ${this.detail || this.agentFor ? "close" : "back to work"}`))
+      .child(div().flex_none().child("↑↓ Enter · Alt+↑↓ agents"))
       .child(div().flex_1())
       .when(this.mode === "live" && Boolean(this.beadsDir), (el) => el.child(div().min_w(0).truncate()
         .child(`beads ${(this.beadsDir ?? "").replace(/^\/Users\/[^/]+|^\/home\/[^/]+/, "~")}`)));
@@ -584,35 +437,6 @@ export default class Fleet extends View {
         .child("Agents show up here once they report a status. Start one from the + menu in the tab bar, or from any terminal:"))
       .child(div().px(10).py(5).rounded(6).bg(t.background).border_1().border_color(t.border)
         .font_family(String(settings()?.font ?? "JetBrains Mono")).text_size(SM).child("hc run -- claude"));
-  }
-
-  /** @param {Palette} t @param {Tier} tier @param {number} n @param {boolean} spaced */
-  tierHeading(t, tier, n, spaced) {
-    return h_flex().gap(8).items_center().text_size(SM).when(spaced, (el) => el.mt(12))
-      .child(div().font_medium().text_color(t.muted).child(TIER[tier]))
-      .child(div().text_size(XS).text_color(t.muted).child(String(n)))
-      .child(div().flex_1().h(1).bg(t.border));
-  }
-
-  /** @param {Ui} ui @param {ShownRoot} r */
-  rootRow(ui, r) {
-    const { t, open, narrow } = ui;
-    const isOpen = r.node.id === open;
-    const card = this.card(ui, r.node, r, !isOpen);
-    const kids = r.node.children;
-    // Said once for the tree, not on every card: workers no bead names, or an orchestrator with no epic.
-    const noEpic = this.mode === "live" && r.orch && r.node.address && this.live.byOrch?.get(r.node.address)?.length === 0;
-    const note = r.rollup.unbeaded ? `${r.rollup.unbeaded} ${r.rollup.unbeaded === 1 ? "worker has" : "workers have"} no bead`
-      : noEpic ? "No open epic for this session" : null;
-    const left = v_flex().flex_none().gap(6).child(card)
-      .when(isOpen && Boolean(note), (el) => el.child(div().pl(12).text_size(XS).text_color(t.muted).child(note ?? "")));
-    if (!isOpen || !kids.length) return h_flex().items_start().child(left);
-    if (narrow) return v_flex().items_start().child(left).child(div().pl(18).child(this.branch(ui, kids, "top")));
-    // The open root's line leaves its right edge from a small ring and meets the spine.
-    const stub = div().relative().w(STUB).h(ANCHOR * 2).flex_none()
-      .child(div().absolute().top(ANCHOR).left(0).w(STUB).h(1).bg(t.accent))
-      .child(div().absolute().top(ANCHOR - 3).left(-4).size(7).rounded_full().border_1().border_color(t.accent).bg(t.canvas));
-    return h_flex().items_start().child(left).child(stub).child(this.branch(ui, kids, "side"));
   }
 
   /**
@@ -637,7 +461,7 @@ export default class Fleet extends View {
         .when(!last, (el) => el.child(div().absolute().top(y).left(0).bottom(0).w(1).bg(line)));
       return h_flex().items_start().child(arm)
         .child(v_flex().pt(pad).items_start()
-          .child(this.card(ui, n, null, false))
+          .child(this.card(ui, n))
           .when(n.children.length > 0, (el) => el.child(div().pl(16).child(this.branch(ui, n.children, "top")))));
     }));
   }
@@ -705,36 +529,24 @@ export default class Fleet extends View {
         .when(Boolean(pr), (r) => r.child(div().flex_none().text_color(t.muted).child(`PR #${pr}`)))));
   }
 
-  /** A card: a root (with its rollup, dimmed while another root is open) or a child. @param {Ui} ui @param {Node} n
-   * @param {ShownRoot | null} root @param {boolean} dim */
-  card(ui, n, root, dim) {
+  /** A card in the tree: a sub-agent, tool or task. @param {Ui} ui @param {Node} n */
+  card(ui, n) {
     const { t, now } = ui;
-    const cursor = this.cursor === n.id, shown = this.detail === n.id || ui.agent === n.id;
+    const cursor = this.cursor === n.id, shown = this.detail === n.id;
     const since = ageLabel(n, now);
-    const meta = (root ? [n.app, n.address, root.space] : n.bead ? [n.bead.id, n.address] : [n.app, n.address])
-      .filter((x, i, all) => x && all.indexOf(x) === i).join(" · ");
+    const meta = (n.bead ? [n.bead.id, n.address] : [n.app, n.address]).filter((x, i, all) => x && all.indexOf(x) === i).join(" · ");
     const kids = n.children.length;
-    const answer = !root && n.status === "blocked" && answerable(n);
-    const r = root?.rollup;
-    const mark = !r ? "idle" : r.needs ? "blocked" : r.failed ? "failed" : r.working ? "running" : "idle";
-    const foot = r ? r.text : kids ? `${kids} under it` : null;
-    return v_flex().id(`card-${n.id}`).w(root ? ui.size.root : ui.size.child).flex_none().px(12).pt(11).pb(10).gap(7).rounded(12)
-      .bg(shown ? t.selected : t.background).border_1()
-      .border_color(cursor ? t.accent : root && !dim ? t.input : t.border)
+    const answer = n.status === "blocked" && answerable(n);
+    return v_flex().id(`card-${n.id}`).w(ui.size.child).flex_none().px(12).pt(11).pb(10).gap(7).rounded(12)
+      .bg(shown ? t.selected : t.background).border_1().border_color(cursor ? t.accent : t.border)
       .when(n.status === "queued", (el) => el.border_dashed())
-      .opacity(dim ? 0.7 : 1).transition("opacity", 160)
       .cursor_pointer().hover((s) => s.border_color(cursor ? t.accent : t.input))
       .role("button").accessibility_label(`${n.name}, ${LABEL[n.shown] ?? n.shown}`)
       .on_click((_e, cx) => {
         this.cursor = n.id;
         this.keys.focus();
-        // An agent shows its live terminal beside the tree (again: goes to it); else, narrow, the first click opens
-        // its tree. A worker or a bead shows its detail.
-        if (root && ui.split && n.live && n.address) {
-          this.open = n.id;
-          if (ui.agent === n.id) this.focus(n); else this.showAgent(n, cx);
-        } else if (root && ui.open !== n.id) { this.open = n.id; this.detail = null; cx.notify(); }
-        else this.openDetail(n, cx);
+        // Again on the card whose detail shows: go to its terminal.
+        if (this.detail === n.id && n.live && n.address) this.focus(n); else this.openDetail(n, cx);
       })
       .child(h_flex().gap(9).items_start()
         .child(this.tile(t, n))
@@ -744,13 +556,11 @@ export default class Fleet extends View {
             .child(this.badge(t, n)))
           .child(h_flex().gap(8).text_size(XS).text_color(t.muted)
             .child(div().flex_1().min_w(0).truncate().child(meta))
-            .when(!root && Boolean(since), (m) => m.child(div().flex_none().child(since ?? ""))))))
+            .when(Boolean(since), (m) => m.child(div().flex_none().child(since ?? ""))))))
       .when(Boolean(n.task), (el) => el.child(div().text_size(SM).text_color(t.muted).truncate().child(n.task)))
       .when(Boolean(n.life), (el) => (n.life ? el.child(this.strip(t, n, n.life, false)) : el))
-      .when(Boolean(foot || answer || (root && since)), (el) => el.child(h_flex().gap(8).items_center().text_size(XS)
-        .when(Boolean(r), (f) => f.child(this.glyph(mark, this.color(t, mark === "running" ? "working" : mark === "idle" ? "ended" : mark))))
-        .child(div().flex_1().min_w(0).truncate().text_color(r?.needs ? t.foreground : t.muted).child(foot ?? ""))
-        .when(Boolean(root && since), (f) => f.child(div().flex_none().text_color(t.muted).child(since ?? "")))
+      .when(kids > 0 || answer, (el) => el.child(h_flex().gap(8).items_center().text_size(XS)
+        .child(div().flex_1().min_w(0).truncate().text_color(t.muted).child(kids ? `${kids} under it` : ""))
         .when(answer, (f) => f.child(div().id(`answer-${n.id}`).h(22).px(8).flex().items_center().rounded(5)
           .border_1().border_color(t.input).bg(t.raised).text_color(t.foreground).font_medium()
           .hover((s) => s.bg(t.hover)).role("button").accessibility_label(`Answer ${n.name}`)
@@ -817,7 +627,7 @@ export default class Fleet extends View {
     return v_flex().id("fleet-detail").flex_none().min_h(0).bg(t.popover).border_color(t.border)
       .when(replace, (el) => el.child(h_flex().h(36).flex_none().px(10).items_center().border_b_1().border_color(t.border)
         .child(h_flex().id("detail-back").h(26).px(6).gap(4).items_center().rounded(5).cursor_pointer()
-          .role("button").accessibility_label("Back to the fleet").text_size(SM).text_color(t.muted)
+          .role("button").accessibility_label("Back to the tree").text_size(SM).text_color(t.muted)
           .hover((s) => s.bg(t.hover).text_color(t.foreground)).on_click((_e, cx) => back(cx))
           .child(svg("mods/workspace-chrome/chevron-left.svg").size(14)).child("Back"))))
       .child(h_flex().px(16).pt(14).pb(12).gap(10).items_start().border_b_1().border_color(t.border)

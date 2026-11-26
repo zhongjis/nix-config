@@ -143,35 +143,27 @@ in {
         "ctrl-b" = "mod.open:tmux-prefix";
       };
       "mod:tmux-prefix"."ctrl-b" = "tmux-prefix.send-prefix";
-      # herdr-panda: Cmd/Ctrl+Shift+S settles the focused agent (panda-focus mod); Cmd/Ctrl+Shift+A swaps the work
-      # area for the Agent Fleet (fleet mod) and back.
+      # herdr-panda: Cmd/Ctrl+Shift+S settles the focused agent (panda-focus mod); Cmd/Ctrl+Shift+A toggles the
+      # Agents panel (fleet mod, through panda-tabs' panel buttons).
       "layout:herdr-panda" = {
         "cmd-shift-s" = "panda-focus.settle";
         "ctrl-shift-s" = "panda-focus.settle";
-        ${fleetKey} = {
-          command = "layout.select";
-          args = {
-            stack = "work-switch";
-            child = "fleet";
-          };
-        };
+        ${fleetKey} = "panda-tabs.fleet";
       };
-      "mod:fleet".${fleetKey} = "fleet.toggle";
     };
-    # Herdr's default `main` layout with the panda-focus agent cards in the sidebar, its work area in a stack:
-    # the tabs' panes and panel, or the Agent Fleet.
+    # Herdr's default `main` layout with the panda-focus agent cards in the sidebar and an Agents panel on the right.
     layouts.herdr-panda = lib.importJSON ./layouts/herdr-panda.json;
     # Mods linking files from mods/shared come from the whole mods folder, so the links resolve when copied.
     mods = {
       panda-focus = "${./mods}/panda-focus";
       panda-subagents = "${./mods}/panda-subagents";
-      # Agent Fleet: agents, their workers and their beads as a tree; herdr-panda's work-area alternative.
+      # Agents panel: the focused agent's workers and their beads as a tree, in herdr-panda's right panel.
       fleet = ./mods/fleet;
       # Herdr's `spaces` mod with the repo/branch on its own line.
       panda-spaces = "${./mods}/panda-spaces";
       # panda-spaces' right-click menu on a worktree without a space.
       panda-worktree-menu = ./mods/panda-worktree-menu;
-      # Herdr's `tabs` mod with icon-only Files/Changes/PR/CI panel buttons.
+      # Herdr's `tabs` mod with icon-only Agents/Files/Changes/PR/CI panel buttons.
       panda-tabs = ./mods/panda-tabs;
       # Herdr's `workspace-chrome` footer (Settings, Add machine) with centered icons on the collapsed rail.
       panda-chrome = ./mods/panda-chrome;

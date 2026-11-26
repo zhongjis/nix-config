@@ -1,6 +1,6 @@
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex } from "gpui-base";
-import { spaces, panes, run, openOverlay, theme, window, shared, layout, settings } from "herdr";
+import { spaces, panes, run, openOverlay, theme, window, shared, layout, settings, nextCommand } from "herdr";
 
 function find(node, id) {
   if (node?.id === id) return node;
@@ -9,6 +9,13 @@ function find(node, id) {
     if (found) return found;
   }
   return null;
+}
+
+// Shows a side panel, or hides it when it's the one showing.
+function togglePanel(id) {
+  const root = layout(), panel = find(root, "panel"), on = panel && !panel.hidden && find(root, "panel-body")?.active === id;
+  if (on) run("layout.hide", { id: "panel" });
+  else { run("layout.select", { stack: "panel-body", child: id }); run("layout.show", { id: "panel" }); }
 }
 
 // A tab's agent status, never by color alone: a spinner, a ring with a "!",
@@ -20,10 +27,12 @@ const STATUS = {
 };
 
 export default class Tabs extends View {
-  init() {
+  init(_props, cx) {
     this.pressed = null;
     this.over = null;
     this.panels = JSON.parse(localStorage.getItem("panels") ?? "{}");
+    // Keys: panda-tabs.<panel> (fleet, files, changes, pr, ci) toggles that panel.
+    cx.spawn(async () => { for (;;) togglePanel(await nextCommand()); });
   }
 
   // The side panel is remembered per space: switching shows that space's choice
@@ -101,10 +110,7 @@ export default class Tabs extends View {
       return h_flex().id(`panel-${id}`).size(26).flex_none().items_center().justify_center().rounded(6).cursor_pointer()
         .bg(on ? t.selected : t.chrome).text_color(on ? t.foreground : t.muted).tooltip(label)
         .hover(s => s.bg(on ? t.selected : t.hover)).on_mouse_down("left", stop)
-        .on_click(() => {
-          if (on) run("layout.hide", { id: "panel" });
-          else { run("layout.select", { stack: "panel-body", child: id }); run("layout.show", { id: "panel" }); }
-        }).child(svg(icon).size(14));
+        .on_click(() => togglePanel(id)).child(svg(icon).size(14));
     };
     // The window buttons: Windows' own caption glyphs, a size down elsewhere.
     const caption = w?.platform === "windows" ? 16 : 14;
@@ -115,6 +121,7 @@ export default class Tabs extends View {
       .on_scroll_wheel(e => { if (Math.abs(e.delta.y) >= 1) run(e.delta.y > 0 ? "tab.prev" : "tab.next"); })
       .child(h_flex().id("tab-scroll").flex_1().min_w(0).h_full().items_center().gap(3).overflow_x_scrollbar().children(shown.map(item)))
       .child(button("tab-new", svg("mods/workspace-chrome/plus.svg").size(14), "New tab", () => openOverlay({ mod: "new-menu", kind: "popup", width: 250, height: 512 })))
+      .when(enabled.includes("fleet"), el => el.child(panelButton("fleet", "Agents", "icons/agent.svg")))
       .when(enabled.includes("files"), el => el.child(panelButton("files", "Files", "mods/files/file.svg")))
       .when(enabled.includes("changes"), el => el.child(panelButton("changes", "Changes", "mods/changes/changes.svg")))
       .when(enabled.includes("pr"), el => el.child(panelButton("pr", "Pull requests", "mods/pr-flow/merge.svg")))
