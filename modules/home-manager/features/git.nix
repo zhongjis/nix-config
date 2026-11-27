@@ -69,6 +69,7 @@
       transfer = {
         fsckobjects = true;
       };
+      beads.role = "maintainer";
     };
 
     # settings.attributes = [];
