@@ -10,6 +10,14 @@
     if pkgs.stdenv.hostPlatform.isDarwin
     then "cmd-shift-a"
     else "ctrl-shift-a";
+  needsKey =
+    if pkgs.stdenv.hostPlatform.isDarwin
+    then "cmd-shift-j"
+    else "ctrl-shift-j";
+  snoozeKey =
+    if pkgs.stdenv.hostPlatform.isDarwin
+    then "cmd-shift-d"
+    else "ctrl-shift-d";
   # panda-focus's session hooks, passed per launch instead of installed into Claude Code, Pi, Codex and Copilot.
   # agy has no per-launch plugin flag: its hook is a plugin linked into agy's plugins folder below.
   integrations = "${config.xdg.configHome}/herdr-app/mods/panda-focus/integrations";
@@ -149,6 +157,10 @@ in {
         "cmd-shift-s" = "panda-focus.settle";
         "ctrl-shift-s" = "panda-focus.settle";
         ${fleetKey} = "panda-tabs.fleet";
+        # Jumps to the next agent or task that needs the person.
+        ${needsKey} = "panda-focus.next-needs";
+        # Snoozes the agent in view, or wakes it when it is snoozed.
+        ${snoozeKey} = "panda-focus.snooze";
       };
     };
     # Herdr's default `main` layout with the panda-focus agent cards in the sidebar and an Agents panel on the right.
@@ -158,13 +170,13 @@ in {
       panda-focus = "${./mods}/panda-focus";
       panda-subagents = "${./mods}/panda-subagents";
       # Agents panel: the focused agent's workers and their beads as a tree, in herdr-panda's right panel.
-      fleet = ./mods/fleet;
+      fleet = "${./mods}/fleet";
       # Herdr's `spaces` mod with the repo/branch on its own line.
       panda-spaces = "${./mods}/panda-spaces";
       # panda-spaces' right-click menu on a worktree without a space.
       panda-worktree-menu = ./mods/panda-worktree-menu;
       # Herdr's `tabs` mod with icon-only Agents/Files/Changes/PR/CI panel buttons.
-      panda-tabs = ./mods/panda-tabs;
+      panda-tabs = "${./mods}/panda-tabs";
       # Herdr's `workspace-chrome` footer (Settings, Add machine) with centered icons on the collapsed rail.
       panda-chrome = ./mods/panda-chrome;
       # Replaces Herdr's shipped `changes` panel (reuses its git listing): inline diffs, opens hunk, sends hunk notes to the tab's agent.

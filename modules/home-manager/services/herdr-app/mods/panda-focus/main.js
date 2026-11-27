@@ -14,16 +14,34 @@
 // with a new pid in the same pane: the line is typed into it, or, for a settled one, kept as a closed row.
 // The same integrations re-inject an orchestrator's or worker's state after a context compaction: on a terminal labelled
 // `orch-context=<script>` they run that script and add its output to the agent's context.
-// Hibernating: an orchestrator worker (a sub-agent labelled `hibernate=ok`) idle past HIBERNATE is exited the same
-// way. Its terminal finishes with `hibernated=<ms>` and `resume=<line>` on it, so its parent can revive it (rm,
-// then run the line); shared "panda-focus.hibernated" lists them for the cards and the sub-agents popup.
+// Hibernating: an orchestrator worker (a sub-agent labelled `hibernate=ok`, never Codex) idle past HIBERNATE is exited
+// the same way. Its terminal finishes with `hibernated=<ms>` and `resume=<line>` on it, so it can be revived (shared
+// revive.js: the launch contract comes back from that finished terminal); shared "panda-focus.hibernated" lists them
+// for the cards and the sub-agents popup. Its resume line is `env K=V... <agent line>` (ENV_KEPT, for the skill's
+// restart), the browser namespace and bead identity in front.
+// Orchestrators (an `[o] ` pane, tab or title, an `orch-context` label, or live children labelled `orch=<address>`):
+// every ORCH_EVERY while the window shows, the tasks of each one's session (its newest open epic, the one the Agents
+// panel draws) are summed (bd.js loadSummaries, tasks.js) into shared "orch.summary" ({ [address]: { epic, total,
+// merged, inPr, you, waiting, working, text, at, youBead, youKey } }, written only when it changed, `at` then being when
+// it last changed). A read that fails drops that orchestrator's summary, so a stale one never lingers. Their card's
+// workers chip says that text, red when a task waits on the person. A sub-agent's status flip or a fresh
+// `orch.in=<ms>:<kind>` label shows as a ticker on its card. Card times count from the clock (clock.js): what the rail
+// saw change, else the core's live status time (`hc get`), never terminals()' stale status_ms; shared
+// "panda-focus.since" publishes them for the Agents panel.
+// Keys, as mod commands (`panda-focus.<command>`): settle, next-needs (the next agent, in rail order, that is stuck or
+// has a task waiting on the person; for such an orchestrator also the Agents panel at that task), snooze (the snooze
+// menu, or wake when the agent in view is snoozed), wake.
 
 import { View, div, image, svg } from "gpui-kit";
 import { v_flex, h_flex, Scrollbar } from "gpui-base";
-import { agents, terminals, panes, spaces, focused, run, openOverlay, hc, exec, notify, theme, shared, setShared, setAgentOrder, props, nextCommand, settings, layout, home, readTextFile, window } from "herdr";
-import { namer } from "./name.js";
-import { kidStatus, descendants, treeStatus } from "./tree.js";
+import { agents, terminals, panes, spaces, focused, run, openOverlay, closeOverlay, checking, hc, exec, notify, theme, shared, setShared, setAgentOrder, props, nextCommand, settings, layout, home, readTextFile, window } from "herdr";
+import { namer, termName } from "./name.js";
+import { kidStatus, descendants, treeStatus, isOrchName } from "./tree.js";
 import { firstFolder } from "./terminal.js";
+import { agentWord, ago, took } from "./words.js";
+import { buildTasks, summary } from "./tasks.js";
+import { Clock } from "./clock.js";
+import { beadsDir, loadSummaries, statusMs } from "./bd.js";
 
 const BUSY = new Set(["working", "blocked"]);
 // A theme color at some opacity (#rgb or #rrggbb); any other color gives `solid` instead.
@@ -79,6 +97,16 @@ const HIBERNATE = 5 * 60000;
 // Arriving in Active needing the person (blocked, done), a card glows in its status color, fading natively over
 // GLOW (ms): a cue for the corner of the eye, beside Herdr's own sound and toast. A section change reorders at once.
 const GLOW = 1200;
+// Orchestrator summaries for the cards, and how often they are read while the window shows (ms).
+const ORCH = "orch.summary";
+// What each agent card's corner counts from ({ [address]: ms }), for the Agents panel's header.
+const SINCE = "panda-focus.since";
+const ORCH_EVERY = 30000;
+// A card's ticker: shown for TICK (ms), faded out over FADE, gone after TICK + FADE + 200. An `orch.in` label counts as
+// news for FRESH (ms).
+const TICK = 3000, FADE = 1200, FRESH = 5000;
+// What a worker keeps when hibernated (read from its argv's `env` prefix), in the order written to its resume line.
+const ENV_KEPT = ["AGENT_BROWSER_NAMESPACE", "BEADS_ACTOR", "ORCH_BEAD", "BEADS_DIR", "BEADS_DOLT_SHARED_SERVER"];
 // Can be closed and resumed: a local agent that prints a resume line.
 const closable = (a) => Boolean(EXIT[a.app]) && !a.address.includes("/");
 // How often the resume labels are brought up to date (ms): a reboot loses at most this much of a session switch.
@@ -98,15 +126,6 @@ const narrow = () => (sidebar(layout())?.size?.px ?? Infinity) < 160;
 function expandSidebar() {
   setShared("sidebar.collapsed", false);
   run("layout.resize", { id: "sidebar", px: shared("sidebar.width") ?? 268 });
-}
-
-// As T3's sidebar times: no "ago", nothing past days.
-function ago(ms, now) {
-  const m = Math.floor((now - ms) / 60000);
-  if (m < 1) return "just now";
-  if (m < 60) return `${m}m`;
-  if (m < 1440) return `${Math.floor(m / 60)}h`;
-  return `${Math.floor(m / 1440)}d`;
 }
 
 // T3's default snooze menu: one and three hours on, 6 PM today (gone once past), 9 AM tomorrow and next Monday
@@ -130,17 +149,84 @@ function wakes(ms, now) {
   return days <= 0 ? time : days === 1 ? `Tomorrow ${time}` : days < 7 ? `${DAYS[d.getDay()]} ${time}` : `${d.getMonth() + 1}/${d.getDate()} ${time}`;
 }
 
-// How long it's been working, as T3's Working pill: 9s, 4m, 1h 5m.
-function took(ms, now) {
-  const s = Math.max(0, Math.floor((now - ms) / 1000)), m = Math.floor(s / 60);
-  return s < 60 ? `${s}s` : m < 60 ? `${m}m` : `${Math.floor(m / 60)}h ${m % 60}m`;
-}
-
 // The program's icon from the app's table: a one-color glyph or a picture.
 function icon(p, size, color) {
   if (!p?.icon) return null;
   return p.tint ? svg(p.icon).size(size).flex_none().text_color(color) : image(p.icon).w(size).h(size).flex_none();
 }
+
+// `K=V` for each ENV_KEPT key in the `env` prefix of an argv (`env K=V ... agent`, or bare assignments), values with no
+// whitespace only: the words of an `env <K=V...> ` that go before an agent's resume line. "" when there are none.
+function envPrefix(argv) {
+  const found = new Map();
+  let at = /(^|\/)env$/.test(argv?.[0] ?? "") ? 1 : 0;
+  for (; at < (argv?.length ?? 0); at++) {
+    const x = String(argv[at]), eq = x.indexOf("=");
+    if (eq > 0 && /^[A-Za-z_][A-Za-z0-9_]*$/.test(x.slice(0, eq))) {
+      const v = x.slice(eq + 1);
+      if (ENV_KEPT.includes(x.slice(0, eq)) && v && !/\s/.test(v)) found.set(x.slice(0, eq), v);
+    } else if (!x.startsWith("-")) break;
+  }
+  return ENV_KEPT.filter((k) => found.has(k)).map((k) => `${k}=${found.get(k)}`).join(" ");
+}
+
+// The line that revives a hibernated worker: its agent line with the identity of its argv in front.
+function resumeWithEnv(argv, line) {
+  const env = envPrefix(argv);
+  return env ? `env ${env} ${line}` : line;
+}
+
+// The live orchestrators' addresses on this machine: a pane, tab or title marked `[o] ...` (tree.js isOrchName, as the
+// Agents panel reads it), a terminal labelled `orch-context`, or a live terminal a child names in its `orch` label.
+function orchestrators(all, ps, tabName) {
+  const live = new Set(all.filter((k) => k.state === "live").map((k) => k.address));
+  const out = new Set();
+  const add = (address) => { if (address && !address.includes("/") && live.has(address)) out.add(address); };
+  for (const k of all) {
+    if (k.state !== "live") continue;
+    // Workers carry `orch-context` too (their own context script), with an `orch` label naming their parent.
+    if (k.labels?.["orch-context"] && !k.labels?.orch) add(k.address);
+    add(k.labels?.orch);
+  }
+  for (const p of ps) if ([p.name, p.title, tabName(p.tab)].some(isOrchName)) add(p.terminal);
+  return out;
+}
+
+// What a card's ticker says about a sub-agent: the label's news (fresh `orch.in=<ms>:<kind>`, not shown yet), else its
+// status flip (`was` to `now`: working again is down, a stop or a stuck prompt is up). null when there is none.
+// `color` names the theme color.
+function tickText(address, name, label, was, now, at, seen) {
+  const [ms, kind] = String(label ?? "").split(":"), sent = Number(ms);
+  if (kind && Number.isFinite(sent) && at - sent < FRESH && !seen.has(`${address}:${ms}`)) {
+    seen.set(`${address}:${ms}`, at);
+    return { text: `↓ ${kind === "command" ? "command sent to" : kind} ${name}`, color: "accent" };
+  }
+  if (!was || was === now) return null;
+  // A flip alone doesn't say who sent the work; the label above does. A sub-agent at a prompt is its parent's to
+  // answer, so it doesn't say "needs you".
+  return now === "working" ? { text: `↓ ${name} working`, color: "accent" }
+    : now === "blocked" ? { text: `↑ ${name} at a prompt`, color: "blocked" } : { text: `↑ ${name} reported`, color: "done" };
+}
+
+// An orchestrator's tasks in its session (its newest open epic), as the summary the cards show (`found`:
+// loadSummaries' Map). The same rows the Agents panel builds, so both say the same.
+export function summaries(found, ctx) {
+  const out = {};
+  for (const [orch, { session }] of found) {
+    if (!session) continue;
+    const tasks = buildTasks({ ...session, ...ctx });
+    if (!tasks.length) continue;
+    const you = tasks.find((t) => t.turn === "you");
+    out[orch] = { epic: session.epic.id, ...summary(tasks), youBead: you?.id ?? null, youKey: you?.key ?? null, at: ctx.now };
+  }
+  return out;
+}
+
+// Same summaries, whatever their times.
+const sameSummaries = (x, y) => {
+  const flat = (o) => JSON.stringify(Object.entries(o ?? {}).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)).map(([k, v]) => [k, { ...v, at: 0 }]));
+  return flat(x) === flat(y);
+};
 
 export default class Focus extends View {
   init(_props, cx) {
@@ -160,6 +246,16 @@ export default class Focus extends View {
     this.hovered = null;
     // Takes the keyboard while a row is lifted, so Esc can put it back.
     this.keys = cx.focus_handle();
+    // When each card's agent last changed, as the core says it on first sight (terminals() status_ms is stale).
+    this.clock = new Clock((address) => (checking() || address.includes("/") ? Promise.resolve(null) : statusMs(address).catch(() => null)));
+    // Sub-agents' last status and the `orch.in` labels already shown (key -> ms), for the cards' ticker; each card's
+    // ticker ({text, color, at}); the live orchestrators (set by render).
+    this.kidSeen = new Map();
+    this.inSeen = new Map();
+    this.ticks = {};
+    this.orchs = new Set();
+    // Nothing below may start in `herdr-app check`: passes, labels, timers and tasks.
+    if (checking()) return;
     // "Working 9s" counts by the second only while such a card shows under a minute, the window in front; past
     // that it reads in minutes, and the minute tick below moves it on.
     cx.timer.every(1000, (cx) => { if (this.ticking && window()?.active) cx.notify(); });
@@ -180,11 +276,39 @@ export default class Focus extends View {
       localStorage.setItem("pins-moved", "true");
     }
     cx.timer.every(2000, () => this.movePins());
-    // `t3-focus.settle` (cmd-shift-s in keys.json): see settleKey in render.
+    // Orchestrators' task summaries: soon after start, then every ORCH_EVERY while the window shows.
+    cx.timer.every(ORCH_EVERY, (cx) => this.summarize(cx));
+    cx.timer.after(2000, (cx) => this.summarize(cx));
+    // `panda-focus.<command>` (keys.json): settle (cmd-shift-s), next-needs, snooze, wake; see the *Key handlers in render.
     cx.spawn(async (cx) => {
       for (;;) {
         const c = await nextCommand();
         if (c === "settle") this.settleKey?.(cx);
+        else if (c === "next-needs") this.needsKey?.(cx);
+        else if (c === "snooze") this.snoozeKey?.(cx);
+        else if (c === "wake") this.wakeKey?.(cx);
+        cx.notify();
+      }
+    });
+  }
+
+  // Reads the live orchestrators' sessions and publishes their task summaries (shared "orch.summary"), only when they
+  // changed. One pass at a time. A failed read (bd missing, a locked database) drops the summaries it couldn't read:
+  // the cards fall back to their workers, and next-needs never acts on an old "your turn".
+  summarize(cx) {
+    if (this.summing || !this.orchs.size || !window()?.visible) return;
+    this.summing = true;
+    cx.spawn(async (cx) => {
+      try {
+        this.dir ??= await beadsDir();
+        const found = await loadSummaries([...this.orchs], this.dir);
+        const listed = new Map(agents().map((a) => [a.address, a.status]));
+        const next = summaries(found, { terms: terminals(), listed, hibernated: shared(HIBERNATED) ?? [], now: Date.now() });
+        if (!sameSummaries(next, shared(ORCH))) setShared(ORCH, next);
+      } catch {
+        if (Object.keys(shared(ORCH) ?? {}).length) setShared(ORCH, {});
+      } finally {
+        this.summing = false;
         cx.notify();
       }
     });
@@ -325,6 +449,8 @@ export default class Focus extends View {
     this.pinsToMove = [];
   }
 
+  // Only agents and terminals with a resume line are asked about (`hc get` each): a plain shell or tool has nothing to
+  // label or resume.
   sessions(cx) {
     if (this.syncing) return;
     this.syncing = true;
@@ -332,6 +458,7 @@ export default class Focus extends View {
       try {
         for (const t of terminals()) {
           if (t.state !== "live" || t.address.includes("/")) continue;
+          if (!t.program?.agent && !t.status && !t.report && !t.labels?.resume) continue;
           const k = await this.inspect(t.address);
           if (!k || k.state !== "live") continue;
           const prompt = SHELL.test(k.foreground?.name ?? "");
@@ -353,9 +480,11 @@ export default class Focus extends View {
   }
 
   // An orchestrator worker idle (not stuck) past HIBERNATE, once per idle spell. Only its parent works with it, so
-  // focus doesn't hold it back as it does a settled agent.
+  // focus doesn't hold it back as it does a settled agent. Never Codex, even labelled: the orchestration skill can't
+  // resume a Codex session, so its worker would be lost.
   sleepy(k) {
-    return Boolean(k.parent) && k.labels?.hibernate === "ok" && !k.labels?.hibernated && ["idle", "done"].includes(k.status?.state)
+    return Boolean(k.parent) && k.labels?.hibernate === "ok" && !k.labels?.hibernated && k.status?.app !== "codex"
+      && ["idle", "done"].includes(k.status?.state)
       && k.status_ms > 0 && Date.now() - k.status_ms >= HIBERNATE && !this.tried.has(`hibernate:${k.address}:${k.status_ms}`);
   }
 
@@ -387,9 +516,8 @@ export default class Focus extends View {
       notify({ title: "Couldn't hibernate", body: `${title}: no resume command appeared, so it was left running.`, level: "warning" });
       return;
     }
-    // The worker's browser namespace (start-worker.sh) comes back with it.
-    const ns = (k.argv ?? []).find((x) => x.startsWith("AGENT_BROWSER_NAMESPACE="));
-    const resume = ns ? `env ${ns} ${line}` : line;
+    // The worker's identity (browser namespace, bead actor and epic, beads database) comes back with it.
+    const resume = resumeWithEnv(k.argv, line);
     await hc(["label", k.address, `resume=${resume}`, "resume.pid="]).catch(() => null);
     // A worker resumed in a recovered shell (a reboot) is back at that shell's prompt, still live: ended here, keep
     // off first (keep recovers a killed program too), so it finishes like any other and revive's `hc rm` works.
@@ -498,7 +626,7 @@ export default class Focus extends View {
   snoozeMenu(t) {
     const { snooze, overlay } = props(), now = Date.now();
     return v_flex().w_full().p(5).bg(t.popover).text_size(12.8)
-      .child(div().px(8).pt(4).pb(6).text_size(11).text_color(t.dim).child("Snooze until"))
+      .child(div().px(8).pt(4).pb(6).text_size(12).text_color(t.muted).child("Snooze until"))
       .children(snoozes(now).map((p) => h_flex().id(`snooze-${p.id}`).h(31).px(8).gap(9).rounded(7).items_center()
         .text_color(t.foreground).cursor_pointer().hover((el) => el.bg(t.hover))
         .on_click(() => {
@@ -506,7 +634,7 @@ export default class Focus extends View {
           closeOverlay(overlay);
         })
         .child(div().flex_1().child(p.label))
-        .child(div().flex_none().text_size(11).text_color(t.dim).child(wakes(p.until, now)))));
+        .child(div().flex_none().text_size(12).text_color(t.muted).child(wakes(p.until, now)))));
   }
 
   render(cx) {
@@ -516,6 +644,11 @@ export default class Focus extends View {
     const list = every;
     const listed = new Map(every.map((a) => [a.address, a.status]));
     const term = new Map(all.map((k) => [k.address, k]));
+    // Live orchestrators, and the task summary of each (shared "orch.summary", written by summarize()).
+    const tabNames = new Map(sp.flatMap((s) => s.tabs.map((c) => [c.id, c.name])));
+    this.orchs = orchestrators(all, ps, (id) => tabNames.get(id));
+    const sums = shared(ORCH) ?? {};
+    const sumOf = (a) => (this.orchs.has(a.address) ? sums[a.address] : undefined);
     for (const [key, m] of Object.entries(this.pending)) {
       for (const [k, v] of Object.entries(m)) if (!term.has(k) || (term.get(k).labels?.[key] ?? "") === v) delete m[k];
     }
@@ -564,20 +697,40 @@ export default class Focus extends View {
       turn: term.get(a.address)?.turn ?? 0, excluded: pins.includes(a.address) || Boolean(settledAt(a) || snoozedAt(a)),
     })), all, now, cx);
     const mark = (a) => this.changed[a.address];
-    // Seen changing, then; before that, the core's time of its last change. terminals() only has that as of
-    // the app's start (status_ms isn't updated live), so it serves only until we see a change ourselves.
-    const since = (a) => mark(a)?.at || term.get(a.address)?.status_ms || 0;
+    // The core's live time of each card's last change (clock.js): asked once per agent, redrawn when it answers.
+    for (const a of every) this.clock.observe(a.address, state(a), Number(term.get(a.address)?.status_ms) || 0, now);
+    // Working sub-agents too: a parent waiting on them counts from the longest-working one's live time.
+    // (a listed one is observed above with its own word: observing it twice would flip it every render).
+    const subs = new Map();
+    for (const a of every) for (const k of descendants(all, a.address)) if (!listed.has(k.address)) subs.set(k.address, k);
+    for (const k of subs.values()) this.clock.observe(k.address, kidStatus(k, listed), Number(k.status_ms) || 0, now);
+    this.clock.prune([...every.map((a) => a.address), ...subs.keys()]);
+    const asked = this.clock.takePending();
+    if (asked.length) cx.spawn(async (cx) => { await Promise.allSettled(asked); cx.notify(); });
+    const coreAt = (a) => this.clock.since(a.address);
+    // Seen changing, then; before that, the core's time of its last change (the clock's, not terminals()' status_ms,
+    // which is only right as of the app's start).
+    const since = (a) => mark(a)?.at || coreAt(a) || 0;
     // Just stopped: it shows its state now but keeps its Working place until the grace is out.
     const lingering = (a) => mark(a)?.s === "idle" && mark(a).start != null;
     // T3's Working shelf.
     const working = (a) => running(a) || lingering(a);
     // Active by when each came back to the person; Working by when its run started.
     const newest = (x, y) => since(y) - since(x) || byAddress(x, y);
-    const begun = (a) => (lingering(a) ? mark(a).start || term.get(a.address)?.status_ms || 0 : since(a));
-    // Working since: seen set going; before that, its own report, or for a parent waiting on sub-agents the
+    const begun = (a) => (lingering(a) ? mark(a).start || coreAt(a) || 0 : since(a));
+    // Working since: seen set going; before that, its own live time, or for a parent waiting on sub-agents the
     // longest-working one's.
-    const started = (a) => mark(a)?.at || (a.status === "working" ? term.get(a.address)?.status_ms
-      : Math.min(Infinity, ...descendants(all, a.address).filter((k) => kidStatus(k, listed) === "working").map((k) => k.status_ms).filter(Boolean)));
+    const started = (a) => mark(a)?.at || (a.status === "working" ? coreAt(a)
+      : Math.min(Infinity, ...descendants(all, a.address).filter((k) => kidStatus(k, listed) === "working").map((k) => this.clock.since(k.address) || k.status_ms).filter(Boolean)));
+    // The time each card's corner counts from (its run's start while working, else its last change), published so
+    // the Agents panel's header says the same (shared SINCE); written only when it changed.
+    const shownAt = {};
+    for (const a of every) {
+      const at = running(a) ? started(a) : since(a);
+      if (at > 0 && at < Infinity) shownAt[a.address] = at;
+    }
+    const was = shared(SINCE) ?? {};
+    if (Object.keys(was).length !== Object.keys(shownAt).length || Object.entries(shownAt).some(([k, v]) => was[k] !== v)) setShared(SINCE, shownAt);
     const pinned = pins.map((p) => list.find((a) => a.address === p)).filter(Boolean);
     const rest = list.filter((a) => !pins.includes(a.address));
     const awake = rest.filter((a) => !settledAt(a) && !snoozedAt(a));
@@ -599,8 +752,9 @@ export default class Focus extends View {
       // Not for the one in view: the person is already looking at it.
       const a = every.find((x) => x.address === k), st = a && state(a);
       if (a.focused || (st !== "blocked" && st !== "done")) continue;
-      (this.glows ??= {})[k] = { at: now, color: st === "blocked" ? t.blocked : t.done };
-      cx.timer.after(50, (cx) => cx.notify());
+      const glow = { at: now, color: st === "blocked" ? t.blocked : t.done, armed: false };
+      (this.glows ??= {})[k] = glow;
+      cx.timer.after(50, (cx) => { glow.armed = true; cx.notify(); });
     }
     for (const [k, g] of Object.entries(this.glows ?? {})) if (now - g.at > GLOW + 60 || !sectionNow.has(k)) delete this.glows[k];
     this.sections = sectionNow;
@@ -609,6 +763,29 @@ export default class Focus extends View {
     if (find(layout())?.active !== "lists") setAgentOrder([...pinned, ...out, ...work, ...nap, ...put].map((a) => a.address));
 
     const title = namer();
+    // The ticker: a sub-agent's status flip or fresh `orch.in` label is news for the cards above it, shown for TICK. One
+    // timer per tick wakes the render that fades it; the render after FADE drops it.
+    const news = new Map(), alive = new Set();
+    for (const a of every) {
+      for (const k of descendants(all, a.address)) {
+        alive.add(k.address);
+        if (!news.has(k.address)) {
+          const now_ = kidStatus(k, listed);
+          news.set(k.address, tickText(k.address, termName(k, title, listed), k.labels?.["orch.in"], this.kidSeen.get(k.address), now_, now, this.inSeen));
+          this.kidSeen.set(k.address, now_);
+        }
+        const n = news.get(k.address);
+        if (n && this.ticks[a.address]?.at !== now) {
+          this.ticks[a.address] = { ...n, at: now };
+          // One render starts the fade, one after it drops the ticker: no per-second redraw.
+          cx.timer.after(TICK, (cx) => cx.notify());
+          cx.timer.after(TICK + FADE + 250, (cx) => cx.notify());
+        }
+      }
+    }
+    for (const k of this.kidSeen.keys()) if (!alive.has(k)) this.kidSeen.delete(k);
+    for (const [k, at] of this.inSeen) if (now - at > FRESH * 2) this.inSeen.delete(k);
+    for (const [k, tk] of Object.entries(this.ticks)) if (now - tk.at > TICK + FADE + 200) delete this.ticks[k];
     const hover = (a) => (on, cx) => {
       if (on) this.hovered = a.address;
       else if (this.hovered === a.address) this.hovered = null;
@@ -625,8 +802,9 @@ export default class Focus extends View {
     // text color reads best on it.
     const avatar = (id, name, size) => {
       const color = (shared("space.colors") ?? {})[id] ?? "ansi6", fill = color.startsWith("#") ? color : t[color] ?? t.accent;
+      // Never under 12 px: the letter may fill the small avatar, it stays readable.
       return h_flex().size(size).flex_none().rounded(4).bg(fill)
-        .items_center().justify_center().text_size(size * 0.64).font_bold().text_color(ink(t, fill))
+        .items_center().justify_center().text_size(Math.max(12, size * 0.64)).font_bold().text_color(ink(t, fill))
         .child([...(name ?? "")][0]?.toUpperCase() ?? "?");
     };
     // Brought back, it's news again: the top of the list. Brought back by the person (`look`), it's also what
@@ -655,6 +833,40 @@ export default class Focus extends View {
       if (settledAt(a)) unsettle(a, cx);
       else if (!busy(a) && !pins.includes(a.address)) settle([a], cx);
     };
+    // The snooze menu, for a card's Snooze button and the snooze key.
+    const openSnooze = (a) => openOverlay({ mod: "panda-focus", kind: "popup", at: "pointer", width: 220, height: 42 + 31 * snoozes(Date.now()).length, props: { snooze: a.address } });
+    // The snooze key: the agent in view, as its card's Snooze (not while it needs the person, nor pinned or settled);
+    // on an agent already snoozed it wakes it, as the settle key unsettles.
+    this.snoozeKey = (cx) => {
+      const a = every.find((a) => a.focused);
+      if (!a) return;
+      if (snoozedAt(a)) return void unsettle(a, cx, true, "snoozed");
+      const why = state(a) === "blocked" ? "it needs you" : pins.includes(a.address) ? "it is pinned" : settledAt(a) ? "it is settled" : null;
+      if (why) notify({ title: "Can't snooze", body: `${title(a)}: ${why}.`, level: "info" });
+      else openSnooze(a);
+    };
+    // The wake key: the agent in view, as its snoozed row's Wake.
+    this.wakeKey = (cx) => {
+      const a = every.find((a) => a.focused);
+      if (a && snoozedAt(a)) unsettle(a, cx, true, "snoozed");
+    };
+    // The next-needs key: the next agent in rail order after the one in view (wrapping) that is stuck or has a task
+    // waiting on the person. An orchestrator with such a task also opens it in the Agents panel (shared "fleet.open").
+    this.needsKey = () => {
+      const rail = [...pinned, ...out, ...work, ...nap, ...put], at = rail.findIndex((a) => a.focused);
+      const next = [...rail.slice(at + 1), ...rail.slice(0, at + 1)].find((a) => state(a) === "blocked" || (sumOf(a)?.you ?? 0) > 0);
+      if (!next) {
+        notify({ title: "Nothing needs you", level: "info" });
+        return;
+      }
+      run("agent.focus", { terminal: next.address });
+      const asked = sumOf(next);
+      if (asked?.you > 0 && asked.youBead) {
+        setShared("fleet.open", { orch: next.address, epic: asked.epic, bead: asked.youBead, at: Date.now() });
+        run("layout.select", { stack: "panel-body", child: "fleet" });
+        run("layout.show", { id: "panel" });
+      }
+    };
 
     // The rail (the sidebar under 160px): one 28px row per agent in the list's order, its groups (Pinned, Active,
     // Working as its shelf folds, Settled) told apart by 12px of space alone, Working and Settled at the bottom as
@@ -677,8 +889,8 @@ export default class Focus extends View {
       const said = (a) => {
         const st = state(a), age = since(a) > 0 ? ago(since(a), now) : "", s = started(a);
         const machine = a.address.includes("/") ? a.address.split("/")[0] : null;
-        const word = running(a) ? `Working ${s > 0 && s < Infinity ? took(s, now) : ""}`
-          : `${st === "blocked" ? "Needs you" : st === "done" ? "Done" : "Idle"} ${age}`;
+        const word = running(a) ? `${agentWord("working")} ${s > 0 && s < Infinity ? took(s, now) : ""}`
+          : `${agentWord(st === "blocked" || st === "done" ? st : "idle")} ${age}`;
         return [title(a), machine ? `${a.space_name} · ${machine}` : a.space_name, word.trim()].filter(Boolean).join(" · ");
       };
       const tile = (a) => h_flex().id(`rail-${a.address}`).h(28).flex_none().items_center().justify_center().cursor_pointer()
@@ -767,7 +979,7 @@ export default class Focus extends View {
     const BADGE = { pin: ["mods/workspace-chrome/pin.svg", "Pin"], unpin: ["mods/workspace-chrome/pin-off.svg", "Unpin"],
       settle: ["mods/workspace-chrome/circle-check.svg", "Settle"], unsettle: ["mods/panda-focus/undo.svg", "Unsettle"] };
     const badge = (v) => h_flex().id(`badge-${v}`).h(20).px(6).gap(4).flex_none().items_center().rounded(4)
-      .border(1).border_color(tint(t.accent, 0.4, t.accent)).bg(tint(t.accent, 0.1, t.selected)).text_size(11).font_medium().text_color(t.accent)
+      .border(1).border_color(tint(t.accent, 0.4, t.accent)).bg(tint(t.accent, 0.1, t.selected)).text_size(12).font_medium().text_color(t.accent)
       .child(svg(BADGE[v][0]).size(12).flex_none().text_color(t.accent)).child(BADGE[v][1]);
 
     // Settled shows one page; while a drag moves a row out of it the next row fills in, and one settled into
@@ -895,7 +1107,7 @@ export default class Focus extends View {
       // person (that would wake it at once), not pinned (pinning ends a snooze).
       const nid = `snooze-${a.address}`;
       const doze = !ghost && !swept(a) && !dragging && !this.sweep?.moved && this.hovered === a.address && st !== "blocked" && !pins.includes(a.address)
-        && h_flex().id(nid).size(22).flex_none().items_center().justify_center().rounded(5)
+        && h_flex().id(nid).size(24).flex_none().items_center().justify_center().rounded(5)
           .on_hover(glow(nid)).cursor_pointer().hover((s) => s.bg(t.hover))
           .role("button").accessibility_label("Snooze").tooltip("Snooze")
           .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
@@ -903,7 +1115,7 @@ export default class Focus extends View {
             cx.stop_propagation();
             if (justDropped()) return;
             this.hovered = null;
-            openOverlay({ mod: "panda-focus", kind: "popup", at: "pointer", width: 220, height: 40 + 31 * snoozes(Date.now()).length, props: { snooze: a.address } });
+            openSnooze(a);
           })
           .child(svg("mods/workspace-chrome/clock.svg").size(12).flex_none().text_color(lit(nid, t.muted)));
       // As in T3, the corner says the state when there's one worth saying (Working, Needs you, Done: finished
@@ -916,7 +1128,7 @@ export default class Focus extends View {
       const corner = ghost ? (verb ? badge(verb) : div())
         : swept(a) ? badge("settle")
         : offer
-        ? h_flex().id(id).h(22).px(6).gap(4).flex_none().items_center().rounded(5)
+        ? h_flex().id(id).h(24).px(6).gap(4).flex_none().items_center().rounded(5)
           .text_size(12).text_color(lit(id, t.muted)).on_hover(glow(id)).cursor_pointer().hover((s) => s.bg(t.hover))
           .role("button").accessibility_label("Settle").tooltip(`Settle  ${window()?.platform === "macos" ? "⌘⇧S" : "Ctrl+Shift+S"}`)
           .on_mouse_down("left", sweepFrom("settle", a))
@@ -934,28 +1146,36 @@ export default class Focus extends View {
           .child("Settle")
         : running(a)
           ? pill(t.working, svg("mods/workspace-chrome/spinner.svg").size(16).flex_none().text_color(t.working).spin(900),
-            "Working", started(a) > 0 && started(a) < Infinity ? took(started(a), now) : null)
+            agentWord("working"), started(a) > 0 && started(a) < Infinity ? took(started(a), now) : null)
             // Waiting on sub-agents with a reply not yet seen: a dot, so the reply isn't lost while it stays here.
             .when(a.status === "done", (el) => el.child(div().id(`reply-${a.address}`).size(6).flex_none().rounded_full().bg(t.done).tooltip("Reply not yet seen")))
           : st === "blocked"
-            ? pill(t.blocked, div().size(14).flex_none().rounded(4).bg(tint(t.blocked, 0.15, t.hover)).text_size(11).font_bold().flex().items_center().justify_center().child("!"), "Needs you")
+            ? pill(t.blocked, div().size(14).flex_none().rounded(4).bg(tint(t.blocked, 0.15, t.hover)).text_size(12).font_bold().flex().items_center().justify_center().child("!"), agentWord("blocked"))
             : st === "done"
-              ? pill(t.done, svg("mods/workspace-chrome/circle-check.svg").size(16).flex_none().text_color(t.done), "Done")
+              ? pill(t.done, svg("mods/workspace-chrome/circle-check.svg").size(16).flex_none().text_color(t.done), agentWord("done"))
               : div().id(`state-${a.address}`).flex_none().child(since(a) > 0 ? ago(since(a), now) : "");
+      // An orchestrator's tasks, as its workers chip says them: red when one waits on the person (summary text), or a worker is
+      // stuck; else the workers going. Without a summary yet, the workers alone.
+      const sum = sumOf(a), wait = (sum?.you ?? 0) > 0;
+      const chip = wait && sum.text ? sum.text : stuck ? `${stuck} worker${stuck > 1 ? "s" : ""} stuck` : sum?.text ? sum.text
+        : going ? `${going} worker${going > 1 ? "s" : ""} working` : "View finished workers";
+      const alarm = wait || stuck > 0;
+      // The ticker (see its tracking above): live for TICK, then faded out until it is dropped.
+      const tick = !ghost && this.ticks[a.address], ticking = Boolean(tick) && now - tick.at < TICK;
       // Relative only while it glows: its glow is laid over the card's box.
       const base = v_flex().id(`${ghost ? "ghost-" : ""}card-${a.address}`).px(10).py(8).gap(2).flex_none().rounded(10);
       // The arrival glow, drawn under the content: full on the render that sees it arrive, then faded out over GLOW
       // natively once a render sets its target (see sectionNow).
       const g = !ghost && this.glows?.[a.address];
       const shine = g && div().id(`glow-${a.address}`).absolute().top(0).left(0).right(0).bottom(0).rounded(10)
-        .bg(tint(g.color, 0.24, t.hover)).opacity(now - g.at < 40 ? 1 : 0).transition("opacity", { duration: GLOW, easing: "ease-out" });
+        .bg(tint(g.color, 0.24, t.hover)).opacity(g.armed ? 0 : 1).transition("opacity", { duration: GLOW, easing: "ease-out" });
       return (ghost ? base : row(base, a).role("button").accessibility_label(title(a)).on_hover(hover(a)).cursor_pointer()
         // agent.focus, not pane.focus: in tabs it focuses the pane, and it picks what the agent view shows.
         .on_click(open(a)).on_size_change((size) => { this.cardH = size.height; }))
         .when(on, (el) => el.bg(t.selected))
         .when(!on && !ghost && !dragging && !this.sweep?.moved, (el) => el.hover((s) => s.bg(t.hover)))
         .when(Boolean(shine), (el) => el.relative().child(shine))
-        .child(h_flex().h(20).gap(6).items_center().text_size(12).text_color(t.dim)
+        .child(h_flex().h(24).gap(6).items_center().text_size(12).text_color(t.muted)
           .child(avatar(a.space, a.space_name, 14))
           // Lifted, a pin keeps its glyph only while it stays among the pins.
           .when(pins.includes(a.address) && (!ghost || plan?.section === "pinned" || !plan), (el) => el.child(svg("mods/workspace-chrome/pin.svg").size(12).flex_none().text_color(t.dim)))
@@ -967,23 +1187,30 @@ export default class Focus extends View {
           .child(div().flex_1().min_w(0).truncate().text_size(13).text_color(on ? t.foreground : t.muted).child(title(a)))
           .when(Boolean(pic), (el) => el.child(pic)))
         // The sub-agents part opens a list of them (panda-subagents); a click there peeks at one.
-        .when(Boolean(branch || live), (el) => el.child(h_flex().min_w(0).gap(4).items_center().text_size(12).text_color(t.dim)
-          .when(Boolean(branch), (el) => el.child(div().min_w(0).truncate().child(branch)))
-          .when(Boolean(branch && live), (el) => el.child(div().flex_none().child("·")))
-          .when(Boolean(live) && !ghost, (el) => el.child(h_flex().id(`subs-${a.address}`).flex_none().h(22).px(6).gap(4).items_center().rounded(5)
-            .cursor_pointer().role("button").accessibility_label("Show workers").tooltip(`${live} worker${live > 1 ? "s" : ""}`)
-            .hover((s) => s.text_color(t.foreground).bg(t.hover))
-            .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
-            .on_click((_e, cx) => {
-              cx.stop_propagation();
-              // Sized for what it will list: the live ones under it and the hibernated ones they or it left.
-              const subs = descendants(terminals(), a.address), under = new Set([a.address, ...subs.map((k) => k.address)]);
-              const asleep = (shared(HIBERNATED) ?? []).filter((r) => under.has(r.parent)).length;
-              openOverlay({ mod: "panda-subagents", kind: "popup", width: 300, height: subsHeight(subs.length, asleep), props: { parent: a.address } });
-            })
-            .when(stuck > 0, (el) => el.text_color(t.blocked)
-              .child(div().size(14).flex_none().rounded(4).bg(tint(t.blocked, 0.15, t.hover)).text_size(11).font_bold().flex().items_center().justify_center().child("!")))
-            .child(stuck ? `${stuck} worker${stuck > 1 ? "s" : ""} stuck` : going ? `${going} worker${going > 1 ? "s" : ""} working` : "View finished workers")))));
+        .when(Boolean(branch || live || sum?.text), (el) => el.child(div().relative().min_w(0)
+          .child(h_flex().id(`sub-${a.address}`).min_w(0).gap(4).items_center().text_size(12).text_color(t.muted)
+            // The ticker takes the line over for TICK: this fades out fast, and back in slowly, under it.
+            .when(Boolean(tick), (el) => el.opacity(ticking ? 0 : 1).transition("opacity", { duration: ticking ? 150 : FADE, easing: "ease-out" }))
+            .when(Boolean(branch), (el) => el.child(div().min_w(0).truncate().child(branch)))
+            .when(Boolean(branch && (live || sum?.text)), (el) => el.child(div().flex_none().text_color(t.dim).child("·")))
+            .when((Boolean(live) || Boolean(sum?.text)) && !ghost, (el) => el.child(h_flex().id(`subs-${a.address}`).min_w(0).h(24).px(6).gap(4).items_center().rounded(5)
+              .cursor_pointer().role("button").accessibility_label("Show workers").tooltip(`${live} worker${live === 1 ? "" : "s"}`)
+              .hover((s) => s.text_color(t.foreground).bg(t.hover))
+              .on_mouse_down("left", (_e, cx) => cx.stop_propagation())
+              .on_click((_e, cx) => {
+                cx.stop_propagation();
+                // Sized for what it will list: the live ones under it and the hibernated ones they or it left.
+                const subs = descendants(terminals(), a.address), under = new Set([a.address, ...subs.map((k) => k.address)]);
+                const asleep = (shared(HIBERNATED) ?? []).filter((r) => under.has(r.parent)).length;
+                openOverlay({ mod: "panda-subagents", kind: "popup", width: 300, height: subsHeight(subs.length, asleep), props: { parent: a.address } });
+              })
+              // A task waiting on the person, or a stuck worker: red, with a mark that reads without the color.
+              .when(alarm, (el) => el.text_color(t.blocked)
+                .child(div().size(14).flex_none().rounded(4).bg(tint(t.blocked, 0.15, t.hover)).text_size(12).font_bold().flex().items_center().justify_center().child("!")))
+              .child(div().min_w(0).truncate().child(chip)))))
+          .when(Boolean(tick), (el) => el.child(h_flex().id(`tick-${a.address}`).absolute().top(0).left(0).right(0).bottom(0).items_center().px(6).text_size(12)
+            .text_color(t[tick.color] ?? t.accent).opacity(ticking ? 1 : 0).transition("opacity", { duration: FADE, easing: "ease-out" })
+            .child(div().min_w(0).truncate().child(tick.text))))));
     };
 
     // A settled row: one dim line; viewing it leaves it settled. Hovered it brightens and its time
@@ -1013,7 +1240,7 @@ export default class Focus extends View {
         .child(ghost ? (verb ? badge(verb) : div()) : swept(a) ? badge("unsettle")
           // No settle time (its label is on its way back from the core): no time on it. "closing" only while
           // retire() runs: a failed or never-started exit reads its settle time.
-          : over ? undo : div().flex_none().text_size(12).text_color(t.dim).child(!settledAt(a) ? "" : this.closing.has(a.address)
+          : over ? undo : div().flex_none().text_size(12).text_color(t.muted).child(!settledAt(a) ? "" : this.closing.has(a.address)
             ? "closing" : ago(settledAt(a)[0], now)));
     };
 
@@ -1037,7 +1264,7 @@ export default class Focus extends View {
               cx.notify();
             })
             .child(svg("mods/panda-focus/undo.svg").size(14).flex_none().text_color(lit(id, t.muted)))
-          : h_flex().flex_none().gap(4).items_center().text_size(12).text_color(t.dim)
+          : h_flex().flex_none().gap(4).items_center().text_size(12).text_color(t.muted)
             .child(svg("mods/workspace-chrome/clock.svg").size(12).flex_none().text_color(t.dim)).child(z ? wakes(z[0], now) : ""));
     };
 
@@ -1070,13 +1297,13 @@ export default class Focus extends View {
             .on_hover(glow(id)).role("button").accessibility_label("Forget").tooltip("Forget")
             .on_click((_e, cx) => { cx.stop_propagation(); this.hovered = null; forget(r); cx.notify(); })
             .child(svg("mods/workspace-chrome/x.svg").size(14).flex_none().text_color(lit(id, t.muted)))
-          : h_flex().flex_none().gap(4).items_center().text_size(12).text_color(t.dim)
+          : h_flex().flex_none().gap(4).items_center().text_size(12).text_color(t.muted)
             .child(svg("mods/panda-focus/moon.svg").size(12).flex_none().text_color(t.dim)).child(ago(r.at, now)));
     };
 
     // A shelf's header, folding it: label, then count and chevron at the far edge.
     const shelf = (id, label, count, open, toggle, extra) => h_flex().id(id).h(30).px(10).gap(6).flex_none().items_center().rounded(8)
-      .text_size(12).font_medium().text_color(t.dim).cursor_pointer().when(!dragging, (el) => el.hover((s) => s.bg(t.hover)))
+      .text_size(12).font_medium().text_color(t.muted).cursor_pointer().when(!dragging, (el) => el.hover((s) => s.bg(t.hover)))
       .role("button").accessibility_label(`${open ? "Hide" : "Show"} ${label.toLowerCase()} agents`)
       .on_click((_e, cx) => {
         toggle();
@@ -1087,18 +1314,25 @@ export default class Focus extends View {
       .child(div().child(String(count)))
       .child(svg(`mods/workspace-chrome/chevron-${open ? "down" : "right"}.svg`).size(12).flex_none());
 
-    // Ticks by the second only while a shown working time is still in seconds (took).
+    // Ticks by the second only while a shown working time is still in seconds (took); tickers have their own timers.
     this.ticking = [...pinned, ...busyRows].some((a) => {
       const s = started(a);
       return running(a) && s > 0 && s < Infinity && now - s < 60000;
     });
     // The first shelf takes the free space above it, so both sit at the bottom.
+    // Folded, the Working shelf still says how much under it needs attention: workers stuck on a prompt and tasks
+    // waiting on the person (an orchestrator's summary), a red count with a mark.
+    const stuckWork = work.reduce((n, a) => n + kids.get(a.address).filter((x) => x === "blocked").length + (sumOf(a)?.you ?? 0), 0);
+    const stuckChip = !this.workOpen && stuckWork > 0 && h_flex().id("working-stuck").h(24).gap(4).flex_none().items_center().text_color(t.blocked)
+      .tooltip(`${stuckWork} need${stuckWork > 1 ? "" : "s"} attention`).accessibility_label(`${stuckWork} need attention`)
+      .child(div().size(14).flex_none().rounded(4).bg(tint(t.blocked, 0.15, t.hover)).text_size(12).font_bold().flex().items_center().justify_center().child("!"))
+      .child(String(stuckWork));
     const shelves = v_flex().id("shelves").pt(12).flex_none()
       .when(work.length > 0, (el) => el
         .child(shelf("working-header", "Working", work.length, this.workOpen, () => {
           this.workOpen = !this.workOpen;
           localStorage.setItem("working-open", String(this.workOpen));
-        }).on_mouse_move((_e, cx) => aim(null, cx)))
+        }, stuckChip).on_mouse_move((_e, cx) => aim(null, cx)))
         .child(v_flex().children(lane("working", busyRows, (a) => card(a), 2))))
       // T3's Snoozed shelf, between Working and Settled; nothing drops into it (a snooze needs a wake time).
       .when(nap.length > 0, (el) => el
@@ -1140,9 +1374,9 @@ export default class Focus extends View {
         else close(cx);
       }
     };
-    const clearButton = doomed.length > 0 && h_flex().id("settled-clear").h(22).px(6).flex_none().items_center().rounded(5)
+    const clearButton = doomed.length > 0 && h_flex().id("settled-clear").h(24).px(6).flex_none().items_center().rounded(5)
       .cursor_pointer().hover((s) => s.bg(t.hover))
-      .text_color(this.clearing ? t.blocked : lit("settled-clear", t.dim)).on_hover((on, cx) => {
+      .text_color(this.clearing ? t.blocked : lit("settled-clear", t.muted)).on_hover((on, cx) => {
         if (this.clearing) unask(on ? 0 : 400, cx);
         glow("settled-clear")(on, cx);
       })
@@ -1171,7 +1405,7 @@ export default class Focus extends View {
       .children(lane("settled", rows, (a) => slim(a), 0))
       .when(this.open, (el) => el.children(closed.map(closedRow)))
       .when(this.open && put.length > this.limit, (el) => el.child(h_flex().id("settled-more").h(30).px(10).gap(8).flex_none().items_center().rounded(8)
-        .text_color(t.dim).cursor_pointer().hover((s) => s.bg(t.hover).text_color(t.foreground))
+        .text_color(t.muted).cursor_pointer().hover((s) => s.bg(t.hover).text_color(t.foreground))
         .role("button").accessibility_label("Show more settled agents")
         .on_click((_e, cx) => {
           this.limit += MORE;
@@ -1183,7 +1417,7 @@ export default class Focus extends View {
 
     // The shipped agents list's header in place of T3's search, filter, new space and new agent row.
     const top = h_flex().id("focus-top").px(16).h(HEAD).pt(14).pb(5).flex_none().items_center()
-      .child(div().text_size(12).font_medium().text_color(t.dim).child("Agents"));
+      .child(div().text_size(12).font_medium().text_color(t.muted).child("Agents"));
 
     return v_flex().id("t3-focus-root").relative().size_full().min_h(0).bg(t.chrome).text_size(13)
       .on_size_change((size) => { this.height = size.height; this.width = size.width; })
@@ -1223,7 +1457,7 @@ export default class Focus extends View {
         .when(dragging && others(out).length === 0 && !(out.length > 0 && !plan), (el) => el
           .child(plan?.gap === "head-active" ? gap("head-active") : placeholder("active", "Active")))
         .children(lane("active", out, (a) => card(a), 2))
-        .when(out.length === 0 && !dragging, (el) => el.child(div().px(10).py(8).text_size(12).text_color(t.dim)
+        .when(out.length === 0 && !dragging, (el) => el.child(div().px(10).py(8).text_size(12).text_color(t.muted)
           .child(every.length ? "Nothing needs you." : "No agent status yet. Agents show up here when they report their status.")))
         // While dragging, Settled shows even empty: it's where a drop settles.
         // The free space above the shelves pushes them to the bottom; a drag over it lands in Active, as T3's

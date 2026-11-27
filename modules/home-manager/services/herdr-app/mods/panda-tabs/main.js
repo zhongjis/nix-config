@@ -1,6 +1,8 @@
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex } from "gpui-base";
-import { spaces, panes, run, openOverlay, theme, window, shared, layout, settings, nextCommand } from "herdr";
+import { spaces, panes, agents, run, openOverlay, theme, window, shared, layout, settings, nextCommand, checking } from "herdr";
+import { namer } from "./name.js";
+import { agentWord } from "./words.js";
 
 function find(node, id) {
   if (node?.id === id) return node;
@@ -18,12 +20,12 @@ function togglePanel(id) {
   else { run("layout.select", { stack: "panel-body", child: id }); run("layout.show", { id: "panel" }); }
 }
 
-// A tab's agent status, never by color alone: a spinner, a ring with a "!",
-// or a dot, and its word on hover.
+// A tab's agent status, never by color alone: a spinner, a ring with a "!", or a dot, and its word (words.js, the
+// rail's and the Agents panel's) on hover.
 const STATUS = {
-  working: ["Working", t => svg("mods/workspace-chrome/spinner.svg").size(12).text_color(t.working).spin(900)],
-  blocked: ["Needs you", t => svg("mods/panda-tabs/alert.svg").size(12).text_color(t.blocked)],
-  done: ["Done", t => div().size(6).rounded(3).bg(t.done)],
+  working: t => svg("mods/workspace-chrome/spinner.svg").size(12).text_color(t.working).spin(900),
+  blocked: t => svg("mods/panda-tabs/alert.svg").size(12).text_color(t.blocked),
+  done: t => div().size(6).rounded(3).bg(t.done),
 };
 
 export default class Tabs extends View {
@@ -31,7 +33,8 @@ export default class Tabs extends View {
     this.pressed = null;
     this.over = null;
     this.panels = JSON.parse(localStorage.getItem("panels") ?? "{}");
-    // Keys: panda-tabs.<panel> (fleet, files, changes, pr, ci) toggles that panel.
+    // Keys: panda-tabs.<panel> (fleet, files, changes, pr, ci) toggles that panel. Not in `herdr-app check`.
+    if (checking()) return;
     cx.spawn(async () => { for (;;) togglePanel(await nextCommand()); });
   }
 
@@ -68,13 +71,18 @@ export default class Tabs extends View {
     const space = spaces().find(p => p.active);
     const shown = space?.tabs ?? [];
     const stop = (_e, cx) => cx.stop_propagation();
+    // A tab nobody named is called after its agent as the rail and the Agents panel call it (name.js).
+    const nameOf = namer(), agentIn = new Map();
+    for (const a of agents()) if (!agentIn.has(a.tab)) agentIn.set(a.tab, a);
     const button = (id, label, tip, action) => div().id(id).size(26).flex_none().flex().items_center().justify_center().rounded(6).text_color(t.dim).cursor_pointer().hover(s => s.bg(t.hover).text_color(t.foreground))
       .tooltip(tip).on_mouse_down("left", stop).on_click(action).child(label);
     // A drag shows where the tab lands: dimmed where it was, an accent bar on the side of the tab it takes the place of.
     const drop = (on, cx) => { if (this.over !== on) { this.over = on; cx.notify(); } };
     const item = (c, i) => {
       const program = panes().find(p => p.tab === c.id && p.program?.agent)?.program ?? panes().find(p => p.tab === c.id)?.program;
-      const name = /^tb\d+$/.test(c.name) ? program?.name ?? "Terminal" : c.name;
+      const agent = agentIn.get(c.id);
+      // An unnamed tab's name is its position ("3"): with an agent in it, the agent's name says more.
+      const name = !c.named && agent ? nameOf(agent) : c.name;
       const status = STATUS[c.status], target = this.over === i && this.pressed !== null && this.pressed !== i;
       return h_flex().id(`tab-${c.id}`).relative().h(29).pl(10).pr(c.active ? 6 : 10).gap(7).rounded(7).items_center().flex_none().text_size(13)
         .border(1).border_color(c.active ? t.border : t.chrome).bg(c.active ? t.raised : t.chrome).text_color(c.active ? t.foreground : t.muted)
@@ -91,8 +99,8 @@ export default class Tabs extends View {
         .when(Boolean(program?.icon), el => el.child(program.tint ? svg(program.icon).size(14).text_color(t.muted) : image(program.icon).size(14)))
         .child(div().max_w(170).truncate().child(name))
         .when(c.zoomed, el => el.child(div().id(`zoom-${c.id}`).flex_none().text_color(t.muted).tooltip("Zoomed").child(svg("mods/pane/zoom.svg").size(12))))
-        .when(Boolean(status), el => el.child(div().id(`status-${c.id}`).size(12).flex_none().flex().items_center().justify_center().tooltip(status[0]).child(status[1](t))))
-        .when(c.active, el => el.child(div().id(`close-${c.id}`).size(18).flex_none().flex().items_center().justify_center().rounded(5).text_color(t.dim).cursor_pointer()
+        .when(Boolean(status), el => el.child(div().id(`status-${c.id}`).size(12).flex_none().flex().items_center().justify_center().tooltip(agentWord(c.status)).child(status(t))))
+        .when(c.active, el => el.child(div().id(`close-${c.id}`).size(24).flex_none().flex().items_center().justify_center().rounded(5).text_color(t.dim).cursor_pointer()
           .hover(s => s.bg(t.hover).text_color(t.foreground)).tooltip("Close tab")
           .on_mouse_down("left", stop).on_click((_e, cx) => { cx.stop_propagation(); run("tab.close", { id: c.id }); }).child(svg("mods/pane/close.svg").size(12))));
     };
@@ -104,11 +112,11 @@ export default class Tabs extends View {
     const panel = find(root, "panel"), body = find(root, "panel-body");
     const enabled = shared("workspace.panels") ?? ["files", "changes"];
     this.syncPanel(space, panel, body, enabled);
-    // Icon-only panel buttons; the label is the tooltip.
-    const panelButton = (id, label, icon) => {
+    // Icon-only panel buttons; the label is the tooltip, with its key when it has one.
+    const panelButton = (id, label, icon, key) => {
       const on = panel && !panel.hidden && body?.active === id;
       return h_flex().id(`panel-${id}`).size(26).flex_none().items_center().justify_center().rounded(6).cursor_pointer()
-        .bg(on ? t.selected : t.chrome).text_color(on ? t.foreground : t.muted).tooltip(label)
+        .bg(on ? t.selected : t.chrome).text_color(on ? t.foreground : t.muted).tooltip(key ? `${label}  ${key}` : label)
         .hover(s => s.bg(on ? t.selected : t.hover)).on_mouse_down("left", stop)
         .on_click(() => togglePanel(id)).child(svg(icon).size(14));
     };
@@ -121,7 +129,7 @@ export default class Tabs extends View {
       .on_scroll_wheel(e => { if (Math.abs(e.delta.y) >= 1) run(e.delta.y > 0 ? "tab.prev" : "tab.next"); })
       .child(h_flex().id("tab-scroll").flex_1().min_w(0).h_full().items_center().gap(3).overflow_x_scrollbar().children(shown.map(item)))
       .child(button("tab-new", svg("mods/workspace-chrome/plus.svg").size(14), "New tab", () => openOverlay({ mod: "new-menu", kind: "popup", width: 250, height: 512 })))
-      .when(enabled.includes("fleet"), el => el.child(panelButton("fleet", "Agents", "icons/agent.svg")))
+      .when(enabled.includes("fleet"), el => el.child(panelButton("fleet", "Agents", "icons/agent.svg", w?.platform === "macos" ? "⌘⇧A" : "Ctrl+Shift+A")))
       .when(enabled.includes("files"), el => el.child(panelButton("files", "Files", "mods/files/file.svg")))
       .when(enabled.includes("changes"), el => el.child(panelButton("changes", "Changes", "mods/changes/changes.svg")))
       .when(enabled.includes("pr"), el => el.child(panelButton("pr", "Pull requests", "mods/pr-flow/merge.svg")))

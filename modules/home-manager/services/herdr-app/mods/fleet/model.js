@@ -1,370 +1,318 @@
-// The fleet as data: which terminals are roots and children, what each one's status, task and lifecycle
-// step are and how urgent each root is. Pure (no herdr imports), so
-// model.check.mjs runs it in node.
+// The Agents panel as data. Pure (imports only the shared pure modules, never "herdr"), so
+// tests/fleet-model.mjs runs it in node.
+//
+// Two kinds of root: an orchestrator draws its session's tasks (shared tasks.js buildTasks, ordered here), any other
+// agent draws the terminal tree of what it started, and an agent with nothing under it the solo view.
+//
+// API
+//   buildRoots({ agents, terminals, spaces, nameOf })   roots in agents() order: { node, space, orch, address }
+//        node: { id, address, kind: "agent" | "tool" | "ended", name, program, app, status, shown, report, live,
+//                pane, tab, labels, children }; status is the node's own word, shown adds what runs under it.
+//   descendants(node)                depth-first children
+//   isSolo(root, hasEpic)            no children and (not an orchestrator, or no epic)
+//   orderTasks(tasks)                dependency order (prerequisites first), settled tasks last
+//   sessionView({ session, terms, listed, hibernated, now })
+//                                    { epic, mode, source, tasks, summary }: tasks ordered, with the epic's metadata
+//   slotsOf(terms, orch)             slots held, as the skill's slot-free.sh counts them: live w-/r- terminals
+//                                    labelled orch=<address> whose own status is working
+//   prNumber(ref) / prFor(prs, ref)  a PR reference (url, "#12", "12") and its entry in "panda-spaces.prs": a URL
+//                                    by that URL, or its repo and number; a bare number only when one repo has it
+//   eventLabel(e) / eventShort(e) / eventFacts(e)   words of one bead event
+//   newestLine(task, now)            the card's dim line: newest event, its age, what it unblocks
+//   timelineOf(events, now)          rounds of rows with holders, spans and totals (see below)
+//   rowPasses(row, filter)           the timeline's filters: all, decisions, reports, instructions
+//   orchIn(label)                    "orch.in=<ms>:<kind>" -> { at, kind } | null
+//   pulsesOf({ task, flip, label, now })   fresh pulses a task's worker moved: [{ key, at, down, tone, kind }]
+//   answerState(task, orch)          "answer" | "orch-blocked" | "no-orch" | "worker-prompt" | null
+//   answerMessage({ key, id, qid, question, text })   what Send tells the orchestrator: the task, the bead, the
+//                                    comment id of the question it answers, the question on one line, the answer
+//   reachOf(address, panes, tab)     How a session row reaches a live agent: "peek" (no pane: a hidden worker or
+//                                    reviewer), null (its pane is on the current tab), "focus" (a pane elsewhere)
 
-/**
- * @typedef {import("herdr").Program} Program
- * @typedef {{ app?: string, msg?: string, state?: string }} Report
- * A core terminal as terminals() / hc ls --json give it: the fields read here.
- * @typedef {{ address: string, name?: string, title?: string, parent?: string, state?: string,
- *   exit_code?: number | null, status?: string | Report | null, report?: Report | null, status_ms?: number | null,
- *   agent?: string, labels?: Record<string, string>, program?: Program | null, where?: string }} Term
- * An agents() entry: the fields read here.
- * @typedef {{ address: string, status: string, space_name?: string, tab_name?: string, title?: string,
- *   pane_name?: string | null, app?: string | null, program?: Program | null }} Agent
- * @typedef {{ text?: string, created_at?: string }} Comment
- * @typedef {{ name: string, fields: Record<string, string>, at: number | null, line: string, body: string }} BeadEvent
- * @typedef {{ id: string, title?: string, status?: string, assignee?: string, metadata?: Record<string, string> }} Bead
- * @typedef {{ bead: Bead, events: BeadEvent[] }} Task
- * @typedef {{ epic: Bead, tasks: Task[] }} Epic
- * @typedef {{ step: number, round: number, pr: string | null, blocked: string | null, result: string | null }} Life
- * @typedef {"agent" | "tool" | "bead" | "ended" | "synthetic"} Kind
- * `status` is the node's own word; `shown` is what its badge says: "supervising" when it rests while
- * something under it works.
- * @typedef {{ id: string, address: string | null, kind: Kind, name: string, app: string | null,
- *   program: Program | null, status: string, shown: string, task: string, report: string, since: number | null,
- *   live: boolean, pane: boolean, tab: string | null, labels: Record<string, string>, worker: boolean,
- *   life: Life | null, bead: Bead | null, events: BeadEvent[], depth: number, children: FleetNode[] }} FleetNode
- * @typedef {{ text: string, needs: number, failed: number, working: number, done: number, tasks: number,
- *   finished: number, unbeaded: number, size: number }} Rollup
- * @typedef {"needs" | "failed" | "working" | "done" | "idle"} Tier
- * @typedef {{ node: FleetNode, space: string, orch: boolean }} Root
- * @typedef {Root & { rollup: Rollup, tier: Tier }} ShownRoot
- * @typedef {{ mode: "fixture", epics: Epic[] } | { mode: "live", byOrch: Map<string, Epic[]> }} Beads
- */
+import { kidStatus, treeStatus, isOrchName } from "./tree.js";
+import { buildTasks, summary, taskKey } from "./tasks.js";
+import { held, rounds } from "./events.js";
+import { reportWord, eventWord, ago } from "./words.js";
 
-// The worker lifecycle, left to right. A bead's metadata and events pick the step it has reached.
-export const STEPS = ["queued", "dispatched", "review", "PR", "merged", "settled"];
-// Roots in this order, most urgent first.
-export const TIERS = /** @type {const} */ (["needs", "failed", "working", "done", "idle"]);
+// ----- terminal tree ---------------------------------------------------------------------------------------------
 
-const ORCH_MARK = /^\[o\]/i;
-const WORKER_NAME = /^[wr]-/;
-
-/**
- * An event comment's first line: `event=<name> k=v ...`; anything after it is a free body. Not an event: null.
- * @param {Comment} comment
- * @returns {BeadEvent | null}
- */
-export function parseEvent(comment) {
-  const [first = "", ...rest] = String(comment?.text ?? "").split("\n");
-  const m = /^event=([a-z][a-z0-9-]*)(?: |$)/.exec(first);
-  if (!m) return null;
-  /** @type {Record<string, string>} */
-  const fields = {};
-  for (const [, k, v] of first.matchAll(/(?:^| )([a-z][a-z0-9_-]*)=(\S+)/g)) if (k !== "event") fields[k] = v;
-  const at = Date.parse(comment?.created_at ?? "");
-  return { name: m[1], fields, at: Number.isNaN(at) ? null : at, line: first, body: rest.join("\n").trim() };
-}
-
-/**
- * Events of a task, oldest first.
- * @param {Comment[] | null | undefined} comments
- * @returns {BeadEvent[]}
- */
-export function eventsOf(comments) {
-  /** @type {BeadEvent[]} */
-  const out = [];
-  for (const c of comments ?? []) { const e = parseEvent(c); if (e) out.push(e); }
-  return out.sort((a, b) => (a.at ?? 0) - (b.at ?? 0));
-}
-
-/**
- * Where a task bead is: the furthest step its metadata or events prove. blocked_reason (or a blocked bead)
- * holds it at that step.
- * @param {Bead | null} bead
- * @param {BeadEvent[]} events
- * @returns {Life}
- */
-export function lifecycle(bead, events) {
-  const md = bead?.metadata ?? {};
-  /** @param {string} n */
-  const has = (n) => events.some((e) => e.name === n);
-  const round = Number(md.review_round) || 0;
-  let step = 0;
-  if (has("dispatched") || has("handed-off") || has("adopted")) step = 1;
-  if (round > 0) step = 2;
-  if (md.pr_url) step = 3;
-  if (md.merged_sha || has("merged")) step = 4;
-  if (has("settled")) step = 5;
-  const settled = events.filter((e) => e.name === "settled").at(-1);
-  const blocked = md.blocked_reason ?? (bead?.status === "blocked" ? "blocked" : null);
-  return { step, round, pr: md.pr_url ?? null, blocked, result: settled?.fields.result ?? null };
-}
-
-/**
- * A bead with no live terminal: queued until dispatched, then waiting; blocked holds it; merged, settled or
- * closed is done.
- * @param {Bead} bead
- * @param {Life} life
- */
-function beadStatus(bead, life) {
-  if (life.blocked) return "blocked";
-  if (life.step >= 4 || bead.status === "closed") return "done";
-  return life.step === 0 ? "queued" : "idle";
-}
-
-/**
- * A terminal's word. A listed agent's own; else the core's (a report counts as an agent), error reading as
- * needing the person. A finished terminal failed when it exited nonzero. A live tool with no report is running.
- * @param {Term} k
- * @param {Map<string, Agent>} listed
- * @returns {string}
- */
-export function terminalStatus(k, listed) {
-  const own = listed.get(k.address)?.status;
-  if (own) return own;
-  if (k.state && k.state !== "live") return k.exit_code ? "failed" : "idle";
-  const s = typeof k.status === "string" ? k.status : k.status?.state ?? k.report?.state;
-  if (s === "error") return "blocked";
-  return s || "working";
-}
-
-/** @param {Term} k @param {Map<string, Agent>} listed */
 const isAgent = (k, listed) => listed.has(k.address) || Boolean(k.status ?? k.report) || Boolean(k.program?.agent);
-/** Live children, and finished ones that failed: a clean exit is old news. @param {Term} k */
+// Live children, and finished ones that failed: a clean exit is old news.
 const showable = (k) => (k.state ?? "live") === "live" || Boolean(k.exit_code);
 
-/**
- * @param {Term} k
- * @param {Map<string, Agent>} listed
- * @param {Term[]} all
- * @param {number} depth
- * @returns {FleetNode}
- */
-function terminalNode(k, listed, all, depth) {
-  const a = listed.get(k.address);
-  const name = k.name || a?.pane_name || a?.title || k.title || k.program?.name || k.address;
-  const kids = all.filter((c) => c.parent === k.address && showable(c));
-  const status = typeof k.status === "object" ? k.status : null;
-  // What it last said. Never the terminal's title: that only repeats the name ("π - <msg> - <name>").
-  const report = k.report?.msg ?? status?.msg ?? "";
-  const word = terminalStatus(k, listed);
+// A root's own word, as the rail reads it (done stays done); a sub-agent's as kidStatus (done is its parent's news).
+const rootStatus = (k, listed) => { const s = listed.get(k.address) ?? k.status; return s === "error" ? "blocked" : s; };
+
+function nodeOf(k, ctx, depth) {
+  const live = (k.state ?? "live") === "live";
+  const agent = isAgent(k, ctx.listed);
+  // A live terminal with no word of its own (a tool) is running.
+  const own = live ? (depth === 0 ? rootStatus(k, ctx.listed) : kidStatus(k, ctx.listed)) ?? "working" : k.exit_code ? "failed" : "ended";
+  const kids = ctx.terminals.filter((c) => c.parent === k.address && showable(c));
+  const children = kids.map((c) => nodeOf(c, ctx, depth + 1));
+  const under = descendants({ children }).filter((n) => n.live).map((n) => n.status);
+  const status = !agent && live && own === "working" ? "running" : own;
+  const report = k.report?.msg ?? (typeof k.status === "object" ? k.status?.msg : "") ?? "";
   return {
     id: k.address,
     address: k.address,
-    kind: isAgent(k, listed) ? "agent" : "tool",
-    name,
-    app: a?.app ?? k.report?.app ?? status?.app ?? k.agent ?? k.program?.name ?? null,
-    program: a?.program ?? k.program ?? null,
-    status: word,
-    shown: word,
-    task: report,
+    kind: agent ? "agent" : "tool",
+    name: ctx.nameOf(k),
+    program: k.program ?? null,
+    app: k.report?.app ?? k.agent ?? k.program?.name ?? null,
+    status,
+    shown: agent && live ? treeStatus(own, under) : status,
     report,
-    since: Number(k.status_ms) || null,
-    live: (k.state ?? "live") === "live",
-    pane: Boolean(a),
-    tab: a?.tab_name ?? null,
+    live,
+    pane: ctx.listed.has(k.address),
+    tab: ctx.tabs?.get(k.address) ?? null,
     labels: k.labels ?? {},
-    worker: WORKER_NAME.test(name) || Boolean(k.labels?.orch),
-    life: null,
-    bead: null,
-    events: [],
-    depth,
-    children: kids.map((c) => terminalNode(c, listed, all, depth + 1)),
+    children,
   };
 }
 
-/**
- * A task bead with no live terminal, drawn as a worker card under its orchestrator.
- * @param {Task} task
- * @param {number} depth
- * @returns {FleetNode}
- */
-function beadNode(task, depth) {
-  const life = lifecycle(task.bead, task.events);
-  const word = beadStatus(task.bead, life);
-  return {
-    id: `bead:${task.bead.id}`,
-    address: null,
-    kind: "bead",
-    name: task.bead.assignee || task.bead.metadata?.key || task.bead.id,
-    app: task.bead.id,
-    program: null,
-    status: word,
-    shown: word,
-    task: task.bead.title ?? "",
-    report: "",
-    since: task.events.at(-1)?.at ?? null,
-    live: false,
-    pane: false,
-    tab: null,
-    labels: {},
-    worker: true,
-    life,
-    bead: task.bead,
-    events: task.events,
-    depth,
-    children: [],
-  };
-}
+export const descendants = (node) => node.children.flatMap((c) => [c, ...descendants(c)]);
 
-/** @param {FleetNode[]} nodes @returns {FleetNode[]} */
-const flat = (nodes) => nodes.flatMap((n) => [n, ...flat(n.children)]);
-
-/** @param {FleetNode} node @param {Agent | undefined} agent @param {Term[]} all */
 const isOrchestrator = (node, agent, all) =>
-  [node.name, agent?.pane_name, agent?.tab_name, agent?.title].some((s) => ORCH_MARK.test(s ?? ""))
-  || Boolean(node.labels["orch-context"])
+  [node.name, agent?.pane_name, agent?.tab_name, agent?.title].some(isOrchName)
+  // Workers carry `orch-context` too (their own context script), with an `orch` label naming their parent.
+  || (Boolean(node.labels["orch-context"]) && !node.labels.orch)
   || all.some((k) => k.labels?.orch === node.address);
 
-/**
- * A task meets its worker: the terminal (or agent name) its latest w-* dispatch names, else the terminal named
- * like the bead's assignee. A matched worker reads as its task (title, id, lifecycle); the rest get bead cards.
- * @param {FleetNode} root
- * @param {Task[]} tasks
- */
-export function attachTasks(root, tasks) {
-  for (const task of tasks) {
-    const sent = task.events.filter((e) => e.name === "dispatched" && (e.fields.agent ?? "").startsWith("w-")).at(-1);
-    const who = task.bead.assignee;
-    const card = flat(root.children).find((n) => n.kind !== "bead" && !n.bead
-      && ((sent && (n.address === sent.fields.terminal || n.name === sent.fields.agent)) || (who && n.name === who)));
-    if (card) {
-      card.bead = task.bead;
-      card.events = task.events;
-      card.life = lifecycle(task.bead, task.events);
-      card.worker = true;
-      card.task = task.bead.title || card.report;
-    } else root.children.push(beadNode(task, root.depth + 1));
-  }
-}
-
-/** @param {Term} k @param {Map<string, string>} spaceNames */
-function where(k, spaceNames) {
-  const id = k.labels?.["herdr.space"] ?? k.labels?.space ?? "";
-  return spaceNames.get(id) ?? (k.labels?.where ?? k.where ?? "").split(" / ")[0] ?? "";
-}
-
-/**
- * A node at rest while something under it works is supervising. Set on every node, after beads attach.
- * @param {FleetNode} node
- */
-function settleShown(node) {
-  for (const c of node.children) settleShown(c);
-  const busy = flat(node.children).some((n) => n.live && n.status === "working");
-  node.shown = (node.status === "idle" || node.status === "done") && busy && node.kind !== "ended" && node.kind !== "synthetic"
-    ? "supervising" : node.status;
-}
-
-/**
- * What a root sums up from everything under it: who needs the person, what failed, what works, how far its
- * tasks got (merged, settled or closed counts as done), and how many workers no bead names.
- * @param {FleetNode} root
- * @returns {Rollup}
- */
-export function rollup(root) {
-  const under = flat(root.children);
-  /** @param {string} s */
-  const count = (s) => under.filter((n) => n.status === s).length;
-  const needs = count("blocked"), failed = count("failed"), done = count("done");
-  const working = under.filter((n) => n.live && n.status === "working").length;
-  const tasks = under.filter((n) => n.bead);
-  const finished = tasks.filter((n) => (n.life?.step ?? 0) >= 4 || n.bead?.status === "closed").length;
-  const unbeaded = under.filter((n) => n.worker && !n.bead && n.kind !== "bead").length;
-  const parts = [];
-  if (needs) parts.push(`${needs} needs you`);
-  if (failed) parts.push(`${failed} failed`);
-  if (working) parts.push(`${working} working`);
-  if (tasks.length) parts.push(`${finished}/${tasks.length} tasks done`);
-  else if (done) parts.push(`${done} done`);
-  if (!parts.length) parts.push(under.length ? `${under.length} idle` : "No sub-agents");
-  return { text: parts.join(" · "), needs, failed, working, done, tasks: tasks.length, finished, unbeaded, size: under.length };
-}
-
-/**
- * How urgent a root is, for the order: it, or something under it, needs the person; failed; works (itself or
- * through what it supervises); finished unseen; else idle.
- * @param {FleetNode} node
- * @param {Rollup} r
- * @returns {Tier}
- */
-export function tierOf(node, r) {
-  if (node.status === "blocked" || r.needs) return "needs";
-  if (node.status === "failed" || r.failed) return "failed";
-  if (node.shown === "working" || node.shown === "supervising") return "working";
-  if (node.shown === "done" || r.done) return "done";
-  return "idle";
-}
-
-/**
- * A root drawn for something that isn't a listed agent: an ended parent, or the fixture's stand-in orchestrator.
- * @param {string} id
- * @param {Kind} kind
- * @param {string} name
- * @param {string} task
- * @returns {FleetNode}
- */
-const standIn = (id, kind, name, task) => ({
-  id, address: kind === "ended" ? id : null, kind, name, app: null, program: null, status: "idle", shown: "idle",
-  task, report: "", since: null, live: false, pane: false, tab: null, labels: {}, worker: false, life: null,
-  bead: null, events: [], depth: 0, children: [],
-});
-
-/**
- * The whole view: roots most urgent first, each with its tree, rollup and tier.
- * Fixture beads attach to the first orchestrator (or a stand-in one); live beads to each orchestrator they name.
- * @param {{ agents: Agent[], terminals: Term[], spaces?: { id: string, name: string }[], beads?: Beads | null }} input
- */
-export function buildFleet({ agents, terminals, spaces = [], beads = null }) {
-  const listed = new Map(agents.map((a) => [a.address, a]));
+export function buildRoots({ agents, terminals, spaces = [], nameOf }) {
+  const listed = new Map(agents.map((a) => [a.address, a.status]));
+  const byAgent = new Map(agents.map((a) => [a.address, a]));
   const byAddress = new Map(terminals.map((k) => [k.address, k]));
   const spaceNames = new Map(spaces.map((s) => [s.id, s.name]));
+  const tabs = new Map(agents.map((a) => [a.address, a.tab_name]));
+  const ctx = { terminals, listed, nameOf, tabs };
   // A listed agent under another listed agent reads in its parent's tree, not as a root of its own.
-  const nested = new Set(agents.flatMap((a) => flat(terminals.filter((k) => k.parent === a.address)
-    .map((k) => terminalNode(k, listed, terminals, 1))).map((n) => n.id)));
-  /** @type {Root[]} */
+  const under = (k) => terminals.filter((c) => c.parent === k.address).flatMap((c) => [c, ...under(c)]);
+  const nested = new Set(agents.flatMap((a) => under({ address: a.address }).map((k) => k.address)));
   const roots = agents.filter((a) => !nested.has(a.address)).map((a) => {
-    const node = terminalNode(byAddress.get(a.address) ?? { address: a.address, state: "live" }, listed, terminals, 0);
-    return { node, space: a.space_name || "", orch: isOrchestrator(node, a, terminals) };
+    const node = nodeOf(byAddress.get(a.address) ?? { address: a.address, state: "live", status: a.status }, ctx, 0);
+    return { node, address: a.address, space: a.space_name || spaceNames.get(a.space) || "", orch: isOrchestrator(node, byAgent.get(a.address), terminals) };
   });
-  // Live children whose parent ended: under a stand-in for that parent, so a dead orchestrator's workers still show.
-  const placed = new Set([...roots.flatMap((r) => flat([r.node]).map((n) => n.id)), ...nested]);
+  // Live children whose parent ended (gone, or still listed as finished): under a stand-in for that parent, so a dead
+  // orchestrator's workers still show.
+  const placed = new Set([...roots.flatMap((r) => [r.node, ...descendants(r.node)].map((n) => n.address)), ...nested]);
   const orphans = terminals.filter((k) => k.parent && (k.state ?? "live") === "live" && !placed.has(k.address)
-    && !byAddress.has(k.parent) && (isAgent(k, listed) || k.labels?.orch));
-  for (const parent of new Set(orphans.map((k) => k.parent ?? ""))) {
+    && !placed.has(k.parent) && (byAddress.get(k.parent)?.state ?? "gone") !== "live" && (isAgent(k, listed) || k.labels?.orch));
+  for (const parent of new Set(orphans.map((k) => k.parent))) {
     const kids = orphans.filter((k) => k.parent === parent);
-    const node = standIn(parent, "ended", `${parent} (ended)`, "Its parent terminal has ended; these kept running.");
-    node.children = kids.map((k) => terminalNode(k, listed, terminals, 1));
-    roots.push({ node, space: where(kids[0], spaceNames), orch: kids.some((k) => k.labels?.orch === parent) });
+    const node = {
+      id: parent, address: parent, kind: "ended", name: `${parent} (ended)`, program: null, app: null, status: "ended",
+      shown: "ended", report: "Its parent terminal has ended; these kept running.", live: false, pane: false, tab: null,
+      labels: {}, children: kids.map((k) => nodeOf(k, ctx, 1)),
+    };
+    const first = kids[0];
+    roots.push({ node, address: parent, space: spaceNames.get(first?.labels?.["herdr.space"] ?? first?.labels?.space) ?? "",
+      orch: kids.some((k) => k.labels?.orch === parent) });
   }
-
-  if (beads?.mode === "fixture" && beads.epics.length) {
-    let host = roots.find((r) => r.orch);
-    if (!host) {
-      host = { node: standIn("fixture-orch", "synthetic", "Fixture orchestrator", "Stand-in orchestrator for the fixture epic."), space: "Fixture", orch: true };
-      roots.push(host);
-    }
-    for (const e of beads.epics) attachTasks(host.node, e.tasks);
-  } else if (beads?.mode === "live") {
-    for (const r of roots.filter((x) => x.orch && x.node.address)) for (const e of beads.byOrch.get(r.node.address ?? "") ?? []) attachTasks(r.node, e.tasks);
-  }
-
-  for (const r of roots) settleShown(r.node);
-  /** @type {ShownRoot[]} */
-  const shown = roots.map((r) => { const ru = rollup(r.node); return { ...r, rollup: ru, tier: tierOf(r.node, ru) }; });
-  // Most urgent first; within a tier, the order agents() gives (space, tab, pane).
-  const ordered = shown.map((r, i) => ({ r, i }))
-    .sort((a, b) => TIERS.indexOf(a.r.tier) - TIERS.indexOf(b.r.tier) || a.i - b.i).map((x) => x.r);
-  return { roots: ordered };
+  return roots;
 }
 
-/**
- * Depth-first children of a node.
- * @param {FleetNode} node
- */
-export const descendants = (node) => flat(node.children);
+export const isSolo = (root, hasEpic) => root.node.children.length === 0 && (!root.orch || !hasEpic);
 
-/**
- * "12m", "3h", "2d": how long a state has held. Null without a start.
- * @param {number | null} ms
- * @param {number} now
- */
-export function age(ms, now) {
-  if (!ms) return null;
-  const m = Math.max(0, Math.floor((now - ms) / 60000));
-  if (m < 1) return "now";
-  if (m < 60) return `${m}m`;
-  if (m < 1440) return `${Math.floor(m / 60)}h`;
-  return `${Math.floor(m / 1440)}d`;
+// ----- tasks -----------------------------------------------------------------------------------------------------
+
+// Prerequisites first (a task that blocks another comes before it), ties in bd's order; settled tasks go last,
+// in the same order among themselves.
+export function orderTasks(tasks) {
+  const ids = new Set(tasks.map((t) => t.id));
+  const indegree = new Map(tasks.map((t) => [t.id, 0]));
+  for (const t of tasks) for (const b of t.blocks) if (ids.has(b.id)) indegree.set(b.id, indegree.get(b.id) + 1);
+  const out = [];
+  const left = [...tasks];
+  while (left.length) {
+    const i = left.findIndex((t) => indegree.get(t.id) === 0);
+    const [t] = left.splice(i < 0 ? 0 : i, 1);
+    out.push(t);
+    for (const b of t.blocks) if (indegree.has(b.id)) indegree.set(b.id, indegree.get(b.id) - 1);
+  }
+  const done = (t) => t.turn === "done";
+  return [...out.filter((t) => !done(t)), ...out.filter(done)];
+}
+
+// The ticket the session works from: its epic's external_ref key, else a source in its metadata.
+function sourceOf(epic) {
+  const md = epic?.metadata ?? {};
+  const key = taskKey(epic);
+  if (key && key !== epic?.id) return key;
+  return md.source || md.ticket || md.source_ticket || null;
+}
+
+export function sessionView({ session, terms, listed, hibernated, now }) {
+  const rows = buildTasks({ ...session, terms, listed, hibernated, now });
+  const tasks = orderTasks(rows);
+  return { epic: session.epic, mode: session.mode ?? null, source: sourceOf(session.epic), tasks, summary: summary(tasks) };
+}
+
+// Slots held against --max, counted as the skill's slot-free.sh does: this orchestrator's live w-/r- terminals
+// (labelled orch=<address>) whose own status is working.
+export function slotsOf(terms, orch) {
+  const own = (k) => (typeof k.status === "string" ? k.status : k.status?.state);
+  return terms.filter((k) => (k.state ?? "live") === "live" && k.labels?.orch === orch && /^[wr]-/.test(k.name ?? "")
+    && own(k) === "working").length;
+}
+
+// ----- PRs -------------------------------------------------------------------------------------------------------
+
+export const prNumber = (ref) => /(?:\/pull\/|#|^)(\d+)\/?$/.exec(String(ref ?? "").trim())?.[1] ?? null;
+
+// The entry of shared "panda-spaces.prs" ({ [repo]: [{ number, url, ci, ... }] }) a task's PR reference names:
+// by url, else by number when only one repo has it. Returns { ...pr, repo } | null.
+// A PR URL's repo with its forge, as "host/owner/name" (lower case), or null. The same owner/name on another host
+// is another repo.
+const repoOf = (url) => /^https?:\/\/([^/]+\/[^/]+\/[^/]+)\/pull\/\d+/.exec(String(url ?? ""))?.[1]?.toLowerCase() ?? null;
+// A "panda-spaces.prs" key with its forge: "host/owner/name" as given, "owner/name" on github.com.
+const feedRepo = (key) => { const k = String(key ?? "").toLowerCase(); return k.split("/").length === 3 ? k : `github.com/${k}`; };
+
+export function prFor(prs, ref) {
+  const all = Object.entries(prs ?? {}).flatMap(([repo, list]) => (list ?? []).map((p) => ({ ...p, repo })));
+  const url = String(ref ?? "").trim().replace(/\/+$/, "");
+  const n = prNumber(ref);
+  if (url.includes("/")) {
+    const byUrl = all.find((p) => String(p.url ?? "").replace(/\/+$/, "") === url);
+    if (byUrl) return byUrl;
+    // The same repo and number (the feed's URL may differ in form); never another repo's PR with that number.
+    const repo = repoOf(url);
+    return (repo && n && all.find((p) => String(p.number) === n && (p.url ? repoOf(p.url) === repo : feedRepo(p.repo) === repo))) || null;
+  }
+  const same = n ? all.filter((p) => String(p.number) === n) : [];
+  return same.length === 1 ? same[0] : null;
+}
+
+// ----- events ----------------------------------------------------------------------------------------------------
+
+export function eventLabel(e) {
+  if (e.name === "report") return `Reported · ${reportWord(e.fields.kind)}`;
+  if (e.name === "decided") return e.fields.by === "user" ? "You decided" : "Orchestrator decided";
+  if (e.name === "blocked") return e.fields.reason === "needs-user" ? "Asked you" : "Blocked";
+  return eventWord(e.name);
+}
+
+// The words alone, for the card's dim line.
+export const eventShort = (e) => (e.name === "report" ? reportWord(e.fields.kind) : eventLabel(e));
+
+export function eventFacts(e) {
+  const f = e.fields, pr = prNumber(f.pr);
+  return [e.name === "dispatched" && f.kind ? f.kind : null, f.terminal ?? null,
+    e.name === "dispatched" && f.result && f.result !== "working" ? f.result : null, f.head ? f.head.slice(0, 7) : null,
+    pr ? `#${pr}` : null].filter(Boolean).join(" · ");
+}
+
+const unblocks = (task) => (task.blocks.length && !task.life.merged ? `Merging it readies ${task.blocks.map((b) => b.key).join(", ")}` : "");
+
+export function newestLine(task, now) {
+  const e = task.events.at(-1);
+  const parts = [];
+  if (e) {
+    const facts = e.name === "report" || e.name === "ready" ? eventFacts(e) : "";
+    parts.push([eventShort(e), facts].filter(Boolean).join(" "));
+    if (e.at) parts.push(ago(e.at, now));
+  } else parts.push("No events yet");
+  const next = unblocks(task);
+  if (next) parts.push(next);
+  return parts.join(" · ");
+}
+
+// ----- timeline --------------------------------------------------------------------------------------------------
+
+export const LONG_HOLD = 30 * 60000;
+
+// Who an event's avatar shows: you (your decision, or the question that waits on you), the orchestrator, or a worker.
+function avatarOf(e) {
+  if (e.name === "decided" && e.fields.by === "user") return "you";
+  if (e.name === "blocked" && e.fields.reason === "needs-user") return "you";
+  return e.actor === "orch" ? "orch" : e.actor === "reviewer" ? "reviewer" : "worker";
+}
+
+const HOLD_NOTE = { you: "waiting on you", worker: "worker at work", orch: "with the orchestrator" };
+
+// Rows (one per event, in time order) with who held the task after it and for how long; grouped in rounds with their
+// own held-time bar; totals for the summary bar. A row's key is its time and index, so a poll never moves what's open.
+export function timelineOf(events, now) {
+  const { spans, totals } = held(events, now);
+  const rows = new Map();
+  spans.forEach((s, i) => {
+    const e = s.event;
+    rows.set(e, {
+      key: `${e.at ?? 0}:${i}`, i, event: e, holder: s.holder, from: s.from, to: s.to, ms: s.ms,
+      kind: avatarOf(e), label: eventLabel(e), facts: eventFacts(e),
+      note: s.ms > LONG_HOLD && HOLD_NOTE[s.holder] ? HOLD_NOTE[s.holder] : null,
+    });
+  });
+  const groups = rounds(events).map((r) => {
+    const list = r.events.map((e) => rows.get(e));
+    const from = list[0]?.from ?? null, to = list.at(-1)?.to ?? null;
+    const lastReport = [...list].reverse().find((x) => x.event.name === "report");
+    return {
+      n: r.n, key: `r${r.n}:${r.at ?? 0}`, rows: list, ms: from != null && to != null ? Math.max(0, to - from) : 0,
+      bar: list.map((x) => ({ holder: x.holder, ms: x.ms })),
+      verdict: lastReport ? reportWord(lastReport.event.fields.kind) : "in progress",
+    };
+  });
+  const first = events[0]?.at ?? null;
+  return { groups, totals, span: first != null ? Math.max(0, now - first) : 0, count: events.length, roundCount: groups.filter((g) => g.n > 0).length };
+}
+
+const FILTERS = {
+  all: () => true,
+  decisions: (e) => e.name === "decided" || e.name === "blocked",
+  reports: (e) => e.name === "report",
+  instructions: (e) => e.name === "dispatched" || e.name === "re-instructed",
+};
+export const FILTER_KEYS = ["all", "decisions", "reports", "instructions"];
+export const rowPasses = (row, filter) => (FILTERS[filter] ?? FILTERS.all)(row.event);
+
+// ----- pulses ----------------------------------------------------------------------------------------------------
+
+export const PULSE_WINDOW = 5000;
+
+export function orchIn(label) {
+  const m = /^(\d{10,})(?::(.+))?$/.exec(String(label ?? "").trim());
+  return m ? { at: Number(m[1]), kind: m[2] ?? "" } : null;
+}
+
+// What a task's worker did in the last PULSE_WINDOW: a status flip seen live (Clock.flip) and a fresh `orch.in`
+// label. down: the orchestrator sent; up: the worker answered. tone: the color's name in the theme.
+export function pulsesOf({ task, flip, label, now }) {
+  const out = [];
+  const addr = task.worker?.address;
+  if (!addr || task.turn === "done") return out;
+  if (flip && now - flip.at < PULSE_WINDOW) {
+    if (flip.to === "working") out.push({ key: `flip:${addr}:${flip.at}`, at: flip.at, down: true, tone: "accent", kind: "" });
+    else if (flip.from === "working" && (flip.to === "idle" || flip.to === "done")) out.push({ key: `flip:${addr}:${flip.at}`, at: flip.at, down: false, tone: "done", kind: "" });
+    else if (flip.to === "blocked") out.push({ key: `flip:${addr}:${flip.at}`, at: flip.at, down: false, tone: "blocked", kind: "" });
+  }
+  const sent = orchIn(label);
+  if (sent && now - sent.at < PULSE_WINDOW && sent.at <= now + 1000) out.push({ key: `in:${addr}:${sent.at}`, at: sent.at, down: true, tone: "accent", kind: sent.kind });
+  return out;
+}
+
+// ----- answers ---------------------------------------------------------------------------------------------------
+
+// Where a task's question goes: on your turn, to the orchestrator (not when it is blocked itself, or gone); a worker
+// stuck at its own prompt is the orchestrator's to answer.
+export function answerState(task, orch) {
+  if (task.turn === "you") {
+    if (!orch || !orch.live) return "no-orch";
+    return orch.status === "blocked" ? "orch-blocked" : "answer";
+  }
+  if (task.turn === "orch" && task.worker?.status === "blocked") return "worker-prompt";
+  return null;
+}
+
+const oneLine = (s) => String(s ?? "").replace(/\s+/g, " ").trim();
+
+export const answerMessage = ({ key, id, qid, question, text }) =>
+  `Answer from the herdr-app panel for ${key} (bead ${id}, question ${qid}). Question: ${oneLine(question)}. Answer: ${oneLine(text)}`;
+
+// ----- session rows ----------------------------------------------------------------------------------------------
+
+export function reachOf(address, panes, tab) {
+  const pane = (panes ?? []).find((p) => p.terminal === address);
+  if (!pane) return "peek";
+  return pane.tab === tab ? null : "focus";
 }

@@ -18,11 +18,16 @@ hc label "$HC_TERMINAL_ID" "resume=claude --resume $id" >/dev/null || {
   exit 1
 }
 
-# Best effort from here: a missing jq, label or script only loses the reminder.
+# Best effort from here: a missing jq or label only loses the reminder; a label naming a missing script says so.
 case "$input" in *'"source"'*'"compact"'*) ;; *) exit 0 ;; esac
 command -v jq >/dev/null || exit 0
 script=$(hc get "$HC_TERMINAL_ID" --json 2>/dev/null | jq -r '.labels["orch-context"] // empty' 2>/dev/null)
-[ -n "$script" ] && [ -x "$script" ] || exit 0
-context=$("$script" 2>/dev/null) || exit 0
+[ -n "$script" ] || exit 0
+# A directory is "executable" too: only a runnable file counts.
+if [ -f "$script" ] && [ -x "$script" ]; then
+  context=$("$script" 2>/dev/null) || exit 0
+else
+  context="Orchestrator context script missing: $script. Run status.sh --live before acting."
+fi
 [ -n "$context" ] || exit 0
 printf '%s' "$context" | jq -Rs '{hookSpecificOutput: {hookEventName: "SessionStart", additionalContext: .}}'

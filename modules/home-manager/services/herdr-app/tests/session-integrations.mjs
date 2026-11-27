@@ -4,7 +4,7 @@
 // Run: nix shell nixpkgs#nodejs nixpkgs#jq --command node --test modules/home-manager/services/herdr-app/tests/session-integrations.mjs
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { chmodSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -36,11 +36,27 @@ test("claude: compaction on an orchestrator terminal injects the script output",
   assert.match(f.calls(), /label t1 resume=claude --resume abc-123/);
 });
 
-test("claude: startup or a terminal without the label prints nothing", () => {
+test("claude: startup prints nothing, a compaction without the label too", () => {
   const f = fixture(false);
   assert.equal(claude(f, "startup"), "");
+  writeFileSync(join(f.root, "labels.json"), JSON.stringify({ labels: {} }));
   assert.equal(claude(f, "compact"), "");
   assert.match(f.calls(), /resume=claude --resume abc-123/);
+});
+
+const MISSING = (path) => `Orchestrator context script missing: ${path}. Run status.sh --live before acting.`;
+
+test("claude: compaction with a missing or non-executable script says so", () => {
+  const f = fixture(false);
+  assert.equal(JSON.parse(claude(f, "compact")).hookSpecificOutput.additionalContext, MISSING("/nonexistent"));
+  const g = fixture(true);
+  chmodSync(join(g.root, "context.sh"), 0o644);
+  assert.equal(JSON.parse(claude(g, "compact")).hookSpecificOutput.additionalContext, MISSING(join(g.root, "context.sh")));
+  // A directory has the x bit too, but runs nothing.
+  const h = fixture(false), folder = join(h.root, "a-folder");
+  mkdirSync(folder);
+  writeFileSync(join(h.root, "labels.json"), JSON.stringify({ labels: { "orch-context": folder } }));
+  assert.equal(JSON.parse(claude(h, "compact")).hookSpecificOutput.additionalContext, MISSING(folder));
 });
 
 // codex.sh's parent is this test process: it plays the terminal's foreground Codex, or a nested one.
@@ -119,6 +135,27 @@ test("pi: the first turn after a compaction carries the script output, once", as
     const result = await handlers.before_agent_start();
     assert.deepEqual(result, { message: { customType: "herdr-orchestrator-state", content: "state for t1", display: false } });
     assert.equal(await handlers.before_agent_start(), undefined);
+  } finally {
+    process.env = saved;
+  }
+});
+
+test("pi: a missing script is named in the message after a compaction", async () => {
+  const f = fixture(false);
+  const saved = { ...process.env };
+  Object.assign(process.env, f.env);
+  const handlers = {};
+  try {
+    const { default: init } = await import(`${pathToFileURL(join(dir, "pi.ts")).href}?${Date.now()}b`);
+    init({ on: (event, fn) => { handlers[event] = fn; } });
+    handlers.session_compact();
+    assert.deepEqual(await handlers.before_agent_start(), { message: { customType: "herdr-orchestrator-state", content: MISSING("/nonexistent"), display: false } });
+    // A directory has the x bit too, but runs nothing.
+    const folder = join(f.root, "a-folder");
+    mkdirSync(folder);
+    writeFileSync(join(f.root, "labels.json"), JSON.stringify({ labels: { "orch-context": folder } }));
+    handlers.session_compact();
+    assert.deepEqual(await handlers.before_agent_start(), { message: { customType: "herdr-orchestrator-state", content: MISSING(folder), display: false } });
   } finally {
     process.env = saved;
   }

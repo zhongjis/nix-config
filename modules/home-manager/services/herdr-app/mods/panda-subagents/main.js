@@ -2,7 +2,7 @@
 // counts (props().filter: {space, folder, except}, mainIn in space.js), most urgent status first; a click peeks at one.
 // Opened from panda-focus cards' sub-agents line and panda-spaces' agents chip. Under a parent, hibernated workers
 // (shared "panda-focus.hibernated") show a moon and
-// how long ago; a click revives one where it was (same name, folder, parent, session), then peeks at it.
+// how long ago; a click revives one as its launch made it (shared revive.js), then peeks at it.
 // A live worker on a branch of its own shows that branch's PR (panda-spaces' shared "panda-spaces.prs"), as a space row does.
 // The keyboard works it too: j/k or the arrows pick a row, Enter peeks or revives, p opens the picked worker's PR
 // in the PR panel, Esc closes; a footer under the rows says so.
@@ -10,8 +10,10 @@
 
 import { View, div, image, svg } from "gpui-kit";
 import { v_flex, h_flex, v_virtual_list, Scrollbar, VirtualListScrollHandle } from "gpui-base";
-import { agents, terminals, theme, run, props, closeOverlay, exec, hc, shared, setShared, notify, window } from "herdr";
+import { agents, terminals, theme, run, props, closeOverlay, exec, hc, shared, setShared, notify, window, checking } from "herdr";
 import { mainIn } from "./space.js";
+import { agentWord, ago } from "./words.js";
+import { revive as reviveTerminal } from "./revive.js";
 
 const HIBERNATED = "panda-focus.hibernated";
 // A row's height with the 2px under it: a live one has two lines (the second kept even empty, so a git answer
@@ -22,31 +24,18 @@ const FOOT = 24;
 // Indents stop here, so a deep tree keeps room for its names.
 const DEPTH = 3;
 
-// As panda-focus times: no "ago", nothing past days.
-function ago(ms, now) {
-  const m = Math.floor((now - ms) / 60000);
-  if (m < 1) return "just now";
-  if (m < 60) return `${m}m`;
-  if (m < 1440) return `${Math.floor(m / 60)}h`;
-  return `${Math.floor(m / 1440)}d`;
-}
-
-// The finished terminal goes, and its resume line runs as a new one under the same parent, opted in again.
+// The worker comes back as its own launch made it (argv with its env, name, folder, parent, labels; shared revive.js);
+// the finished terminal goes only once the new one started.
 async function revive(r) {
-  await hc(["rm", r.address]).catch(() => null);
-  const args = ["run", "--bg", "--json", "--cwd", r.cwd, "--outlive-parent"];
-  if (r.name) args.push("--name", r.name);
-  if (terminals().some((k) => k.address === r.parent && k.state === "live")) args.push("--parent", r.parent);
-  if (r.space) args.push("--label", `space=${r.space}`);
-  const res = await hc([...args, ...r.line.split(" ")]).catch((e) => ({ code: 1, stderr: String(e) }));
-  if (res.code !== 0) {
-    notify({ title: "Couldn't revive the agent", body: `${r.title}: ${res.stderr.trim()}`, level: "error" });
+  const parentLive = (a) => terminals().some((k) => k.address === a && k.state === "live");
+  const res = await reviveTerminal(r.address, { hc, exec, parentLive });
+  if (!res.ok) {
+    notify({ title: "Couldn't revive the agent", body: `${r.title ?? r.name ?? r.address}: ${res.error}`, level: "error" });
     return;
   }
   setShared(HIBERNATED, (shared(HIBERNATED) ?? []).filter((x) => x.address !== r.address));
-  const addr = JSON.parse(res.stdout).address;
-  await hc(["label", addr, "hibernate=ok"]).catch(() => null);
-  run("terminal.peek", { terminal: addr });
+  if (res.warning) notify({ title: "Revived; the old terminal stayed", body: res.warning, level: "warning" });
+  run("terminal.peek", { terminal: res.address });
 }
 
 const icon = (p, size, color) => !p?.icon ? null
@@ -85,6 +74,8 @@ export default class SubAgents extends View {
     this.reviving = new Set();
     this.scroll = VirtualListScrollHandle.new();
     this.keys = cx.focus_handle();
+    // No git reads or timers in `herdr-app check`.
+    if (checking()) return;
     this.keys.focus();
     this.refresh(cx);
     cx.timer.every(5000, (cx) => { if (window()?.active) this.refresh(cx); });
@@ -163,7 +154,7 @@ export default class SubAgents extends View {
       const pic = icon(k.program, 14, t.muted), name = k.name || k.template || k.program?.name || k.address;
       // Its PR, as a space row's badge draws it: display only (the row's click peeks; p opens it), never cut.
       const ci = marks[pr?.ci];
-      const chip = pr ? h_flex().id(`pr-${k.address}`).flex_none().gap(3).items_center().text_size(11).text_color(t.muted)
+      const chip = pr ? h_flex().id(`pr-${k.address}`).flex_none().gap(3).items_center().text_size(12).text_color(t.muted)
         .tooltip([`PR #${pr.number}`, ci?.[2], pr.title].filter(Boolean).join(" · "))
         .accessibility_label([`PR #${pr.number}`, ci?.[2]].filter(Boolean).join(", "))
         .child(`#${pr.number}`)
@@ -174,9 +165,9 @@ export default class SubAgents extends View {
         .role("button").accessibility_label(`Peek at ${name}`)
         .child(h_flex().h(20).gap(8).items_center().min_w(0)
           .child(div().flex_1().min_w(0).truncate().text_color(t.foreground).child(name))
-          .child(div().flex_none().text_size(11).text_color(color[st] ?? t.unknown).child(st ?? "")))
+          .child(div().flex_none().text_size(12).text_color(color[st] ?? t.unknown).child(agentWord(st))))
         .child(h_flex().h(18).gap(8).items_center().min_w(0)
-          .child(div().flex_1().min_w(0).truncate().text_size(11).text_color(t.dim).child(info.join(" · ")))
+          .child(div().flex_1().min_w(0).truncate().text_size(12).text_color(t.muted).child(info.join(" · ")))
           .when(Boolean(chip), (el) => el.child(chip))
           .when(Boolean(pic), (el) => el.child(pic)));
     };
@@ -187,17 +178,17 @@ export default class SubAgents extends View {
         .role("button").accessibility_label(waking ? `Reviving ${r.title}` : `Revive ${r.title}`)
         .child(div().flex_1().min_w(0).truncate().text_color(t.muted).child(r.title))
         .child(waking
-          ? h_flex().flex_none().gap(4).items_center().text_size(11).text_color(t.muted)
+          ? h_flex().flex_none().gap(4).items_center().text_size(12).text_color(t.muted)
             .child(svg("mods/workspace-chrome/spinner.svg").size(11).flex_none().text_color(t.muted).spin(900)).child("Reviving…")
-          : h_flex().flex_none().gap(4).items_center().text_size(11).text_color(t.dim)
+          : h_flex().flex_none().gap(4).items_center().text_size(12).text_color(t.muted)
             .child(svg("mods/panda-focus/moon.svg").size(11).flex_none().text_color(t.dim)).child(ago(r.at, now)))
         .when(Boolean(pic), (el) => el.child(pic));
     };
     // The keys, under the rows: a cap per key, p's lit while the picked row has a PR to open.
-    const cap = (key, lit) => div().px(4).rounded(3).text_size(10).bg(lit ? t.accent : t.raised).text_color(lit ? t.background : t.muted).child(key);
-    const hint = (keys, label, lit = false) => h_flex().flex_none().gap(3).items_center().text_color(lit ? t.foreground : t.dim)
+    const cap = (key, lit) => div().px(4).rounded(3).text_size(11).bg(lit ? t.accent : t.raised).text_color(lit ? t.background : t.muted).child(key);
+    const hint = (keys, label, lit = false) => h_flex().flex_none().gap(3).items_center().text_color(lit ? t.foreground : t.muted)
       .children(keys.map((x) => cap(x, lit))).child(label);
-    const footer = h_flex().flex_none().h(FOOT - 2).mt(2).pt(3).px(8).gap(10).items_center().border_t(1).border_color(t.border).text_size(11)
+    const footer = h_flex().flex_none().h(FOOT - 2).mt(2).pt(3).px(8).gap(10).items_center().border_t(1).border_color(t.border).text_size(12)
       .child(hint(["j", "k"], "move")).child(hint(["↵"], "peek")).child(hint(["p"], "open PR", Boolean(items[this.at]?.pr)))
       .child(hint(["esc"], "close"));
     return v_flex().id("subagents-root").track_focus(this.keys).size_full().p(6).text_size(13).bg(t.popover)
@@ -212,7 +203,7 @@ export default class SubAgents extends View {
         cx.stop_propagation();
         cx.notify();
       })
-      .when(items.length === 0, (el) => el.child(div().p(8).text_color(t.dim).child(filter ? "No agents." : "No workers.")))
+      .when(items.length === 0, (el) => el.child(div().p(8).text_color(t.muted).child(filter ? "No agents." : "No workers.")))
       // A popup takes its content's height and a virtual list has none of its own: state it, capped as openers
       // cap the popup (360 less the 12px padding and the footer).
       .when(items.length > 0, (el) => el.child(div().relative().flex_none().h(Math.min(348 - FOOT, items.reduce((s, x) => s + x.h, 0)))

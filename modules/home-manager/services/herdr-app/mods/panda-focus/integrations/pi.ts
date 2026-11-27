@@ -3,9 +3,11 @@
 // so panda-focus can bring it back after a reboot. Runs again on /new and /resume. Does nothing outside herdr-core.
 // After a compaction, a terminal labelled `orch-context=<script>` (an orchestrator or worker) also
 // gets that script's output back in context on its next turn, since compaction summarizes the session's state away.
+// A script that is missing or not executable is named instead.
 // @ts-nocheck
 
 import { execFile } from "node:child_process";
+import { accessSync, constants, statSync } from "node:fs";
 import { homedir } from "node:os";
 
 const run = (file, args, env) =>
@@ -45,7 +47,17 @@ export default function (pi) {
       return;
     }
     if (!script) return;
-    const content = (await run(script, [], env)).trim();
+    let runnable = true;
+    try {
+      // A directory passes X_OK too: only a runnable file counts.
+      if (!statSync(script).isFile()) throw new Error("not a file");
+      accessSync(script, constants.X_OK);
+    } catch {
+      runnable = false;
+    }
+    const content = runnable
+      ? (await run(script, [], env)).trim()
+      : `Orchestrator context script missing: ${script}. Run status.sh --live before acting.`;
     if (content) return { message: { customType: "herdr-orchestrator-state", content, display: false } };
   });
 }
