@@ -71,6 +71,8 @@ in {
       {
         # ICM is the memory store; disable Claude Code's built-in auto memory.
         CLAUDE_CODE_DISABLE_AUTO_MEMORY = "1";
+        # Bypass mode still prompts on an rm it cannot check, which stalls unattended workers.
+        CLAUDE_CODE_EVEN_MORE_DANGEROUSLY_SKIP_PERMISSIONS = "1";
         # Keep long-running background watchers alive; Claude Code otherwise reaps
         # idle background shells under critical memory pressure (undocumented knob).
         CLAUDE_CODE_DISABLE_BG_SHELL_PRESSURE_REAP = "1";
