@@ -1,0 +1,8 @@
+{
+  "place": "none",
+  "title": "Beads",
+  "focusable": true,
+  "palette": [
+    { "title": "Beads board", "command": "tab.new", "args": { "mod": "beads", "name": "Beads" }, "words": "beads sessions epics tasks dependencies blocks graph" }
+  ]
+}

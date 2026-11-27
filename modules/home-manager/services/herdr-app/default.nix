@@ -171,6 +171,8 @@ in {
       panda-subagents = "${./mods}/panda-subagents";
       # Agents panel: the focused agent's workers and their beads as a tree, in herdr-panda's right panel.
       fleet = "${./mods}/fleet";
+      # Beads board: open session epics, a session's blocks graph, and each bead's remote, local and session facts (a tab).
+      beads = "${./mods}/beads";
       # Herdr's `spaces` mod with the repo/branch on its own line.
       panda-spaces = "${./mods}/panda-spaces";
       # panda-spaces' right-click menu on a worktree without a space.
