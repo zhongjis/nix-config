@@ -1,6 +1,7 @@
 // Loaded per launch: inside Herdr terminals the `pi` shim passes this file with `-e`.
 // Labels this Pi's herdr-core terminal with the line that resumes its session (`resume=pi --session <id>`),
 // so panda-focus can bring it back after a reboot. Runs again on /new and /resume. Does nothing outside herdr-core.
+// It also labels the current model (`model=<provider>/<id>`), refreshed on every model switch.
 // After a compaction, a terminal labelled `orch-context=<script>` (an orchestrator or worker) also
 // gets that script's output back in context on its next turn, since compaction summarizes the session's state away.
 // A script that is missing or not executable is named instead.
@@ -30,6 +31,16 @@ export default function (pi) {
     if (typeof id === "string" && id) execFile("hc", ["label", terminal, `resume=pi --session ${id}`], { env }, (error) => {
       if (error) ctx.ui?.notify?.(`Herdr can't resume this session after a reboot: ${error.message}`, "warning");
     });
+    labelModel(ctx?.model);
+  });
+
+  // Best effort: `model=<provider>/<id>` lets an orchestrator read this Pi's model family without the screen.
+  // Restoring a session fires no model_select, so session_start labels the restored model too.
+  const labelModel = (model) => {
+    if (model?.provider && model?.id) execFile("hc", ["label", terminal, `model=${model.provider}/${model.id}`], { env }, () => {});
+  };
+  pi.on("model_select", (event, ctx) => {
+    if (ctx?.mode === "tui") labelModel(event?.model);
   });
 
   // Best effort: a missing label, script or hc only loses the reminder.

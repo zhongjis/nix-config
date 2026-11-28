@@ -1,5 +1,6 @@
 // panda-focus session integrations: after a compaction, an orchestrator terminal (label `orch-context=<script>`)
-// gets the script's output back in context; every other session start only sets the resume label. Codex sets it
+// gets the script's output back in context; every other session start only sets the resume label (Claude and Pi also
+// label the model, Pi again on every model switch). Codex sets it
 // only from the terminal's own foreground Codex; agy does too. Copilot skips sub-agents, as Claude does.
 // Run: nix shell nixpkgs#nodejs nixpkgs#jq --command node --test modules/home-manager/services/herdr-app/tests/session-integrations.mjs
 import assert from "node:assert/strict";
@@ -34,6 +35,15 @@ test("claude: compaction on an orchestrator terminal injects the script output",
   assert.equal(out.hookSpecificOutput.hookEventName, "SessionStart");
   assert.equal(out.hookSpecificOutput.additionalContext, "state for t1");
   assert.match(f.calls(), /label t1 resume=claude --resume abc-123/);
+});
+
+test("claude: a session start labels the model it reports", () => {
+  const f = fixture(false);
+  execFileSync("sh", [join(dir, "claude.sh")], { env: f.env, input: JSON.stringify({ session_id: "abc-123", source: "startup", model: "claude-opus-5-5" }) });
+  assert.match(f.calls(), /label t1 model=claude-opus-5-5/);
+  const g = fixture(false);
+  claude(g, "startup");
+  assert.doesNotMatch(g.calls(), /model=/);
 });
 
 test("claude: startup prints nothing, a compaction without the label too", () => {
@@ -156,6 +166,29 @@ test("pi: a missing script is named in the message after a compaction", async ()
     writeFileSync(join(f.root, "labels.json"), JSON.stringify({ labels: { "orch-context": folder } }));
     handlers.session_compact();
     assert.deepEqual(await handlers.before_agent_start(), { message: { customType: "herdr-orchestrator-state", content: MISSING(folder), display: false } });
+  } finally {
+    process.env = saved;
+  }
+});
+
+test("pi: session start and every model switch label the model", async () => {
+  const f = fixture(false);
+  const saved = { ...process.env };
+  Object.assign(process.env, f.env);
+  const handlers = {};
+  try {
+    const { default: init } = await import(`${pathToFileURL(join(dir, "pi.ts")).href}?${Date.now()}c`);
+    init({ on: (event, fn) => { handlers[event] = fn; } });
+    const ctx = { mode: "tui", sessionManager: { getSessionId: () => "s-1" }, model: { provider: "openai", id: "gpt-6" } };
+    handlers.session_start({}, ctx);
+    handlers.model_select({ model: { provider: "google", id: "gemini-3" } }, ctx);
+    handlers.model_select({ model: { provider: "google", id: "gemini-4" } }, { mode: "rpc" });
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    const calls = f.calls();
+    assert.match(calls, /label t1 resume=pi --session s-1/);
+    assert.match(calls, /label t1 model=openai\/gpt-6/);
+    assert.match(calls, /label t1 model=google\/gemini-3/);
+    assert.doesNotMatch(calls, /gemini-4/);
   } finally {
     process.env = saved;
   }

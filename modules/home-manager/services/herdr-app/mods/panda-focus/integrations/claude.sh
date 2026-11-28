@@ -19,8 +19,12 @@ hc label "$HC_TERMINAL_ID" "resume=claude --resume $id" >/dev/null || {
 }
 
 # Best effort from here: a missing jq or label only loses the reminder; a label naming a missing script says so.
-case "$input" in *'"source"'*'"compact"'*) ;; *) exit 0 ;; esac
 command -v jq >/dev/null || exit 0
+# `model=<id>` lets an orchestrator read this Claude's model without the screen; a /model switch
+# mid-session fires no SessionStart, so the label holds the model the session started or resumed with.
+model=$(printf '%s' "$input" | jq -r '.model | if type == "string" then . elif type == "object" then (.id // empty) else empty end' 2>/dev/null)
+[ -z "$model" ] || hc label "$HC_TERMINAL_ID" "model=$model" >/dev/null 2>&1 || :
+case "$input" in *'"source"'*'"compact"'*) ;; *) exit 0 ;; esac
 script=$(hc get "$HC_TERMINAL_ID" --json 2>/dev/null | jq -r '.labels["orch-context"] // empty' 2>/dev/null)
 [ -n "$script" ] || exit 0
 # A directory is "executable" too: only a runnable file counts.
